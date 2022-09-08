@@ -104,12 +104,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../3d_model_viewer_platform/lib/glfw-3.3.8.bin.WIN64/include;../3d_model_viewer_platform/lib/glm;../3d_model_viewer_platform/lib\gkew-2.1.0/include;../3d_model_viewer_platform/lib/FreeImage-3170;/Source;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../3d_model_viewer_platform/lib/glfw-3.3.8.bin.WIN64/lib-vc2022;../3d_model_viewer_platform/lib/glew-2.1.0/lib/Release/x64/;../3d_model_viewer_platform/lib/FreeImage-3170/lib/x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\lib\Release\x64;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\lib-vc2022</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;kernel32.lib;winspool.lib;comdlg32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -120,12 +121,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\lib\Release\x64;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\lib-vc2022</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;kernel32.lib;winspool.lib;comdlg32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

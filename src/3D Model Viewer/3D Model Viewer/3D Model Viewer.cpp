@@ -1,5 +1,10 @@
 // 3D Model Viewer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+// Framework created by: George Mavroeidis
+// 
+// Date created on on 09/08/2022.
+// 
+// All dependencies and libraries used listed on README.md
 
 #include <iostream>
 
