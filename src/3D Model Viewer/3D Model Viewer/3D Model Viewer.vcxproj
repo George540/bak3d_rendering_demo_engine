@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glew-2.1.0\include;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,10 +134,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\Tools\glad.c" />
+    <ClCompile Include="src\Tools\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OBJloader.h" />
-    <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\Tools\OBJloader.h" />
+    <ClInclude Include="include\Tools\shader.h" />
+    <ClInclude Include="include\Tools\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
