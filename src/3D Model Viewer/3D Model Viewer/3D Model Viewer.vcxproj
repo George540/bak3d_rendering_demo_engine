@@ -104,11 +104,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../3d_model_viewer_platform/lib/glfw-3.3.8.bin.WIN64/include;../3d_model_viewer_platform/lib/glm;../3d_model_viewer_platform/lib\gkew-2.1.0/include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3d_model_viewer_platform/lib/glfw-3.3.8.bin.WIN64/include;../3d_model_viewer_platform/lib/glm;../3d_model_viewer_platform/lib\gkew-2.1.0/include;../3d_model_viewer_platform/lib/FreeImage-3170;/Source;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../3d_model_viewer_platform/lib/glfw-3.3.8.bin.WIN64/lib-vc2022;../3d_model_viewer_platform/lib/glew-2.1.0/lib/Release/x64/;../3d_model_viewer_platform/lib/FreeImage-3170/lib/x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
