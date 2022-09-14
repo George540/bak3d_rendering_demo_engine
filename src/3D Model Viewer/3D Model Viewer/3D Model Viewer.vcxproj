@@ -146,6 +146,7 @@
     <ClCompile Include="src\Tools\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\object.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\Tools\OBJloader.h" />
     <ClInclude Include="include\Tools\shader.h" />

@@ -56,5 +56,8 @@
     <ClInclude Include="src\event_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
