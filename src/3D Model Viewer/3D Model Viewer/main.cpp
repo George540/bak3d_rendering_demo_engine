@@ -8,9 +8,34 @@
 
 #include <iostream>
 
+#include "renderer.h"
+#include "src/event_manager.h"
+
 int main()
 {
     std::cout << "Hello World!\n";
+
+    EventManager::initialize();
+    Renderer::initialize();
+
+    do
+    {
+        // Update Event Manager - Frame time / input / events processing 
+        EventManager::update();
+
+        // Update World
+        const float dt = EventManager::get_frame_time();
+
+        Renderer::begin_frame();
+        Renderer::end_frame();
+
+
+    } while (EventManager::is_exit_requested() == false);
+
+    Renderer::shutdown();
+    EventManager::shutdown();
+
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -13,14 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Tools">
-      <UniqueIdentifier>{be5296fb-81df-446a-8427-655e0b3eef4f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\src">
       <UniqueIdentifier>{8c3400d9-3b8e-4c50-8417-6e265c15b8d6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Tools">
       <UniqueIdentifier>{2544c7ec-8c18-47d6-962f-42a4c4596438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tools">
+      <UniqueIdentifier>{be5296fb-81df-446a-8427-655e0b3eef4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +29,12 @@
     </ClCompile>
     <ClCompile Include="src\Tools\shader.cpp">
       <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event_manager.cpp">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="src\Tools\glad.c">
       <Filter>Source Files\Tools</Filter>
@@ -43,6 +49,12 @@
     </ClInclude>
     <ClInclude Include="include\Tools\shader.h">
       <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event_manager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

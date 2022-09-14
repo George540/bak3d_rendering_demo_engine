@@ -1,8 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
-
-#include <glad.h>
 #include <string>
+#include <glad/glad.h> 
+
+using namespace std;
 
 class Shader
 {

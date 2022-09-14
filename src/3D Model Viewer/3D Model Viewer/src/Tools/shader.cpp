@@ -3,9 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <glad.h>
-
-using namespace std;
 
 Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
 {
@@ -44,7 +41,7 @@ Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
     const char* fShaderCode = fragmentCode.c_str();
 
     // 2. compile shaders
-    unsigned int vertex, fragment;
+    GLuint vertex, fragment;
 
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
