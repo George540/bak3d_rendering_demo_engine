@@ -10,6 +10,7 @@
 
 #include "renderer.h"
 #include "src/event_manager.h"
+#include "scene.h"
 
 int main()
 {
@@ -18,6 +19,8 @@ int main()
     EventManager::initialize();
     Renderer::initialize();
 
+    auto world = World();
+
     do
     {
         // Update Event Manager - Frame time / input / events processing 
@@ -25,11 +28,9 @@ int main()
 
         // Update World
         const float dt = EventManager::get_frame_time();
+        world.update(dt);
 
-        Renderer::begin_frame();
-        Renderer::end_frame();
-
-
+        world.draw();
     } while (EventManager::is_exit_requested() == false);
 
     Renderer::shutdown();

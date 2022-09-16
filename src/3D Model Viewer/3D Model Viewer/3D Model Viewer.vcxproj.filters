@@ -39,6 +39,9 @@
     <ClCompile Include="src\Tools\glad.c">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\scene.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\OBJloader.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

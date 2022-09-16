@@ -16,6 +16,7 @@ class Object
 public:
 	Object();
 	Object(glm::vec3& position, glm::vec3& scale, glm::vec4& color);
+	~Object();
 };
 
 #endif
