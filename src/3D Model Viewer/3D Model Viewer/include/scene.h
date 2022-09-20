@@ -4,6 +4,8 @@
 #include <glm/fwd.hpp>
 #include <glad.h>
 
+#include "object.h"
+
 class World
 {
 public:
@@ -26,6 +28,8 @@ public:
 	void set_world_matrix(int shader_program, glm::mat4 world_matrix);
 private:
 	static World* instance;
+
+	Object* m_object;
 	//Camera* m_Camera;
 };
 

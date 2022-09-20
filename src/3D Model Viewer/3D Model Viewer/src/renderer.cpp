@@ -54,6 +54,7 @@ void Renderer::begin_frame()
 void Renderer::end_frame()
 {
 	// Swap buffers
+	glDisable(GL_DEPTH_TEST);
 	glfwSwapBuffers(r_window);
 	glfwPollEvents();
 }
