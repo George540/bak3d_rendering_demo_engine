@@ -10,11 +10,10 @@
 
 #include <string>
 #include <vector>
-using namespace std;
 
 #define MAX_BONE_INFLUENCE 4
 
-struct Vertex {
+struct vertex {
     // position
     glm::vec3 position;
     // normal
@@ -31,7 +30,7 @@ struct Vertex {
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
-struct Texture {
+struct texture {
     unsigned int id;
     string type;
     string path;
@@ -41,17 +40,17 @@ class Mesh
 {
 public:
     // mesh Data
-    vector<Vertex>       vertices;
+    vector<vertex>       vertices;
     vector<unsigned int> indices;
-    vector<Texture>      textures;
-    unsigned int vao;
+    vector<texture>      textures;
+    unsigned int m_vao;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
-    void draw(Shader& shader); // render the mesh
+    Mesh(vector<vertex> vertices, vector<unsigned int> indices, vector<texture> textures);
+    void draw(const Shader& shader) const; // render the mesh
 private:
     // render data 
-    unsigned int vbo, ebo;
+    unsigned int m_vbo, m_ebo;
     void set_up_mesh();
 };
 

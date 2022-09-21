@@ -1,5 +1,4 @@
 #include "object.h"
-#include "OBJloader.h"
 
 #include <iostream>
 #include <vector>
@@ -47,7 +46,7 @@ void Object::set_up_model_buffer(std::string path, GLuint& vertex_count)
 	vector<glm::vec2> uvs;
 
 	//read the vertex data from the model's OBJ file
-	loadOBJ(path.c_str(), vertices, normals, uvs);
+	//loadOBJ(path.c_str(), vertices, normals, uvs);
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -79,7 +78,7 @@ void Object::set_up_model_buffer(std::string path, GLuint& vertex_count)
 
 	glBindVertexArray(0);
 	m_vao = vao;
-	vertex_count = vertices.size();
+	vertex_count = static_cast<GLuint>(vertices.size());
 }
 
 void Object::draw()

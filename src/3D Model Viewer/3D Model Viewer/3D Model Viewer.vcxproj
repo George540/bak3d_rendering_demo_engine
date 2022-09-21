@@ -150,10 +150,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\mesh.h" />
+    <ClInclude Include="include\model.h" />
     <ClInclude Include="include\object.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
-    <ClInclude Include="include\Tools\OBJloader.h" />
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="src\event_manager.h" />
