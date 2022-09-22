@@ -1,11 +1,11 @@
 #include "mesh.h"
 
-struct vertex;
+#include <utility>
 
 Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<texture> textures) :
-    vertices(vertices),
-    indices(indices),
-    textures(textures)
+    vertices(std::move(vertices)),
+    indices(std::move(indices)),
+    textures(std::move(textures))
 {
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     set_up_mesh();
