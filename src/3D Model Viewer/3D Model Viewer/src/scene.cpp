@@ -3,7 +3,7 @@
 
 #include "scene.h"
 #include "renderer.h"
-#include "object.h"
+#include "model.h"
 #include <glm/gtc/type_ptr.hpp>
 
 
@@ -18,7 +18,8 @@ World::World()
 	// Camera Setup
 
 	// Object set up
-	m_object = new Object();
+	auto path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/untitled.obj";
+	m_object = new Model(FileSystem::getPath(path));
 }
 
 World::~World()

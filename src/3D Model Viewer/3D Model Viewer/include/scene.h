@@ -4,7 +4,7 @@
 #include <glm/fwd.hpp>
 #include <glad.h>
 
-#include "object.h"
+#include "model.h"
 
 class World
 {

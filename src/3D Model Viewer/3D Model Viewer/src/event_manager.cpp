@@ -77,8 +77,19 @@ void EventManager::shutdown()
 
 void EventManager::update()
 {
+	// Update inputs / events
+	glfwPollEvents();
+
+	// Update mouse positions
+	double x, y;
+	glfwGetCursorPos(m_window, &x, &y);
+	mouse_delta_x = static_cast<float>(x - last_mouse_position_x);
+	mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
+	last_mouse_position_x = x;
+	last_mouse_position_y = y;
+
 	// Update frame time
-	double current_time = glfwGetTime();
+	const double current_time = glfwGetTime();
 	frame_time = static_cast<float>(current_time - last_frame_time);
 	last_frame_time = current_time;
 }
@@ -96,4 +107,31 @@ bool EventManager::is_exit_requested()
 GLFWwindow* EventManager::get_window()
 {
 	return m_window;
+}
+
+float EventManager::get_mouse_motion_x()
+{
+	return mouse_delta_x;
+}
+
+float EventManager::get_mouse_motion_y()
+{
+	return mouse_delta_y;
+}
+
+void EventManager::enable_mouse_cursor()
+{
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void EventManager::disable_mouse_cursor()
+{
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+float EventManager::get_random_float(float min, float max)
+{
+	const auto value = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);  // NOLINT(concurrency-mt-unsafe)
+
+	return min + value * (max - min);
 }

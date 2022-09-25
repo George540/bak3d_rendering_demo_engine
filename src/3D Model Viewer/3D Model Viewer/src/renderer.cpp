@@ -5,6 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "stb_image.h"
+
 
 using namespace std;
 
@@ -21,6 +23,9 @@ void Renderer::initialize()
         std::cerr << "Failed to initialize GLAD" << std::endl;
         exit(-1);
     }    
+
+	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+	stbi_set_flip_vertically_on_load(true);
 
 	// Somehow, glewInit triggers a glInvalidEnum... Let's ignore it
 	glGetError();
