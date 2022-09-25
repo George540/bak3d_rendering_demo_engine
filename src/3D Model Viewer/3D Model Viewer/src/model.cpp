@@ -1,18 +1,17 @@
 #include "model.h"
 #include <assimp/postprocess.h>
-#include "stb_image.h"
+#define STB_IMAGE_IMPLEMENTATION    
+#include "Tools/stb_image.h"
 
 #include <iostream>
 #include <ostream>
-
-unsigned int texture_from_file(const char* path, const string& directory, bool gamma = false);
 
 Model::Model(string const& path, bool gamma) : gamma_correction(gamma)
 {
 	load_model(path);
 }
 
-void Model::draw(Shader& shader)
+void Model::draw(const Shader& shader) const
 {
 	for (auto& mesh : meshes)
 	{
@@ -201,18 +200,18 @@ unsigned int texture_from_file(const char* path, const string& directory, bool g
 		GLenum format;
 		switch (nr_components)
 		{
-			case 1:
-				format = GL_RED;
-				break;
-			case 3:
-				format = GL_RGB;
-				break;
-			case 4:
-				format = GL_RGBA;
-				break;
-			default:
-				format = GL_RGB;
-				break;
+		case 1:
+			format = GL_RED;
+			break;
+		case 3:
+			format = GL_RGB;
+			break;
+		case 4:
+			format = GL_RGBA;
+			break;
+		default:
+			format = GL_RGB;
+			break;
 		}
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);

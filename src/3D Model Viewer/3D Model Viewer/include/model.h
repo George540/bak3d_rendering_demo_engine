@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+unsigned int texture_from_file(const char* path, const string& directory, bool gamma = false);
+
 class Model
 {
 public:
@@ -21,7 +23,7 @@ public:
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, bool gamma = false);
 
-    void draw(Shader& shader); // draws the model, and thus all its meshes
+    void draw(const Shader& shader) const; // draws the model, and thus all its meshes
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void load_model(string const& path);
