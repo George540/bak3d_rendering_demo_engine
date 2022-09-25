@@ -1,14 +1,23 @@
 #include "event_manager.h"
-#include "renderer.h"
-
-#include <GLFW/glfw3.h>
+//#include "renderer.h"
 
 #include <iostream>
+#include <GLFW/glfw3.h>
 
 using namespace std;
 
+// Time
 double EventManager::last_frame_time = glfwGetTime();
 float EventManager::frame_time = 0.0f;
+
+// Mouse
+double EventManager::last_mouse_position_x = 0.0;
+double EventManager::last_mouse_position_y = 0.0;
+float EventManager::mouse_delta_x = 0.0;
+float EventManager::mouse_delta_y = 0.0;
+int EventManager::last_mouse_left_state = GLFW_RELEASE;
+int EventManager::last_mouse_right_state = GLFW_RELEASE;
+int EventManager::last_mouse_middle_state = GLFW_RELEASE;
 
 GLFWwindow* EventManager::m_window = nullptr;
 
@@ -83,8 +92,15 @@ void EventManager::update()
 	// Update mouse positions
 	double x, y;
 	glfwGetCursorPos(m_window, &x, &y);
-	mouse_delta_x = static_cast<float>(x - last_mouse_position_x);
-	mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
+	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	{
+		mouse_delta_x = static_cast<float>(x - last_mouse_position_x);
+	}
+	if (last_mouse_left_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
+	}
+
 	last_mouse_position_x = x;
 	last_mouse_position_y = y;
 

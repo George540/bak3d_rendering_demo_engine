@@ -1,6 +1,8 @@
 #ifndef EVENT_MANAGER_H
 #define EVENT_MANAGER_H
 
+#include <GLFW/glfw3.h>
+
 struct GLFWwindow;
 
 class EventManager
@@ -14,9 +16,12 @@ class EventManager
 
 	// Mouse
 	static double last_mouse_position_x;
-	static float  mouse_delta_x;
+	static float mouse_delta_x;
 	static double last_mouse_position_y;
-	static float  mouse_delta_y;
+	static float mouse_delta_y;
+	static int last_mouse_left_state;
+	static int last_mouse_right_state;
+	static int last_mouse_middle_state;
 public:
 	static void initialize();
 	static void shutdown();

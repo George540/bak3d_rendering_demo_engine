@@ -21,6 +21,7 @@ private:
 	glm::vec3 m_cam_up; // up vector
 
 	float m_cam_speed;
+	float m_angular_speed{};
 	float m_horizontal_angle; // horizontal angle
 	float m_vertical_angle;   // vertical angle
 	float m_zoom;

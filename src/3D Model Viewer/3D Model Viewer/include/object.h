@@ -22,6 +22,7 @@ public:
 	void draw();
 	void set_up_model_buffer(std::string path, GLuint& vertex_count);
 	void update_world_matrix();
+	void build_test_object(GLuint& vertex_count);
 };
 
 #endif

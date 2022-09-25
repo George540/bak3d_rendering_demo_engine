@@ -15,7 +15,8 @@ Object::Object()
 
 	cout << "Setting up object..." << endl;
 	auto path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/untitled.obj";
-	set_up_model_buffer(path, m_num_of_vertices);
+	//set_up_model_buffer(path, m_num_of_vertices);
+	build_test_object(m_num_of_vertices);
 
 	cout << "Object with default settings spawned." << endl;
 }
@@ -27,7 +28,8 @@ Object::Object(glm::vec3& position, glm::vec3& scale) :
 	m_vao = NULL;
 
 	auto path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/untitled.obj";
-	set_up_model_buffer(path, m_num_of_vertices);
+	//set_up_model_buffer(path, m_num_of_vertices);
+	build_test_object(m_num_of_vertices);
 
 	cout << "Object spawned." << endl;
 }
@@ -101,4 +103,77 @@ void Object::update_world_matrix()
 {
 	auto model = glm::mat4(1.0f);
 	m_world_transformation_matrix = translate(model, m_position) * rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * scale(model, m_scaling);
+}
+
+void Object::build_test_object(GLuint& vertex_count)
+{
+	//cube model
+	const float vertices[] = {
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+	};
+
+	// Create a vertex array
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
+	// Upload Vertex Buffer to the GPU, keep a reference to it (mVertexBufferID)
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+
+	// texture coord attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	m_vao = lightVAO;
+	vertex_count = static_cast<GLuint>(36);
 }
