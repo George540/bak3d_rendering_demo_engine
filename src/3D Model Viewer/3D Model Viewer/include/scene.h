@@ -4,7 +4,8 @@
 #include <glm/fwd.hpp>
 #include <glad.h>
 
-#include "object.h"
+#include "model.h"
+#include "camera.h"
 
 class World
 {
@@ -29,8 +30,8 @@ public:
 private:
 	static World* instance;
 
-	Object* m_object;
-	//Camera* m_Camera;
+	Model* m_object;
+	Camera* m_camera;
 };
 
 #endif
