@@ -13,14 +13,20 @@ Model::Model(string const& path, bool gamma) : gamma_correction(gamma)
 
 void Model::draw(const Shader& shader) const
 {
+	cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
+		cout << "Drawing mesh VAO: " << std::to_string(mesh.m_vao) << endl;
 		mesh.draw(shader);
+		cout << "Drew mesh VAO: " << std::to_string(mesh.m_vao) << endl;
 	}
 }
 
 void Model::load_model(string const& path)
 {
+	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model)
+	stbi_set_flip_vertically_on_load(true);
+
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -166,11 +172,11 @@ vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType typ
 		mat->GetTexture(type, i, &str);
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
-		for (auto& j : textures_loaded)
+		for (auto& text_loaded : textures_loaded)
 		{
-			if (std::strcmp(j.path.data(), str.C_Str()) == 0)
+			if (std::strcmp(text_loaded.path.data(), str.C_Str()) == 0)
 			{
-				textures.push_back(j);
+				textures.push_back(text_loaded);
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
 				break;
 			}

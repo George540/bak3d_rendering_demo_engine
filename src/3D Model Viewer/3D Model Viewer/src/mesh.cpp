@@ -35,17 +35,28 @@ void Mesh::draw(const Shader& shader) const
         {
             number = std::to_string(specular_nr++);
         }
+        else if (name == "texture_normal")
+        {
+            number = std::to_string(normal_nr++);
+        }
+        else if (name == "texture_height")
+        {
+            number = std::to_string(height_nr++);
+        }
 
-        shader.set_int(("material." + name + number).c_str(), i);
+        // now set the sampler to the correct texture unit
+        glUniform1i(glGetUniformLocation(shader.get_id(), (name + number).c_str()), i);
+        // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
-
-    glActiveTexture(GL_TEXTURE0);
 
     // draw mesh
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+
+    // always good practice to set everything back to defaults once configured.
+    glActiveTexture(GL_TEXTURE0);
 }
 
 void Mesh::set_up_mesh()
