@@ -142,6 +142,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\event_manager.cpp" />
+    <ClCompile Include="src\light.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\object.cpp" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\light.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\model.h" />
     <ClInclude Include="include\object.h" />
@@ -160,6 +162,14 @@
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="src\event_manager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Assets\Shaders\1.model_loading.fs" />
+    <None Include="..\..\..\Assets\Shaders\1.model_loading.vs" />
+    <None Include="..\..\..\Assets\Shaders\LightShader.fs" />
+    <None Include="..\..\..\Assets\Shaders\LightShader.vs" />
+    <None Include="..\..\..\Assets\Shaders\MainShader.fs" />
+    <None Include="..\..\..\Assets\Shaders\MainShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

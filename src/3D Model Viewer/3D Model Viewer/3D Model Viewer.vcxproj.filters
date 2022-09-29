@@ -22,6 +22,9 @@
     <Filter Include="Header Files\Tools">
       <UniqueIdentifier>{be5296fb-81df-446a-8427-655e0b3eef4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{6ed5bcdb-c72a-4bab-945f-610820a0d6cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -54,6 +57,9 @@
     <ClCompile Include="src\camera.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\light.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -83,5 +89,28 @@
     <ClInclude Include="include\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Assets\Shaders\1.model_loading.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\1.model_loading.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\LightShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\LightShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\MainShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\MainShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

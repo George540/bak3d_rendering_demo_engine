@@ -6,6 +6,7 @@
 
 #include "model.h"
 #include "camera.h"
+#include "light.h"
 
 class World
 {
@@ -32,6 +33,7 @@ private:
 
 	Model* m_object;
 	Camera* m_camera;
+	Light* m_light;
 };
 
 #endif

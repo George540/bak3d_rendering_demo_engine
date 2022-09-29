@@ -13,12 +13,11 @@ Model::Model(string const& path, bool gamma) : gamma_correction(gamma)
 
 void Model::draw(const Shader& shader) const
 {
-	cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
+	//cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
-		cout << "Drawing mesh VAO: " << std::to_string(mesh.m_vao) << endl;
 		mesh.draw(shader);
-		cout << "Drew mesh VAO: " << std::to_string(mesh.m_vao) << endl;
+		//cout << "Drew mesh VAO: " << std::to_string(mesh.m_vao) << endl;
 	}
 }
 

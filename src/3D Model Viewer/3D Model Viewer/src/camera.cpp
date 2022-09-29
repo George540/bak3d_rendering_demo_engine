@@ -45,6 +45,8 @@ void Camera::update(float dt)
 	m_lookat = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
 	auto side_vector = glm::cross(m_lookat, m_cam_up);
 	glm::normalize(side_vector);
+
+	//std::cout << "Position X: " <<m_horizontal_angle << std::endl << std::flush;
 }
 
 glm::mat4 Camera::get_view_matrix() const

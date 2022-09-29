@@ -100,6 +100,7 @@ void EventManager::update()
 	{
 		mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
 	}
+	//mouse_delta_x += 1;
 
 	last_mouse_position_x = x;
 	last_mouse_position_y = y;
