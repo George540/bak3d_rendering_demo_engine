@@ -22,11 +22,11 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, 
 void Camera::update(float dt)
 {
 	// Prevent from having the camera move only when the cursor is within the windows
-	EventManager::disable_mouse_cursor();
+	EventManager::enable_mouse_cursor();
 
 	// Mouse motion to get the variation in angle
-	m_horizontal_angle -= EventManager::get_mouse_motion_x() * m_angular_speed * dt;
-	m_vertical_angle -= EventManager::get_mouse_motion_y() * m_angular_speed * dt;
+	m_horizontal_angle -= EventManager::get_mouse_motion_x() * m_cam_speed * dt;
+	m_vertical_angle -= EventManager::get_mouse_motion_y() * m_cam_speed * dt;
 
 	// Clamp vertical angle to [-85, 85] degrees
 	m_vertical_angle = std::max(-85.0f, std::min(85.0f, m_vertical_angle));
@@ -46,7 +46,7 @@ void Camera::update(float dt)
 	auto side_vector = glm::cross(m_lookat, m_cam_up);
 	glm::normalize(side_vector);
 
-	//std::cout << "Position X: " <<m_horizontal_angle << std::endl << std::flush;
+	//std::cout << "Position X: " << m_horizontal_angle << std::endl << std::flush;
 }
 
 glm::mat4 Camera::get_view_matrix() const

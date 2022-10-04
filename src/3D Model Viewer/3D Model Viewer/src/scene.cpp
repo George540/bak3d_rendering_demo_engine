@@ -16,12 +16,13 @@ World::World()
 	instance = this;
 
 	// Camera Setup
-	m_camera = new Camera(glm::vec3(0.0f, 1.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, -30.0f, 45.0f);
+	m_camera = new Camera(glm::vec3(0.0f, 1.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 5.0f, 0.0f, -30.0f, 45.0f);
 
 	// Object set up
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
 	m_object = new Model(model_path);
 	//m_object = new Object();
+	cout << "Model with path " << model_path << " has been spawned." << endl;
 
 	m_light = new Light(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -30,6 +31,7 @@ World::World()
 	ourShader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
+	cout << "Shader with path " << shader_path << " has been loaded." << endl;
 }
 
 World::~World()

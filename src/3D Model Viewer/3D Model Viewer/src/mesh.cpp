@@ -1,14 +1,17 @@
 #include "mesh.h"
 
+#include <iostream>
 #include <utility>
 
 Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<texture> textures) :
-    vertices(std::move(vertices)),
-    indices(std::move(indices)),
-    textures(std::move(textures))
+	vertices(std::move(vertices)),
+	indices(std::move(indices)),
+	textures(std::move(textures)),
+	m_vao(0)
 {
-    // now that we have all the required data, set the vertex buffers and its attribute pointers.
-    set_up_mesh();
+	// now that we have all the required data, set the vertex buffers and its attribute pointers.
+	set_up_mesh();
+	cout << "Mesh with VAO " << m_vao << " has been spawned." << endl;
 }
 
 void Mesh::draw(const Shader& shader) const

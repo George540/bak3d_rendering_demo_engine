@@ -95,10 +95,12 @@ void EventManager::update()
 	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
 		mouse_delta_x = static_cast<float>(x - last_mouse_position_x);
+		//cout << "Moving mouse on X: " << x << endl;
 	}
 	if (last_mouse_left_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
+		//cout << "Moving mouse on Y: " << y << endl;
 	}
 	//mouse_delta_x += 1;
 
