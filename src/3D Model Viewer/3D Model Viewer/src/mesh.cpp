@@ -11,7 +11,7 @@ Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<texture> te
 {
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	set_up_mesh();
-	cout << "Mesh with VAO " << m_vao << " has been spawned." << endl;
+	//cout << "Mesh with VAO " << m_vao << " has been spawned." << endl;
 }
 
 void Mesh::draw(const Shader& shader) const

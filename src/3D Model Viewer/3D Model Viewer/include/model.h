@@ -18,6 +18,7 @@ public:
     std::vector<texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     std::vector<Mesh> meshes; // a model is made out of one or more meshes
     std::string directory;
+    std::string m_name;
     bool gamma_correction;
 
     // constructor, expects a filepath to a 3D model.

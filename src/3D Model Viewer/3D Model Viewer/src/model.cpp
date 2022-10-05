@@ -41,6 +41,8 @@ void Model::load_model(string const& path)
 
 	// retrieve the directory path of the filepath
 	directory = path.substr(0, path.find_last_of('/'));
+	m_name = path.substr(path.find_last_of('/') + 1, path.size());
+	cout << "Loading model named: " << m_name << endl;
 
 	// process ASSIMP's root node recursively
 	process_node(scene->mRootNode, scene);
@@ -58,6 +60,8 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh * mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(process_mesh(mesh, scene));
+
+		cout << "Processed " << node->mNumMeshes << " meshes at node " << i << endl;
 	}
 
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
@@ -125,6 +129,8 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 
 		vertices.push_back(vertex);
 	}
+
+	cout << "Processed mesh " << mesh->mName.C_Str() << " with " << mesh->mNumVertices << " vertices" << endl;
 
 	// now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
