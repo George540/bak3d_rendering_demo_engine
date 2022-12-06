@@ -22,6 +22,7 @@ Light::Light(glm::vec3 position, glm::vec3 scaling) :
 	mShader = LoadShader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.fs");
+	std::cout << "Light created..." << std::endl;
 }
 
 Light::~Light()

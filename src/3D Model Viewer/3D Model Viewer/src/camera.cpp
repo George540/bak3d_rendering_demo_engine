@@ -46,7 +46,7 @@ void Camera::update(float dt)
 	auto side_vector = glm::cross(m_lookat, m_cam_up);
 	glm::normalize(side_vector);
 
-	//std::cout << "Position X: " << m_horizontal_angle << std::endl << std::flush;
+	//std::cout << "Position X: " << m_horizontal_angle << std::endl;
 }
 
 glm::mat4 Camera::get_view_matrix() const
@@ -56,7 +56,7 @@ glm::mat4 Camera::get_view_matrix() const
 
 glm::mat4 Camera::get_projection_matrix() const
 {
-	return glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, -0.1f, 100.0f);
+	return glm::perspective(glm::radians(m_zoom), static_cast<float>(1920) / static_cast<float>(1080), 0.1f, 100.0f);
 }
 
 glm::mat4 Camera::get_view_projection_matrix() const
