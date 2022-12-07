@@ -7,12 +7,11 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float ang_speed, float hor_angle, float ver_angle, float zoom) :
+Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom) :
 	m_position(position),
 	m_lookat(lookat),
 	m_cam_up(up),
 	m_cam_speed(speed),
-	m_angular_speed(ang_speed),
 	m_horizontal_angle(hor_angle),
 	m_vertical_angle(ver_angle),
 	m_zoom(zoom)
@@ -45,7 +44,7 @@ void Camera::update(float dt)
 
 	// Set position of camera while orbiting lookat
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
-	m_position *= 10.0f;
+	m_position *= EventManager::get_camera_scroll_offset();
 	auto side_vector = glm::cross(m_lookat, m_cam_up);
 	glm::normalize(side_vector);
 }

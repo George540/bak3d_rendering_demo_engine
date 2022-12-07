@@ -17,6 +17,7 @@ double EventManager::last_mouse_position_x = 0.0;
 double EventManager::last_mouse_position_y = 0.0;
 double EventManager::delta_x = 0.0;
 double EventManager::delta_y = 0.0;
+double EventManager::cam_zoom_distance = 10.0;
 int EventManager::last_mouse_left_state = GLFW_RELEASE;
 int EventManager::last_mouse_right_state = GLFW_RELEASE;
 int EventManager::last_mouse_middle_state = GLFW_RELEASE;
@@ -93,18 +94,22 @@ void EventManager::update()
 
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
-
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
-		delta_y = static_cast<float>(mouse_pos_y - last_mouse_position_y);
-		//cout << "Moving mouse on X: " << x << endl;
+		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);
 	}
-	//mouse_delta_x += 1;
-
+	else
+	{
+		delta_x = 0.0;
+		delta_y = 0.0;
+	}
 	last_mouse_position_x = mouse_pos_x;
 	last_mouse_position_y = mouse_pos_y;
+
+	// Update mouse zoom via scroll wheel
+	glfwSetScrollCallback(m_window, scroll_callback);
 
 	// Update frame time
 	const double current_time = glfwGetTime();
@@ -137,6 +142,12 @@ double EventManager::get_mouse_motion_y()
 	return delta_y;
 }
 
+double EventManager::get_camera_scroll_offset()
+{
+	return cam_zoom_distance;
+}
+
+
 void EventManager::enable_mouse_cursor()
 {
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -152,4 +163,11 @@ float EventManager::get_random_float(float min, float max)
 	const auto value = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);  // NOLINT(concurrency-mt-unsafe)
 
 	return min + value * (max - min);
+}
+
+void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	cam_zoom_distance -= yoffset;
+	// Clamp zoom to a minimum of 1 degree
+	if (cam_zoom_distance < 1.0) cam_zoom_distance = 1.0;
 }

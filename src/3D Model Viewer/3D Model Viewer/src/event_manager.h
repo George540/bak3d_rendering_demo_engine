@@ -21,6 +21,7 @@ class EventManager
 	static double last_mouse_position_y;
 	static double delta_x;
 	static double delta_y;
+	static double cam_zoom_distance;
 	static int last_mouse_left_state;
 	static int last_mouse_right_state;
 	static int last_mouse_middle_state;
@@ -37,10 +38,13 @@ public:
 
 	static double get_mouse_motion_x();
 	static double get_mouse_motion_y();
+	static double get_camera_scroll_offset();
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();
 	static float get_random_float(float min, float max);
+
+	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 };
 
 #endif
