@@ -11,10 +11,12 @@ double EventManager::last_frame_time = glfwGetTime();
 float EventManager::frame_time = 0.0f;
 
 // Mouse
+double EventManager::mouse_pos_x = 0.0;
+double EventManager::mouse_pos_y = 0.0;
 double EventManager::last_mouse_position_x = 0.0;
 double EventManager::last_mouse_position_y = 0.0;
-float EventManager::mouse_delta_x = 0.0;
-float EventManager::mouse_delta_y = 0.0;
+double EventManager::delta_x = 0.0;
+double EventManager::delta_y = 0.0;
 int EventManager::last_mouse_left_state = GLFW_RELEASE;
 int EventManager::last_mouse_right_state = GLFW_RELEASE;
 int EventManager::last_mouse_middle_state = GLFW_RELEASE;
@@ -90,22 +92,19 @@ void EventManager::update()
 	glfwPollEvents();
 
 	// Update mouse positions
-	double x, y;
-	glfwGetCursorPos(m_window, &x, &y);
-	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
+
+	// Camera tilt and Pan
+	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-		mouse_delta_x = static_cast<float>(x - last_mouse_position_x);
+		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
+		delta_y = static_cast<float>(mouse_pos_y - last_mouse_position_y);
 		//cout << "Moving mouse on X: " << x << endl;
-	}
-	if (last_mouse_left_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		mouse_delta_y = static_cast<float>(y - last_mouse_position_y);
-		//cout << "Moving mouse on Y: " << y << endl;
 	}
 	//mouse_delta_x += 1;
 
-	last_mouse_position_x = x;
-	last_mouse_position_y = y;
+	last_mouse_position_x = mouse_pos_x;
+	last_mouse_position_y = mouse_pos_y;
 
 	// Update frame time
 	const double current_time = glfwGetTime();
@@ -128,14 +127,14 @@ GLFWwindow* EventManager::get_window()
 	return m_window;
 }
 
-float EventManager::get_mouse_motion_x()
+double EventManager::get_mouse_motion_x()
 {
-	return mouse_delta_x;
+	return delta_x;
 }
 
-float EventManager::get_mouse_motion_y()
+double EventManager::get_mouse_motion_y()
 {
-	return mouse_delta_y;
+	return delta_y;
 }
 
 void EventManager::enable_mouse_cursor()

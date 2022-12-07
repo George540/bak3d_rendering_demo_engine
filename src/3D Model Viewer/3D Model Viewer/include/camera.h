@@ -7,7 +7,7 @@
 class Camera
 {
 public:
-	Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom);
+	Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float ang_speed, float hor_angle, float ver_angle, float zoom);
 	~Camera() = default;
 
 	void update(float dt);

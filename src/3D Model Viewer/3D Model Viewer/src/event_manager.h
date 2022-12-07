@@ -15,10 +15,12 @@ class EventManager
 	static float frame_time;
 
 	// Mouse
+	static double mouse_pos_x;
+	static double mouse_pos_y;
 	static double last_mouse_position_x;
-	static float mouse_delta_x;
 	static double last_mouse_position_y;
-	static float mouse_delta_y;
+	static double delta_x;
+	static double delta_y;
 	static int last_mouse_left_state;
 	static int last_mouse_right_state;
 	static int last_mouse_middle_state;
@@ -33,8 +35,8 @@ public:
 
 	static GLFWwindow* get_window();
 
-	static float get_mouse_motion_x();
-	static float get_mouse_motion_y();
+	static double get_mouse_motion_x();
+	static double get_mouse_motion_y();
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();
