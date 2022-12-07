@@ -168,6 +168,6 @@ float EventManager::get_random_float(float min, float max)
 void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	cam_zoom_distance -= yoffset;
-	// Clamp zoom to a minimum of 1 degree
-	if (cam_zoom_distance < 1.0) cam_zoom_distance = 1.0;
+	// Clamp zoom to [1, 10] degrees
+	cam_zoom_distance = std::max(1.0, std::min(15.0, cam_zoom_distance));
 }

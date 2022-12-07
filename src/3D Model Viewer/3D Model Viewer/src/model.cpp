@@ -30,8 +30,6 @@ void Model::load_model(string const& path)
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
-	cout << "Shader read." << endl;
-
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) //if it's not zero
 	{
@@ -42,12 +40,9 @@ void Model::load_model(string const& path)
 	// retrieve the directory path of the filepath
 	directory = path.substr(0, path.find_last_of('/'));
 	m_name = path.substr(path.find_last_of('/') + 1, path.size());
-	cout << "Loading model named: " << m_name << endl;
 
 	// process ASSIMP's root node recursively
 	process_node(scene->mRootNode, scene);
-
-	cout << "Processed node." << endl;
 }
 
 // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).

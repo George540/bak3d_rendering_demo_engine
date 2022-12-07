@@ -7,7 +7,7 @@ class Grid
 {
 public:
 	Grid();
-	~Grid();
+	~Grid() = default;
 
 	void draw() const;
 private:

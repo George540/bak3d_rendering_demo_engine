@@ -1,4 +1,3 @@
-#include <vector>
 #include <iostream>
 #include <glm/ext.hpp>
 
@@ -18,12 +17,13 @@ World::World()
 
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 3.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 10.0f, 0.0f, -30.0f, 45.0f);
+	// Grid Setup
 	m_grid = new Grid();
 
 	m_light = new Light(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// Model Set up
-	string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
+	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
 	ourShader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
@@ -32,7 +32,6 @@ World::World()
 	// Object set up
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
 	m_object = new Model(model_path);
-	//m_object = new Object();
 	cout << "Model with path " << model_path << " has been spawned." << endl;
 }
 
@@ -44,14 +43,14 @@ World::~World()
 	delete m_light;
 }
 
-void World::update(float dt)
+void World::update(float dt) const
 {
 	// camera
 	m_camera->update(dt);
     //cout << "\rCurrent frame dt: " << dt << ' ' << endl << flush;
 }
 
-void World::draw()
+void World::draw() const
 {
     Renderer::begin_frame();
 

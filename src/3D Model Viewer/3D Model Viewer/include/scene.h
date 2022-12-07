@@ -23,8 +23,8 @@ public:
 
 	void generate_grid();
 	void draw_grid();
-	void update(float dt);
-	void draw();
+	void update(float dt) const;
+	void draw() const;
 	void set_matrix(GLuint shader_program, glm::mat4 world_matrix);
 
 	void set_projection_matrix(int shader_program, glm::mat4 projection_matrix);
@@ -37,8 +37,6 @@ private:
 	Camera* m_camera;
 	Light* m_light;
 	Grid* m_grid;
-	unsigned int grid_vao;
-	int length;
 };
 
 #endif
