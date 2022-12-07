@@ -31,7 +31,7 @@ void Renderer::initialize()
 	glGetError();
 
 	// Gray background
-	glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+	glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
 	std::cout << "Setting background color..." << endl;
 
 	// Enable depth test

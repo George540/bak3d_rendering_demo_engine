@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <glm/ext.hpp>
 
 #include "scene.h"
 #include "renderer.h"
@@ -17,6 +18,7 @@ World::World()
 
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 3.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 10.0f, 0.0f, -30.0f, 45.0f);
+	m_grid = new Grid();
 
 	m_light = new Light(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -36,7 +38,7 @@ World::World()
 
 World::~World()
 {
-	// delete camera
+	delete m_grid;
 	delete m_camera;
 	delete m_object;
 	delete m_light;
@@ -52,6 +54,8 @@ void World::update(float dt)
 void World::draw()
 {
     Renderer::begin_frame();
+
+	m_grid->draw();
 
 	ourShader->use();
 

@@ -6,6 +6,7 @@
 
 #include "model.h"
 #include "camera.h"
+#include "grid.h"
 #include "light.h"
 
 class World
@@ -21,6 +22,7 @@ public:
 	}
 
 	void generate_grid();
+	void draw_grid();
 	void update(float dt);
 	void draw();
 	void set_matrix(GLuint shader_program, glm::mat4 world_matrix);
@@ -34,6 +36,9 @@ private:
 	Model* m_object;
 	Camera* m_camera;
 	Light* m_light;
+	Grid* m_grid;
+	unsigned int grid_vao;
+	int length;
 };
 
 #endif
