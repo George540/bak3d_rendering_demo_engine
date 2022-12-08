@@ -63,6 +63,9 @@
     <ClCompile Include="src\grid.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="include\axis.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\axis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

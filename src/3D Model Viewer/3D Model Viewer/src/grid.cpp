@@ -3,8 +3,9 @@
 #include <vector>
 #include <glm/ext.hpp>
 
-Grid::Grid() : number_of_slices(10), grid_size(10.0f)
+Grid::Grid() : number_of_slices(40), grid_size(20.0f)
 {
+	// GRID LINE SETUP
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::uvec4> indices;
 

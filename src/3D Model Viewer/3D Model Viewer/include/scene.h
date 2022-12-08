@@ -7,6 +7,7 @@
 #include "model.h"
 #include "camera.h"
 #include "grid.h"
+#include "axis.h"
 #include "light.h"
 
 class World
@@ -37,6 +38,7 @@ private:
 	Camera* m_camera;
 	Light* m_light;
 	Grid* m_grid;
+	Axis* m_axis;
 };
 
 #endif

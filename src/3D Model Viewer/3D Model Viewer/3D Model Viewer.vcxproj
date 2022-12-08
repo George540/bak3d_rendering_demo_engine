@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\axis.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\event_manager.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="src\Tools\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\axis.h" />
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\grid.h" />
     <ClInclude Include="include\light.h" />

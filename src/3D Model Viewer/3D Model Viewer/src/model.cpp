@@ -84,6 +84,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 		vector.y = mesh->mVertices[i].y;
 		vector.z = mesh->mVertices[i].z;
 		vertex.position = vector;
+		vertex.position.y += 1.0f;
 
 		// normals
 		if (mesh->HasNormals())

@@ -169,5 +169,5 @@ void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 {
 	cam_zoom_distance -= yoffset;
 	// Clamp zoom to [1, 10] degrees
-	cam_zoom_distance = std::max(1.0, std::min(15.0, cam_zoom_distance));
+	cam_zoom_distance = std::max(1.0, std::min(25.0, cam_zoom_distance));
 }
