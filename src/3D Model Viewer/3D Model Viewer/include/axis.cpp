@@ -1,5 +1,6 @@
 #include "axis.h"
 
+#include <iostream>
 #include <vector>
 #include <glm/ext.hpp>
 
@@ -27,6 +28,14 @@ Axis::Axis(Camera& camera)
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindVertexArray(0);
+
+	std::cout << "Setting up 3D axis gizmo..." << std::endl;
+}
+
+Axis::~Axis()
+{
+	delete m_camera;
+	delete m_shader;
 }
 
 void Axis::draw() const
@@ -37,7 +46,6 @@ void Axis::draw() const
 	m_shader->set_mat4("view", m_camera->get_view_matrix());
 
 	auto model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(1.0f, 100.0f, 1.0f));
 	m_shader->set_mat4("model", model);
 
 	glBindVertexArray(m_vao);

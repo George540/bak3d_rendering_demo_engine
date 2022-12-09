@@ -10,7 +10,7 @@ class Axis
 {
 public:
 	Axis(Camera& camera);
-	~Axis() = default;
+	~Axis();
 
 	void draw() const;
 private:

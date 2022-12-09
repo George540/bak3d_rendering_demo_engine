@@ -1,5 +1,6 @@
 #include "grid.h"
 
+#include <iostream>
 #include <vector>
 #include <glm/ext.hpp>
 
@@ -51,6 +52,8 @@ Grid::Grid() : number_of_slices(40), grid_size(20.0f)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	number_of_elements = static_cast<GLuint>(indices.size()) * 4;
+
+	std::cout << "Setting up grid..." << std::endl;
 }
 
 void Grid::draw() const

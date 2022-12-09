@@ -6,17 +6,37 @@
 #include <iostream>
 #include <ostream>
 
-Model::Model(string const& path, bool gamma) : gamma_correction(gamma)
+Model::Model(string const& path, Camera& cam, bool gamma) : gamma_correction(gamma)
 {
+	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
+	m_camera = &cam;
+	m_shader = new Shader(
+		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
+		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
 	load_model(path);
 }
 
-void Model::draw(const Shader& shader) const
+Model::~Model()
+{
+	delete m_shader;
+	delete m_camera;
+}
+
+void Model::draw() const
 {
 	//cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
-		mesh.draw(shader);
+		mesh.draw(*m_shader);
+		m_shader->use();
+
+		m_shader->set_mat4("projection", m_camera->get_projection_matrix());
+		m_shader->set_mat4("view", m_camera->get_view_matrix());
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+		m_shader->set_mat4("model", model);
 		//cout << "Drew mesh VAO: " << std::to_string(mesh.m_vao) << endl;
 	}
 }

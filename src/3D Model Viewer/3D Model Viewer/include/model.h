@@ -5,6 +5,7 @@
 #include <assimp/scene.h>
 
 #include "mesh.h"
+#include "camera.h"
 
 #include <string>
 #include <vector>
@@ -22,9 +23,10 @@ public:
     bool gamma_correction;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, bool gamma = false);
+    Model(string const& path, Camera& cam, bool gamma = false);
+    ~Model();
 
-    void draw(const Shader& shader) const; // draws the model, and thus all its meshes
+    void draw() const; // draws the model, and thus all its meshes
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void load_model(string const& path);
@@ -34,6 +36,8 @@ private:
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     vector<texture> load_material_textures(aiMaterial* mat, aiTextureType type, string typeName);
+    Shader* m_shader;
+    Camera* m_camera;
 };
 
 #endif

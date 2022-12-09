@@ -9,7 +9,6 @@
 using namespace std;
 
 World* World::instance;
-Shader* ourShader;
 
 World::World()
 {
@@ -23,15 +22,9 @@ World::World()
 
 	m_light = new Light(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-	// Model Set up
-	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
-	ourShader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
-
-	// Object set up
+	// Model set up
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
-	m_object = new Model(model_path);
+	m_object = new Model(model_path, *m_camera);
 	cout << "Model with path " << model_path << " has been spawned." << endl;
 }
 
@@ -57,18 +50,7 @@ void World::draw() const
 
 	m_grid->draw();
 	m_axis->draw();
-
-	ourShader->use();
-
-	ourShader->set_mat4("projection", m_camera->get_projection_matrix());
-	ourShader->set_mat4("view", m_camera->get_view_matrix());
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-	ourShader->set_mat4("model", model);
-
-	m_object->draw(*ourShader);
+	m_object->draw();
 
 	//m_light->Draw();
 
