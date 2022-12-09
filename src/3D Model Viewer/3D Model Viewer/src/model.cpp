@@ -19,7 +19,6 @@ Model::Model(string const& path, Camera& cam, bool gamma) : gamma_correction(gam
 Model::~Model()
 {
 	delete m_shader;
-	delete m_camera;
 }
 
 void Model::draw() const
@@ -27,7 +26,6 @@ void Model::draw() const
 	//cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
-		mesh.draw(*m_shader);
 		m_shader->use();
 
 		m_shader->set_mat4("projection", m_camera->get_projection_matrix());
@@ -37,7 +35,7 @@ void Model::draw() const
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		m_shader->set_mat4("model", model);
-		//cout << "Drew mesh VAO: " << std::to_string(mesh.m_vao) << endl;
+		mesh.draw(*m_shader);
 	}
 }
 
@@ -75,8 +73,6 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh * mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(process_mesh(mesh, scene));
-
-		cout << "Processed " << node->mNumMeshes << " meshes at node " << i << endl;
 	}
 
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
@@ -145,8 +141,6 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 
 		vertices.push_back(vertex);
 	}
-
-	cout << "Processed mesh " << mesh->mName.C_Str() << " with " << mesh->mNumVertices << " vertices" << endl;
 
 	// now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)

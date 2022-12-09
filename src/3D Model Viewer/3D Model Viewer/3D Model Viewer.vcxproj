@@ -172,6 +172,8 @@
     <None Include="..\..\..\Assets\Shaders\1.model_loading.vs" />
     <None Include="..\..\..\Assets\Shaders\LightShader.fs" />
     <None Include="..\..\..\Assets\Shaders\LightShader.vs" />
+    <None Include="..\..\..\Assets\Shaders\LineShader.fs" />
+    <None Include="..\..\..\Assets\Shaders\LineShader.vs" />
     <None Include="..\..\..\Assets\Shaders\MainShader.fs" />
     <None Include="..\..\..\Assets\Shaders\MainShader.vs" />
   </ItemGroup>

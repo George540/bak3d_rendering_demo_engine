@@ -124,5 +124,11 @@
     <None Include="..\..\..\Assets\Shaders\MainShader.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\Assets\Shaders\LineShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\LineShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
