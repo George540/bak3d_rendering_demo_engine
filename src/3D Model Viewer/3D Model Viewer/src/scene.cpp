@@ -48,6 +48,7 @@ void World::draw() const
 {
     Renderer::begin_frame();
 
+	// Set depth test for axis to render in front of grid
 	glDepthFunc(GL_ALWAYS);
 	m_grid->draw();
 	m_axis->draw();

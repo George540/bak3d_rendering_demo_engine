@@ -13,14 +13,14 @@ Axis::Axis(Camera& camera)
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LineShader.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LineShader.fs");
 	constexpr glm::vec3 vertices[] = { // position, color
-									glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), // X red line
+									glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), // X red line
 									glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
 
-									glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-									glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), // Y green line
+									glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), // Y green line
+									glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
 
-									glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-									glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) // Z blue line
+									glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), // Z blue line
+									glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)
 									};
 
 	// Create a vertex array
@@ -59,7 +59,7 @@ void Axis::draw() const
 	m_shader->set_mat4("view", m_camera->get_view_matrix());
 
 	auto model = glm::mat4(1.0f);
-	model = glm::scale(model, glm::vec3(10.0f));
+	model = glm::scale(model, glm::vec3(5.0f));
 	m_shader->set_mat4("model", model);
 
 	glBindVertexArray(m_vao);
