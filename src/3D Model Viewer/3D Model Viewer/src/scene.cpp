@@ -48,8 +48,10 @@ void World::draw() const
 {
     Renderer::begin_frame();
 
+	glDepthFunc(GL_ALWAYS);
 	m_grid->draw();
 	m_axis->draw();
+	glDepthFunc(GL_LESS);
 	m_object->draw();
 
 	//m_light->Draw();
