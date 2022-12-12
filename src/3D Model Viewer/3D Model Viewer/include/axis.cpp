@@ -39,7 +39,6 @@ Axis::Axis(Camera& camera)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)sizeof(glm::vec3));
 	glEnableVertexAttribArray(1);
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindVertexArray(0);
 
@@ -49,6 +48,7 @@ Axis::Axis(Camera& camera)
 Axis::~Axis()
 {
 	delete m_shader;
+	delete m_camera;
 }
 
 void Axis::draw() const

@@ -6,10 +6,11 @@
 #include <iostream>
 #include <ostream>
 
-Model::Model(string const& path, Camera& cam, bool gamma) : gamma_correction(gamma)
+Model::Model(string const& path, Camera& cam, Light& light, bool gamma) : gamma_correction(gamma)
 {
 	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
 	m_camera = &cam;
+	m_light = &light;
 	m_shader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
@@ -19,6 +20,8 @@ Model::Model(string const& path, Camera& cam, bool gamma) : gamma_correction(gam
 Model::~Model()
 {
 	delete m_shader;
+	delete m_camera;
+	delete m_light;
 }
 
 void Model::draw() const
@@ -35,6 +38,7 @@ void Model::draw() const
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		m_shader->set_mat4("model", model);
+		m_shader->set_vec3("lightPos", m_light->GetPosition());
 		mesh.draw(*m_shader);
 	}
 }
@@ -139,6 +143,26 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 			vertex.tex_coords = glm::vec2(0.0f, 0.0f);
 		}
 
+		if (scene->mNumMaterials > mesh->mMaterialIndex)
+		{
+			const auto& mat = scene->mMaterials[mesh->mMaterialIndex];
+			aiColor4D diffuse;
+
+			if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+			{
+				vertex.color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+			}
+
+			if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+			{
+				vertex.useDiffuseTexture = true;
+			}
+			else
+			{
+				vertex.useDiffuseTexture = false;
+			}
+		}
+
 		vertices.push_back(vertex);
 	}
 
@@ -152,6 +176,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+
 	// process materials
 	auto material = scene->mMaterials[mesh->mMaterialIndex];
 	// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
@@ -177,6 +202,28 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// return a mesh object created from the extracted mesh data
 	return Mesh(vertices, indices, textures);
 }
+
+material Model::load_material(aiMaterial* mat)
+{
+	material material{};
+	aiColor3D color(1.0f, 1.0f, 1.0f);
+	float shininess;
+
+	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+	material.Diffuse = glm::vec3(color.r, color.b, color.g);
+
+	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+	material.Ambient = glm::vec3(color.r, color.b, color.g);
+
+	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+	material.Specular = glm::vec3(color.r, color.b, color.g);
+
+	mat->Get(AI_MATKEY_SHININESS, shininess);
+	material.Shininess = shininess;
+
+	return material;
+}
+
 
 vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType type, string typeName)
 {

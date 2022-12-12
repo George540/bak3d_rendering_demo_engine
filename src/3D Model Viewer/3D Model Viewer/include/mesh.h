@@ -24,6 +24,10 @@ struct vertex {
     glm::vec3 tangent;
     // bitangent
     glm::vec3 bitangent;
+    // color
+    glm::vec3 color;
+    // use diffuse texture or not
+    bool useDiffuseTexture;
     //bone indexes which will influence this vertex
     int m_BoneIDs[MAX_BONE_INFLUENCE];
     //weights from each bone
@@ -36,13 +40,23 @@ struct texture {
     string path;
 };
 
+struct material {
+    glm::vec3 Diffuse;
+    glm::vec3 Specular;
+    glm::vec3 Ambient;
+    glm::vec3 Normal;
+    glm::vec3 Roughness;
+    float Shininess;
+};
+
 class Mesh
 {
 public:
     // mesh Data
-    vector<vertex>       vertices;
+    material m_material;
+    vector<vertex> vertices;
     vector<unsigned int> indices;
-    vector<texture>      textures;
+    vector<texture> textures;
     unsigned int m_vao;
 
     // constructor
