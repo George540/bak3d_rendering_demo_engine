@@ -35,7 +35,7 @@ void Model::draw() const
 		m_shader->set_mat4("view", m_camera->get_view_matrix());
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+		//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		m_shader->set_mat4("model", model);
 		m_shader->set_vec3("lightPos", m_light->GetPosition());
@@ -62,6 +62,7 @@ void Model::load_model(string const& path)
 	// retrieve the directory path of the filepath
 	directory = path.substr(0, path.find_last_of('/'));
 	m_name = path.substr(path.find_last_of('/') + 1, path.size());
+	std::cout << "Loading model with name: " << m_name << std::endl;
 
 	// process ASSIMP's root node recursively
 	process_node(scene->mRootNode, scene);
@@ -104,7 +105,6 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 		vector.y = mesh->mVertices[i].y;
 		vector.z = mesh->mVertices[i].z;
 		vertex.position = vector;
-		vertex.position.y += 1.0f;
 
 		// normals
 		if (mesh->HasNormals())
@@ -210,16 +210,16 @@ material Model::load_material(aiMaterial* mat)
 	float shininess;
 
 	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	material.Diffuse = glm::vec3(color.r, color.b, color.g);
+	material.diffuse = glm::vec3(color.r, color.b, color.g);
 
 	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	material.Ambient = glm::vec3(color.r, color.b, color.g);
+	material.ambient = glm::vec3(color.r, color.b, color.g);
 
 	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	material.Specular = glm::vec3(color.r, color.b, color.g);
+	material.specular = glm::vec3(color.r, color.b, color.g);
 
 	mat->Get(AI_MATKEY_SHININESS, shininess);
-	material.Shininess = shininess;
+	material.shininess = shininess;
 
 	return material;
 }
@@ -259,6 +259,7 @@ vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType typ
 unsigned int texture_from_file(const char* path, const string& directory, bool gamma)
 {
 	auto filename = string(path);
+	std::cout << "Loading texture file: " << filename << std::endl;
 	filename = directory + '/' + filename;
 
 	unsigned int texture_id;
