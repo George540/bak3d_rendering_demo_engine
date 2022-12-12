@@ -17,9 +17,6 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 
 	BuildVertexBuffer();
 
-	// World Matrix Update
-	glm::mat4 model = glm::mat4(1.0f);
-	mWorldTransformationMatrix = translate(model, mPosition) * scale(model, mScaling);
 	mCamera = &camera;
 	mShader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.vs",
@@ -40,8 +37,9 @@ void Light::Draw() const
 	mShader->set_mat4("projection", mCamera->get_projection_matrix());
 	mShader->set_mat4("view", mCamera->get_view_matrix());
 
+	// World Matrix Update
 	auto model = glm::mat4(1.0f);
-	model = glm::translate(model, mPosition);
+	model = translate(model, mPosition) * scale(model, mScaling);
 	mShader->set_mat4("model", model);
 
 	// Draw the triangles !
@@ -114,94 +112,4 @@ void Light::BuildVertexBuffer()
 	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 	glBindVertexArray(0);
-}
-
-//
-// The following code is taken from
-// www.opengl-tutorial.org
-//
-GLuint Light::LoadShader(std::string vertex_shader_path, std::string fragment_shader_path)
-{
-	// Create the shaders
-	auto VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	auto FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	// Read the Vertex Shader code from the file
-	std::string VertexShaderCode;
-	std::ifstream vertex_shader_stream(vertex_shader_path, std::ios::in);
-	if (vertex_shader_stream.is_open()) {
-		std::string Line = "";
-		while (getline(vertex_shader_stream, Line))
-			VertexShaderCode += "\n" + Line;
-		vertex_shader_stream.close();
-	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_shader_path.c_str());
-		getchar();
-		exit(-1);
-	}
-
-	// Read the Fragment Shader code from the file
-	std::string FragmentShaderCode;
-	std::ifstream FragmentShaderStream(fragment_shader_path, std::ios::in);
-	if (FragmentShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(FragmentShaderStream, Line))
-			FragmentShaderCode += "\n" + Line;
-		FragmentShaderStream.close();
-	}
-
-	auto Result = GL_FALSE;
-	int InfoLogLength;
-
-	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_shader_path.c_str());
-	char const* VertexSourcePointer = VertexShaderCode.c_str();
-	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, nullptr);
-	glCompileShader(VertexShaderID);
-
-	// Check Vertex Shader
-	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
-	}
-
-	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_shader_path.c_str());
-	char const* FragmentSourcePointer = FragmentShaderCode.c_str();
-	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, nullptr);
-	glCompileShader(FragmentShaderID);
-
-	// Check Fragment Shader
-	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
-	}
-
-	// Link the program
-	printf("Linking program\n");
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
-
-	// Check the program
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-		glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
-		printf("%s\n", &ProgramErrorMessage[0]);
-	}
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
-	return ProgramID;
 }

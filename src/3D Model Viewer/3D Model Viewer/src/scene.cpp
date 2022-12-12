@@ -20,7 +20,7 @@ World::World()
 	m_grid = new Grid(*m_camera);
 	m_axis = new Axis(*m_camera);
 
-	m_light = new Light(glm::vec3(0.0f, 10.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f), *m_camera);
+	m_light = new Light(glm::vec3(0.0f, 10.0f, 5.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
 
 	// Model set up
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
