@@ -31,16 +31,36 @@ void Model::draw() const
 	{
 		m_shader->use();
 
+		// Set MVP matrix
+		glm::mat4 model = glm::mat4(1.0f);
 		m_shader->set_mat4("projection", m_camera->get_projection_matrix());
 		m_shader->set_mat4("view", m_camera->get_view_matrix());
-
-		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 		m_shader->set_mat4("model", model);
-		m_shader->set_vec3("lightPos", m_light->GetPosition());
+
+		update_light_properties();
+		update_material_properties(mesh);
+
 		mesh.draw(*m_shader);
 	}
+}
+
+void Model::update_light_properties() const
+{
+	const auto light = m_light->get_light_properties();
+	m_shader->set_vec3("light.position", light.position);
+	m_shader->set_vec3("light.diffuse", light.diffuse);
+	m_shader->set_vec3("light.specular", light.specular);
+	m_shader->set_vec3("light.ambient", light.ambient);
+}
+
+void Model::update_material_properties(const Mesh& mesh) const
+{
+	m_shader->set_float("material.diffuse", 1.0f);
+	m_shader->set_float("material.specular", 0.5f);
+	m_shader->set_float("material.ambient", 0.5f);
+	m_shader->set_float("material.shininess", 256.0f);
+	m_shader->set_bool("material.useDiffuseTexture", true);
 }
 
 void Model::load_model(string const& path)
@@ -203,26 +223,26 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	return Mesh(vertices, indices, textures);
 }
 
-material Model::load_material(aiMaterial* mat)
-{
-	material material{};
-	aiColor3D color(1.0f, 1.0f, 1.0f);
-	float shininess;
-
-	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	material.diffuse = glm::vec3(color.r, color.b, color.g);
-
-	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	material.ambient = glm::vec3(color.r, color.b, color.g);
-
-	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	material.specular = glm::vec3(color.r, color.b, color.g);
-
-	mat->Get(AI_MATKEY_SHININESS, shininess);
-	material.shininess = shininess;
-
-	return material;
-}
+//material Model::load_material(aiMaterial* mat)
+//{
+//	material material{};
+//	aiColor3D color(1.0f, 1.0f, 1.0f);
+//	float shininess;
+//
+//	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+//	material.diffuse = glm::vec3(color.r, color.b, color.g);
+//
+//	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+//	material.ambient = glm::vec3(color.r, color.b, color.g);
+//
+//	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+//	material.specular = glm::vec3(color.r, color.b, color.g);
+//
+//	mat->Get(AI_MATKEY_SHININESS, shininess);
+//	material.shininess = shininess;
+//
+//	return material;
+//}
 
 
 vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType type, string typeName)

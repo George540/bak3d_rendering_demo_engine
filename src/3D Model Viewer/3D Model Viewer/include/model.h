@@ -38,7 +38,10 @@ private:
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     vector<texture> load_material_textures(aiMaterial* mat, aiTextureType type, string typeName);
-    Shader* m_shader;
+    void update_light_properties() const;
+    void update_material_properties(const Mesh& mesh) const;
+
+	Shader* m_shader;
     Camera* m_camera;
     Light* m_light;
 };

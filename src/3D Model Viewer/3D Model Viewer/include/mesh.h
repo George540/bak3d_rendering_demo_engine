@@ -41,13 +41,14 @@ struct texture {
 };
 
 struct material {
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    glm::vec3 ambient;
-    glm::vec3 normal;
-    glm::vec3 roughness;
-    texture texture;
+    float diffuse;
+    float specular;
+    float ambient;
+    //glm::vec3 normal;
+    //float roughness;
+    //texture texture;
     float shininess;
+    bool useDiffuseTexture;
 };
 
 class Mesh

@@ -11,33 +11,43 @@
 #include "shader.h"
 #include "camera.h"
 
+struct light {
+	glm::vec3 position;
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+};
+
 class Light
 {
 	// ORIENTATION
-	glm::vec3 mPosition;
-	glm::vec3 mScaling;
-	glm::mat4 mWorldTransformationMatrix;
+	glm::vec3 m_position;
+	glm::vec3 m_scaling;
 
+	// MESH
 	unsigned int mVAO;
 	unsigned int mVBO;
 	std::vector<glm::vec3> mVertexPositions;
-	Shader* mShader;
-	Camera* mCamera;
+
+	// EXTERNAL
+	Shader* m_shader;
+	Camera* m_camera;
+
+	// PROPERTIES
+	light m_properties{};
 
 public:
-	Light(glm::vec3 position, glm::vec3 scale, Camera& camera);
+	Light(glm::vec3 position, glm::vec3 scaling, Camera& camera);
 	~Light();
 
-	void Draw() const;
-	void SetPosition(glm::vec3& position) { mPosition = position; }
-	void SetScaling(glm::vec3& scaling) { mScaling = scaling; }
-	glm::vec3 GetPosition() const { return mPosition; }
-	glm::vec3 GetScaling() const { return mScaling; }
-	glm::mat4 GetWorldTransformationMatrix() const { return mWorldTransformationMatrix; }
+	void draw() const;
+	light get_light_properties() const;
+	void set_position(const glm::vec3& position) { m_position = position; }
+	void set_scaling(const glm::vec3& scaling) { m_scaling = scaling; }
+	glm::vec3 get_position() const { return m_position; }
+	glm::vec3 get_scaling() const { return m_scaling; }
 
-	unsigned int GetVAO() { return mVAO; }
-
-	void BuildVertexBuffer();
+	void build_vertex_buffer();
 };
 
 #endif

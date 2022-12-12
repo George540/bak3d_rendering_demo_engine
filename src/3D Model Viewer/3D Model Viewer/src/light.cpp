@@ -9,16 +9,21 @@
 
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
-	mPosition(position),
-	mScaling(scaling)
+	m_position(position),
+	m_scaling(scaling)
 {
 	mVAO = NULL;
 	mVBO = NULL;
 
-	BuildVertexBuffer();
+	m_properties.position = m_position;
+	m_properties.diffuse = glm::vec3(1.0f);
+	m_properties.ambient = glm::vec3(0.3f);
+	m_properties.specular = glm::vec3(0.3f);
 
-	mCamera = &camera;
-	mShader = new Shader(
+	build_vertex_buffer();
+
+	m_camera = &camera;
+	m_shader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.fs");
 	std::cout << "Light created..." << std::endl;
@@ -26,21 +31,20 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 
 Light::~Light()
 {
-	delete mShader;
-	delete mCamera;
+	delete m_shader;
+	delete m_camera;
 }
 
-void Light::Draw() const
+void Light::draw() const
 {
-	mShader->use();
+	m_shader->use();
 
-	mShader->set_mat4("projection", mCamera->get_projection_matrix());
-	mShader->set_mat4("view", mCamera->get_view_matrix());
-
-	// World Matrix Update
+	// MVP Update
+	m_shader->set_mat4("projection", m_camera->get_projection_matrix());
+	m_shader->set_mat4("view", m_camera->get_view_matrix());
 	auto model = glm::mat4(1.0f);
-	model = translate(model, mPosition) * scale(model, mScaling);
-	mShader->set_mat4("model", model);
+	model = translate(model, m_position) * scale(model, m_scaling);
+	m_shader->set_mat4("model", model);
 
 	// Draw the triangles !
 	glBindVertexArray(mVAO);
@@ -48,11 +52,16 @@ void Light::Draw() const
 	glBindVertexArray(0);
 }
 
+light Light::get_light_properties() const
+{
+	return m_properties;
+}
 
-void Light::BuildVertexBuffer()
+
+void Light::build_vertex_buffer()
 {
 	//cube model
-	const float vertices[] = {
+	constexpr float vertices[] = {
 		-0.5f, -0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f,
 		 0.5f,  0.5f, -0.5f,
