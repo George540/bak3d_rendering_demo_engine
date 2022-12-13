@@ -55,7 +55,7 @@ class Mesh
 {
 public:
     // mesh Data
-    material m_material;
+    material m_material{};
     vector<vertex> vertices;
     vector<unsigned int> indices;
     vector<texture> textures;
@@ -66,7 +66,7 @@ public:
     void draw(const Shader& shader) const; // render the mesh
 private:
     // render data 
-    unsigned int m_vbo, m_ebo;
+    unsigned int m_vbo{}, m_ebo{};
     void set_up_mesh();
 };
 

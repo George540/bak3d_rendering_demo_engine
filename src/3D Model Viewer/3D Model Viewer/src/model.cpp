@@ -56,10 +56,10 @@ void Model::update_light_properties() const
 
 void Model::update_material_properties(const Mesh& mesh) const
 {
-	m_shader->set_float("material.diffuse", 1.0f);
-	m_shader->set_float("material.specular", 0.5f);
+	m_shader->set_int("material.diffuse", 0);
+	m_shader->set_int("material.specular", 1);
 	m_shader->set_float("material.ambient", 0.5f);
-	m_shader->set_float("material.shininess", 256.0f);
+	m_shader->set_float("material.shininess", 64.0f);
 	m_shader->set_bool("material.useDiffuseTexture", true);
 }
 
