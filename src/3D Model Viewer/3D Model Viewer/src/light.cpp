@@ -1,7 +1,6 @@
 #include "light.h"
 #include "shader.h"
 
-#include <string>
 #include <glm/ext/matrix_transform.hpp>
 
 #include <iostream>

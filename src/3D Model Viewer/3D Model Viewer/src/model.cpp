@@ -1,10 +1,12 @@
-#include "model.h"
 #include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION    
 #include "Tools/stb_image.h"
 
 #include <iostream>
 #include <ostream>
+
+#include "model.h"
+#include "event_manager.h"
 
 Model::Model(string const& path, Camera& cam, Light& light, bool gamma) : gamma_correction(gamma)
 {
@@ -60,7 +62,7 @@ void Model::update_material_properties(const Mesh& mesh) const
 	m_shader->set_int("material.specular", 1);
 	m_shader->set_float("material.ambient", 0.5f);
 	m_shader->set_float("material.shininess", 64.0f);
-	m_shader->set_bool("material.useDiffuseTexture", true);
+	m_shader->set_bool("material.useDiffuseTexture", EventManager::get_using_diffuse_texture());
 }
 
 void Model::load_model(string const& path)

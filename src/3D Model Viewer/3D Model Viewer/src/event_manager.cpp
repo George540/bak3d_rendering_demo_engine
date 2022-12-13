@@ -21,6 +21,7 @@ double EventManager::cam_zoom_distance = 10.0;
 int EventManager::last_mouse_left_state = GLFW_RELEASE;
 int EventManager::last_mouse_right_state = GLFW_RELEASE;
 int EventManager::last_mouse_middle_state = GLFW_RELEASE;
+bool EventManager::is_using_diffuse_texture = true;
 
 GLFWwindow* EventManager::m_window = nullptr;
 
@@ -75,7 +76,7 @@ void EventManager::initialize()
 
 	// Initial time
 	last_frame_time = glfwGetTime();
-	srand(static_cast<unsigned int>(time(nullptr)));
+	srand(static_cast<unsigned int>(time(nullptr)));  // NOLINT(cert-msc51-cpp)
 	std::cout << "Ending Event Manager Initialization..." << endl;
 }
 
@@ -97,8 +98,8 @@ void EventManager::update()
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
-		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);
+		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);  // NOLINT(clang-diagnostic-double-promotion)
+		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);  // NOLINT(clang-diagnostic-double-promotion)
 	}
 	else
 	{
@@ -110,6 +111,8 @@ void EventManager::update()
 
 	// Update mouse zoom via scroll wheel
 	glfwSetScrollCallback(m_window, scroll_callback);
+	// Toggle diffuse texture usage
+	glfwSetKeyCallback(m_window, toggle_diffuse_callback);
 
 	// Update frame time
 	const double current_time = glfwGetTime();
@@ -170,4 +173,12 @@ void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 	cam_zoom_distance -= yoffset;
 	// Clamp zoom to [1, 10] degrees
 	cam_zoom_distance = std::max(1.0, std::min(25.0, cam_zoom_distance));
+}
+
+void EventManager::toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+	{
+		is_using_diffuse_texture = !is_using_diffuse_texture;
+	}
 }

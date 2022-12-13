@@ -25,6 +25,7 @@ class EventManager
 	static int last_mouse_left_state;
 	static int last_mouse_right_state;
 	static int last_mouse_middle_state;
+	static bool is_using_diffuse_texture;
 public:
 	static void initialize();
 	static void shutdown();
@@ -39,12 +40,14 @@ public:
 	static double get_mouse_motion_x();
 	static double get_mouse_motion_y();
 	static double get_camera_scroll_offset();
+	static bool get_using_diffuse_texture() { return is_using_diffuse_texture; }
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();
 	static float get_random_float(float min, float max);
 
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	static void toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 #endif
