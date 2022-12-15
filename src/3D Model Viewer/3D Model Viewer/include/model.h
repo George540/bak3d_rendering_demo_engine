@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-unsigned int texture_from_file(const char* path, const string& directory, bool gamma = false);
+unsigned int texture_from_file(const char* path, const string& directory);
 
 class Model
 {
@@ -24,7 +24,7 @@ public:
     bool gamma_correction;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, Camera& cam, Light& light, bool gamma = false);
+    Model(string const& path, Camera& cam, Light& light);
     ~Model();
 
     void draw() const; // draws the model, and thus all its meshes

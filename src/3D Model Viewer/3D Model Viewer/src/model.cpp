@@ -8,7 +8,7 @@
 #include "model.h"
 #include "event_manager.h"
 
-Model::Model(string const& path, Camera& cam, Light& light, bool gamma) : gamma_correction(gamma)
+Model::Model(string const& path, Camera& cam, Light& light)
 {
 	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
 	m_camera = &cam;
@@ -63,6 +63,7 @@ void Model::update_material_properties(const Mesh& mesh) const
 	m_shader->set_float("material.ambient", 0.5f);
 	m_shader->set_float("material.shininess", 64.0f);
 	m_shader->set_bool("material.useDiffuseTexture", EventManager::get_using_diffuse_texture());
+	m_shader->set_bool("material.gamma", true);
 }
 
 void Model::load_model(string const& path)
@@ -278,7 +279,7 @@ vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType typ
 	return textures;
 }
 
-unsigned int texture_from_file(const char* path, const string& directory, bool gamma)
+unsigned int texture_from_file(const char* path, const string& directory)
 {
 	auto filename = string(path);
 	std::cout << "Loading texture file: " << filename << std::endl;

@@ -30,6 +30,7 @@ uniform sampler2D texture_diffuse1;
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
+uniform bool gamma;
 
 void main()
 {    
@@ -67,7 +68,22 @@ void main()
     float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
     vec3 specular = light.specular * spec * vec3(texture(material.specular, fs_in.TexCoord));  
 
+    float distance = length(light.position - fs_in.FragPos);
+    float attenuation = 1.0 / (gamma ? distance * distance : distance);
+
+    if (gamma)
+    {
+        diffuse *= attenuation;
+        specular *= attenuation;
+    }
+
 	vec3 result = ambient + diffuse + specular;
+
+    // Process gamma correction if enabled
+    if (gamma)
+    {
+        result = pow(result, vec3(1.0/2.2));
+    }
 
 	FragColor = vec4(result, 1.0);
 }
