@@ -67,9 +67,9 @@ void Model::update_material_properties(const Mesh& mesh) const
 	m_shader->set_int("material.normal", 2);
 	m_shader->set_float("material.ambient", 0.5f);
 	m_shader->set_float("material.shininess", 64.0f);
-	m_shader->set_bool("material.useDiffuseTexture", EventManager::get_using_diffuse_texture());
-	m_shader->set_bool("material.useSpecularTexture", EventManager::get_using_specular_texture());
-	m_shader->set_bool("material.useNormalMaps", EventManager::get_using_normal_maps());
+	m_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
+	m_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
+	m_shader->set_bool("materialSettings.useNormalMaps", EventManager::get_using_normal_maps());
 	m_shader->set_bool("material.gamma", true);
 }
 

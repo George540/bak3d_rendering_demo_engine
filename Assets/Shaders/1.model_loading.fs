@@ -6,9 +6,12 @@ struct Material
     sampler2D specular;
     float ambient;
     sampler2D normal;
-    vec3 normalDefault;
     vec3 roughness;
     float shininess;
+};
+
+struct MaterialSettings
+{
     bool useDiffuseTexture;
     bool useSpecularTexture;
     bool useNormalMaps;
@@ -36,6 +39,7 @@ in VS_OUT
 
 uniform vec3 viewPos;
 uniform Material material;
+uniform MaterialSettings materialSettings;
 uniform Light light;
 uniform bool gamma;
 
@@ -43,7 +47,7 @@ void main()
 {    
 	// ambient
     vec3 ambient = vec3(1.0);
-    if (material.useDiffuseTexture)
+    if (materialSettings.useDiffuseTexture)
     {
         ambient = light.ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
     }
@@ -55,7 +59,7 @@ void main()
     // normal
     vec3 normal = normalize(fs_in.Normal);
     vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    if (material.useNormalMaps)
+    if (materialSettings.useNormalMaps)
     {
         normal = texture(material.normal, fs_in.TexCoord).rgb; // obtain normal from normal map in range [0,1]
         normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space, [-1,1]
@@ -65,7 +69,7 @@ void main()
 
     // diffuse 
     vec3 diffuse = vec3(1.0);
-    if (material.useDiffuseTexture)
+    if (materialSettings.useDiffuseTexture)
     {
         diffuse = light.diffuse * diff * texture(material.diffuse, fs_in.TexCoord).rgb;
     }
@@ -80,7 +84,7 @@ void main()
     vec3 reflectDir = reflect(-lightDir, normal); 
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
     vec3 specular = vec3(1.0);
-    if (material.useSpecularTexture)
+    if (materialSettings.useSpecularTexture)
     {
         specular = light.specular * spec * texture(material.specular, fs_in.TexCoord).rgb;
     }
