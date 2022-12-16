@@ -6,9 +6,12 @@ struct Material
     sampler2D specular;
     float ambient;
     sampler2D normal;
+    vec3 normalDefault;
     vec3 roughness;
     float shininess;
     bool useDiffuseTexture;
+    bool useSpecularTexture;
+    bool useNormalMaps;
 };
 
 struct Light 
@@ -24,6 +27,7 @@ out vec4 FragColor;
 in VS_OUT
 {
     vec3 FragPos;
+    vec3 Normal;
     vec2 TexCoord;
     vec3 TangentLightPos;
     vec3 TangentViewPos;
@@ -48,9 +52,15 @@ void main()
         ambient *= light.ambient * vec3(material.ambient);
     }
 
-    vec3 normal = texture(material.normal, fs_in.TexCoord).rgb; // obtain normal from normal map in range [0,1]
-    normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space, [-1,1]
-    vec3 lightDir = normalize(fs_in.TangentLightPos - fs_in.TangentFragPos);
+    // normal
+    vec3 normal = normalize(fs_in.Normal);
+    vec3 lightDir = normalize(light.position - fs_in.FragPos);
+    if (material.useNormalMaps)
+    {
+        normal = texture(material.normal, fs_in.TexCoord).rgb; // obtain normal from normal map in range [0,1]
+        normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space, [-1,1]
+        lightDir = normalize(fs_in.TangentLightPos - fs_in.TangentFragPos);
+    }
     float diff = max(dot(lightDir, normal), 0.0);
 
     // diffuse 
@@ -69,7 +79,15 @@ void main()
     vec3 halfwayDir = normalize(lightDir + viewDir);
     vec3 reflectDir = reflect(-lightDir, normal); 
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * texture(material.specular, fs_in.TexCoord).rgb;  
+    vec3 specular = vec3(1.0);
+    if (material.useSpecularTexture)
+    {
+        specular = light.specular * spec * texture(material.specular, fs_in.TexCoord).rgb;
+    }
+    else
+    {
+        specular = light.specular * spec * 0.7;
+    }
 
     float distance = length(light.position - fs_in.FragPos);
     float attenuation = 1.0 / (gamma ? distance * distance : distance);

@@ -26,6 +26,8 @@ class EventManager
 	static int last_mouse_right_state;
 	static int last_mouse_middle_state;
 	static bool is_using_diffuse_texture;
+	static bool is_using_specular_texture;
+	static bool is_using_normal_maps;
 public:
 	static void initialize();
 	static void shutdown();
@@ -41,6 +43,8 @@ public:
 	static double get_mouse_motion_y();
 	static double get_camera_scroll_offset();
 	static bool get_using_diffuse_texture() { return is_using_diffuse_texture; }
+	static bool get_using_specular_texture() { return is_using_specular_texture; }
+	static bool get_using_normal_maps() { return is_using_normal_maps; }
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();

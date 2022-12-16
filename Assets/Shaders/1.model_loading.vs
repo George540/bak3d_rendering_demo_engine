@@ -15,6 +15,7 @@ uniform vec3 lightPos;
 out VS_OUT
 {
     vec3 FragPos;
+    vec3 Normal;
     vec2 TexCoord;
     vec3 TangentLightPos;
     vec3 TangentViewPos;
@@ -25,6 +26,8 @@ void main()
 {
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
     vs_out.TexCoord = aTexCoords;  
+    vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
+
 
     //mat3 normalMatrix = transpose(inverse(mat3(model)));
     vec3 T = normalize(vec3(model * vec4(aTangent, 0.0)));

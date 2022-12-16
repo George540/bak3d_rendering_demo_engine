@@ -22,6 +22,8 @@ int EventManager::last_mouse_left_state = GLFW_RELEASE;
 int EventManager::last_mouse_right_state = GLFW_RELEASE;
 int EventManager::last_mouse_middle_state = GLFW_RELEASE;
 bool EventManager::is_using_diffuse_texture = true;
+bool EventManager::is_using_specular_texture = true;
+bool EventManager::is_using_normal_maps = true;
 
 GLFWwindow* EventManager::m_window = nullptr;
 
