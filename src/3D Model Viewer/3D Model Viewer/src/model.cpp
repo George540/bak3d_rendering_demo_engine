@@ -62,6 +62,7 @@ void Model::update_light_properties() const
 
 void Model::update_material_properties(const Mesh& mesh) const
 {
+	// FRAGMENT MATERIAL
 	m_shader->set_int("material.diffuse", 0);
 	m_shader->set_int("material.specular", 1);
 	m_shader->set_int("material.normal", 2);

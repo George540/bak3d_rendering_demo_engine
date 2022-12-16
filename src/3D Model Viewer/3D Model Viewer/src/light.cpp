@@ -9,7 +9,8 @@
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	m_position(position),
-	m_scaling(scaling)
+	m_scaling(scaling),
+	m_camera(&camera)
 {
 	mVAO = NULL;
 	mVBO = NULL;
@@ -21,7 +22,6 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 
 	build_vertex_buffer();
 
-	m_camera = &camera;
 	m_shader = new Shader(
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.vs",
 		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.fs");
@@ -50,12 +50,6 @@ void Light::draw() const
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)
 	glBindVertexArray(0);
 }
-
-light Light::get_light_properties() const
-{
-	return m_properties;
-}
-
 
 void Light::build_vertex_buffer()
 {

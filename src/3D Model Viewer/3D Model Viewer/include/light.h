@@ -41,7 +41,7 @@ public:
 	~Light();
 
 	void draw() const;
-	light get_light_properties() const;
+	light get_light_properties() const { return m_properties; }
 	void set_position(const glm::vec3& position) { m_position = position; }
 	void set_scaling(const glm::vec3& scaling) { m_scaling = scaling; }
 	glm::vec3 get_position() const { return m_position; }
