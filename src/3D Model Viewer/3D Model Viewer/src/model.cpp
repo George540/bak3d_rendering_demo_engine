@@ -50,6 +50,12 @@ void Model::draw() const
 void Model::update_light_properties() const
 {
 	const auto light = m_light->get_light_properties();
+
+	// VERTEX
+	m_shader->set_vec3("viewPos", m_camera->get_camera_position());
+	m_shader->set_vec3("lightPos", light.position);
+
+	// FRAGMENT
 	m_shader->set_vec3("light.position", light.position);
 	m_shader->set_vec3("light.diffuse", light.diffuse);
 	m_shader->set_vec3("light.specular", light.specular);
@@ -60,6 +66,7 @@ void Model::update_material_properties(const Mesh& mesh) const
 {
 	m_shader->set_int("material.diffuse", 0);
 	m_shader->set_int("material.specular", 1);
+	m_shader->set_int("material.normal", 2);
 	m_shader->set_float("material.ambient", 0.5f);
 	m_shader->set_float("material.shininess", 64.0f);
 	m_shader->set_bool("material.useDiffuseTexture", EventManager::get_using_diffuse_texture());
