@@ -170,6 +170,8 @@
   <ItemGroup>
     <None Include="..\..\..\Assets\Shaders\1.model_loading.fs" />
     <None Include="..\..\..\Assets\Shaders\1.model_loading.vs" />
+    <None Include="..\..\..\Assets\Shaders\bufferShader.fs" />
+    <None Include="..\..\..\Assets\Shaders\bufferShader.vs" />
     <None Include="..\..\..\Assets\Shaders\GridShader.fs" />
     <None Include="..\..\..\Assets\Shaders\GridShader.vs" />
     <None Include="..\..\..\Assets\Shaders\LightShader.fs" />
