@@ -80,9 +80,6 @@ void Renderer::begin_frame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-
-	//bool show_demo_window = true;
-	//ImGui::ShowDemoWindow(&show_demo_window);
 }
 
 void Renderer::render_demo_window()
@@ -90,7 +87,7 @@ void Renderer::render_demo_window()
 	static float f = 0.0f;
 	static int counter = 0;
 
-	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+	ImGui::Begin("Metrics!");                          // Create a window called "Hello, world!" and append into it.
 
 	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -99,12 +96,30 @@ void Renderer::render_demo_window()
 	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 	ImGui::ColorEdit3("clear color", reinterpret_cast<float*>(&clear_color)); // Edit 3 floats representing a color
 
-	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		counter++;
+	if (ImGui::Button("Albedo Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
+	{
+		EventManager::set_using_diffuse_texture(!EventManager::get_using_diffuse_texture());
+	}
 	ImGui::SameLine();
-	ImGui::Text("counter = %d", counter);
+	ImGui::Text("Is On: %d\n", EventManager::get_using_diffuse_texture());
 
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	if (ImGui::Button("Specular Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
+	{
+		EventManager::set_using_specular_texture(!EventManager::get_using_specular_texture());
+	}
+	ImGui::SameLine();
+	ImGui::Text("Is On: %d\n", EventManager::get_using_specular_texture());
+
+	if (ImGui::Button("Normal Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
+	{
+		EventManager::set_using_normal_maps(!EventManager::get_using_normal_maps());
+	}
+	ImGui::SameLine();
+	ImGui::Text("Is On: %d\n", EventManager::get_using_normal_maps());
+
+	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
+	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
+	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
 	ImGui::End();
 }
 
