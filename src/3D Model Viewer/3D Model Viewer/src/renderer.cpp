@@ -5,12 +5,20 @@
 
 #include <GLFW/glfw3.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "stb_image.h"
 
 
 using namespace std;
 
 GLFWwindow* Renderer::r_window = nullptr;
+
+bool show_demo_window = true;
+bool show_another_window = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 
 void Renderer::initialize()
 {
@@ -38,14 +46,28 @@ void Renderer::initialize()
 	glDepthFunc(GL_LESS);
 	std::cout << "Enabling depth test..." << endl;
 
+	initialize_imgui();
+
 	//check_for_errors();
 	std::cout << "Ending Renderer Initialization..." << endl;
 }
 
-void Renderer::shutdown()
+void Renderer::initialize_imgui()
 {
-	// Managed by EventManager
-	r_window = nullptr;
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(r_window, true);
+	const auto glsl_version = "#version 330";
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	std::cout << "Initializing IMGUI window..." << endl;
 }
 
 void Renderer::begin_frame()
@@ -53,12 +75,59 @@ void Renderer::begin_frame()
 	// Clear the screen
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	//bool show_demo_window = true;
+	//ImGui::ShowDemoWindow(&show_demo_window);
 }
+
+void Renderer::render_demo_window()
+{
+	static float f = 0.0f;
+	static int counter = 0;
+
+	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Another Window", &show_another_window);
+
+	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::ColorEdit3("clear color", reinterpret_cast<float*>(&clear_color)); // Edit 3 floats representing a color
+
+	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+		counter++;
+	ImGui::SameLine();
+	ImGui::Text("counter = %d", counter);
+
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
+}
+
 
 void Renderer::end_frame()
 {
+	// Render ImGui window
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	glfwSwapBuffers(r_window);
 	glfwPollEvents();
+}
+
+void Renderer::shutdown()
+{
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	// Managed by EventManager
+	r_window = nullptr;
 }

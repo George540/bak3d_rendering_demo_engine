@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
@@ -123,7 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
@@ -139,6 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_widgets.cpp" />
     <ClCompile Include="include\axis.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\camera.cpp" />
@@ -154,6 +161,15 @@
     <ClCompile Include="src\Tools\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\lib\imgui\include\imconfig.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_internal.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_truetype.h" />
     <ClInclude Include="include\axis.h" />
     <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\grid.h" />

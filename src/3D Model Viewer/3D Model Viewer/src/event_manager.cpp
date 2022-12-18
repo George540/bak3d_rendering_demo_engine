@@ -85,6 +85,7 @@ void EventManager::initialize()
 void EventManager::shutdown()
 {
 	// Close OpenGL window and terminate GLFW
+	glfwDestroyWindow(m_window);
 	glfwTerminate();
 	m_window = nullptr;
 	std::cout << "Terminating EventManager..." << endl;

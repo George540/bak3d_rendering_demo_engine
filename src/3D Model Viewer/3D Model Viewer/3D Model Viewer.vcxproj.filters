@@ -66,6 +66,27 @@
     <ClCompile Include="include\axis.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_demo.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_draw.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_impl_glfw.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_tables.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\lib\imgui\src\imgui_widgets.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -103,6 +124,33 @@
     </ClInclude>
     <ClInclude Include="include\axis.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imconfig.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_glfw.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_opengl3.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imgui_internal.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_rectpack.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_textedit.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\lib\imgui\include\imstb_truetype.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

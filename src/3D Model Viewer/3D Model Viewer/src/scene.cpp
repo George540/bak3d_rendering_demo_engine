@@ -57,5 +57,7 @@ void World::draw() const
 
 	m_light->draw();
 
+	Renderer::render_demo_window();
+
     Renderer::end_frame();
 }

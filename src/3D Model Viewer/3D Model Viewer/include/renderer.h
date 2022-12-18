@@ -10,8 +10,8 @@ struct GLFWwindow;
 class Renderer
 {
 	static GLFWwindow* r_window;
-	static std::vector<Shader> shader_program_id;
-	static unsigned int current_shader;
+
+	static void initialize_imgui();
 public:
 	static void initialize();
 	static void shutdown();
@@ -19,8 +19,7 @@ public:
 	static void begin_frame();
 	static void end_frame();
 
-	static void check_for_errors();
-	static bool print_error();
+	static void render_demo_window();
 };
 
 #endif
