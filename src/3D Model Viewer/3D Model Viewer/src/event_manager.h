@@ -22,12 +22,10 @@ class EventManager
 	static double delta_x;
 	static double delta_y;
 	static double cam_zoom_distance;
+	static double cam_zoom_factor;
 	static int last_mouse_left_state;
 	static int last_mouse_right_state;
 	static int last_mouse_middle_state;
-	static bool is_using_diffuse_texture;
-	static bool is_using_specular_texture;
-	static bool is_using_normal_maps;
 public:
 	static void initialize();
 	static void shutdown();
@@ -58,6 +56,9 @@ public:
 
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	static void toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static bool is_using_diffuse_texture;
+	static bool is_using_specular_texture;
+	static bool is_using_normal_maps;
 };
 
 #endif

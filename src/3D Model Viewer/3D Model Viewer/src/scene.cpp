@@ -48,11 +48,14 @@ void World::draw() const
 {
     Renderer::begin_frame();
 
-	// Set depth test for axis to render in front of grid
-	glDepthFunc(GL_ALWAYS);
-	m_grid->draw();
-	m_axis->draw();
-	glDepthFunc(GL_LESS);
+	if (Renderer::is_grid_rendering)
+	{
+		// Set depth test for axis to render in front of grid
+		glDepthFunc(GL_ALWAYS);
+		m_grid->draw();
+		m_axis->draw();
+		glDepthFunc(GL_LESS);
+	}
 	m_object->draw();
 
 	m_light->draw();

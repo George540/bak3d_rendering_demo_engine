@@ -20,6 +20,8 @@ public:
 	static void end_frame();
 
 	static void render_demo_window();
+
+	static bool is_grid_rendering;
 };
 
 #endif

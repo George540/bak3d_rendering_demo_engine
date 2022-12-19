@@ -14,10 +14,7 @@
 using namespace std;
 
 GLFWwindow* Renderer::r_window = nullptr;
-
-bool show_demo_window = true;
-bool show_another_window = false;
-ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+bool Renderer::is_grid_rendering = true;
 
 
 void Renderer::initialize()
@@ -88,39 +85,22 @@ void Renderer::render_demo_window()
 	static int counter = 0;
 
 	ImGui::Begin("Metrics!");                          // Create a window called "Hello, world!" and append into it.
-
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Another Window", &show_another_window);
-
-	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	ImGui::ColorEdit3("clear color", reinterpret_cast<float*>(&clear_color)); // Edit 3 floats representing a color
-
-	if (ImGui::Button("Albedo Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
-	{
-		EventManager::set_using_diffuse_texture(!EventManager::get_using_diffuse_texture());
-	}
-	ImGui::SameLine();
-	ImGui::Text("Is On: %d\n", EventManager::get_using_diffuse_texture());
-
-	if (ImGui::Button("Specular Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
-	{
-		EventManager::set_using_specular_texture(!EventManager::get_using_specular_texture());
-	}
-	ImGui::SameLine();
-	ImGui::Text("Is On: %d\n", EventManager::get_using_specular_texture());
-
-	if (ImGui::Button("Normal Toggle"))                          // Buttons return true when clicked (most widgets return true when edited/activated)
-	{
-		EventManager::set_using_normal_maps(!EventManager::get_using_normal_maps());
-	}
-	ImGui::SameLine();
-	ImGui::Text("Is On: %d\n", EventManager::get_using_normal_maps());
-
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
 	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
 	ImGui::End();
+
+	ImGui::Begin("Settings");
+	ImGui::Text("Environment Toggles");
+	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
+	ImGui::Text("Texture Toggles");               // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
+	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
+	ImGui::End();
+
+	//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	//ImGui::ColorEdit3("clear color", reinterpret_cast<float*>(&clear_color)); // Edit 3 floats representing a color
 }
 
 

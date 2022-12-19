@@ -18,6 +18,7 @@ double EventManager::last_mouse_position_y = 0.0;
 double EventManager::delta_x = 0.0;
 double EventManager::delta_y = 0.0;
 double EventManager::cam_zoom_distance = 10.0;
+double EventManager::cam_zoom_factor = 1.0;
 int EventManager::last_mouse_left_state = GLFW_RELEASE;
 int EventManager::last_mouse_right_state = GLFW_RELEASE;
 int EventManager::last_mouse_middle_state = GLFW_RELEASE;
@@ -173,6 +174,7 @@ float EventManager::get_random_float(float min, float max)
 
 void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
+
 	cam_zoom_distance -= yoffset;
 	// Clamp zoom to [1, 10] degrees
 	cam_zoom_distance = std::max(1.0, std::min(25.0, cam_zoom_distance));
