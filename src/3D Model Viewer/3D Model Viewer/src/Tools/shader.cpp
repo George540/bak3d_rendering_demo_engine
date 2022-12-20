@@ -67,6 +67,8 @@ Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+
+    std::cout << "Shader with ID " << id << " has compiled..." << std::endl;
 }
 
 void Shader::use() const

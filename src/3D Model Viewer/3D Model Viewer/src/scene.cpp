@@ -24,7 +24,8 @@ World::World()
 
 	// Model set up
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
-	m_object = new Model(model_path, *m_camera, *m_light);
+	m_model = new Model(model_path, *m_camera, *m_light);
+	Renderer::current_model = m_model;
 	cout << "Model with path " << model_path << " has been spawned." << endl;
 }
 
@@ -32,7 +33,7 @@ World::~World()
 {
 	delete m_grid;
 	delete m_camera;
-	delete m_object;
+	delete m_model;
 	delete m_light;
 	delete m_axis;
 }
@@ -56,9 +57,13 @@ void World::draw() const
 		m_axis->draw();
 		glDepthFunc(GL_LESS);
 	}
-	m_object->draw();
 
-	m_light->draw();
+	if (Renderer::is_full_render_selected)
+	{
+		m_light->draw();
+	}
+
+	m_model->draw();
 
 	Renderer::render_demo_window();
 

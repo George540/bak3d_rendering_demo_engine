@@ -21,17 +21,17 @@ public:
     std::vector<Mesh> meshes; // a model is made out of one or more meshes
     std::string directory;
     std::string m_name;
-    bool gamma_correction;
+    bool gamma_correction{};
 
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, Camera& cam, Light& light);
     ~Model();
 
     void draw() const; // draws the model, and thus all its meshes
+    void set_current_shader(int id) { m_current_shader = m_shaders.at(id); }
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void load_model(string const& path);
-    material load_material(aiMaterial* mat);
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
 	void process_node(aiNode* node, const aiScene* scene);
     Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
@@ -40,8 +40,10 @@ private:
     vector<texture> load_material_textures(aiMaterial* mat, aiTextureType type, string typeName);
     void update_light_properties() const;
     void update_material_properties(const Mesh& mesh) const;
+    void update_breakdown_shader() const;
 
-	Shader* m_shader;
+	vector<Shader*> m_shaders;
+    Shader* m_current_shader{};
     Camera* m_camera;
     Light* m_light;
 };

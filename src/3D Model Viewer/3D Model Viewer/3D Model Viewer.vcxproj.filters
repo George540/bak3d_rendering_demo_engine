@@ -190,5 +190,11 @@
     <None Include="..\..\..\Assets\Shaders\bufferShader.fs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\Assets\Shaders\DissectShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Assets\Shaders\DissectShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,19 +22,13 @@ public:
 		return instance;
 	}
 
-	void generate_grid();
-	void draw_grid();
 	void update(float dt) const;
 	void draw() const;
-	void set_matrix(GLuint shader_program, glm::mat4 world_matrix);
-
-	void set_projection_matrix(int shader_program, glm::mat4 projection_matrix);
-	void set_view_matrix(int shader_program, glm::mat4 view_matrix);
-	void set_world_matrix(int shader_program, glm::mat4 world_matrix);
+	Model* get_model() const { return m_model; }
 private:
 	static World* instance;
 
-	Model* m_object;
+	Model* m_model;
 	Camera* m_camera;
 	Light* m_light;
 	Grid* m_grid;

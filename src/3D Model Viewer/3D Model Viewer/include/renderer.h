@@ -1,11 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
+#include "model.h"
 
 struct GLFWwindow;
-
-#include <vector>
-
-#include "shader.h"
 
 class Renderer
 {
@@ -21,7 +18,12 @@ public:
 
 	static void render_demo_window();
 
+	static Model* current_model;
 	static bool is_grid_rendering;
+	static bool is_full_render_selected;
+	static bool is_diffuse_render_selected;
+	static bool is_specular_selected;
+	static bool is_normal_map_selected;
 };
 
 #endif

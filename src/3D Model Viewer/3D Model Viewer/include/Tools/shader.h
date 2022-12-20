@@ -9,6 +9,7 @@ using namespace std;
 class Shader
 {
 	unsigned int id;
+    unsigned int index;
 	static void check_compile_errors(unsigned int shader, std::string type);
 public:
     // Constructor
@@ -17,6 +18,10 @@ public:
 
     // Core functions
     unsigned int get_id() const { return id; }
+
+    unsigned int get_index() const { return index; }
+    void set_index(int i) { index = i; }
+
     void use() const;
 
     // Utility Functions

@@ -8,13 +8,19 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "scene.h"
 #include "stb_image.h"
 
 
 using namespace std;
 
 GLFWwindow* Renderer::r_window = nullptr;
+Model* Renderer::current_model = nullptr;
 bool Renderer::is_grid_rendering = true;
+bool Renderer::is_full_render_selected = true;
+bool Renderer::is_diffuse_render_selected = false;
+bool Renderer::is_specular_selected = false;
+bool Renderer::is_normal_map_selected = false;
 
 
 void Renderer::initialize()
@@ -84,7 +90,7 @@ void Renderer::render_demo_window()
 	static float f = 0.0f;
 	static int counter = 0;
 
-	ImGui::Begin("Metrics!");                          // Create a window called "Hello, world!" and append into it.
+	ImGui::Begin("Metrics");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
 	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
@@ -93,10 +99,69 @@ void Renderer::render_demo_window()
 	ImGui::Begin("Settings");
 	ImGui::Text("Environment Toggles");
 	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
-	ImGui::Text("Texture Toggles");               // Display some text (you can use a format strings too)
+	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
 	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
 	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
+	ImGui::End();
+
+	ImGui::Begin("Map Breakdowns");
+	if (ImGui::Button("Full Render"))
+	{
+		is_full_render_selected = true;
+		is_diffuse_render_selected = false;
+		is_specular_selected = false;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = true;
+		EventManager::is_using_specular_texture = true;
+		EventManager::is_using_normal_maps = true;
+
+		current_model->set_current_shader(0);
+		std::cout << "Full Render Mode" << std::endl;
+	}
+	if (ImGui::Button("Albedo"))
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = true;
+		is_specular_selected = false;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Albedo Dissecting" << std::endl;
+	}
+	if (ImGui::Button("Specular"))
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = false;
+		is_specular_selected = true;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Specular Map Dissecting" << std::endl;
+	}
+	if (ImGui::Button("Normal"))
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = false;
+		is_specular_selected = false;
+		is_normal_map_selected = true;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Rendering Dissecting" << std::endl;
+	}
 	ImGui::End();
 
 	//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f

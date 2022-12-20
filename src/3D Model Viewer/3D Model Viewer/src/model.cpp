@@ -7,19 +7,41 @@
 
 #include "model.h"
 #include "event_manager.h"
+#include "renderer.h"
 
 Model::Model(string const& path, Camera& cam, Light& light) : m_camera(&cam), m_light(&light)
 {
-	const string shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
-	m_shader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
+	const char* shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
+	auto shader = new Shader("D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
+	                         "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
+	shader->set_index(0);
+	m_shaders.push_back(shader);
+	shader = nullptr;
+	shader = new Shader(
+		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/DissectShader.vs",
+		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/DissectShader.fs");
+	shader->set_index(1);
+	m_shaders.push_back(shader);
 	load_model(path);
+
+	std::cout << "Number of shaders compiled: " << m_shaders.size() << std::endl;
+
+	if (m_shaders.empty())
+	{
+		throw std::runtime_error("ERROR::SHADER_COMPILATION_ERROR: No shaders loaded!");
+	}
+
+	set_current_shader(0);
 }
 
 Model::~Model()
 {
-	delete m_shader;
+	for (const auto s : m_shaders)
+	{
+		delete s;
+	}
+	m_shaders.clear();
+	delete m_current_shader;
 	delete m_camera;
 	delete m_light;
 }
@@ -29,19 +51,30 @@ void Model::draw() const
 	//cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
-		m_shader->use();
+		m_current_shader->use();
 
 		// Set MVP matrix
 		glm::mat4 model = glm::mat4(1.0f);
-		m_shader->set_mat4("projection", m_camera->get_projection_matrix());
-		m_shader->set_mat4("view", m_camera->get_view_matrix());
+		m_current_shader->set_mat4("projection", m_camera->get_projection_matrix());
+		m_current_shader->set_mat4("view", m_camera->get_view_matrix());
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		m_shader->set_mat4("model", model);
+		m_current_shader->set_mat4("model", model);
 
-		update_light_properties();
-		update_material_properties(mesh);
+		if (m_current_shader->get_index() == 0
+			&& Renderer::is_full_render_selected
+			&& !Renderer::is_diffuse_render_selected
+			&& !Renderer::is_specular_selected
+			&& !Renderer::is_normal_map_selected)
+		{
+			update_light_properties();
+			update_material_properties(mesh);
+		}
+		else
+		{
+			update_breakdown_shader();
+		}
 
-		mesh.draw(*m_shader);
+		mesh.draw(*m_current_shader);
 	}
 }
 
@@ -50,28 +83,50 @@ void Model::update_light_properties() const
 	const auto light = m_light->get_light_properties();
 
 	// VERTEX
-	m_shader->set_vec3("viewPos", m_camera->get_camera_position());
-	m_shader->set_vec3("lightPos", light.position);
+	m_current_shader->set_vec3("viewPos", m_camera->get_camera_position());
+	m_current_shader->set_vec3("lightPos", light.position);
 
 	// FRAGMENT
-	m_shader->set_vec3("light.position", light.position);
-	m_shader->set_vec3("light.diffuse", light.diffuse);
-	m_shader->set_vec3("light.specular", light.specular);
-	m_shader->set_vec3("light.ambient", light.ambient);
+	m_current_shader->set_vec3("light.position", light.position);
+	m_current_shader->set_vec3("light.diffuse", light.diffuse);
+	m_current_shader->set_vec3("light.specular", light.specular);
+	m_current_shader->set_vec3("light.ambient", light.ambient);
 }
 
 void Model::update_material_properties(const Mesh& mesh) const
 {
 	// FRAGMENT MATERIAL
-	m_shader->set_int("material.diffuse", 0);
-	m_shader->set_int("material.specular", 1);
-	m_shader->set_int("material.normal", 2);
-	m_shader->set_float("material.ambient", 0.5f);
-	m_shader->set_float("material.shininess", 64.0f);
-	m_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
-	m_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
-	m_shader->set_bool("materialSettings.useNormalMaps", EventManager::get_using_normal_maps());
-	m_shader->set_bool("material.gamma", true);
+	m_current_shader->set_int("material.diffuse", 0);
+	m_current_shader->set_int("material.specular", 1);
+	m_current_shader->set_int("material.normal", 2);
+	m_current_shader->set_float("material.ambient", 0.5f);
+	m_current_shader->set_float("material.shininess", 64.0f);
+	m_current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
+	m_current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
+	m_current_shader->set_bool("materialSettings.useNormalMaps", EventManager::get_using_normal_maps());
+	m_current_shader->set_bool("material.gamma", true);
+}
+
+void Model::update_breakdown_shader() const
+{
+	int texture_id = 0;
+	if (Renderer::is_diffuse_render_selected)
+	{
+		texture_id = 0;
+	}
+	else if (Renderer::is_specular_selected)
+	{
+		texture_id = 1;
+	}
+	else if (Renderer::is_normal_map_selected)
+	{
+		texture_id = 2;
+	}
+	else
+	{
+		texture_id = 0;
+	}
+	m_current_shader->set_int("textureSampler", texture_id);
 }
 
 void Model::load_model(string const& path)
