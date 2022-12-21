@@ -74,6 +74,8 @@ void EventManager::initialize()
 		std::cout << "Opening Window..." << endl;
 	}
 
+	cam_zoom_factor = 1;
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
 
@@ -174,10 +176,18 @@ float EventManager::get_random_float(float min, float max)
 
 void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-
-	cam_zoom_distance -= yoffset;
+	if (yoffset > 0)
+	{
+		cam_zoom_factor = (cam_zoom_distance * 0.2) * 1;
+	}
+	else if (yoffset < 0)
+	{
+		cam_zoom_factor = (cam_zoom_distance * 0.2) * -1;
+	}
+	cam_zoom_distance -= cam_zoom_factor;
+	std::cout << yoffset << std::endl;
 	// Clamp zoom to [1, 10] degrees
-	cam_zoom_distance = std::max(1.0, std::min(25.0, cam_zoom_distance));
+	cam_zoom_distance = std::max(0.3, std::min(25.0, cam_zoom_distance));
 }
 
 void EventManager::toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
