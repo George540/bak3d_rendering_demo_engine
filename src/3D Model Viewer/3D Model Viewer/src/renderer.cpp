@@ -21,6 +21,8 @@ bool Renderer::is_full_render_selected = true;
 bool Renderer::is_diffuse_render_selected = false;
 bool Renderer::is_specular_selected = false;
 bool Renderer::is_normal_map_selected = false;
+bool Renderer::is_gamma_enabled = false;
+float Renderer::shininess = 64.0f;
 
 Light* Renderer::environment_point_light = nullptr;
 float Renderer::light_horizontal_rotation = 0.0f;
@@ -132,6 +134,12 @@ void Renderer::render_demo_window()
 	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
 	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
+
+	// Toggle Material Settings
+	ImGui::Text("Material Properties");
+	ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
+	ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
+
 	ImGui::End();
 
 	// BREAKDOWN WINDOW

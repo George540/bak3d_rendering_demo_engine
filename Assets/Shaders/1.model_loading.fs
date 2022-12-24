@@ -8,6 +8,7 @@ struct Material
     sampler2D normal;
     vec3 roughness;
     float shininess;
+    bool gamma;
 };
 
 struct MaterialSettings
@@ -40,7 +41,6 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform MaterialSettings materialSettings;
 uniform Light light;
-uniform bool gamma;
 
 out vec4 FragColor;
 
@@ -95,9 +95,9 @@ void main()
     }
 
     float distance = length(light.position - fs_in.FragPos);
-    float attenuation = 1.0 / (gamma ? distance * distance : distance);
+    float attenuation = 1.0 / (material.gamma ? distance * distance : distance);
 
-    if (gamma)
+    if (material.gamma)
     {
         diffuse *= attenuation;
         specular *= attenuation;
@@ -106,7 +106,7 @@ void main()
 	vec3 result = ambient + diffuse + specular;
 
     // Process gamma correction if enabled
-    if (gamma)
+    if (material.gamma)
     {
         result = pow(result, vec3(1.0/2.2));
     }

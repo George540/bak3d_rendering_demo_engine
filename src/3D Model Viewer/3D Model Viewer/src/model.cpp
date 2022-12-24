@@ -101,11 +101,11 @@ void Model::update_material_properties(const Mesh& mesh) const
 	m_current_shader->set_int("material.specular", 1);
 	m_current_shader->set_int("material.normal", 2);
 	m_current_shader->set_float("material.ambient", 0.5f);
-	m_current_shader->set_float("material.shininess", 64.0f);
+	m_current_shader->set_float("material.shininess", Renderer::shininess);
 	m_current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
 	m_current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
 	m_current_shader->set_bool("materialSettings.useNormalMaps", EventManager::get_using_normal_maps());
-	m_current_shader->set_bool("material.gamma", true);
+	m_current_shader->set_bool("material.gamma", Renderer::is_gamma_enabled);
 }
 
 void Model::update_breakdown_shader() const

@@ -24,6 +24,8 @@ public:
 	static bool is_diffuse_render_selected;
 	static bool is_specular_selected;
 	static bool is_normal_map_selected;
+	static bool is_gamma_enabled;
+	static float shininess;
 
 	static Light* environment_point_light;
 	static float light_horizontal_rotation;
