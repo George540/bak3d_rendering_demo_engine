@@ -24,6 +24,11 @@ public:
 	static bool is_diffuse_render_selected;
 	static bool is_specular_selected;
 	static bool is_normal_map_selected;
+
+	static Light* environment_point_light;
+	static float light_horizontal_rotation;
+	static float light_vertical_rotation;
+	static float light_origin_distance;
 };
 
 #endif

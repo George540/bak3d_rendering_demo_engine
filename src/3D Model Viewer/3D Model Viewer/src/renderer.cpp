@@ -22,6 +22,11 @@ bool Renderer::is_diffuse_render_selected = false;
 bool Renderer::is_specular_selected = false;
 bool Renderer::is_normal_map_selected = false;
 
+Light* Renderer::environment_point_light = nullptr;
+float Renderer::light_horizontal_rotation = 0.0f;
+float Renderer::light_vertical_rotation = 0.0f;
+float Renderer::light_origin_distance = 0.0f;
+
 
 void Renderer::initialize()
 {
@@ -87,9 +92,6 @@ void Renderer::begin_frame()
 
 void Renderer::render_demo_window()
 {
-	static float f = 0.0f;
-	static int counter = 0;
-
 	ImGui::Begin("Metrics");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
@@ -97,8 +99,18 @@ void Renderer::render_demo_window()
 	ImGui::End();
 
 	ImGui::Begin("Settings");
+
 	ImGui::Text("Environment Toggles");
 	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
+
+	ImGui::Text("Light Repositioning");
+	ImGui::SliderFloat("Horizontal", &light_horizontal_rotation, 0.0f, 360.0f);
+	environment_point_light->set_horizontal_angle(light_horizontal_rotation);
+	ImGui::SliderFloat("Vertical", &light_vertical_rotation, 0.0f, 360.0f);
+	environment_point_light->set_vertical_angle(light_vertical_rotation);
+	ImGui::SliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f);
+	environment_point_light->set_distance_offset(light_origin_distance);
+
 	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
 	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);

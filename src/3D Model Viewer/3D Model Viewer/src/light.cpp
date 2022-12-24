@@ -5,6 +5,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <GLFW/glfw3.h>
+
+#include "event_manager.h"
+#include "renderer.h"
 
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
@@ -20,6 +24,15 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	m_properties.ambient = glm::vec3(0.3f);
 	m_properties.specular = glm::vec3(0.3f);
 
+	m_horizontal_angle = m_position.x;
+	m_vertical_angle = m_position.y;
+	m_distance_offset = glm::distance(m_position, glm::vec3(0.0f));
+
+	Renderer::light_horizontal_rotation = 45.0f;
+	Renderer::light_vertical_rotation = 135.0f;
+	Renderer::light_origin_distance = m_distance_offset;
+
+
 	build_vertex_buffer();
 
 	m_shader = new Shader(
@@ -33,6 +46,36 @@ Light::~Light()
 	delete m_shader;
 	delete m_camera;
 }
+
+void Light::update(float dt)
+{
+	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_A) == GLFW_PRESS)
+	{
+		//m_position.x += dt * 3.0f;
+		m_horizontal_angle += dt * 30.0f;
+	}
+	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_D) == GLFW_PRESS)
+	{
+		//m_position.x += dt * 3.0f;
+		m_horizontal_angle -= dt * 30.0f;
+	}
+
+	auto theta = glm::radians(m_horizontal_angle);
+	auto phi = glm::radians(m_vertical_angle);
+	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
+
+	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_W) == GLFW_PRESS)
+	{
+		m_distance_offset += dt * 30.0f;
+	}
+	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_S) == GLFW_PRESS)
+	{
+		m_distance_offset -= dt * 30.0f;
+	}
+	m_position *= m_distance_offset;
+	m_properties.position = m_position;
+}
+
 
 void Light::draw() const
 {

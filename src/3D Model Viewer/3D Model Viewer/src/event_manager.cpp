@@ -1,4 +1,5 @@
 #include "event_manager.h"
+#include "imgui.h"
 //#include "renderer.h"
 
 #include <iostream>
@@ -102,7 +103,11 @@ void EventManager::update()
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
 	// Camera tilt and Pan
-	if (last_mouse_right_state == GLFW_RELEASE && glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (last_mouse_right_state == GLFW_RELEASE
+		&& glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+		&& !ImGui::IsAnyItemHovered()
+		&& !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+		&& !ImGui::IsAnyItemFocused())
 	{
 		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);  // NOLINT(clang-diagnostic-double-promotion)
 		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);  // NOLINT(clang-diagnostic-double-promotion)
@@ -185,9 +190,7 @@ void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 		cam_zoom_factor = (cam_zoom_distance * 0.2) * -1;
 	}
 	cam_zoom_distance -= cam_zoom_factor;
-	std::cout << yoffset << std::endl;
-	// Clamp zoom to [1, 10] degrees
-	cam_zoom_distance = std::max(0.3, std::min(25.0, cam_zoom_distance));
+	cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
 }
 
 void EventManager::toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -26,6 +26,7 @@ World::World()
 	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
 	m_model = new Model(model_path, *m_camera, *m_light);
 	Renderer::current_model = m_model;
+	Renderer::environment_point_light = m_light;
 	cout << "Model with path " << model_path << " has been spawned." << endl;
 }
 
@@ -42,6 +43,7 @@ void World::update(float dt) const
 {
 	// camera
 	m_camera->update(dt);
+	m_light->update(dt);
     //cout << "\rCurrent frame dt: " << dt << ' ' << endl << flush;
 }
 
