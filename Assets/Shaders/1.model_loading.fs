@@ -23,6 +23,7 @@ struct Light
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float intensity;
 };
 
 in VS_OUT
@@ -110,5 +111,5 @@ void main()
         result = pow(result, vec3(1.0/2.2));
     }
 
-	FragColor = vec4(result, 1.0);
+	FragColor = vec4(result * light.intensity, 1.0);
 }

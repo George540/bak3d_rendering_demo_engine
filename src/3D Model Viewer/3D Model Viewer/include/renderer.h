@@ -29,6 +29,8 @@ public:
 	static float light_horizontal_rotation;
 	static float light_vertical_rotation;
 	static float light_origin_distance;
+	static glm::vec3 light_diffuse_color;
+	static float light_intensity;
 };
 
 #endif

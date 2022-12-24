@@ -88,6 +88,8 @@ void Light::draw() const
 	model = translate(model, m_position) * scale(model, m_scaling);
 	m_shader->set_mat4("model", model);
 
+	m_shader->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
+
 	// Draw the triangles !
 	glBindVertexArray(mVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)

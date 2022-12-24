@@ -1,9 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <string>
 #include <vector>
-#include <glad.h>
 #include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
@@ -16,6 +14,7 @@ struct light {
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
+	float intensity;
 };
 
 class Light
@@ -57,6 +56,9 @@ public:
 
 	float get_distance_offset() const { return m_distance_offset; }
 	void set_distance_offset(const float distance) { m_distance_offset = distance; }
+
+	void set_diffuse_color(const glm::vec3 col) { m_properties.diffuse = col; }
+	void set_light_intensity(const float intensity) { m_properties.intensity = intensity; }
 
 	glm::vec3 get_position() const { return m_position; }
 	glm::vec3 get_scaling() const { return m_scaling; }

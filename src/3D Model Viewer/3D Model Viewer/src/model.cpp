@@ -91,6 +91,7 @@ void Model::update_light_properties() const
 	m_current_shader->set_vec3("light.diffuse", light.diffuse);
 	m_current_shader->set_vec3("light.specular", light.specular);
 	m_current_shader->set_vec3("light.ambient", light.ambient);
+	m_current_shader->set_float("light.intensity", light.intensity);
 }
 
 void Model::update_material_properties(const Mesh& mesh) const

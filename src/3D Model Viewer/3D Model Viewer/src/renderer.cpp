@@ -26,6 +26,8 @@ Light* Renderer::environment_point_light = nullptr;
 float Renderer::light_horizontal_rotation = 0.0f;
 float Renderer::light_vertical_rotation = 0.0f;
 float Renderer::light_origin_distance = 0.0f;
+glm::vec3 Renderer::light_diffuse_color = glm::vec3(1.0f);
+float Renderer::light_intensity = 1.0f;
 
 
 void Renderer::initialize()
@@ -92,17 +94,21 @@ void Renderer::begin_frame()
 
 void Renderer::render_demo_window()
 {
+	// METRICS WINDOW
 	ImGui::Begin("Metrics");                          // Create a window called "Hello, world!" and append into it.
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
 	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
 	ImGui::End();
 
+	// SETTINGS WINDOW
 	ImGui::Begin("Settings");
 
+	// Toggle Environment graphics
 	ImGui::Text("Environment Toggles");
 	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
 
+	// Toggle Light properties: position, color, intensity
 	ImGui::Text("Light Repositioning");
 	ImGui::SliderFloat("Horizontal", &light_horizontal_rotation, 0.0f, 360.0f);
 	environment_point_light->set_horizontal_angle(light_horizontal_rotation);
@@ -110,13 +116,25 @@ void Renderer::render_demo_window()
 	environment_point_light->set_vertical_angle(light_vertical_rotation);
 	ImGui::SliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f);
 	environment_point_light->set_distance_offset(light_origin_distance);
+	ImGui::SliderFloat("Intensity", &light_intensity, 0.0f, 5.0f);
+	environment_point_light->set_light_intensity(light_intensity);
 
+	// Toggle light color
+	float light_col[3] = {light_diffuse_color.r, light_diffuse_color.g, light_diffuse_color.b};
+	ImGui::ColorEdit3("Light Color", light_col);
+	light_diffuse_color.r = light_col[0];
+	light_diffuse_color.g = light_col[1];
+	light_diffuse_color.b = light_col[2];
+	environment_point_light->set_diffuse_color(light_diffuse_color);
+
+	// Toggle map breakdowns
 	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
 	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
 	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
 	ImGui::End();
 
+	// BREAKDOWN WINDOW
 	ImGui::Begin("Map Breakdowns");
 	if (ImGui::Button("Full Render"))
 	{
