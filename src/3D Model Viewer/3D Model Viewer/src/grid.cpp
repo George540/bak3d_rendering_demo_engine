@@ -74,9 +74,9 @@ void Grid::draw() const
 
 	auto model = glm::mat4(1.0f);
 	m_shader->set_mat4("model", model);
+	m_shader->set_vec3("color", glm::vec3(0.5f));
 
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_LINES, number_of_elements, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 }
-
