@@ -349,8 +349,8 @@ unsigned int texture_from_file(const char* path, const string& directory)
 	std::cout << "Loading texture file: " << filename << std::endl;
 	filename = directory + '/' + filename;
 
-	unsigned int texture_id;
-	glGenTextures(1, &texture_id);
+	unsigned int texture_color_buffer;
+	glGenTextures(1, &texture_color_buffer);
 
 	int width, height, nr_components;
 	const auto data = stbi_load(filename.c_str(), &width, &height, &nr_components, 0);
@@ -374,14 +374,16 @@ unsigned int texture_from_file(const char* path, const string& directory)
 			break;
 		}
 
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
 		stbi_image_free(data);
 	}
@@ -391,5 +393,13 @@ unsigned int texture_from_file(const char* path, const string& directory)
 		stbi_image_free(data);
 	}
 
-	return texture_id;
+	return texture_color_buffer;
+}
+
+void Model::delete_mesh_vaos() const
+{
+	for (auto& mesh : meshes)
+	{
+		mesh.delete_vao_vbo();
+	}
 }

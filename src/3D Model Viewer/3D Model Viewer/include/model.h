@@ -29,6 +29,7 @@ public:
 
     void draw() const; // draws the model, and thus all its meshes
     void set_current_shader(int id) { m_current_shader = m_shaders.at(id); }
+    void delete_mesh_vaos() const;
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void load_model(string const& path);

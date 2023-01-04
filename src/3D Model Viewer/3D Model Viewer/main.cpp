@@ -34,6 +34,7 @@ int main()
     } while (EventManager::is_exit_requested() == false);
 
     Renderer::shutdown();
+    world.delete_arrays_and_buffers();
     EventManager::shutdown();
 
     return 0;

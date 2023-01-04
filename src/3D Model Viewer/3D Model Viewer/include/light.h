@@ -27,8 +27,8 @@ class Light
 	float m_distance_offset;
 
 	// MESH
-	unsigned int mVAO;
-	unsigned int mVBO;
+	unsigned int m_vao;
+	unsigned int m_vbo;
 	std::vector<glm::vec3> mVertexPositions;
 
 	// EXTERNAL
@@ -64,6 +64,7 @@ public:
 	glm::vec3 get_scaling() const { return m_scaling; }
 
 	void build_vertex_buffer();
+	void delete_vao_vbo() const;
 };
 
 #endif

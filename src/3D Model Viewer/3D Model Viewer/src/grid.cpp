@@ -39,9 +39,8 @@ Grid::Grid(Camera& cam) : m_camera(&cam), number_of_slices(40), grid_size(20.0f)
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), glm::value_ptr(vertices[0]), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 
@@ -79,4 +78,10 @@ void Grid::draw() const
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_LINES, number_of_elements, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
+}
+
+void Grid::delete_vao_vbo() const
+{
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
 }

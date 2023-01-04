@@ -59,14 +59,16 @@ public:
     vector<vertex> vertices;
     vector<unsigned int> indices;
     vector<texture> textures;
-    unsigned int m_vao;
 
     // constructor
     Mesh(vector<vertex> vertices, vector<unsigned int> indices, vector<texture> textures);
     void draw(const Shader& shader) const; // render the mesh
+    void delete_vao_vbo() const;
 private:
     // render data 
-    unsigned int m_vbo{}, m_ebo{};
+    GLuint m_vao{};
+    GLuint m_vbo{};
+	GLuint m_ebo{};
     void set_up_mesh();
 };
 

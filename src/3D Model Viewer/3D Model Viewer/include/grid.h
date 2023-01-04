@@ -13,8 +13,10 @@ public:
 	~Grid() = default;
 
 	void draw() const;
+	void delete_vao_vbo() const;
 private:
 	GLuint m_vao{};
+	GLuint m_vbo{};
 	Shader* m_shader;
 	Camera* m_camera;
 	int number_of_elements;

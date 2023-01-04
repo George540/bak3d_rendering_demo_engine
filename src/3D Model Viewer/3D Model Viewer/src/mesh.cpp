@@ -104,3 +104,10 @@ void Mesh::set_up_mesh()
 
 	glBindVertexArray(0);
 }
+
+void Mesh::delete_vao_vbo() const
+{
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteBuffers(1, &m_ebo);
+}

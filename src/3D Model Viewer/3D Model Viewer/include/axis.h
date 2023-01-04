@@ -13,10 +13,12 @@ public:
 	~Axis();
 
 	void draw() const;
+	void delete_vao_vbo() const;
 private:
 	Camera* m_camera;
 	Shader* m_shader;
 	GLuint m_vao{};
+	GLuint m_vbo{};
 };
 
 #endif

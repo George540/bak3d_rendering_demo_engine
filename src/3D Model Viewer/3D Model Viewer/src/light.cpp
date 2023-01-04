@@ -16,8 +16,8 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	m_scaling(scaling),
 	m_camera(&camera)
 {
-	mVAO = NULL;
-	mVBO = NULL;
+	m_vao = NULL;
+	m_vbo = NULL;
 
 	m_properties.position = m_position;
 	m_properties.diffuse = glm::vec3(1.0f);
@@ -91,7 +91,7 @@ void Light::draw() const
 	m_shader->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
 
 	// Draw the triangles !
-	glBindVertexArray(mVAO);
+	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)
 	glBindVertexArray(0);
 }
@@ -144,12 +144,12 @@ void Light::build_vertex_buffer()
 	};
 
 	// Create a vertex array
-	glGenVertexArrays(1, &mVAO);
-	glBindVertexArray(mVAO);
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
 
 	// Upload Vertex Buffer to the GPU, keep a reference to it (mVertexBufferID)
-	glGenBuffers(1, &mVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// position attribute
@@ -157,6 +157,12 @@ void Light::build_vertex_buffer()
 	glEnableVertexAttribArray(0);
 
 	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBindVertexArray(0);
+}
+
+void Light::delete_vao_vbo() const
+{
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
 }

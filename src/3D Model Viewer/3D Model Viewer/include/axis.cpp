@@ -27,9 +27,8 @@ Axis::Axis(Camera& camera)
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 
@@ -39,7 +38,7 @@ Axis::Axis(Camera& camera)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)sizeof(glm::vec3));
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBindVertexArray(0);
 
 	std::cout << "Setting up 3D axis gizmo..." << std::endl;
@@ -65,4 +64,10 @@ void Axis::draw() const
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_LINES, 0, 6);
 	glBindVertexArray(0);
+}
+
+void Axis::delete_vao_vbo() const
+{
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
 }

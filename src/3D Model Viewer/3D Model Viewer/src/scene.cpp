@@ -5,7 +5,6 @@
 #include "renderer.h"
 #include "model.h"
 
-
 using namespace std;
 
 World* World::instance;
@@ -70,4 +69,12 @@ void World::draw() const
 	Renderer::render_demo_window();
 
     Renderer::end_frame();
+}
+
+void World::delete_arrays_and_buffers() const
+{
+	m_model->delete_mesh_vaos();
+	m_grid->delete_vao_vbo();
+	m_axis->delete_vao_vbo();
+	m_light->delete_vao_vbo();
 }
