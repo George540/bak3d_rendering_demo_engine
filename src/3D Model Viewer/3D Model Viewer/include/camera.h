@@ -1,3 +1,8 @@
+// =====================================================================================
+// Camera class was made by George Mavroeidis using reference for the constructor
+// only by COMP 371 lab 10
+// =====================================================================================
+
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -18,10 +23,10 @@ public:
 
 	void update(float dt);
 
-	glm::mat4 get_view_matrix() const;
-	glm::mat4 get_projection_matrix() const;
-	glm::mat4 get_view_projection_matrix() const;
-	glm::vec3 get_camera_position() const { return m_position; }
+	[[nodiscard]] glm::mat4 get_view_matrix() const;
+	[[nodiscard]] glm::mat4 get_projection_matrix() const;
+	[[nodiscard]] glm::mat4 get_view_projection_matrix() const;
+	[[nodiscard]] glm::vec3 get_camera_position() const { return m_position; }
 private:
 	glm::vec3 m_position; // camera position
 	glm::vec3 m_lookat; // look towards this point

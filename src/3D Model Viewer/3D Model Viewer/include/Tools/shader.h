@@ -1,3 +1,9 @@
+// =====================================================================================
+// This shader class is referenced from https://learnopengl.com by Joey de Vries
+// Only changes made were attribute naming format and more modern C++ syntax
+// Joe de Vries on twitter: https://twitter.com/JoeyDeVriez
+// =====================================================================================
+
 #ifndef SHADER_H
 #define SHADER_H
 #include <string>
@@ -10,18 +16,16 @@ class Shader
 {
 	unsigned int id;
     unsigned int index;
-	static void check_compile_errors(unsigned int shader, std::string type);
+	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
     // Constructor
-    Shader(const char* vertexShaderSource, const char* fragmentShaderSource);
+    Shader(const char* vertex_shader_source, const char* fragment_shader_source);
     ~Shader() = default;
 
     // Core functions
-    unsigned int get_id() const { return id; }
-
-    unsigned int get_index() const { return index; }
+	[[nodiscard]] unsigned int get_id() const { return id; }
+	[[nodiscard]] unsigned int get_index() const { return index; }
     void set_index(int i) { index = i; }
-
     void use() const;
 
     // Utility Functions

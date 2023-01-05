@@ -1,11 +1,11 @@
-#include "camera.h"
-#include "event_manager.h"
-
 #include <algorithm>
 #include <iostream>
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+
+#include "camera.h"
+#include "event_manager.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom) :
 	m_position(position),
@@ -39,8 +39,8 @@ void Camera::update(float dt)
 		m_horizontal_angle += 360;
 	}
 
-	auto theta = glm::radians(m_horizontal_angle);
-	auto phi = glm::radians(m_vertical_angle);
+	const auto theta = glm::radians(m_horizontal_angle);
+	const auto phi = glm::radians(m_vertical_angle);
 
 	// Set position of camera while orbiting lookat
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));

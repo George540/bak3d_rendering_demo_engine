@@ -6,7 +6,12 @@
 
 #include <glm/glm.hpp>
 
-Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
+/**
+ * \brief Constructor for Shader class
+ * \param vertex_shader_source path for vertex shader
+ * \param fragment_shader_source path for fragment shader
+ */
+Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source)
 {
     // 1. retrieve the vertex/fragment source code from filePath
 	string vertexCode;
@@ -21,8 +26,8 @@ Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
     try
     {
         // open files
-        vShaderFile.open(vertexShaderSource);
-        fShaderFile.open(fragmentShaderSource);
+        vShaderFile.open(vertex_shader_source);
+        fShaderFile.open(fragment_shader_source);
         stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
@@ -71,6 +76,9 @@ Shader::Shader(const char* vertexShaderSource, const char* fragmentShaderSource)
     std::cout << "Shader with ID " << id << " has compiled..." << std::endl;
 }
 
+/**
+ * \brief Use the specified shader program
+ */
 void Shader::use() const
 {
     glUseProgram(id);
@@ -136,7 +144,12 @@ void Shader::set_mat4(const std::string& name, const glm::mat4& mat) const
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::check_compile_errors(unsigned int shader, string type)
+/**
+ * \brief 
+ * \param shader id for the specified shader
+ * \param type the error to check
+ */
+void Shader::check_compile_errors(unsigned int shader, const string& type)
 {
     GLint success;
     GLchar infoLog[1024];
