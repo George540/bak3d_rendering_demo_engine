@@ -56,7 +56,7 @@ glm::mat4 Camera::get_view_matrix() const
 
 glm::mat4 Camera::get_projection_matrix() const
 {
-	return glm::perspective(glm::radians(m_zoom), static_cast<float>(1920) / static_cast<float>(1080), 0.1f, 100.0f);
+	return glm::perspective(glm::radians(m_zoom), static_cast<float>(EventManager::get_window_width()) / static_cast<float>(EventManager::get_window_height()), 0.1f, 100.0f);
 }
 
 glm::mat4 Camera::get_view_projection_matrix() const

@@ -1,14 +1,16 @@
-#include "grid.h"
-
 #include <iostream>
 #include <vector>
+#include <filesystem>
+
 #include <glm/ext.hpp>
+
+#include "grid.h"
 
 Grid::Grid(Camera& cam) : m_camera(&cam), number_of_slices(40), grid_size(20.0f)
 {
 	m_shader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/GridShader.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/GridShader.fs");
+		std::filesystem::absolute("shaders/GridShader.vs").string().c_str(),
+		std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
 
 	// GRID LINE SETUP
 	std::vector<glm::vec3> vertices;

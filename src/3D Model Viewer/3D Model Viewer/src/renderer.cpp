@@ -14,7 +14,13 @@
 
 using namespace std;
 
+// Renderer
 GLFWwindow* Renderer::r_window = nullptr;
+GLuint Renderer::frame_buffer = NULL;
+GLuint Renderer::texture_color_buffer = NULL;
+GLuint Renderer::render_buffer = NULL;
+
+// Model
 Model* Renderer::current_model = nullptr;
 bool Renderer::is_grid_rendering = true;
 bool Renderer::is_full_render_selected = true;
@@ -24,6 +30,7 @@ bool Renderer::is_normal_map_selected = false;
 bool Renderer::is_gamma_enabled = false;
 float Renderer::shininess = 64.0f;
 
+// Light
 Light* Renderer::environment_point_light = nullptr;
 float Renderer::light_horizontal_rotation = 0.0f;
 float Renderer::light_vertical_rotation = 0.0f;
@@ -42,7 +49,33 @@ void Renderer::initialize()
     {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         exit(-1);
-    }    
+    }
+	std::cout << "Initializing GLAD..." << std::endl;
+
+	glfwSetFramebufferSizeCallback(r_window, EventManager::framebuffer_size_callback);
+
+	//// Generate and Bind buffers
+	//glGenFramebuffers(1, &frame_buffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+	//std::cout << "Initializing and binding frame buffer..." << std::endl;
+
+	//glGenTextures(1, &texture_color_buffer);
+	//glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, EventManager::get_window_width(), EventManager::get_window_height(), 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
+	//std::cout << "Initializing and binding texture color buffer..." << std::endl;
+
+	//glGenRenderbuffers(1, &render_buffer);
+	//glBindRenderbuffer(GL_RENDERBUFFER, render_buffer); // use a single renderbuffer object for both a depth AND stencil buffer.
+	//// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//{
+	//	cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	//}
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//std::cout << "Initializing and binding render buffer..." << std::endl;
 
 	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
 	stbi_set_flip_vertically_on_load(true);
@@ -85,6 +118,7 @@ void Renderer::initialize_imgui()
 void Renderer::begin_frame()
 {
 	// Clear the screen
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -201,11 +235,17 @@ void Renderer::render_demo_window()
 		std::cout << "Rendering Dissecting" << std::endl;
 	}
 	ImGui::End();
-
-	//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	//ImGui::ColorEdit3("clear color", reinterpret_cast<float*>(&clear_color)); // Edit 3 floats representing a color
 }
 
+void Renderer::post_processing()
+{
+	// bind back to default and draw quad plane
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+	// clear all relevant buffers
+	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+	//glClear(GL_COLOR_BUFFER_BIT);
+}
 
 void Renderer::end_frame()
 {

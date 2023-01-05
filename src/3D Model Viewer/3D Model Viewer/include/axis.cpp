@@ -1,17 +1,17 @@
-#include "axis.h"
-
 #include <iostream>
 #include <vector>
+#include <filesystem>
 #include <glm/ext.hpp>
 
+#include "axis.h"
 #include "renderer.h"
 
 Axis::Axis(Camera& camera)
 {
 	m_camera = &camera;
 	m_shader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LineShader.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LineShader.fs");
+		std::filesystem::absolute("shaders/LineShader.vs").string().c_str(),
+		std::filesystem::absolute("shaders/LineShader.fs").string().c_str());
 	constexpr glm::vec3 vertices[] = { // position, color
 									glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), // X red line
 									glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),

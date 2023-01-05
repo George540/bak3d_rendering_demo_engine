@@ -1,5 +1,6 @@
 #include <iostream>
 #include <glm/ext.hpp>
+#include <filesystem>
 
 #include "scene.h"
 #include "renderer.h"
@@ -22,7 +23,7 @@ World::World()
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
 
 	// Model set up
-	const auto model_path = "D:/GitRepositories/3d_model_viewer_platform/src/3D Model Viewer/3D Model Viewer/assets/backpack/backpack.obj";
+	const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
 	m_model = new Model(model_path, *m_camera, *m_light);
 	Renderer::current_model = m_model;
 	Renderer::environment_point_light = m_light;
@@ -67,7 +68,7 @@ void World::draw() const
 	m_model->draw();
 
 	Renderer::render_demo_window();
-
+	Renderer::post_processing();
     Renderer::end_frame();
 }
 

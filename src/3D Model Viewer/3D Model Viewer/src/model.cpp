@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <filesystem>
 
 #include "model.h"
 #include "event_manager.h"
@@ -11,15 +12,14 @@
 
 Model::Model(string const& path, Camera& cam, Light& light) : m_camera(&cam), m_light(&light)
 {
-	const char* shader_path = "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/";
-	auto shader = new Shader("D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.vs",
-	                         "D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/1.model_loading.fs");
+	auto shader = new Shader(std::filesystem::absolute("shaders/ModelShader.vs").string().c_str(),
+							 std::filesystem::absolute("shaders/ModelShader.fs").string().c_str());
 	shader->set_index(0);
 	m_shaders.push_back(shader);
 	shader = nullptr;
 	shader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/DissectShader.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/DissectShader.fs");
+		std::filesystem::absolute("shaders/DissectShader.vs").string().c_str(),
+		std::filesystem::absolute("shaders/DissectShader.fs").string().c_str());
 	shader->set_index(1);
 	m_shaders.push_back(shader);
 	load_model(path);
@@ -289,28 +289,6 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// return a mesh object created from the extracted mesh data
 	return Mesh(vertices, indices, textures);
 }
-
-//material Model::load_material(aiMaterial* mat)
-//{
-//	material material{};
-//	aiColor3D color(1.0f, 1.0f, 1.0f);
-//	float shininess;
-//
-//	mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-//	material.diffuse = glm::vec3(color.r, color.b, color.g);
-//
-//	mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
-//	material.ambient = glm::vec3(color.r, color.b, color.g);
-//
-//	mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
-//	material.specular = glm::vec3(color.r, color.b, color.g);
-//
-//	mat->Get(AI_MATKEY_SHININESS, shininess);
-//	material.shininess = shininess;
-//
-//	return material;
-//}
-
 
 vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType type, string typeName)
 {

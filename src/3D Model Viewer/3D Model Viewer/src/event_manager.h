@@ -4,11 +4,17 @@
 #include <GLFW/glfw3.h>
 
 struct GLFWwindow;
+struct GLFWmonitor;
+struct GLFWvidmode;
 
 class EventManager
 {
 	// Window
 	static GLFWwindow* m_window;
+	static GLFWmonitor* m_monitor;
+	static const GLFWvidmode* m_vid_mode;
+	static int m_window_width;
+	static int m_window_height;
 
 	// Time
 	static double last_frame_time;
@@ -36,6 +42,8 @@ public:
 	static bool is_exit_requested();
 
 	static GLFWwindow* get_window();
+	static int get_window_width() { return m_window_width; }
+	static int get_window_height() { return m_window_height; }
 
 	static double get_mouse_motion_x();
 	static double get_mouse_motion_y();
@@ -56,6 +64,7 @@ public:
 
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	static void toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static bool is_using_diffuse_texture;
 	static bool is_using_specular_texture;
 	static bool is_using_normal_maps;

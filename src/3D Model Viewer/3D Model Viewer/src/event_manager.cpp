@@ -1,6 +1,5 @@
 #include "event_manager.h"
 #include "imgui.h"
-//#include "renderer.h"
 
 #include <iostream>
 #include <GLFW/glfw3.h>
@@ -27,7 +26,12 @@ bool EventManager::is_using_diffuse_texture = true;
 bool EventManager::is_using_specular_texture = true;
 bool EventManager::is_using_normal_maps = true;
 
+// Window
 GLFWwindow* EventManager::m_window = nullptr;
+GLFWmonitor* EventManager::m_monitor = nullptr;
+const GLFWvidmode* EventManager::m_vid_mode = nullptr;
+int EventManager::m_window_width = 1920; // defaulting to 1920 / 1080 just in case
+int EventManager::m_window_height = 1080;
 
 void EventManager::initialize()
 {
@@ -62,7 +66,15 @@ void EventManager::initialize()
 
 	// Open a window and create its OpenGL context
 	glfwWindowHint(GLFW_RESIZABLE, 1);
-	m_window = glfwCreateWindow(1920, 1080, "3D Model Viewer (WIP)", nullptr, nullptr);
+	m_monitor = glfwGetPrimaryMonitor();
+	m_vid_mode = glfwGetVideoMode(m_monitor);
+
+	glfwWindowHint(GLFW_RED_BITS, m_vid_mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, m_vid_mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, m_vid_mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, m_vid_mode->refreshRate);
+
+	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "          Bak3D Rendering Demo Engine (WIP)", nullptr, nullptr);
 
 	if (m_window == nullptr)
 	{
@@ -70,10 +82,9 @@ void EventManager::initialize()
 		glfwTerminate();
 		exit(-1);  // NOLINT(concurrency-mt-unsafe)
 	}
-	else
-	{
-		std::cout << "Opening Window..." << endl;
-	}
+
+	glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
+	std::cout << "Opening Window..." << endl;
 
 	cam_zoom_factor = 1;
 
@@ -99,6 +110,9 @@ void EventManager::update()
 {
 	// Update inputs / events
 	glfwPollEvents();
+	//int a, b;
+	//glfwGetWindowPos(m_window, &a, &b);
+	//std::cout << a << ", " << b << std::endl;
 
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
@@ -161,7 +175,6 @@ double EventManager::get_camera_scroll_offset()
 	return cam_zoom_distance;
 }
 
-
 void EventManager::enable_mouse_cursor()
 {
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -199,4 +212,13 @@ void EventManager::toggle_diffuse_callback(GLFWwindow* window, int key, int scan
 	{
 		is_using_diffuse_texture = !is_using_diffuse_texture;
 	}
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void EventManager::framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
 }

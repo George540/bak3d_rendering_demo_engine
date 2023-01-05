@@ -106,6 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +127,7 @@
       <AdditionalIncludeDirectories>D:\GitRepositories\3d_model_viewer_platform\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\3d_model_viewer_platform\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include;D:\GitRepositories\3d_model_viewer_platform\lib;D:\GitRepositories\3d_model_viewer_platform\lib\KHR;D:\GitRepositories\3d_model_viewer_platform\lib\glad;D:\GitRepositories\3d_model_viewer_platform\src\3D Model Viewer\3D Model Viewer\include\Tools;D:\GitRepositories\3d_model_viewer_platform\lib\glm;D:\GitRepositories\3d_model_viewer_platform\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -1,15 +1,11 @@
-#include "light.h"
-#include "shader.h"
-
-#include <glm/ext/matrix_transform.hpp>
-
 #include <iostream>
 #include <fstream>
-#include <GLFW/glfw3.h>
+#include <filesystem>
 
+#include "light.h"
+#include "shader.h"
 #include "event_manager.h"
 #include "renderer.h"
-
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	m_position(position),
@@ -36,8 +32,8 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	build_vertex_buffer();
 
 	m_shader = new Shader(
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.vs",
-		"D:/GitRepositories/3d_model_viewer_platform/Assets/Shaders/LightShader.fs");
+		std::filesystem::absolute("shaders/LightShader.vs").string().c_str(),
+		std::filesystem::absolute("shaders/LightShader.fs").string().c_str());
 	std::cout << "Light created..." << std::endl;
 }
 

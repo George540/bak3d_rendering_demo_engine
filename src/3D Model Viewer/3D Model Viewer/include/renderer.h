@@ -7,6 +7,9 @@ struct GLFWwindow;
 class Renderer
 {
 	static GLFWwindow* r_window;
+	static GLuint frame_buffer;
+	static GLuint texture_color_buffer;
+	static GLuint render_buffer;
 
 	static void initialize_imgui();
 public:
@@ -14,6 +17,7 @@ public:
 	static void shutdown();
 
 	static void begin_frame();
+	static void post_processing();
 	static void end_frame();
 
 	static void render_demo_window();
