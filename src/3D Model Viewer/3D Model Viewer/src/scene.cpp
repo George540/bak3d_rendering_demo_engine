@@ -68,7 +68,7 @@ void World::draw() const
 	m_model->draw();
 
 	Renderer::render_demo_window();
-	Renderer::post_processing();
+	//Renderer::post_processing();
     Renderer::end_frame();
 }
 
