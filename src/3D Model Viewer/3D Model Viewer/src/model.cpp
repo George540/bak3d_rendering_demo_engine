@@ -8,7 +8,6 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "model.h"
-
 #include "event_manager.h"
 #include "renderer.h"
 
@@ -50,7 +49,6 @@ Model::~Model()
 
 void Model::draw() const
 {
-	//cout << "Beginning to draw" + std::to_string(meshes.size()) + "meshes.." << endl;
 	for (auto& mesh : meshes)
 	{
 		m_current_shader->use();

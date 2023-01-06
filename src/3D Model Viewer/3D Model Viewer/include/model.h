@@ -1,3 +1,9 @@
+// =====================================================================================
+// This mesh class is referenced from https://learnopengl.com by Joey de Vries
+// Only changes made were attribute naming format and more modern C++ syntax
+// Joe de Vries on twitter: https://twitter.com/JoeyDeVriez
+// =====================================================================================
+
 #ifndef MODEL_H
 #define MODEL_H
 
