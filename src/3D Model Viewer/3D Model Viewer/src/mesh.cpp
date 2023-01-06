@@ -6,8 +6,7 @@
 Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<texture> textures) :
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
-	textures(std::move(textures)),
-	m_vao(0)
+	textures(std::move(textures))
 {
 	// now that we have all the required data, set the vertex buffers and its attribute pointers.
 	set_up_mesh();

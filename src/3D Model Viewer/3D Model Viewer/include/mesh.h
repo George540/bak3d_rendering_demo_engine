@@ -1,15 +1,19 @@
+// =====================================================================================
+// This mesh class is referenced from https://learnopengl.com by Joey de Vries
+// Only changes made were attribute naming format and more modern C++ syntax
+// Joe de Vries on twitter: https://twitter.com/JoeyDeVriez
+// =====================================================================================
+
 #ifndef MESH_H
 #define MESH_H
 
 #include <glad/glad.h> // holds all OpenGL type declarations
-
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <shader.h>
 
 #include <string>
 #include <vector>
+
+#include "shader.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -44,11 +48,8 @@ struct material {
     float diffuse;
     float specular;
     float ambient;
-    //glm::vec3 normal;
-    //float roughness;
-    //texture texture;
     float shininess;
-    bool useDiffuseTexture;
+    bool use_diffuse_texture;
 };
 
 class Mesh

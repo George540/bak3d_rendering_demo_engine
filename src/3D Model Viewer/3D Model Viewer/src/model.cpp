@@ -5,8 +5,10 @@
 #include <iostream>
 #include <ostream>
 #include <filesystem>
+#include <glm/ext/matrix_transform.hpp>
 
 #include "model.h"
+
 #include "event_manager.h"
 #include "renderer.h"
 
