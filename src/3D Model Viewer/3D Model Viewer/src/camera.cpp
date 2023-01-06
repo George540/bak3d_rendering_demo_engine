@@ -25,11 +25,11 @@ void Camera::update(float dt)
 	EventManager::enable_mouse_cursor();
 
 	// Mouse motion to get the variation in angle
-	m_horizontal_angle -= EventManager::get_mouse_motion_x() * m_cam_speed * dt;
-	m_vertical_angle -= EventManager::get_mouse_motion_y() * m_cam_speed * dt;
+	m_horizontal_angle -= EventManager::get_mouse_motion_x() * m_cam_speed * static_cast<double>(dt);
+	m_vertical_angle -= EventManager::get_mouse_motion_y() * m_cam_speed * static_cast<double>(dt);
 
 	// Clamp vertical angle to [-85, 85] degrees
-	m_vertical_angle = std::max(-85.0f, std::min(85.0f, m_vertical_angle));
+	m_vertical_angle = std::max(-85.0f, std::min(85.0f, static_cast<float>(m_vertical_angle)));
 	if (m_horizontal_angle > 360)
 	{
 		m_horizontal_angle -= 360;
@@ -39,14 +39,13 @@ void Camera::update(float dt)
 		m_horizontal_angle += 360;
 	}
 
-	const auto theta = glm::radians(m_horizontal_angle);
-	const auto phi = glm::radians(m_vertical_angle);
+	const auto theta = static_cast<float>(glm::radians(m_horizontal_angle));
+	const auto phi = static_cast<float>(glm::radians(m_vertical_angle));
 
 	// Set position of camera while orbiting lookat
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
+	// Set zoom based on camera scroll offset
 	m_position *= EventManager::get_camera_scroll_offset();
-	auto side_vector = glm::cross(m_lookat, m_cam_up);
-	glm::normalize(side_vector);
 }
 
 glm::mat4 Camera::get_view_matrix() const

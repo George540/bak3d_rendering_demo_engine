@@ -1,6 +1,6 @@
 // =====================================================================================
-// Camera class was made by George Mavroeidis using reference for the constructor
-// only by COMP 371 lab 10
+// Camera class was made by George Mavroeidis using reference for the update function
+// only from the COMP 371 lab 10
 // =====================================================================================
 
 #ifndef CAMERA_H
@@ -32,10 +32,10 @@ private:
 	glm::vec3 m_lookat; // look towards this point
 	glm::vec3 m_cam_up; // up vector
 
-	float m_cam_speed;
-	float m_horizontal_angle; // horizontal angle
-	float m_vertical_angle;   // vertical angle
-	float m_zoom;
+	double m_cam_speed;
+	double m_horizontal_angle; // horizontal angle
+	double m_vertical_angle;   // vertical angle
+	float m_zoom; // camera zoom
 };
 
 #endif
