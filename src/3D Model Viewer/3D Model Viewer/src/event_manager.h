@@ -1,3 +1,8 @@
+// =====================================================================================
+// EventManager class was made by George Mavroeidis using reference from the
+// EventManager class from the COMP 371 lab 10. It was only used as an inspiration for
+// =====================================================================================
+
 #ifndef EVENT_MANAGER_H
 #define EVENT_MANAGER_H
 
@@ -7,6 +12,9 @@ struct GLFWwindow;
 struct GLFWmonitor;
 struct GLFWvidmode;
 
+/**
+ * \brief Class is static, so it's globally used and there is only one copy of it
+ */
 class EventManager
 {
 	// Window
@@ -63,7 +71,6 @@ public:
 	static float get_random_float(float min, float max);
 
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-	static void toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static bool is_using_diffuse_texture;
 	static bool is_using_specular_texture;

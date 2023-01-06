@@ -1,8 +1,9 @@
+#include <iostream>
+#include <GLFW/glfw3.h>
+
 #include "event_manager.h"
 #include "imgui.h"
 
-#include <iostream>
-#include <GLFW/glfw3.h>
 
 using namespace std;
 
@@ -33,6 +34,10 @@ const GLFWvidmode* EventManager::m_vid_mode = nullptr;
 int EventManager::m_window_width = 1920; // defaulting to 1920 / 1080 just in case
 int EventManager::m_window_height = 1080;
 
+/**
+ * \brief Initializes the proper GLFW window settings and inputs
+ * The OS specific settings were used from the COMP 371 lab
+ */
 void EventManager::initialize()
 {
 	// Initialize GLFW
@@ -110,9 +115,6 @@ void EventManager::update()
 {
 	// Update inputs / events
 	glfwPollEvents();
-	//int a, b;
-	//glfwGetWindowPos(m_window, &a, &b);
-	//std::cout << a << ", " << b << std::endl;
 
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
@@ -192,6 +194,12 @@ float EventManager::get_random_float(float min, float max)
 	return min + value * (max - min);
 }
 
+/**
+ * \brief Scroll callback function for the scroll wheel input, used for camera zoom distance
+ * \param window The OpenGL main window
+ * \param xoffset The scrollwheel x-offset (not used)
+ * \param yoffset The scrollwheel y-offset
+ */
 void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	if (yoffset > 0)
@@ -206,19 +214,18 @@ void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 	cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
 }
 
-void EventManager::toggle_diffuse_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_F && action == GLFW_PRESS)
-	{
-		is_using_diffuse_texture = !is_using_diffuse_texture;
-	}
-}
-
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
+/**
+ * \brief Whenever the window size changed (by OS or user resize) this callback function executes
+ * \param window The OpenGL main window
+ * \param width The OpenGL main window width
+ * \param height The OpenGL main window height
+ */
 void EventManager::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
+	// Note: position is set to 0 for both x and y coordinates
 	glViewport(0, 0, width, height);
 }
