@@ -1,3 +1,8 @@
+// =====================================================================================
+// Scene class was made by George Mavroeidis which is referenced from the COMP 371 lab 10.
+// Mostly the structure of update and draw functions is inspired by the lab.
+// =====================================================================================
+
 #ifndef SCENE_H
 #define SCENE_H
 

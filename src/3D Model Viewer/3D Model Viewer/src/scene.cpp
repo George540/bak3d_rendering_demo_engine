@@ -44,7 +44,6 @@ void World::update(float dt) const
 	// camera
 	m_camera->update(dt);
 	m_light->update(dt);
-    //cout << "\rCurrent frame dt: " << dt << ' ' << endl << flush;
 }
 
 void World::draw() const
