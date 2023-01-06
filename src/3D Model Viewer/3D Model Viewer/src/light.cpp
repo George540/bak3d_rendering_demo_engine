@@ -47,17 +47,15 @@ void Light::update(float dt)
 {
 	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_A) == GLFW_PRESS)
 	{
-		//m_position.x += dt * 3.0f;
 		m_horizontal_angle += dt * 30.0f;
 	}
 	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_D) == GLFW_PRESS)
 	{
-		//m_position.x += dt * 3.0f;
 		m_horizontal_angle -= dt * 30.0f;
 	}
 
-	auto theta = glm::radians(m_horizontal_angle);
-	auto phi = glm::radians(m_vertical_angle);
+	const auto theta = glm::radians(m_horizontal_angle);
+	const auto phi = glm::radians(m_vertical_angle);
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
 
 	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_W) == GLFW_PRESS)
@@ -94,7 +92,7 @@ void Light::draw() const
 
 void Light::build_vertex_buffer()
 {
-	//cube model
+	//cube model, since it's just a cube, no need to load model
 	constexpr float vertices[] = {
 		-0.5f, -0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f,
