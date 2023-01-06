@@ -23,7 +23,7 @@
       <UniqueIdentifier>{be5296fb-81df-446a-8427-655e0b3eef4f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{6ed5bcdb-c72a-4bab-945f-610820a0d6cd}</UniqueIdentifier>
+      <UniqueIdentifier>{0d6d7013-2fbe-4770-99de-ea363c5fbfbf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,9 +43,6 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="src\scene.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\object.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="src\mesh.cpp">
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\event_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\scene.h">
@@ -154,46 +148,40 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Assets\Shaders\1.model_loading.fs">
+    <None Include="shaders\DissectShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\1.model_loading.vs">
+    <None Include="shaders\DissectShader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\LightShader.fs">
+    <None Include="shaders\GridShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\LightShader.vs">
+    <None Include="shaders\GridShader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\MainShader.fs">
+    <None Include="shaders\LightShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\MainShader.vs">
+    <None Include="shaders\LightShader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\LineShader.fs">
+    <None Include="shaders\LineShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\LineShader.vs">
+    <None Include="shaders\LineShader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\GridShader.fs">
+    <None Include="shaders\MainShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\GridShader.vs">
+    <None Include="shaders\MainShader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\bufferShader.vs">
+    <None Include="shaders\ModelShader.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Assets\Shaders\bufferShader.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\Assets\Shaders\DissectShader.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\Assets\Shaders\DissectShader.vs">
+    <None Include="shaders\ModelShader.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

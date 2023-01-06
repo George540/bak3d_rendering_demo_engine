@@ -156,7 +156,6 @@
     <ClCompile Include="src\light.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
-    <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\Tools\glad.c" />
@@ -178,7 +177,6 @@
     <ClInclude Include="include\light.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\model.h" />
-    <ClInclude Include="include\object.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\Tools\shader.h" />
@@ -186,20 +184,18 @@
     <ClInclude Include="src\event_manager.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Assets\Shaders\1.model_loading.fs" />
-    <None Include="..\..\..\Assets\Shaders\1.model_loading.vs" />
-    <None Include="..\..\..\Assets\Shaders\bufferShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\bufferShader.vs" />
-    <None Include="..\..\..\Assets\Shaders\DissectShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\DissectShader.vs" />
-    <None Include="..\..\..\Assets\Shaders\GridShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\GridShader.vs" />
-    <None Include="..\..\..\Assets\Shaders\LightShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\LightShader.vs" />
-    <None Include="..\..\..\Assets\Shaders\LineShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\LineShader.vs" />
-    <None Include="..\..\..\Assets\Shaders\MainShader.fs" />
-    <None Include="..\..\..\Assets\Shaders\MainShader.vs" />
+    <None Include="shaders\DissectShader.fs" />
+    <None Include="shaders\DissectShader.vs" />
+    <None Include="shaders\GridShader.fs" />
+    <None Include="shaders\GridShader.vs" />
+    <None Include="shaders\LightShader.fs" />
+    <None Include="shaders\LightShader.vs" />
+    <None Include="shaders\LineShader.fs" />
+    <None Include="shaders\LineShader.vs" />
+    <None Include="shaders\MainShader.fs" />
+    <None Include="shaders\MainShader.vs" />
+    <None Include="shaders\ModelShader.fs" />
+    <None Include="shaders\ModelShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
