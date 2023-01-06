@@ -13,6 +13,9 @@ Grid::Grid(Camera& cam) : m_camera(&cam), number_of_slices(40), grid_size(20.0f)
 		std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
 
 	// GRID LINE SETUP
+	// Grid setup used indices and EBOs for proper identification of each line
+	// Part of the solution is referenced from thewoz's answer on stackoverflow.com
+	// Link to question and answer: https://stackoverflow.com/questions/58494179/how-to-create-a-grid-in-opengl-and-drawing-it-with-lines#:~:text=this%20the%20code%20for%20render,opengl
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::uvec4> indices;
 
@@ -34,7 +37,6 @@ Grid::Grid(Camera& cam) : m_camera(&cam), number_of_slices(40), grid_size(20.0f)
 
 			indices.emplace_back(row1 + i, row1 + i + 1, row1 + i + 1, row2 + i + 1);
 			indices.emplace_back(row2 + i + 1, row2 + i, row2 + i, row1 + i);
-
 		}
 	}
 

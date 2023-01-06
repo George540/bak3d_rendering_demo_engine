@@ -138,8 +138,6 @@ void EventManager::update()
 
 	// Update mouse zoom via scroll wheel
 	glfwSetScrollCallback(m_window, scroll_callback);
-	// Toggle diffuse texture usage
-	glfwSetKeyCallback(m_window, toggle_diffuse_callback);
 
 	// Update frame time
 	const double current_time = glfwGetTime();
