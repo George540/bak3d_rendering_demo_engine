@@ -68,6 +68,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -76,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,6 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,6 +110,7 @@
       <AdditionalIncludeDirectories>D:\GitRepositories\bak3d_rendering_demo_engine\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\bak3d_rendering_demo_engine\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include;D:\GitRepositories\bak3d_rendering_demo_engine\lib;D:\GitRepositories\bak3d_rendering_demo_engine\lib\KHR;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glad;D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include\Tools;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glm;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,10 +128,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\GitRepositories\bak3d_rendering_demo_engine\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\bak3d_rendering_demo_engine\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include;D:\GitRepositories\bak3d_rendering_demo_engine\lib;D:\GitRepositories\bak3d_rendering_demo_engine\lib\KHR;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glad;D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include\Tools;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glm;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\shaders;D:\GitRepositories\bak3d_rendering_demo_engine\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\bak3d_rendering_demo_engine\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include;D:\GitRepositories\bak3d_rendering_demo_engine\lib;D:\GitRepositories\bak3d_rendering_demo_engine\lib\KHR;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glad;D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include\Tools;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glm;D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\assets\backpack;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

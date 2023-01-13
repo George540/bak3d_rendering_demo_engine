@@ -11,9 +11,11 @@
 #include "renderer.h"
 #include "src/event_manager.h"
 #include "scene.h"
+#include <consoleapi.h>
 
 int main()
 {
+    FreeConsole();
     std::cout << "Hello Computer Graphics!\n";
 
     EventManager::initialize();
