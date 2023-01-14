@@ -2,7 +2,7 @@
 Made by George Mavroeidis
 
 ## Motivation
-I always wanted to improve my fundamentals of computer graphics, so this project is a demonstration of multiple concepts regarding the graphics pipeline. Back in school, I used to study a lot of this subject, but I always felt I was leaving some important knowledge behind as time passed on. So to mitigate that, I thoroughly reviewed computer graphics the past few months.
+I always wanted to improve my fundamentals of computer graphics, so this project is a demonstration of multiple concepts regarding the graphics pipeline. Back in school, I used to study a lot of this subject, but I always felt I was leaving some important knowledge behind as time passed on. So to mitigate that, I thoroughly reviewed computer graphics the past few months by reading and studying [learnopengl.com](https://learnopengl.com/Introduction)(more on this later).
 
 ## What is Bak3D
 Bak3D is a demo rendering engine that demonstrates light and texture properties using a model made up of multiple mesh objects. The basis of these properties rely on shaders, vertex arrays and buffer objects. All the content such as models and textures are loaded up using asset importing, a technique that loads generic 3D models with textures. The user is able to also control the camera and position themselves relatively to the center of the world, which is surrounded by a grid with the model in the middle. 
