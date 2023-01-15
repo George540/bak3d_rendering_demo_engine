@@ -13,6 +13,9 @@ Bak3D is a demo rendering engine that demonstrates light and texture properties 
 ## How it's made
 The project is made in C++ and [OpenGL](https://www.opengl.org), two crucial tools that are necessary to use in computer graphics. Additionally, the [Assimp library](https://github.com/assimp/assimp) is used to assist with model loading and [Dear ImGui](https://github.com/ocornut/imgui) for the user interface. As you might have noticed, all these tools are open-source and free to use. More details on the Aknowledgements section.
 
+## How to launch
+Download and extract the latest .zip folder on the *Releases* section onto your personal computer. Enter the folder and launch the **Bak3D Engine** .exe application. The program will run in windowed version that covers the entire display.
+
 ## Features
 Although few of them, there are a lot of fun-to-play features that demonstrate the capabilities of this little engine.
 
