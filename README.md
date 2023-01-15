@@ -14,7 +14,7 @@ Bak3D is a demo rendering engine that demonstrates light and texture properties 
 The project is made in C++ and [OpenGL](https://www.opengl.org), two crucial tools that are necessary to use in computer graphics. Additionally, the [Assimp library](https://github.com/assimp/assimp) is used to assist with model loading and [Dear ImGui](https://github.com/ocornut/imgui) for the user interface. As you might have noticed, all these tools are open-source and free to use. More details on the Aknowledgements section.
 
 ## How to launch
-Download and extract the latest .zip folder on the *Releases* section onto your personal computer. Enter the folder and launch the **Bak3D Engine** .exe application. The program will run in windowed version that covers the entire display.
+Download and extract the latest .zip folder on the *Releases* section onto your personal computer. Enter the folder and launch the **Bak3D Engine** .exe application. The program will run in windowed version that covers the entire display. To close the program, just open the console window and close it.
 
 ## Features
 Although few of them, there are a lot of fun-to-play features that demonstrate the capabilities of this little engine.
@@ -28,6 +28,8 @@ The Renderer is responsible for properly setting up important OpenGL variables t
 The EventManager is responsible for setting up the window component and preparing other parameters that are used by the whole program. In addition, all the input parameters, callbacks and interactions for the camera are set up here. In general, the event manager is 
 
 You will notice in the code that the Renderer and the EventManager work together and share a lot of data. These two are the backbone of the program. For the input, you will need a mouse and a keyboard.
+
+There is also the console debug window outside of the application window, that shows logs of different actions happening during the startup phase or a change at runtime.
 
 ### The Camera
 
