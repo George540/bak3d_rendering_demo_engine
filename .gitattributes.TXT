@@ -1,2 +1,16 @@
-*.c linguist-language=C++
-*.h linguist-language=C++
+src/*.c linguist-language=C++
+src/*.hpp linguist-language=C++
+src/*.h linguist-language=C++
+src/*.inl linguist-language=C++
+src/*.c linguist-language=C++
+src/*.cpp linguist-language=C++
+
+lib/*.c linguist-language=C++
+lib/*.hpp linguist-language=C++
+lib/*.h linguist-language=C++
+lib/*.inl linguist-language=C++
+lib/*.c linguist-language=C++
+lib/*.cpp linguist-language=C++
+
+src/*.fs linguist-language=GLSL
+src/*.vs linguist-language=GLSL
