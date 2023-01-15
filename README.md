@@ -48,13 +48,56 @@ The intensity of the light as well as its color can also be modified, using the 
 *Figure 3: Change of light color and intensity results in a different mood, enabling artists to try different looks with their models*
 
 ### The Scene
-### Render Slicing
+
+The scene is what spawns and initializes all the items found on the world. It spawns and initializes the camera, the light, the model, the grid and the axis. What's most important is that it contains the main **update()** and **draw()** functions that use Time Integration(dt) in order to process changes in time. The update() function is used to update the camera and light, most importantly their changes in space (position and orientation). The draw() function draws the grid and axis (if activated), the light source, the UI and the model, containing its subsequent meshes with their shaders.
+
+### Render Breakdowns
+
+Under the main GUI panel "Settings", there is a section called *Render Breakdowns*, that toggles which texture and light property is applied to the model. Since there is only Albedo, Specular and Normal maps applied (so far), checking and unchecking each option shows the final result of the model's render.
+
+![Screenshot 2023-01-13 022419](https://user-images.githubusercontent.com/40285461/212521352-fe7fb3d9-fa28-4bf1-a94f-23c69de3f450.png)
+*Figure 4: A render slice of the model without albedo and specular maps, but only the normal maps. Notice the default color of the model is light gray.*
+
 ### Material Properties
-### Texture Breakdown
+
+Under the section "Material Properties" in Settings, there are two miscellaneous options that modify the look of the model, using light properties. The options are shininess and gamma correction. One is a slider and another one is a checkbox respectively.
+
+![Screenshot 2023-01-13 022510](https://user-images.githubusercontent.com/40285461/212521500-b6f1af2e-7965-4ccd-85a3-839185d7ba38.png)
+*Figure 5: Gamma correction is applied to the model's material properties*
+
+### Texture Slicing
+
+Under the *Map Breakdowns* GUI panel, you will see four checkboxes that correspond to each texture map to show. This will set each of these textures as diffuse with no light properties. This is just to show how the texture is applied to the model in order to produce the final result. To apply this look, the model loads a separate shader that only uses a diffuse texture as a fragment color and no other properties. The four modes are Full Render, Albedo, Specular and Normal. Full Render is the default mode that restores the combined result of all texture processes in the model's main shader.
+
+![Screenshot 2023-01-13 022551](https://user-images.githubusercontent.com/40285461/212521301-8a60ff56-d229-488d-a779-d3dc3f83f148.png)
+*Figure 5: A texture breakdown of the specular map, that shows how specular lighting is applied to the model*
+
 ### Important Metrics
+
+You will notice at the bottom of the screen, there is a GUI panel named *Metrics*. This panel shows some basic metrics, like frames-per-second and miliseconds per frame. The main components these metrics are based on are for ImGUI I/O, main application and the deltaTime value for the EventManager, which is subsequently used for the update(dt) function. In general, the program should run on 60.0 FPS and an approximate dt average of 16 ms/frame. If the FPS is lower and/or the dt is higher, the program might have some performance issues on your workstation.
+
+![image](https://user-images.githubusercontent.com/40285461/212521659-51cb4d9d-617d-4b4a-9f0f-b556a90558ab.png)
+*Figure 6: The metrics of the application are displayed*
+
 ### Next Features?
 
+I am currently unsure on how far I want to upgrade this simple demo rendering engine, but this was mainly a personal project that was a form of exercise using study material online. But these are the main features I would like to add to enhance my computer graphics skills:
+- Framebuffers (render, texture, etc)
+- SSAO
+- Deferred Rendering
+- Anti-Aliasing
+
+Most of these I just glossed over their theory just to know what are they like, but once I jump back into this project, these should be top priority. More miscellaneous features can be added that will enhance user experience, such as realtime custom model loading, multiple camera views, inter-adjustable windows with more properties to modify, more metrics and many more. This can easily be turned into a proper CG engine, but I realize it takes more time than anticipated.
+
+
 ## Epilogue
+
+In general, this was a great project with a lot of meaning behind it. Computer graphics has always been the bread and butter of my career and studies. To know what's going on behind a video game or an animated movie in terms of programming, it makes me appreciate even more the developers that spend countless ours making things like these happen on a screen. When I look at engines now like Blender, Unity and Unreal, I have a different perspective when I use them.
+
+I am currently working as a graphics developer at flight simulators and this was a good project to get me on track with my onboarding at work. I hope you enjoy using my little beginner engine and I hope to learn many more things ahead.
+
 ## Acknowledgments
 
-Under construction!!!
+1. Special thanks to [Joe de Vries](http://joeydevries.com/#home) for his ebook ["Lean OpenGL"](https://learnopengl.com/About), the number one source for learning OpenGL online. To attribute his work properly, here is [Joe's twitter](https://twitter.com/JoeyDeVriez.) as well. The code provided on this ebook is licensed under the [CC BY 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license. Proper attribution was given as well as any direct reference of his work in my code. This work is non-commercial.
+
+2. I also appreciate the experts at [Graphics Programming](https://discord.gg/DStdQSaN) and [Together C & C++](https://discord.gg/tccpp) discord servers for answering my basic questions when I needed help understanding something in OpenGL and C++.
