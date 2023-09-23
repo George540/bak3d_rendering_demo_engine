@@ -87,10 +87,14 @@ You will notice at the bottom of the screen, there is a GUI panel named *Metrics
 ### Next Features?
 
 I am currently unsure on how far I want to upgrade this simple demo rendering engine, but this was mainly a personal project that was a form of exercise using study material online. But these are the main features I would like to add to enhance my computer graphics skills:
+- Luminance
+- Lights menu
 - Framebuffers (render, texture, etc)
 - SSAO
 - Deferred Rendering
 - Anti-Aliasing
+- Model I/O
+- Proper Menu Windows (multiple panels)
 
 Most of these I just glossed over their theory just to know what are they like, but once I jump back into this project, these should be top priority. More miscellaneous features can be added that will enhance user experience, such as realtime custom model loading, multiple camera views, inter-adjustable windows with more properties to modify, more metrics and many more. This can easily be turned into a proper CG engine, but I realize it takes more time than anticipated.
 
