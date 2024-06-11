@@ -46,10 +46,10 @@ void Renderer::initialize()
 	std::cout << "Capturing window at Renderer..." << endl;
 
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-    {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
-        exit(-1);
-    }
+	{
+		std::cerr << "Failed to initialize GLAD" << std::endl;
+		exit(-1);
+	}
 	std::cout << "Initializing GLAD..." << std::endl;
 
 	glfwSetFramebufferSizeCallback(r_window, EventManager::framebuffer_size_callback);
@@ -150,10 +150,9 @@ void Renderer::render_demo_window()
 	ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
 	ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
 
-	ImGui::End();
 
-	// BREAKDOWN WINDOW
-	ImGui::Begin("Map Breakdowns");
+	// Toggle Texture Maps
+	ImGui::Text("Texture Map Toggles");
 	if (ImGui::Button("Full Render"))
 	{
 		is_full_render_selected = true;
