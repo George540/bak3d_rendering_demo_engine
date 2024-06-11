@@ -29,6 +29,8 @@ bool Renderer::is_specular_selected = false;
 bool Renderer::is_normal_map_selected = false;
 bool Renderer::is_gamma_enabled = false;
 float Renderer::shininess = 64.0f;
+const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
+int Renderer::render_current = 0;
 
 // Light
 Light* Renderer::environment_point_light = nullptr;
@@ -106,89 +108,23 @@ void Renderer::begin_frame()
 
 void Renderer::render_demo_window()
 {
+	render_metrics_window();
+	render_environment_window();
+	render_object_window();
+}
+
+void Renderer::render_metrics_window()
+{
 	// METRICS WINDOW
-	ImGui::Begin("Metrics");                          // Create a window called "Hello, world!" and append into it.
+	ImGui::Begin("Metrics");
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
 	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
 	ImGui::End();
+}
 
-	// OBJECT SETTINGS WINDOW
-	ImGui::Begin("Object Settings");
-
-	// Toggle map breakdowns
-	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
-	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
-
-	// Toggle Material Settings
-	ImGui::Text("Material Properties");
-	ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
-	ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
-
-
-	// Toggle Texture Maps
-	ImGui::Text("Texture Map Toggles");
-	if (ImGui::Button("Full Render"))
-	{
-		is_full_render_selected = true;
-		is_diffuse_render_selected = false;
-		is_specular_selected = false;
-		is_normal_map_selected = false;
-
-		EventManager::is_using_diffuse_texture = true;
-		EventManager::is_using_specular_texture = true;
-		EventManager::is_using_normal_maps = true;
-
-		current_model->set_current_shader(0);
-		std::cout << "Full Render Mode" << std::endl;
-	}
-	if (ImGui::Button("Albedo"))
-	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = true;
-		is_specular_selected = false;
-		is_normal_map_selected = false;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
-
-		current_model->set_current_shader(1);
-		std::cout << "Albedo Dissecting" << std::endl;
-	}
-	if (ImGui::Button("Specular"))
-	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = false;
-		is_specular_selected = true;
-		is_normal_map_selected = false;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
-
-		current_model->set_current_shader(1);
-		std::cout << "Specular Map Dissecting" << std::endl;
-	}
-	if (ImGui::Button("Normal"))
-	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = false;
-		is_specular_selected = false;
-		is_normal_map_selected = true;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
-
-		current_model->set_current_shader(1);
-		std::cout << "Rendering Dissecting" << std::endl;
-	}
-
-	ImGui::End();
-
+void Renderer::render_environment_window()
+{
 	// ENVIRONMENT SETTINGS
 	ImGui::Begin("Environment Settings");
 
@@ -211,6 +147,86 @@ void Renderer::render_demo_window()
 	light_diffuse_color.g = light_col[1];
 	light_diffuse_color.b = light_col[2];
 	environment_point_light->set_diffuse_color(light_diffuse_color);
+
+	ImGui::End();
+}
+
+void Renderer::render_object_window()
+{
+	// OBJECT SETTINGS WINDOW;
+	ImGui::Begin("Object Settings");
+
+	// Toggle map breakdowns
+	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
+	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
+	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
+	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
+
+	// Toggle Material Settings
+	ImGui::Text("Material Properties");
+	ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
+	ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
+
+
+	// Toggle Texture Maps
+	ImGui::Text("Texture Map Selection");
+	ImGui::Combo("", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
+	if (render_current == 0 && !is_full_render_selected)
+	{
+		is_full_render_selected = true;
+		is_diffuse_render_selected = false;
+		is_specular_selected = false;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = true;
+		EventManager::is_using_specular_texture = true;
+		EventManager::is_using_normal_maps = true;
+
+		current_model->set_current_shader(0);
+		std::cout << "Full Render Mode" << std::endl;
+	}
+	if (render_current == 1 && !is_diffuse_render_selected)
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = true;
+		is_specular_selected = false;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Albedo Dissecting" << std::endl;
+	}
+	if (render_current == 2 && !is_specular_selected)
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = false;
+		is_specular_selected = true;
+		is_normal_map_selected = false;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Specular Map Dissecting" << std::endl;
+	}
+	if (render_current == 3 && !is_normal_map_selected)
+	{
+		is_full_render_selected = false;
+		is_diffuse_render_selected = false;
+		is_specular_selected = false;
+		is_normal_map_selected = true;
+
+		EventManager::is_using_diffuse_texture = false;
+		EventManager::is_using_specular_texture = false;
+		EventManager::is_using_normal_maps = false;
+
+		current_model->set_current_shader(1);
+		std::cout << "Rendering Dissecting" << std::endl;
+	}
 
 	ImGui::End();
 }

@@ -37,6 +37,8 @@ public:
 	static bool is_normal_map_selected;
 	static bool is_gamma_enabled;
 	static float shininess;
+	static const char* map_combo_items[];
+	static int render_current;
 
 	static Light* environment_point_light;
 	static float light_horizontal_rotation;
@@ -44,6 +46,10 @@ public:
 	static float light_origin_distance;
 	static glm::vec3 light_diffuse_color;
 	static float light_intensity;
+private:
+	static void render_metrics_window();
+	static void render_object_window();
+	static void render_environment_window();
 };
 
 #endif
