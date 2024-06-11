@@ -9,7 +9,10 @@ using namespace std;
 
 // Time
 double EventManager::last_frame_time = glfwGetTime();
+double EventManager::last_frame_time_fps = glfwGetTime();
 float EventManager::frame_time = 0.0f;
+int EventManager::nb_frames = 0;
+int EventManager::frames_per_second = 0;
 
 // Mouse
 double EventManager::mouse_pos_x = 0.0;
@@ -141,13 +144,25 @@ void EventManager::update()
 
 	// Update frame time
 	const double current_time = glfwGetTime();
+	nb_frames++;
 	frame_time = static_cast<float>(current_time - last_frame_time);
+	if (current_time - last_frame_time_fps >= 1.0)
+	{
+		frames_per_second = nb_frames;
+		nb_frames = 0;
+		last_frame_time_fps += 1.0;
+	}
 	last_frame_time = current_time;
 }
 
 float EventManager::get_frame_time()
 {
 	return frame_time;
+}
+
+int EventManager::get_frames_per_second()
+{
+	return frames_per_second;
 }
 
 bool EventManager::is_exit_requested()

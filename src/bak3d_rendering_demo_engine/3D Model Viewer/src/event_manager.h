@@ -26,7 +26,10 @@ class EventManager
 
 	// Time
 	static double last_frame_time;
+	static double last_frame_time_fps;
 	static float frame_time;
+	static int nb_frames;
+	static int frames_per_second;
 
 	// Mouse
 	static double mouse_pos_x;
@@ -47,6 +50,7 @@ public:
 	static void update();
 
 	static float get_frame_time();
+	static int get_frames_per_second();
 	static bool is_exit_requested();
 
 	static GLFWwindow* get_window();

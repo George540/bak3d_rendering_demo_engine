@@ -30,7 +30,6 @@ public:
 	static void render_demo_window();
 
 	static Model* current_model;
-	static bool is_grid_rendering;
 	static bool is_full_render_selected;
 	static bool is_diffuse_render_selected;
 	static bool is_specular_selected;
@@ -40,6 +39,7 @@ public:
 	static const char* map_combo_items[];
 	static int render_current;
 
+	static bool is_grid_rendering;
 	static Light* environment_point_light;
 	static float light_horizontal_rotation;
 	static float light_vertical_rotation;

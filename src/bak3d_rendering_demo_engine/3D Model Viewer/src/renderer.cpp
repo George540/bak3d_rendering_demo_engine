@@ -117,9 +117,12 @@ void Renderer::render_metrics_window()
 {
 	// METRICS WINDOW
 	ImGui::Begin("Metrics");
-	ImGui::Text("Application average %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
-	ImGui::Text("ImGuiIO: %.1f FPS", ImGui::GetIO().Framerate);
-	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * EventManager::get_frame_time());
+	float imgui_framerate = ImGui::GetIO().Framerate;
+	float frame_time = EventManager::get_frame_time();
+	ImGui::Text("Application average %.3f ms/frame", 1000.0f / imgui_framerate);
+	ImGui::Text("ImGuiIO: %.1f FPS", imgui_framerate);
+	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * frame_time);
+	ImGui::Text("OpenGL FPS: %d", EventManager::get_frames_per_second());
 	ImGui::End();
 }
 
