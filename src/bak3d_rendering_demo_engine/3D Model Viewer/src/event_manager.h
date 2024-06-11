@@ -28,6 +28,7 @@ class EventManager
 	static double last_frame_time;
 	static double last_frame_time_fps;
 	static float frame_time;
+	static float frame_time_max;
 	static int nb_frames;
 	static int frames_per_second;
 
@@ -50,6 +51,8 @@ public:
 	static void update();
 
 	static float get_frame_time();
+	static float get_frame_time_max();
+	static void set_frame_time_max(float ftm);
 	static int get_frames_per_second();
 	static bool is_exit_requested();
 

@@ -119,10 +119,39 @@ void Renderer::render_metrics_window()
 	ImGui::Begin("Metrics");
 	float imgui_framerate = ImGui::GetIO().Framerate;
 	float frame_time = EventManager::get_frame_time();
+	int fps = EventManager::get_frames_per_second();
 	ImGui::Text("Application average %.3f ms/frame", 1000.0f / imgui_framerate);
 	ImGui::Text("ImGuiIO: %.1f FPS", imgui_framerate);
+	ImGui::Text("OpenGL FPS: %d", fps);
 	ImGui::Text("EventManager: %.4f ms/frame", 1000.0f * frame_time);
-	ImGui::Text("OpenGL FPS: %d", EventManager::get_frames_per_second());
+
+	// Fill an array of contiguous float values to plot
+	static float values[90] = {};
+	static int values_offset = 0;
+	static double refresh_time = 0.0;
+
+	if (refresh_time == 0.0)
+	{
+		refresh_time = ImGui::GetTime();
+	}
+
+	while (refresh_time < ImGui::GetTime()) // Create data based on the OpenGL frame rate
+	{
+		static float phase = 0.0f;
+		values[values_offset] = frame_time * 1000.0f;
+		values_offset = (values_offset + 1) % IM_ARRAYSIZE(values);
+		phase += 0.10f * values_offset;
+		refresh_time += 1.0f / fps;
+	}
+
+	if (values[values_offset] > EventManager::get_frame_time_max())
+	{
+		EventManager::set_frame_time_max(values[values_offset]);
+	}
+	char overlay[32];
+	sprintf_s(overlay, "max: %.4f", EventManager::get_frame_time_max());
+	ImGui::PlotHistogram("", values, IM_ARRAYSIZE(values), values_offset, overlay, -100.0f, 100.0f, ImVec2(0, 80.0f));
+
 	ImGui::End();
 }
 
@@ -156,7 +185,7 @@ void Renderer::render_environment_window()
 	}
 	else
 	{
-		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Light disabled. Object is being dissected.");
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Light disabled. Object is in preview mode.");
 	}
 
 	ImGui::End();
@@ -180,7 +209,7 @@ void Renderer::render_object_window()
 
 
 	// Toggle Texture Maps
-	ImGui::Text("Texture Map Selection");
+	ImGui::Text("Texture Map View Selection");
 	ImGui::Combo("", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
 	if (render_current == 0 && !is_full_render_selected)
 	{
@@ -194,7 +223,7 @@ void Renderer::render_object_window()
 		EventManager::is_using_normal_maps = true;
 
 		current_model->set_current_shader(0);
-		std::cout << "Full Render Mode" << std::endl;
+		std::cout << "Full Render View" << std::endl;
 	}
 	if (render_current == 1 && !is_diffuse_render_selected)
 	{
@@ -208,7 +237,7 @@ void Renderer::render_object_window()
 		EventManager::is_using_normal_maps = false;
 
 		current_model->set_current_shader(1);
-		std::cout << "Albedo Dissecting" << std::endl;
+		std::cout << "Albedo Preview" << std::endl;
 	}
 	if (render_current == 2 && !is_specular_selected)
 	{
@@ -222,7 +251,7 @@ void Renderer::render_object_window()
 		EventManager::is_using_normal_maps = false;
 
 		current_model->set_current_shader(1);
-		std::cout << "Specular Map Dissecting" << std::endl;
+		std::cout << "Specular Map Preview" << std::endl;
 	}
 	if (render_current == 3 && !is_normal_map_selected)
 	{
@@ -236,7 +265,7 @@ void Renderer::render_object_window()
 		EventManager::is_using_normal_maps = false;
 
 		current_model->set_current_shader(1);
-		std::cout << "Normal Map Dissecting" << std::endl;
+		std::cout << "Normal Map Preview" << std::endl;
 	}
 
 	ImGui::End();

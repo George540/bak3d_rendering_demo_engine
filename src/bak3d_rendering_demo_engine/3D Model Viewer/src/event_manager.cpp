@@ -11,6 +11,7 @@ using namespace std;
 double EventManager::last_frame_time = glfwGetTime();
 double EventManager::last_frame_time_fps = glfwGetTime();
 float EventManager::frame_time = 0.0f;
+float EventManager::frame_time_max = 0.0f;
 int EventManager::nb_frames = 0;
 int EventManager::frames_per_second = 0;
 
@@ -158,6 +159,16 @@ void EventManager::update()
 float EventManager::get_frame_time()
 {
 	return frame_time;
+}
+
+float EventManager::get_frame_time_max()
+{
+	return frame_time_max;
+}
+
+void EventManager::set_frame_time_max(float ftm)
+{
+	frame_time_max = ftm;
 }
 
 int EventManager::get_frames_per_second()
