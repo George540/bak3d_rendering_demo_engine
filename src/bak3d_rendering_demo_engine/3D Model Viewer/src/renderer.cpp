@@ -132,24 +132,32 @@ void Renderer::render_environment_window()
 	ImGui::Begin("Environment Settings");
 
 	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
-	// Toggle Light properties: position, color, intensity
-	ImGui::Text("Light Repositioning");
-	ImGui::SliderFloat("Horizontal", &light_horizontal_rotation, 0.0f, 360.0f);
-	environment_point_light->set_horizontal_angle(light_horizontal_rotation);
-	ImGui::SliderFloat("Vertical", &light_vertical_rotation, 0.0f, 360.0f);
-	environment_point_light->set_vertical_angle(light_vertical_rotation);
-	ImGui::SliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f);
-	environment_point_light->set_distance_offset(light_origin_distance);
-	ImGui::SliderFloat("Intensity", &light_intensity, 0.0f, 5.0f);
-	environment_point_light->set_light_intensity(light_intensity);
 
-	// Toggle light color
-	float light_col[3] = { light_diffuse_color.r, light_diffuse_color.g, light_diffuse_color.b };
-	ImGui::ColorEdit3("Light Color", light_col);
-	light_diffuse_color.r = light_col[0];
-	light_diffuse_color.g = light_col[1];
-	light_diffuse_color.b = light_col[2];
-	environment_point_light->set_diffuse_color(light_diffuse_color);
+	if (is_full_render_selected)
+	{
+		// Toggle Light properties: position, color, intensity
+		ImGui::Text("Light Repositioning");
+		ImGui::SliderFloat("Horizontal", &light_horizontal_rotation, 0.0f, 360.0f);
+		environment_point_light->set_horizontal_angle(light_horizontal_rotation);
+		ImGui::SliderFloat("Vertical", &light_vertical_rotation, 0.0f, 360.0f);
+		environment_point_light->set_vertical_angle(light_vertical_rotation);
+		ImGui::SliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f);
+		environment_point_light->set_distance_offset(light_origin_distance);
+		ImGui::SliderFloat("Intensity", &light_intensity, 0.0f, 5.0f);
+		environment_point_light->set_light_intensity(light_intensity);
+
+		// Toggle light color
+		float light_col[3] = { light_diffuse_color.r, light_diffuse_color.g, light_diffuse_color.b };
+		ImGui::ColorEdit3("Light Color", light_col);
+		light_diffuse_color.r = light_col[0];
+		light_diffuse_color.g = light_col[1];
+		light_diffuse_color.b = light_col[2];
+		environment_point_light->set_diffuse_color(light_diffuse_color);
+	}
+	else
+	{
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Light disabled. Object is being dissected.");
+	}
 
 	ImGui::End();
 }
@@ -228,7 +236,7 @@ void Renderer::render_object_window()
 		EventManager::is_using_normal_maps = false;
 
 		current_model->set_current_shader(1);
-		std::cout << "Rendering Dissecting" << std::endl;
+		std::cout << "Normal Map Dissecting" << std::endl;
 	}
 
 	ImGui::End();
