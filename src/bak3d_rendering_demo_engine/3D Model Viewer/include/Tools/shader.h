@@ -20,7 +20,7 @@ class Shader
 public:
     // Constructor
     Shader(const char* vertex_shader_source, const char* fragment_shader_source);
-    ~Shader() = default;
+    ~Shader();
 
     // Core functions
 	[[nodiscard]] unsigned int get_id() const { return id; }

@@ -37,14 +37,25 @@ Model::Model(string const& path, Camera& cam, Light& light) : m_camera(&cam), m_
 
 Model::~Model()
 {
+	// Delete and free shaders in memory
 	for (const auto s : m_shaders)
 	{
 		delete s;
 	}
 	m_shaders.clear();
-	delete m_current_shader;
-	delete m_camera;
-	delete m_light;
+
+	// Free texture data
+	textures_loaded.clear();
+	cout << "Texture data of model " << m_name << " have been cleared" << endl;
+	
+	// Safely dereference camera and light addresses from pointers
+	m_camera = nullptr;
+	m_light = nullptr;
+	
+	// Delete all mesh VAO data
+	delete_mesh_vaos();
+	meshes.clear();
+	cout << "Model " << m_name <<" mesh data have been safely deleted" << endl;
 }
 
 void Model::draw() const

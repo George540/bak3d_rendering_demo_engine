@@ -10,6 +10,8 @@ using namespace std;
 
 World* World::instance;
 
+const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
+
 World::World()
 {
 	instance = this;
@@ -26,14 +28,9 @@ World::World()
 	m_grid = new Grid(*m_camera);
 	m_axis = new Axis(*m_camera);
 
+	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
-
-	// Model set up
-	const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
-	m_model = new Model(model_path, *m_camera, *m_light);
-	Renderer::current_model = m_model;
 	Renderer::environment_point_light = m_light;
-	cout << "Model with path " << model_path << " has been spawned." << endl;
 }
 
 World::~World()
@@ -43,6 +40,25 @@ World::~World()
 	delete m_model;
 	delete m_light;
 	delete m_axis;
+}
+
+void World::process_model_activation()
+{
+	// MODEL INSTANTIATION AND DELETION
+	if (Renderer::object_current == 1 && !m_model)
+	{
+		// Model set up
+		m_model = new Model(model_path, *m_camera, *m_light);
+		Renderer::current_model = m_model;
+		cout << "Model with path " << model_path << " has been instantiated." << endl;
+	}
+	else if (Renderer::object_current != 1 && m_model)
+	{
+		Renderer::current_model = nullptr;
+		delete m_model;
+		m_model = nullptr;
+		cout << "Model with path " << model_path << " has been deleted." << endl;
+	}
 }
 
 void World::update(float dt) const

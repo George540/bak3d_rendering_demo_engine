@@ -14,12 +14,16 @@ struct GLFWwindow;
  */
 class Renderer
 {
+private:
 	static GLFWwindow* r_window;
 	static GLuint frame_buffer;
 	static GLuint texture_color_buffer;
 	static GLuint render_buffer;
 
 	static void initialize_imgui();
+	static void render_metrics_window();
+	static void render_object_window();
+	static void render_environment_window();
 public:
 	static void initialize();
 	static void shutdown();
@@ -36,6 +40,8 @@ public:
 	static bool is_normal_map_selected;
 	static bool is_gamma_enabled;
 	static float shininess;
+	static const char* object_combo_items[];
+	static int object_current;
 	static const char* map_combo_items[];
 	static int render_current;
 
@@ -47,10 +53,6 @@ public:
 	static float light_origin_distance;
 	static glm::vec3 light_diffuse_color;
 	static float light_intensity;
-private:
-	static void render_metrics_window();
-	static void render_object_window();
-	static void render_environment_window();
 };
 
 #endif

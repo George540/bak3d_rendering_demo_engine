@@ -29,6 +29,7 @@ public:
 
 	void update(float dt) const;
 	void draw() const;
+	void process_model_activation();
 	Model* get_model() const { return m_model; }
 	void delete_arrays_and_buffers() const;
 private:

@@ -76,6 +76,11 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     std::cout << "Shader with ID " << id << " has compiled..." << std::endl;
 }
 
+Shader::~Shader()
+{
+    cout << "Shader with ID " << id << " has been deleted..." << endl;
+}
+
 /**
  * \brief Use the specified shader program
  */

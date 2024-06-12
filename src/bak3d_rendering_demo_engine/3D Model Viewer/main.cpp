@@ -19,7 +19,7 @@ int main()
     EventManager::initialize();
     Renderer::initialize();
 
-    const auto world = World();
+    auto world = World();
 
     do
     {
@@ -28,6 +28,7 @@ int main()
 
         // Update World
         const float dt = EventManager::get_frame_time();
+        world.process_model_activation();
         world.update(dt);
 
         world.draw();

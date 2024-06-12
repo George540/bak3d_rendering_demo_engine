@@ -8,7 +8,6 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "scene.h"
 #include "stb_image.h"
 
 
@@ -32,6 +31,8 @@ bool Renderer::is_specular_selected = false;
 bool Renderer::is_normal_map_selected = false;
 bool Renderer::is_gamma_enabled = false;
 float Renderer::shininess = 64.0f;
+const char* Renderer::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
+int Renderer::object_current = 0;
 const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int Renderer::render_current = 0;
 
@@ -206,89 +207,101 @@ void Renderer::render_object_window()
 	// OBJECT SETTINGS WINDOW;
 	ImGui::Begin("Object Settings");
 
-	// Toggle map breakdowns
-	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
-	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
-	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
-	ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
+	// Object Selection Dropdown
+	ImGui::Text("Object Selection");
+	// Simplified one-liner Combo() using an accessor function
+	ImGui::Combo("", &object_current, object_combo_items, IM_ARRAYSIZE(object_combo_items));
 
-	// Toggle Material Settings
-	ImGui::Text("Material Properties");
-	ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
-	ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
-
-
-	// Toggle Texture Maps
-	ImGui::Text("Texture Map View Selection");
-	ImGui::Combo("", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
-	if (render_current == 0 && !is_full_render_selected)
+	if (current_model && object_current == 1)
 	{
-		is_full_render_selected = true;
-		is_diffuse_render_selected = false;
-		is_specular_selected = false;
-		is_normal_map_selected = false;
+		// Toggle map breakdowns
+		ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
+		ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
 
-		EventManager::is_using_diffuse_texture = true;
-		EventManager::is_using_specular_texture = true;
-		EventManager::is_using_normals_texture = true;
+		// Toggle Material Settings
+		ImGui::Text("Material Properties");
+		ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
+		ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
 
-		if (current_model)
+
+		// Toggle Texture Maps
+		ImGui::Text("Texture Map View Selection");
+		ImGui::Combo("", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
+		if (render_current == 0 && !is_full_render_selected)
 		{
-			current_model->set_current_shader(0);
+			is_full_render_selected = true;
+			is_diffuse_render_selected = false;
+			is_specular_selected = false;
+			is_normal_map_selected = false;
+
+			EventManager::is_using_diffuse_texture = true;
+			EventManager::is_using_specular_texture = true;
+			EventManager::is_using_normals_texture = true;
+
+			if (current_model)
+			{
+				current_model->set_current_shader(0);
+			}
+
+			std::cout << "Full Render View" << std::endl;
 		}
-		
-		std::cout << "Full Render View" << std::endl;
+		if (render_current == 1 && !is_diffuse_render_selected)
+		{
+			is_full_render_selected = false;
+			is_diffuse_render_selected = true;
+			is_specular_selected = false;
+			is_normal_map_selected = false;
+
+			EventManager::is_using_diffuse_texture = false;
+			EventManager::is_using_specular_texture = false;
+			EventManager::is_using_normals_texture = false;
+
+			if (current_model)
+			{
+				current_model->set_current_shader(1);
+			}
+			std::cout << "Albedo Preview" << std::endl;
+		}
+		if (render_current == 2 && !is_specular_selected)
+		{
+			is_full_render_selected = false;
+			is_diffuse_render_selected = false;
+			is_specular_selected = true;
+			is_normal_map_selected = false;
+
+			EventManager::is_using_diffuse_texture = false;
+			EventManager::is_using_specular_texture = false;
+			EventManager::is_using_normals_texture = false;
+
+			if (current_model)
+			{
+				current_model->set_current_shader(1);
+			}
+			std::cout << "Specular Map Preview" << std::endl;
+		}
+		if (render_current == 3 && !is_normal_map_selected)
+		{
+			is_full_render_selected = false;
+			is_diffuse_render_selected = false;
+			is_specular_selected = false;
+			is_normal_map_selected = true;
+
+			EventManager::is_using_diffuse_texture = false;
+			EventManager::is_using_specular_texture = false;
+			EventManager::is_using_normals_texture = false;
+
+			if (current_model)
+			{
+				current_model->set_current_shader(1);
+			}
+			std::cout << "Normal Map Preview" << std::endl;
+		}
 	}
-	if (render_current == 1 && !is_diffuse_render_selected)
+	else
 	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = true;
-		is_specular_selected = false;
-		is_normal_map_selected = false;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normals_texture = false;
-
-		if (current_model)
-		{
-			current_model->set_current_shader(1);
-		}
-		std::cout << "Albedo Preview" << std::endl;
-	}
-	if (render_current == 2 && !is_specular_selected)
-	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = false;
-		is_specular_selected = true;
-		is_normal_map_selected = false;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normals_texture = false;
-
-		if (current_model)
-		{
-			current_model->set_current_shader(1);
-		}
-		std::cout << "Specular Map Preview" << std::endl;
-	}
-	if (render_current == 3 && !is_normal_map_selected)
-	{
-		is_full_render_selected = false;
-		is_diffuse_render_selected = false;
-		is_specular_selected = false;
-		is_normal_map_selected = true;
-
-		EventManager::is_using_diffuse_texture = false;
-		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normals_texture = false;
-
-		if (current_model)
-		{
-			current_model->set_current_shader(1);
-		}
-		std::cout << "Normal Map Preview" << std::endl;
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Model settings disabled. No model selected to view.");
 	}
 
 	ImGui::End();
