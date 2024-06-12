@@ -20,9 +20,12 @@ GLuint Renderer::frame_buffer = NULL;
 GLuint Renderer::texture_color_buffer = NULL;
 GLuint Renderer::render_buffer = NULL;
 
+// Environment
+bool Renderer::is_grid_rendering = true;
+glm::vec3 Renderer::background_color = glm::vec3(0.3f);;
+
 // Model
 Model* Renderer::current_model = nullptr;
-bool Renderer::is_grid_rendering = true;
 bool Renderer::is_full_render_selected = true;
 bool Renderer::is_diffuse_render_selected = false;
 bool Renderer::is_specular_selected = false;
@@ -61,9 +64,6 @@ void Renderer::initialize()
 
 	// Somehow, glewInit triggers a glInvalidEnum... Let's ignore it
 	glGetError();
-
-	// Gray background
-	glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -104,6 +104,9 @@ void Renderer::begin_frame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+
+	// Background Color
+	glClearColor(background_color.r, background_color.g, background_color.b, 0.0f);
 }
 
 void Renderer::render_demo_window()
@@ -161,6 +164,13 @@ void Renderer::render_environment_window()
 	ImGui::Begin("Environment Settings");
 
 	ImGui::Checkbox("Render Grid", &Renderer::is_grid_rendering);
+	// Toggle light color
+	float bg_col[3] = { background_color.r, background_color.g, background_color.b };
+	ImGui::ColorEdit3("Background Color", bg_col);
+	background_color.r = bg_col[0];
+	background_color.g = bg_col[1];
+	background_color.b = bg_col[2];
+	environment_point_light->set_diffuse_color(background_color);
 
 	if (is_full_render_selected)
 	{
@@ -222,7 +232,11 @@ void Renderer::render_object_window()
 		EventManager::is_using_specular_texture = true;
 		EventManager::is_using_normals_texture = true;
 
-		current_model->set_current_shader(0);
+		if (current_model)
+		{
+			current_model->set_current_shader(0);
+		}
+		
 		std::cout << "Full Render View" << std::endl;
 	}
 	if (render_current == 1 && !is_diffuse_render_selected)
@@ -236,7 +250,10 @@ void Renderer::render_object_window()
 		EventManager::is_using_specular_texture = false;
 		EventManager::is_using_normals_texture = false;
 
-		current_model->set_current_shader(1);
+		if (current_model)
+		{
+			current_model->set_current_shader(1);
+		}
 		std::cout << "Albedo Preview" << std::endl;
 	}
 	if (render_current == 2 && !is_specular_selected)
@@ -250,7 +267,10 @@ void Renderer::render_object_window()
 		EventManager::is_using_specular_texture = false;
 		EventManager::is_using_normals_texture = false;
 
-		current_model->set_current_shader(1);
+		if (current_model)
+		{
+			current_model->set_current_shader(1);
+		}
 		std::cout << "Specular Map Preview" << std::endl;
 	}
 	if (render_current == 3 && !is_normal_map_selected)
@@ -264,7 +284,10 @@ void Renderer::render_object_window()
 		EventManager::is_using_specular_texture = false;
 		EventManager::is_using_normals_texture = false;
 
-		current_model->set_current_shader(1);
+		if (current_model)
+		{
+			current_model->set_current_shader(1);
+		}
 		std::cout << "Normal Map Preview" << std::endl;
 	}
 

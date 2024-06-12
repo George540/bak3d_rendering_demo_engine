@@ -70,7 +70,10 @@ void World::draw() const
 		m_light->draw();
 	}
 
-	m_model->draw();
+	if (m_model)
+	{
+		m_model->draw();
+	}
 
 	Renderer::render_demo_window();
 	//Renderer::post_processing();

@@ -40,6 +40,7 @@ public:
 	static int render_current;
 
 	static bool is_grid_rendering;
+	static glm::vec3 background_color;
 	static Light* environment_point_light;
 	static float light_horizontal_rotation;
 	static float light_vertical_rotation;
