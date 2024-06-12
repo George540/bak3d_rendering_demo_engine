@@ -32,6 +32,10 @@ struct vertex {
     glm::vec3 color;
     // use diffuse texture or not
     bool useDiffuseTexture;
+    // use specular texture or not
+    bool useSpecularTexture;
+    // use normal texture or not
+    bool useNormalsTexture;
     //bone indexes which will influence this vertex
     int m_BoneIDs[MAX_BONE_INFLUENCE];
     //weights from each bone
@@ -50,6 +54,8 @@ struct material {
     float ambient;
     float shininess;
     bool use_diffuse_texture;
+    bool use_specular_texture;
+    bool use_normal_texture;
 };
 
 class Mesh

@@ -104,7 +104,7 @@ void Model::update_material_properties(const Mesh& mesh) const
 	m_current_shader->set_float("material.shininess", Renderer::shininess);
 	m_current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
 	m_current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
-	m_current_shader->set_bool("materialSettings.useNormalMaps", EventManager::get_using_normal_maps());
+	m_current_shader->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
 	m_current_shader->set_bool("material.gamma", Renderer::is_gamma_enabled);
 }
 
@@ -132,9 +132,6 @@ void Model::update_breakdown_shader() const
 
 void Model::load_model(string const& path)
 {
-	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model)
-	stbi_set_flip_vertically_on_load(true);
-
 	// read file via ASSIMP
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -234,20 +231,30 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 		{
 			const auto& mat = scene->mMaterials[mesh->mMaterialIndex];
 			aiColor4D diffuse;
+			aiColor4D specular;
+			aiColor4D normals;
 
+			// Check if diffuse texture exists
 			if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
 			{
 				vertex.color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 			}
 
-			if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+			vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0 ? true : false;
+			EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;
+
+			// Check if specular texture exists
+			if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular))
 			{
-				vertex.useDiffuseTexture = true;
+				vertex.color = glm::vec4(specular.r, specular.g, specular.b, specular.a);
 			}
-			else
-			{
-				vertex.useDiffuseTexture = false;
-			}
+
+			vertex.useSpecularTexture = mat->GetTextureCount(aiTextureType_SPECULAR) > 0 ? true : false;
+			EventManager::is_using_specular_texture = vertex.useSpecularTexture;
+
+			// Check if normals texture exists
+			vertex.useNormalsTexture = mat->GetTextureCount(aiTextureType_HEIGHT) > 0 ? true : false;
+			EventManager::is_using_normals_texture = vertex.useNormalsTexture;
 		}
 
 		vertices.push_back(vertex);

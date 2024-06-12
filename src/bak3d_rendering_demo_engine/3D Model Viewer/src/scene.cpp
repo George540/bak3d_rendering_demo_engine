@@ -29,7 +29,7 @@ World::World()
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
 
 	// Model set up
-	const auto model_path = std::filesystem::absolute("assets/mushroom/mushroom.obj").generic_string();
+	const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
 	m_model = new Model(model_path, *m_camera, *m_light);
 	Renderer::current_model = m_model;
 	Renderer::environment_point_light = m_light;

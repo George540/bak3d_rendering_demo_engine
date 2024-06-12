@@ -15,7 +15,7 @@ struct MaterialSettings
 {
     bool useDiffuseTexture;
     bool useSpecularTexture;
-    bool useNormalMaps;
+    bool useNormalsTexture;
 };
 
 struct Light 
@@ -60,7 +60,7 @@ void main()
     // normal
     vec3 normal = normalize(fs_in.Normal);
     vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    if (materialSettings.useNormalMaps)
+    if (materialSettings.useNormalsTexture)
     {
         normal = texture(material.normal, fs_in.TexCoord).rgb; // obtain normal from normal map in range [0,1]
         normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space, [-1,1]

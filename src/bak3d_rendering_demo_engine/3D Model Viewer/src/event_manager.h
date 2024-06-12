@@ -70,8 +70,8 @@ public:
 	static bool get_using_specular_texture() { return is_using_specular_texture; }
 	static void set_using_specular_texture(bool isSpecular) { is_using_specular_texture = isSpecular; }
 
-	static bool get_using_normal_maps() { return is_using_normal_maps; }
-	static void set_using_normal_maps(bool isNormal) { is_using_normal_maps = isNormal; }
+	static bool get_using_normal_maps() { return is_using_normals_texture; }
+	static void set_using_normal_maps(bool isNormal) { is_using_normals_texture = isNormal; }
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();
@@ -81,7 +81,7 @@ public:
 	static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	static bool is_using_diffuse_texture;
 	static bool is_using_specular_texture;
-	static bool is_using_normal_maps;
+	static bool is_using_normals_texture;
 };
 
 #endif

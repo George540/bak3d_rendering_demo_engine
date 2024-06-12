@@ -200,7 +200,7 @@ void Renderer::render_object_window()
 	ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
 	ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 	ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
-	ImGui::Checkbox("Normal", &EventManager::is_using_normal_maps);
+	ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
 
 	// Toggle Material Settings
 	ImGui::Text("Material Properties");
@@ -220,7 +220,7 @@ void Renderer::render_object_window()
 
 		EventManager::is_using_diffuse_texture = true;
 		EventManager::is_using_specular_texture = true;
-		EventManager::is_using_normal_maps = true;
+		EventManager::is_using_normals_texture = true;
 
 		current_model->set_current_shader(0);
 		std::cout << "Full Render View" << std::endl;
@@ -234,7 +234,7 @@ void Renderer::render_object_window()
 
 		EventManager::is_using_diffuse_texture = false;
 		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
+		EventManager::is_using_normals_texture = false;
 
 		current_model->set_current_shader(1);
 		std::cout << "Albedo Preview" << std::endl;
@@ -248,7 +248,7 @@ void Renderer::render_object_window()
 
 		EventManager::is_using_diffuse_texture = false;
 		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
+		EventManager::is_using_normals_texture = false;
 
 		current_model->set_current_shader(1);
 		std::cout << "Specular Map Preview" << std::endl;
@@ -262,7 +262,7 @@ void Renderer::render_object_window()
 
 		EventManager::is_using_diffuse_texture = false;
 		EventManager::is_using_specular_texture = false;
-		EventManager::is_using_normal_maps = false;
+		EventManager::is_using_normals_texture = false;
 
 		current_model->set_current_shader(1);
 		std::cout << "Normal Map Preview" << std::endl;
