@@ -26,6 +26,7 @@ private:
 	static void render_environment_window();
 public:
 	static void initialize();
+	static void cleanup_model_dropdown_data();
 	static void shutdown();
 
 	static void begin_frame();
@@ -42,6 +43,9 @@ public:
 	static float shininess;
 	static const char* object_combo_items[];
 	static int object_current;
+	static std::vector<std::string> model_combo_items_vec;
+	static char* model_combo_items[];
+	static int model_current;
 	static const char* map_combo_items[];
 	static int render_current;
 

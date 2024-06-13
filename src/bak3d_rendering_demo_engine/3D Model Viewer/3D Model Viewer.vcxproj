@@ -165,6 +165,7 @@
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\Tools\file_loader.cpp" />
     <ClCompile Include="src\Tools\glad.c" />
     <ClCompile Include="src\Tools\shader.cpp" />
   </ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="include\model.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\Tools\file_loader.h" />
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="src\event_manager.h" />

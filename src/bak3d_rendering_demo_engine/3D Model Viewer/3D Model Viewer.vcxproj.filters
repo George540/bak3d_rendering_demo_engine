@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\..\lib\imgui\src\imgui_widgets.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tools\file_loader.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\lib\imgui\include\imstb_truetype.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\file_loader.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>

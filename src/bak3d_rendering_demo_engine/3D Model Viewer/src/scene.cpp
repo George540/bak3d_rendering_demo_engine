@@ -5,6 +5,7 @@
 #include "scene.h"
 #include "renderer.h"
 #include "model.h"
+#include "file_loader.h"
 
 using namespace std;
 
@@ -31,6 +32,12 @@ World::World()
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
 	Renderer::environment_point_light = m_light;
+
+	/*vector<string> directories = FileLoader::get_directories(std::filesystem::absolute("assets"));
+	for (auto d : directories)
+	{
+		cout << d.c_str() << endl;
+	}*/
 }
 
 World::~World()
@@ -45,15 +52,16 @@ World::~World()
 void World::process_model_activation()
 {
 	// MODEL INSTANTIATION AND DELETION
-	if (Renderer::object_current == 1 && !m_model)
+	if (Renderer::object_current == 1 && Renderer::model_current != 0 && !m_model)
 	{
 		// Model set up
 		m_model = new Model(model_path, *m_camera, *m_light);
 		Renderer::current_model = m_model;
 		cout << "Model with path " << model_path << " has been instantiated." << endl;
 	}
-	else if (Renderer::object_current != 1 && m_model)
+	else if (Renderer::object_current != 1 && Renderer::model_current == 0 && m_model)
 	{
+		Renderer::cleanup_model_dropdown_data();
 		Renderer::current_model = nullptr;
 		delete m_model;
 		m_model = nullptr;

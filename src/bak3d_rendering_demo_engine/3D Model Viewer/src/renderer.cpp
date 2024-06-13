@@ -1,7 +1,10 @@
 #include <iostream>
+#include <filesystem>
+#include <cstring>
 
 #include "renderer.h"
 #include "event_manager.h"
+#include "file_loader.h"
 
 #include <GLFW/glfw3.h>
 
@@ -33,6 +36,9 @@ bool Renderer::is_gamma_enabled = false;
 float Renderer::shininess = 64.0f;
 const char* Renderer::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int Renderer::object_current = 0;
+vector<string> Renderer::model_combo_items_vec;
+char* Renderer::model_combo_items[] = { nullptr };
+int Renderer::model_current = 0;
 const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int Renderer::render_current = 0;
 
@@ -72,6 +78,22 @@ void Renderer::initialize()
 	std::cout << "Enabling depth test..." << endl;
 
 	initialize_imgui();
+
+	model_combo_items_vec = FileLoader::get_files_by_type(std::filesystem::absolute("assets"), FileType::obj);
+	model_combo_items_vec.insert(model_combo_items_vec.begin(), "None");
+	
+	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
+	{
+		// Allocate memory for each string and copy content
+		model_combo_items[i] = new char[model_combo_items_vec[i].size() + 1]; // +1 for null terminator
+		// Copy string using strcpy_s
+		bool success = strcpy_s(model_combo_items[i], model_combo_items_vec[i].size() + 1, model_combo_items_vec[i].c_str()) == 0;
+		if (!success)
+		{
+			cerr << "ERROR::RENDERER: Model dropdown menu items at array copy failed at: " << i << std::endl;
+		}
+	}
+
 
 	std::cout << "Ending Renderer Initialization..." << endl;
 }
@@ -154,7 +176,7 @@ void Renderer::render_metrics_window()
 	}
 	char overlay[32];
 	sprintf_s(overlay, "max: %.4f", EventManager::get_frame_time_max());
-	ImGui::PlotHistogram("", values, IM_ARRAYSIZE(values), values_offset, overlay, -100.0f, 100.0f, ImVec2(0, 80.0f));
+	ImGui::PlotHistogram("##", values, IM_ARRAYSIZE(values), values_offset, overlay, -100.0f, 100.0f, ImVec2(0, 80.0f));
 
 	ImGui::End();
 }
@@ -210,98 +232,108 @@ void Renderer::render_object_window()
 	// Object Selection Dropdown
 	ImGui::Text("Object Selection");
 	// Simplified one-liner Combo() using an accessor function
-	ImGui::Combo("", &object_current, object_combo_items, IM_ARRAYSIZE(object_combo_items));
+	ImGui::Combo("##", &object_current, object_combo_items, IM_ARRAYSIZE(object_combo_items));
 
-	if (current_model && object_current == 1)
+	if (object_current == 1)
 	{
-		// Toggle map breakdowns
-		ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
-		ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
+		ImGui::Text("Model Selection");
+		ImGui::Combo("##", &model_current, model_combo_items, IM_ARRAYSIZE(model_combo_items));
 
-		// Toggle Material Settings
-		ImGui::Text("Material Properties");
-		ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
-		ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
-
-
-		// Toggle Texture Maps
-		ImGui::Text("Texture Map View Selection");
-		ImGui::Combo("", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
-		if (render_current == 0 && !is_full_render_selected)
+		if (current_model && model_current != 0)
 		{
-			is_full_render_selected = true;
-			is_diffuse_render_selected = false;
-			is_specular_selected = false;
-			is_normal_map_selected = false;
+			// Toggle map breakdowns
+			ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
+			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
+			ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
 
-			EventManager::is_using_diffuse_texture = true;
-			EventManager::is_using_specular_texture = true;
-			EventManager::is_using_normals_texture = true;
+			// Toggle Material Settings
+			ImGui::Text("Material Properties");
+			ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
+			ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
 
-			if (current_model)
+
+			// Toggle Texture Maps
+			ImGui::Text("Texture Map View Selection");
+			ImGui::Combo("##", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
+			if (render_current == 0 && !is_full_render_selected)
 			{
-				current_model->set_current_shader(0);
-			}
+				is_full_render_selected = true;
+				is_diffuse_render_selected = false;
+				is_specular_selected = false;
+				is_normal_map_selected = false;
 
-			std::cout << "Full Render View" << std::endl;
+				EventManager::is_using_diffuse_texture = true;
+				EventManager::is_using_specular_texture = true;
+				EventManager::is_using_normals_texture = true;
+
+				if (current_model)
+				{
+					current_model->set_current_shader(0);
+				}
+
+				std::cout << "Full Render View" << std::endl;
+			}
+			if (render_current == 1 && !is_diffuse_render_selected)
+			{
+				is_full_render_selected = false;
+				is_diffuse_render_selected = true;
+				is_specular_selected = false;
+				is_normal_map_selected = false;
+
+				EventManager::is_using_diffuse_texture = false;
+				EventManager::is_using_specular_texture = false;
+				EventManager::is_using_normals_texture = false;
+
+				if (current_model)
+				{
+					current_model->set_current_shader(1);
+				}
+				std::cout << "Albedo Preview" << std::endl;
+			}
+			if (render_current == 2 && !is_specular_selected)
+			{
+				is_full_render_selected = false;
+				is_diffuse_render_selected = false;
+				is_specular_selected = true;
+				is_normal_map_selected = false;
+
+				EventManager::is_using_diffuse_texture = false;
+				EventManager::is_using_specular_texture = false;
+				EventManager::is_using_normals_texture = false;
+
+				if (current_model)
+				{
+					current_model->set_current_shader(1);
+				}
+				std::cout << "Specular Map Preview" << std::endl;
+			}
+			if (render_current == 3 && !is_normal_map_selected)
+			{
+				is_full_render_selected = false;
+				is_diffuse_render_selected = false;
+				is_specular_selected = false;
+				is_normal_map_selected = true;
+
+				EventManager::is_using_diffuse_texture = false;
+				EventManager::is_using_specular_texture = false;
+				EventManager::is_using_normals_texture = false;
+
+				if (current_model)
+				{
+					current_model->set_current_shader(1);
+				}
+				std::cout << "Normal Map Preview" << std::endl;
+			}
 		}
-		if (render_current == 1 && !is_diffuse_render_selected)
+		else
 		{
-			is_full_render_selected = false;
-			is_diffuse_render_selected = true;
-			is_specular_selected = false;
-			is_normal_map_selected = false;
-
-			EventManager::is_using_diffuse_texture = false;
-			EventManager::is_using_specular_texture = false;
-			EventManager::is_using_normals_texture = false;
-
-			if (current_model)
-			{
-				current_model->set_current_shader(1);
-			}
-			std::cout << "Albedo Preview" << std::endl;
-		}
-		if (render_current == 2 && !is_specular_selected)
-		{
-			is_full_render_selected = false;
-			is_diffuse_render_selected = false;
-			is_specular_selected = true;
-			is_normal_map_selected = false;
-
-			EventManager::is_using_diffuse_texture = false;
-			EventManager::is_using_specular_texture = false;
-			EventManager::is_using_normals_texture = false;
-
-			if (current_model)
-			{
-				current_model->set_current_shader(1);
-			}
-			std::cout << "Specular Map Preview" << std::endl;
-		}
-		if (render_current == 3 && !is_normal_map_selected)
-		{
-			is_full_render_selected = false;
-			is_diffuse_render_selected = false;
-			is_specular_selected = false;
-			is_normal_map_selected = true;
-
-			EventManager::is_using_diffuse_texture = false;
-			EventManager::is_using_specular_texture = false;
-			EventManager::is_using_normals_texture = false;
-
-			if (current_model)
-			{
-				current_model->set_current_shader(1);
-			}
-			std::cout << "Normal Map Preview" << std::endl;
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Model settings disabled. Select imported model to view.");
 		}
 	}
 	else
 	{
-		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Model settings disabled. No model selected to view.");
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Object settings disabled. Selected an object type to view.");
 	}
 
 	ImGui::End();
@@ -317,6 +349,14 @@ void Renderer::end_frame()
 	glDisable(GL_DEPTH_TEST);
 	glfwSwapBuffers(r_window);
 	glfwPollEvents();
+}
+
+void Renderer::cleanup_model_dropdown_data()
+{
+	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
+	{
+		delete[] model_combo_items[i];
+	}
 }
 
 void Renderer::shutdown()
