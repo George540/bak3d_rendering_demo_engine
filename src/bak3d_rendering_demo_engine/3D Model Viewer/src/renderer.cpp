@@ -55,14 +55,14 @@ void Renderer::initialize()
 {
 	r_window = EventManager::get_window();
 	glfwMakeContextCurrent(r_window);
-	std::cout << "Capturing window at Renderer..." << endl;
+	cout << "Capturing window at Renderer..." << endl;
 
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
-		std::cerr << "Failed to initialize GLAD" << std::endl;
+		cerr << "Failed to initialize GLAD" << endl;
 		exit(-1);
 	}
-	std::cout << "Initializing GLAD..." << std::endl;
+	cout << "Initializing GLAD..." << endl;
 
 	glfwSetFramebufferSizeCallback(r_window, EventManager::framebuffer_size_callback);
 
@@ -75,11 +75,11 @@ void Renderer::initialize()
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	std::cout << "Enabling depth test..." << endl;
+	cout << "Enabling depth test..." << endl;
 
 	initialize_imgui();
 
-	model_combo_items_vec = FileLoader::get_files_by_type(std::filesystem::absolute("assets"), FileType::obj);
+	model_combo_items_vec = FileLoader::get_files_by_type(filesystem::absolute("assets"), FileType::obj);
 	model_combo_items_vec.insert(model_combo_items_vec.begin(), "None");
 	
 	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
@@ -90,12 +90,12 @@ void Renderer::initialize()
 		bool success = strcpy_s(model_combo_items[i], model_combo_items_vec[i].size() + 1, model_combo_items_vec[i].c_str()) == 0;
 		if (!success)
 		{
-			cerr << "ERROR::RENDERER: Model dropdown menu items at array copy failed at: " << i << std::endl;
+			cerr << "ERROR::RENDERER: Model dropdown menu items at array copy failed at: " << i << endl;
 		}
 	}
 
 
-	std::cout << "Ending Renderer Initialization..." << endl;
+	cout << "Ending Renderer Initialization..." << endl;
 }
 
 void Renderer::initialize_imgui()
@@ -113,7 +113,7 @@ void Renderer::initialize_imgui()
 	const auto glsl_version = "#version 330";
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
-	std::cout << "Initializing IMGUI window..." << endl;
+	cout << "Initializing IMGUI window..." << endl;
 }
 
 void Renderer::begin_frame()
@@ -272,7 +272,7 @@ void Renderer::render_object_window()
 					current_model->set_current_shader(0);
 				}
 
-				std::cout << "Full Render View" << std::endl;
+				cout << "Full Render View" << endl;
 			}
 			if (render_current == 1 && !is_diffuse_render_selected)
 			{
@@ -289,7 +289,7 @@ void Renderer::render_object_window()
 				{
 					current_model->set_current_shader(1);
 				}
-				std::cout << "Albedo Preview" << std::endl;
+				cout << "Albedo Preview" << endl;
 			}
 			if (render_current == 2 && !is_specular_selected)
 			{
@@ -306,7 +306,7 @@ void Renderer::render_object_window()
 				{
 					current_model->set_current_shader(1);
 				}
-				std::cout << "Specular Map Preview" << std::endl;
+				cout << "Specular Map Preview" << endl;
 			}
 			if (render_current == 3 && !is_normal_map_selected)
 			{
@@ -323,7 +323,7 @@ void Renderer::render_object_window()
 				{
 					current_model->set_current_shader(1);
 				}
-				std::cout << "Normal Map Preview" << std::endl;
+				cout << "Normal Map Preview" << endl;
 			}
 		}
 		else
