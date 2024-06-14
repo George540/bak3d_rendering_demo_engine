@@ -95,6 +95,8 @@ I am currently unsure on how far I want to upgrade this simple demo rendering en
 - Anti-Aliasing
 - Model I/O
 - Proper Menu Windows (multiple panels)
+- Simple Particle System
+- GPU Accelerated Particle System
 
 Most of these I just glossed over their theory just to know what are they like, but once I jump back into this project, these should be top priority. More miscellaneous features can be added that will enhance user experience, such as realtime custom model loading, multiple camera views, inter-adjustable windows with more properties to modify, more metrics and many more. This can easily be turned into a proper CG engine, but I realize it takes more time than anticipated.
 
