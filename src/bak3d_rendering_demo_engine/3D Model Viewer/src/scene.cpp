@@ -61,7 +61,6 @@ void World::process_model_activation()
 	}
 	else if (Renderer::object_current != 1 && Renderer::model_current == 0 && m_model)
 	{
-		Renderer::cleanup_model_dropdown_data();
 		Renderer::current_model = nullptr;
 		delete m_model;
 		m_model = nullptr;

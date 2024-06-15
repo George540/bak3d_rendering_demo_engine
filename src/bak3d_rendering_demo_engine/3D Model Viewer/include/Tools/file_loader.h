@@ -35,7 +35,7 @@ public:
 	static std::vector<std::string> get_files_by_type(const std::filesystem::path& path, FileType type);
 	static std::string get_name_from_filename(const std::string filename);
 	static std::string enum_to_string(FileType type);
-	static std::vector<const char*> get_vector_items_to_array(const std::vector<std::string>& vector);
+	static std::vector<char*> get_vector_items_to_array(const std::vector<std::string>& vector);
 };
 
 #endif

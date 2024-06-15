@@ -37,7 +37,7 @@ float Renderer::shininess = 64.0f;
 const char* Renderer::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int Renderer::object_current = 0;
 vector<string> Renderer::model_combo_items_vec;
-char* Renderer::model_combo_items[] = { nullptr };
+vector<char*> Renderer::model_combo_items;
 int Renderer::model_current = 0;
 const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int Renderer::render_current = 0;
@@ -79,20 +79,10 @@ void Renderer::initialize()
 
 	initialize_imgui();
 
+	// Load list of model assets found in assets folder and turn them into combo items vectors
 	model_combo_items_vec = FileLoader::get_files_by_type(filesystem::absolute("assets"), FileType::obj);
 	model_combo_items_vec.insert(model_combo_items_vec.begin(), "None");
-	
-	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
-	{
-		// Allocate memory for each string and copy content
-		model_combo_items[i] = new char[model_combo_items_vec[i].size() + 1]; // +1 for null terminator
-		// Copy string using strcpy_s
-		bool success = strcpy_s(model_combo_items[i], model_combo_items_vec[i].size() + 1, model_combo_items_vec[i].c_str()) == 0;
-		if (!success)
-		{
-			cerr << "ERROR::RENDERER: Model dropdown menu items at array copy failed at: " << i << endl;
-		}
-	}
+	model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_vec);
 
 
 	cout << "Ending Renderer Initialization..." << endl;
@@ -230,14 +220,12 @@ void Renderer::render_object_window()
 	ImGui::Begin("Object Settings");
 
 	// Object Selection Dropdown
-	ImGui::Text("Object Selection");
 	// Simplified one-liner Combo() using an accessor function
-	ImGui::Combo("##", &object_current, object_combo_items, IM_ARRAYSIZE(object_combo_items));
+	ImGui::Combo("Object Selection", &object_current, object_combo_items, IM_ARRAYSIZE(object_combo_items));
 
 	if (object_current == 1)
 	{
-		ImGui::Text("Model Selection");
-		ImGui::Combo("##", &model_current, model_combo_items, IM_ARRAYSIZE(model_combo_items));
+		ImGui::Combo("Model Selection", &model_current, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
 
 		if (current_model && model_current != 0)
 		{
@@ -255,7 +243,7 @@ void Renderer::render_object_window()
 
 			// Toggle Texture Maps
 			ImGui::Text("Texture Map View Selection");
-			ImGui::Combo("##", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
+			ImGui::Combo("Map Selection", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
 			if (render_current == 0 && !is_full_render_selected)
 			{
 				is_full_render_selected = true;
@@ -351,20 +339,18 @@ void Renderer::end_frame()
 	glfwPollEvents();
 }
 
-void Renderer::cleanup_model_dropdown_data()
-{
-	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
-	{
-		delete[] model_combo_items[i];
-	}
-}
-
 void Renderer::shutdown()
 {
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	// Free up model combo items stored in memory
+	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
+	{
+		delete[] model_combo_items[i];
+	}
 
 	// Managed by EventManager
 	r_window = nullptr;

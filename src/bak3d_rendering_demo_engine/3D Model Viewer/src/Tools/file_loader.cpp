@@ -38,8 +38,10 @@ std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::pa
 	{
 		if (filesystem::exists(path) && filesystem::is_directory(path)) {
 			for (const auto& entry : filesystem::recursive_directory_iterator(path)) {
-				if (filesystem::is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type)) {
-					files.push_back(entry.path().filename().generic_string());
+				if (filesystem::is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
+				{
+					auto filename = entry.path().filename().generic_string();
+					files.push_back(filename);
 				}
 			}
 		}
@@ -81,16 +83,19 @@ string FileLoader::enum_to_string(FileType type)
 	}
 }
 
-vector<const char*> FileLoader::get_vector_items_to_array(const vector<string>& vector_items)
+vector<char*> FileLoader::get_vector_items_to_array(const vector<string>& vector_items)
 {
-	vector<const char*> c_str_items;
+	// Allocate an array of char* pointers
+	vector<char*> c_str_items;
 	c_str_items.reserve(vector_items.size());
 
+	// Populate the array with c_str pointers
 	for (const auto& item : vector_items)
 	{
-		c_str_items.push_back(item.c_str());
+		char* c_str = new char[item.size() + 1]; // +1 for null terminator
+		strcpy_s(c_str, item.size() + 1, item.c_str());
+		c_str_items.push_back(c_str);
 	}
 
-	// Return the vector directly (copy elision will optimize return)
 	return c_str_items;
 }
