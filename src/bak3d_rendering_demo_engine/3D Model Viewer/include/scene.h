@@ -34,7 +34,10 @@ public:
 	void delete_arrays_and_buffers() const;
 private:
 	static World* instance;
-	std::vector<std::string> asset_directories;
+
+	void activate_current_model();
+	void deactivate_current_model();
+	void replace_current_model();
 
 	Model* m_model;
 	Camera* m_camera;

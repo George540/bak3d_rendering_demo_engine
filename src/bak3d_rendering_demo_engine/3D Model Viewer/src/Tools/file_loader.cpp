@@ -36,8 +36,10 @@ std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::pa
 
 	try
 	{
-		if (filesystem::exists(path) && filesystem::is_directory(path)) {
-			for (const auto& entry : filesystem::recursive_directory_iterator(path)) {
+		if (filesystem::exists(path) && filesystem::is_directory(path))
+		{
+			for (const auto& entry : filesystem::recursive_directory_iterator(path))
+			{
 				if (filesystem::is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
 				{
 					auto filename = entry.path().filename().generic_string();
@@ -52,6 +54,33 @@ std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::pa
 	}
 
 	return files;
+}
+
+list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesystem::path& path, FileType type)
+{
+	list<pair<string, string>> files_list;
+	try
+	{
+		if (filesystem::exists(path) && filesystem::is_directory(path))
+		{
+			for (const auto& entry : filesystem::recursive_directory_iterator(path))
+			{
+				if (filesystem::is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
+				{
+					auto path = entry.path();
+					auto filepath = path.generic_string();
+					auto filename = path.filename().generic_string();
+					files_list.push_back(make_pair(filename, filepath));
+				}
+			}
+		}
+	}
+	catch (const filesystem::filesystem_error& e)
+	{
+		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+	}
+
+	return files_list;
 }
 
 string FileLoader::get_name_from_filename(const string filename)
@@ -83,13 +112,17 @@ string FileLoader::enum_to_string(FileType type)
 	}
 }
 
-vector<char*> FileLoader::get_vector_items_to_array(const vector<string>& vector_items)
+vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, string>> list_items)
 {
-	// Allocate an array of char* pointers
+	vector<string> vector_items;
+	for (const auto& item : list_items)
+	{
+		vector_items.push_back(item.first);
+	}
+
 	vector<char*> c_str_items;
 	c_str_items.reserve(vector_items.size());
 
-	// Populate the array with c_str pointers
 	for (const auto& item : vector_items)
 	{
 		char* c_str = new char[item.size() + 1]; // +1 for null terminator

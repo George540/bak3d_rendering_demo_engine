@@ -27,10 +27,11 @@ public:
     std::vector<Mesh> meshes; // a model is made out of one or more meshes
     std::string directory;
     std::string m_name;
+    int m_combo_index;
     bool gamma_correction{};
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, Camera& cam, Light& light);
+    Model(string const& path, Camera& cam, Light& light, int index);
     ~Model();
 
     void draw() const; // draws the model, and thus all its meshes

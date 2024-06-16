@@ -27,7 +27,7 @@ bool Renderer::is_grid_rendering = true;
 glm::vec3 Renderer::background_color = glm::vec3(0.3f);;
 
 // Model
-Model* Renderer::current_model = nullptr;
+CurrentModelInfo Renderer::current_model_info = CurrentModelInfo();
 bool Renderer::is_full_render_selected = true;
 bool Renderer::is_diffuse_render_selected = false;
 bool Renderer::is_specular_selected = false;
@@ -36,7 +36,7 @@ bool Renderer::is_gamma_enabled = false;
 float Renderer::shininess = 64.0f;
 const char* Renderer::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int Renderer::object_current = 0;
-vector<string> Renderer::model_combo_items_vec;
+list<pair<string, string>> Renderer::model_combo_items_list;
 vector<char*> Renderer::model_combo_items;
 int Renderer::model_current = 0;
 const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
@@ -80,10 +80,9 @@ void Renderer::initialize()
 	initialize_imgui();
 
 	// Load list of model assets found in assets folder and turn them into combo items vectors
-	model_combo_items_vec = FileLoader::get_files_by_type(filesystem::absolute("assets"), FileType::obj);
-	model_combo_items_vec.insert(model_combo_items_vec.begin(), "None");
-	model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_vec);
-
+	model_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), FileType::obj);
+	model_combo_items_list.push_front(make_pair("None", "none"));
+	model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_list);
 
 	cout << "Ending Renderer Initialization..." << endl;
 }
@@ -226,9 +225,22 @@ void Renderer::render_object_window()
 	if (object_current == 1)
 	{
 		ImGui::Combo("Model Selection", &model_current, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
+		string current_model_name = model_combo_items[model_current];
 
-		if (current_model && model_current != 0)
+		// Find currently selected dropdown item into list and store its dropdown info
+		auto model_info = find_if(model_combo_items_list.begin(), model_combo_items_list.end(), [&current_model_name](const auto& pair)
+			{
+				return pair.first == current_model_name;
+			});
+		if (model_info != model_combo_items_list.end())
 		{
+			current_model_info.set_info(model_info->first, model_info->second, model_current);
+		}
+
+		if (current_model_info.current_model && model_current != 0)
+		{
+			auto current_model = current_model_info.current_model;
+
 			// Toggle map breakdowns
 			ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
 			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
@@ -322,6 +334,11 @@ void Renderer::render_object_window()
 	else
 	{
 		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Object settings disabled. Selected an object type to view.");
+		if (!current_model_info.current_model)
+		{
+			current_model_info.current_model = nullptr;
+			model_current = 0;
+		}
 	}
 
 	ImGui::End();
@@ -347,7 +364,7 @@ void Renderer::shutdown()
 	ImGui::DestroyContext();
 
 	// Free up model combo items stored in memory
-	for (size_t i = 0; i < model_combo_items_vec.size(); ++i)
+	for (size_t i = 0; i < model_combo_items_list.size(); ++i)
 	{
 		delete[] model_combo_items[i];
 	}

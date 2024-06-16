@@ -32,12 +32,6 @@ World::World()
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
 	Renderer::environment_point_light = m_light;
-
-	/*vector<string> directories = FileLoader::get_directories(std::filesystem::absolute("assets"));
-	for (auto d : directories)
-	{
-		cout << d.c_str() << endl;
-	}*/
 }
 
 World::~World()
@@ -52,20 +46,52 @@ World::~World()
 void World::process_model_activation()
 {
 	// MODEL INSTANTIATION AND DELETION
-	if (Renderer::object_current == 1 && Renderer::model_current != 0 && !m_model)
+	if (Renderer::object_current == 1 && Renderer::model_current != 0)
 	{
-		// Model set up
-		m_model = new Model(model_path, *m_camera, *m_light);
-		Renderer::current_model = m_model;
-		cout << "Model with path " << model_path << " has been instantiated." << endl;
+		if (!m_model)
+		{
+			activate_current_model();
+		}
+		else if (m_model && Renderer::current_model_info.model_combo_index != m_model->m_combo_index)
+		{
+			replace_current_model();
+		}
 	}
-	else if (Renderer::object_current != 1 && Renderer::model_current == 0 && m_model)
+	else if (Renderer::model_current == 0 && m_model)
 	{
-		Renderer::current_model = nullptr;
-		delete m_model;
-		m_model = nullptr;
-		cout << "Model with path " << model_path << " has been deleted." << endl;
+		deactivate_current_model();
 	}
+}
+
+void World::activate_current_model()
+{
+	auto model_absolute_path = Renderer::current_model_info.model_file_path;
+	m_model = new Model(model_absolute_path, *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
+	Renderer::current_model_info.current_model = m_model;
+	cout << "Model with path " << model_absolute_path << " has been activated." << endl;
+}
+
+void World::deactivate_current_model()
+{
+	Renderer::current_model_info.current_model = nullptr;
+	delete m_model;
+	m_model = nullptr;
+	Renderer::current_model_info.set_info("None", "none", 0);
+	cout << "Model " << Renderer::current_model_info.model_file_name << " has been deactivated." << endl;
+}
+
+void World::replace_current_model()
+{
+	cout << "Model " << m_model->m_name << " is being deactivated." << endl;
+	Renderer::current_model_info.current_model = nullptr;
+	delete m_model;
+	m_model = nullptr;
+
+	auto model_absolute_path = Renderer::current_model_info.model_file_path;
+	m_model = new Model(model_absolute_path, *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
+	Renderer::current_model_info.current_model = m_model;
+	
+	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
 }
 
 void World::update(float dt) const
@@ -77,7 +103,7 @@ void World::update(float dt) const
 
 void World::draw() const
 {
-    Renderer::begin_frame();
+	Renderer::begin_frame();
 
 	if (Renderer::is_grid_rendering)
 	{
@@ -100,7 +126,7 @@ void World::draw() const
 
 	Renderer::render_demo_window();
 	//Renderer::post_processing();
-    Renderer::end_frame();
+	Renderer::end_frame();
 }
 
 void World::delete_arrays_and_buffers() const

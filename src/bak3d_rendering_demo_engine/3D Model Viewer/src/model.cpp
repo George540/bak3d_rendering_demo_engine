@@ -11,7 +11,7 @@
 #include "event_manager.h"
 #include "renderer.h"
 
-Model::Model(string const& path, Camera& cam, Light& light) : m_camera(&cam), m_light(&light)
+Model::Model(string const& path, Camera& cam, Light& light, int index) : m_camera(&cam), m_light(&light), m_combo_index(index)
 {
 	auto shader = new Shader(std::filesystem::absolute("shaders/ModelShader.vs").string().c_str(),
 							 std::filesystem::absolute("shaders/ModelShader.fs").string().c_str());
