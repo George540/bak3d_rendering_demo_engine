@@ -331,6 +331,14 @@ void Renderer::render_object_window()
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Model settings disabled. Select imported model to view.");
 		}
 	}
+	else if (object_current == 2)
+	{
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Particle System has been selected. Do stuff here!");
+	}
+	else if (object_current == 3)
+	{
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "GPU Particles object has been selected. Do stuff here too!");
+	}
 	else
 	{
 		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Object settings disabled. Selected an object type to view.");

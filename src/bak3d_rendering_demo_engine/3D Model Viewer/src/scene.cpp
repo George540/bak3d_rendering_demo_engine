@@ -68,7 +68,7 @@ void World::activate_current_model()
 	auto model_absolute_path = Renderer::current_model_info.model_file_path;
 	m_model = new Model(model_absolute_path, *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
 	Renderer::current_model_info.current_model = m_model;
-	cout << "Model with path " << model_absolute_path << " has been activated." << endl;
+	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
 }
 
 void World::deactivate_current_model()
