@@ -163,6 +163,7 @@
     <ClCompile Include="src\light.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\particle_generator.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\Tools\file_loader.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="include\light.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\model.h" />
+    <ClInclude Include="include\particle_generator.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
@@ -205,6 +207,8 @@
     <None Include="shaders\MainShader.vs" />
     <None Include="shaders\ModelShader.fs" />
     <None Include="shaders\ModelShader.vs" />
+    <None Include="shaders\ParticleShader.fs" />
+    <None Include="shaders\ParticleShader.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

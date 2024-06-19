@@ -337,7 +337,7 @@ void Renderer::render_object_window()
 	}
 	else if (object_current == 3)
 	{
-		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "GPU Particles object has been selected. Do stuff here too!");
+		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "GPU Particles has been selected. Do stuff here too!");
 	}
 	else
 	{

@@ -87,6 +87,9 @@
     <ClCompile Include="src\Tools\file_loader.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\particle_generator.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -152,6 +155,9 @@
     <ClInclude Include="include\Tools\file_loader.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="include\particle_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.fs">
@@ -188,6 +194,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\ModelShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\ParticleShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\ParticleShader.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -28,6 +28,7 @@ World::World()
 	// Grid Setup
 	m_grid = new Grid(*m_camera);
 	m_axis = new Axis(*m_camera);
+	m_model = nullptr; // will be later assigned during model selection process
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
