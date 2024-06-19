@@ -7,9 +7,10 @@
 #define RENDERER_H
 
 #include <unordered_map>
+#include <list>
 
 #include "model.h"
-#include <list>
+#include "particle_generator.h"
 
 struct GLFWwindow;
 
@@ -66,6 +67,7 @@ public:
 	static std::vector<char*> model_combo_items;
 	static int model_current;
 	static CurrentModelInfo current_model_info;
+	static ParticleGenerator* current_particle_system;
 	static const char* map_combo_items[];
 	static int render_current;
 

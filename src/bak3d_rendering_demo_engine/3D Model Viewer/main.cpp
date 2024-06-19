@@ -28,7 +28,7 @@ int main()
 
         // Update World
         const float dt = EventManager::get_frame_time();
-        world.process_model_activation();
+        world.process_object_activation();
         world.update(dt);
 
         world.draw();

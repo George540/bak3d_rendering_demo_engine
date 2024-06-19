@@ -31,7 +31,8 @@ World::World()
 
 	// Object setup (will be later assigned during model selection process)
 	m_model = nullptr;
-	m_particle_system = new ParticleGenerator(std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string(), 50, *m_camera);
+	m_particle_system = nullptr;
+	//m_particle_system = new ParticleGenerator(std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string(), 50, *m_camera);
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
@@ -46,6 +47,12 @@ World::~World()
 	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
+}
+
+void World::process_object_activation()
+{
+	process_model_activation();
+	process_particle_activation();
 }
 
 void World::process_model_activation()
@@ -97,6 +104,24 @@ void World::replace_current_model()
 	Renderer::current_model_info.current_model = m_model;
 	
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
+}
+
+void World::process_particle_activation()
+{
+	if (Renderer::object_current == 2 && !Renderer::current_particle_system)
+	{
+		auto particle_texture_path = std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string();
+		m_particle_system = new ParticleGenerator(particle_texture_path, 50, *m_camera);
+		Renderer::current_particle_system = m_particle_system;
+		cout << "Particle System with texture path" << particle_texture_path << " has been activated." << endl;
+	}
+	else if (Renderer::current_particle_system && Renderer::object_current != 2)
+	{
+		Renderer::current_particle_system = nullptr;
+		delete m_particle_system;
+		m_particle_system = nullptr;
+		cout << "Particle System  has been deactivated." << endl;
+	}
 }
 
 void World::update(float dt) const

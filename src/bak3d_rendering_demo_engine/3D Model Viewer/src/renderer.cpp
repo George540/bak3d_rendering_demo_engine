@@ -42,6 +42,9 @@ int Renderer::model_current = 0;
 const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int Renderer::render_current = 0;
 
+// Particle system
+ParticleGenerator* Renderer::current_particle_system = nullptr;
+
 // Light
 Light* Renderer::environment_point_light = nullptr;
 float Renderer::light_horizontal_rotation = 0.0f;
