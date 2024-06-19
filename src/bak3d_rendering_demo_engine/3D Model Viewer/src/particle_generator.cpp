@@ -162,23 +162,21 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     for (GLuint i = 0; i < new_particles; ++i)
     {
         auto unused_particle = first_unused_particle();
-        respawn_particle(m_particles[unused_particle]);
+        if (m_particles[unused_particle].lifetime <= 0.0f)
+        {
+            respawn_particle(m_particles[unused_particle]);
+        }
     }
 
     // update all particles
-    for (GLuint i = 0; i < m_amount; ++i)
+    for (particle& p : m_particles)
     {
-        auto& particle = m_particles[i];
-        particle.lifetime -= dt; // reduce life
+        p.lifetime -= dt; // reduce life
 
-        if (particle.lifetime > 0.0f)
+        if (p.lifetime > 0.0f)
         {	
-            particle.position += particle.velocity * dt; // particle is alive, thus update
+            p.position += p.velocity * dt; // particle is alive, thus update
             //p.color.a -= dt * 2.5f;
-        }
-        else
-        {
-            particle.lifetime = 0.0f;
         }
     }
 }
@@ -208,9 +206,7 @@ void ParticleGenerator::draw()
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
-        cout << "Particle position at: " << p.position.x << ", " << p.position.y << ", " << p.position.z << endl;
     }
-    cout << "Particle system size at: " << m_particles.size() << endl;
     // don't forget to reset to default blending mode
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -237,7 +233,7 @@ GLuint ParticleGenerator::first_unused_particle()
     }
     // all particles are taken, override the first one (note that if it repeatedly hits this case, more particles should be reserved)
     last_used_particle = 0;
-    return 0;
+    return last_used_particle;
 }
 
 void ParticleGenerator::respawn_particle(particle& particle)
