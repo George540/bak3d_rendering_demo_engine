@@ -34,6 +34,7 @@ public:
     // constructor
     ParticleGenerator(std::string text_path, GLuint amount, Camera& camera);
     ~ParticleGenerator();
+    void sort_particles();
     void update(float dt, GLuint new_particles, glm::vec3 offset = glm::vec3(0.0f, 0.0f, 0.0f));
     void draw();
     void delete_vao_vbo() const;

@@ -133,6 +133,17 @@ GLuint ParticleGenerator::texture_from_file(const string& path)
     return texture_color_buffer;
 }
 
+void ParticleGenerator::sort_particles()
+{
+    auto cameraPos = m_camera->get_camera_position();
+    std::sort(m_particles.begin(), m_particles.end(),
+        [cameraPos](const particle& a, const particle& b) {
+            float distA = glm::length(glm::vec3(a.position) - cameraPos);
+            float distB = glm::length(glm::vec3(b.position) - cameraPos);
+            return distA > distB; // Sort back to front
+        });
+}
+
 void ParticleGenerator::update(float dt, GLuint new_particles, glm::vec3 offset)
 {
     // add new particles 
@@ -160,9 +171,13 @@ void ParticleGenerator::draw()
 {
     if (!m_shader) return;
 
+    sort_particles();
+
     // use additive blending to give it a 'glow' effect
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     m_shader->use();
+
     for (const particle& p : m_particles)
     {
         if (p.lifetime > 0.0f)

@@ -12,7 +12,7 @@ uniform vec4 color;
 
 void main()
 {
-    float scale = 1.0f;
+    float scale = 0.5f;
 
     // Extract the camera's right and up vectors from the view matrix
     vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
