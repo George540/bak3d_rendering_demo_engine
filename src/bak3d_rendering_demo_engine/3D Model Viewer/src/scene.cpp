@@ -31,7 +31,7 @@ World::World()
 
 	// Object setup (will be later assigned during model selection process)
 	m_model = nullptr;
-	m_particle_system = new ParticleGenerator(std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string(), 50, *m_camera);
+	m_particle_system = new ParticleGenerator(std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string(), 2, *m_camera);
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);

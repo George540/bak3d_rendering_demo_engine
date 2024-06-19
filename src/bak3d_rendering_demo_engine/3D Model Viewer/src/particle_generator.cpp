@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include <random>
 
 #include "stb_image.h"
 #include "particle_generator.h"
@@ -14,8 +15,11 @@ ParticleGenerator::ParticleGenerator(std::string text_path, GLuint amount, Camer
                       std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
     m_texture.path = text_path;
     m_position = glm::vec3(0.0f);
-    m_velocity = glm::vec3(0.0f, -0.1f, 0.0f);
+    m_velocity = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_color = glm::vec4(1.0f);
     m_lifetime = 5.0f;
+    m_range = 3.0f;
+    m_scale = 0.5f;
     initialize();
 }
 
@@ -65,14 +69,14 @@ void ParticleGenerator::initialize()
     m_texture.id = texture_from_file(m_texture.path);
     m_texture.type = aiTextureType_DIFFUSE;
 
-
     for (GLuint i = 0; i < m_amount; ++i)
     {
         auto p = particle();
         p.lifetime = m_lifetime;
-        p.color = glm::vec4(1.0f);
-        p.position = m_position;
+        p.color = m_color;
+        p.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(-m_range, m_range), random_float(-m_range, m_range));
         p.velocity = m_velocity;
+        p.scale = m_scale;
         m_particles.push_back(p);
     }
 
@@ -144,13 +148,21 @@ void ParticleGenerator::sort_particles()
         });
 }
 
-void ParticleGenerator::update(float dt, GLuint new_particles, glm::vec3 offset)
+float ParticleGenerator::random_float(float min, float max)
+{
+    static random_device rd;
+    static mt19937 generator(rd());
+    uniform_real_distribution<float> distribution(min, max);
+    return distribution(generator);
+}
+
+void ParticleGenerator::update(float dt, GLuint new_particles)
 {
     // add new particles 
     for (GLuint i = 0; i < new_particles; ++i)
     {
         auto unused_particle = first_unused_particle();
-        respawn_particle(m_particles[unused_particle], offset);
+        respawn_particle(m_particles[unused_particle]);
     }
 
     // update all particles
@@ -161,8 +173,12 @@ void ParticleGenerator::update(float dt, GLuint new_particles, glm::vec3 offset)
 
         if (particle.lifetime > 0.0f)
         {	
-            particle.position -= particle.velocity * dt; // particle is alive, thus update
+            particle.position += particle.velocity * dt; // particle is alive, thus update
             //p.color.a -= dt * 2.5f;
+        }
+        else
+        {
+            particle.lifetime = 0.0f;
         }
     }
 }
@@ -182,7 +198,8 @@ void ParticleGenerator::draw()
     {
         if (p.lifetime > 0.0f)
         {
-            m_shader->set_vec2("offset", p.position);
+            m_shader->set_vec3("position", p.position);
+            m_shader->set_float("scale", p.scale);
             m_shader->set_vec4("color", p.color);
             m_shader->set_mat4("projection", m_camera->get_projection_matrix());
             m_shader->set_mat4("view", m_camera->get_view_matrix());
@@ -191,7 +208,9 @@ void ParticleGenerator::draw()
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
+        cout << "Particle position at: " << p.position.x << ", " << p.position.y << ", " << p.position.z << endl;
     }
+    cout << "Particle system size at: " << m_particles.size() << endl;
     // don't forget to reset to default blending mode
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -221,14 +240,13 @@ GLuint ParticleGenerator::first_unused_particle()
     return 0;
 }
 
-void ParticleGenerator::respawn_particle(particle& particle, glm::vec3 offset)
+void ParticleGenerator::respawn_particle(particle& particle)
 {
-    float random = static_cast<float>((rand() % 10) - 5);
-    //auto rColor = 0.5f + ((rand() % 100) / 100.0f);
-    particle.position = m_position + glm::vec3(random, 0.0f, random) + offset;
-    particle.color = glm::vec4(1.0f);
+    particle.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(0, m_range), random_float(-m_range, m_range));
+    particle.color = m_color;
     particle.lifetime = m_lifetime;
-    particle.velocity = m_velocity * 0.1f;
+    particle.velocity = m_velocity;
+    particle.scale = m_scale;
 }
 
 void ParticleGenerator::delete_vao_vbo() const
