@@ -380,6 +380,7 @@ unsigned int texture_from_file(const char* path, const string& directory)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		stbi_image_free(data);
 	}

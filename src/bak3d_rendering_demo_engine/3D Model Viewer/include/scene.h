@@ -14,6 +14,7 @@
 #include "grid.h"
 #include "axis.h"
 #include "light.h"
+#include "particle_generator.h"
 
 class World
 {
@@ -40,6 +41,7 @@ private:
 	void replace_current_model();
 
 	Model* m_model;
+	ParticleGenerator* m_particle_system;
 	Camera* m_camera;
 	Light* m_light;
 	Grid* m_grid;

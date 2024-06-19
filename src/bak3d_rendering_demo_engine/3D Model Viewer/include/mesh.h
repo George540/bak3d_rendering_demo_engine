@@ -43,7 +43,7 @@ struct vertex {
 };
 
 struct texture {
-    unsigned int id;
+    GLuint id;
     string type;
     string path;
 };

@@ -28,7 +28,10 @@ World::World()
 	// Grid Setup
 	m_grid = new Grid(*m_camera);
 	m_axis = new Axis(*m_camera);
-	m_model = nullptr; // will be later assigned during model selection process
+
+	// Object setup (will be later assigned during model selection process)
+	m_model = nullptr;
+	m_particle_system = new ParticleGenerator(std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string(), 50, *m_camera);
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera);
@@ -40,6 +43,7 @@ World::~World()
 	delete m_grid;
 	delete m_camera;
 	delete m_model;
+	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
 }
@@ -97,9 +101,13 @@ void World::replace_current_model()
 
 void World::update(float dt) const
 {
-	// camera
 	m_camera->update(dt);
 	m_light->update(dt);
+
+	if (m_particle_system)
+	{
+		m_particle_system->update(dt, 2);
+	}
 }
 
 void World::draw() const
@@ -125,6 +133,11 @@ void World::draw() const
 		m_model->draw();
 	}
 
+	if (m_particle_system)
+	{
+		m_particle_system->draw();
+	}
+
 	Renderer::render_demo_window();
 	//Renderer::post_processing();
 	Renderer::end_frame();
@@ -136,4 +149,5 @@ void World::delete_arrays_and_buffers() const
 	m_grid->delete_vao_vbo();
 	m_axis->delete_vao_vbo();
 	m_light->delete_vao_vbo();
+	m_particle_system->delete_vao_vbo();
 }

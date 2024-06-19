@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "model.h"
+#include <list>
 
 struct GLFWwindow;
 
