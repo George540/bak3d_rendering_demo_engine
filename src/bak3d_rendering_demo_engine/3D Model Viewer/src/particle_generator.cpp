@@ -14,12 +14,13 @@ ParticleGenerator::ParticleGenerator(std::string text_path, GLuint amount, Camer
     m_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vs").string().c_str(),
                       std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
     m_texture.path = text_path;
+    particles_payload_info = particle_info();
     m_position = glm::vec3(0.0f);
-    m_velocity = glm::vec3(0.0f, 1.0f, 0.0f);
-    m_color = glm::vec4(1.0f);
-    m_lifetime = 5.0f;
+    m_velocity = particles_payload_info.velocity;
+    m_color = particles_payload_info.color;
+    m_lifetime = particles_payload_info.lifetime;
     m_range = 3.0f;
-    m_scale = 0.5f;
+    m_scale = particles_payload_info.scale;
     initialize();
 }
 
@@ -171,6 +172,10 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     // update all particles
     for (particle& p : m_particles)
     {
+        p.color = particles_payload_info.color;
+        p.scale = particles_payload_info.scale;
+        p.velocity = particles_payload_info.velocity;
+
         p.lifetime -= dt; // reduce life
 
         if (p.lifetime > 0.0f)
@@ -239,10 +244,10 @@ GLuint ParticleGenerator::first_unused_particle()
 void ParticleGenerator::respawn_particle(particle& particle)
 {
     particle.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(0, m_range), random_float(-m_range, m_range));
-    particle.color = m_color;
-    particle.lifetime = m_lifetime;
-    particle.velocity = m_velocity;
-    particle.scale = m_scale;
+    particle.color = particles_payload_info.color;
+    particle.lifetime = particles_payload_info.lifetime;
+    particle.velocity = particles_payload_info.velocity;
+    particle.scale = particles_payload_info.scale;
 }
 
 void ParticleGenerator::delete_vao_vbo() const

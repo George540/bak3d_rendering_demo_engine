@@ -26,6 +26,22 @@ struct particle
     particle() : position(0.0f), velocity(0.0f), color(1.0f), lifetime(0.0f), scale(0.0f) {}
 };
 
+struct particle_info
+{
+    int amount;
+    glm::vec3 velocity;
+    glm::vec4 color;
+    float lifetime;
+    float scale;
+
+    particle_info() :
+        amount(50),
+        velocity(0.0f, 1.0f, 0.0f),
+        color(1.0f),
+        lifetime(4.0f),
+        scale(0.5f) {}
+};
+
 // ParticleGenerator acts as a container for rendering a large number of 
 // particles by repeatedly spawning and updating particles and killing 
 // them after a given amount of time.
@@ -40,9 +56,12 @@ public:
     void update(float dt, GLuint new_particles);
     void draw();
     void delete_vao_vbo() const;
+
+    particle_info particles_payload_info;
 private:
     // particle state
     std::vector<particle> m_particles;
+
     GLuint m_amount;
     glm::vec3 m_position;
     glm::vec3 m_velocity;

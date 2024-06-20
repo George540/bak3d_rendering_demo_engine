@@ -80,6 +80,7 @@ void World::activate_current_model()
 	auto model_absolute_path = Renderer::current_model_info.model_file_path;
 	m_model = new Model(model_absolute_path, *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
 	Renderer::current_model_info.current_model = m_model;
+
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
 }
 
@@ -89,6 +90,7 @@ void World::deactivate_current_model()
 	delete m_model;
 	m_model = nullptr;
 	Renderer::current_model_info.set_info("None", "none", 0);
+
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been deactivated." << endl;
 }
 
@@ -113,13 +115,16 @@ void World::process_particle_activation()
 		auto particle_texture_path = std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string();
 		m_particle_system = new ParticleGenerator(particle_texture_path, 50, *m_camera);
 		Renderer::current_particle_system = m_particle_system;
+
 		cout << "Particle System with texture path" << particle_texture_path << " has been activated." << endl;
 	}
 	else if (Renderer::current_particle_system && Renderer::object_current != 2)
 	{
+		//Renderer::particle_payload_info = particle_info();
 		Renderer::current_particle_system = nullptr;
 		delete m_particle_system;
 		m_particle_system = nullptr;
+
 		cout << "Particle System  has been deactivated." << endl;
 	}
 }
@@ -139,6 +144,8 @@ void World::draw() const
 {
 	Renderer::begin_frame();
 
+	Renderer::render_demo_window();
+
 	if (Renderer::is_grid_rendering)
 	{
 		// Set depth test for axis to render in front of grid
@@ -148,7 +155,7 @@ void World::draw() const
 		glDepthFunc(GL_LESS);
 	}
 
-	if (Renderer::is_full_render_selected)
+	if (Renderer::is_full_render_selected || !Renderer::current_particle_system)
 	{
 		m_light->draw();
 	}
@@ -163,7 +170,6 @@ void World::draw() const
 		m_particle_system->draw();
 	}
 
-	Renderer::render_demo_window();
 	//Renderer::post_processing();
 	Renderer::end_frame();
 }
