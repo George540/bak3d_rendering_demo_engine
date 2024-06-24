@@ -111,11 +111,10 @@ void World::process_particle_activation()
 {
 	if (Renderer::object_current == 2 && !Renderer::current_particle_system)
 	{
-		auto particle_texture_path = std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string();
-		m_particle_system = new ParticleGenerator(particle_texture_path, *m_camera);
+		m_particle_system = new ParticleGenerator(*m_camera);
 		Renderer::current_particle_system = m_particle_system;
 
-		cout << "Particle System with texture path" << particle_texture_path << " has been activated." << endl;
+		cout << "Particle System has been activated." << endl;
 	}
 	else if (Renderer::current_particle_system && Renderer::object_current != 2)
 	{
@@ -132,8 +131,7 @@ void World::process_particle_activation()
 		delete m_particle_system;
 		m_particle_system = nullptr;
 
-		auto particle_texture_path = std::filesystem::absolute("assets/particles-textures/default-particle.png").generic_string();
-		m_particle_system = new ParticleGenerator(particle_texture_path, *m_camera, Renderer::particle_payload_info);
+		m_particle_system = new ParticleGenerator(*m_camera, Renderer::particle_payload_info);
 		Renderer::current_particle_system = m_particle_system;
 	}
 }

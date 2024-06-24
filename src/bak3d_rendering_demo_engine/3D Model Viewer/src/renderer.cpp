@@ -45,6 +45,9 @@ int Renderer::render_current = 0;
 // Particle system
 ParticleGenerator* Renderer::current_particle_system = nullptr;
 particle_info Renderer::particle_payload_info = particle_info();
+list<pair<string, string>> Renderer::particle_image_combo_items_list;
+vector<char*> Renderer::particle_image_combo_items;
+int Renderer::particle_image_current = 1;
 
 // Light
 Light* Renderer::environment_point_light = nullptr;
@@ -87,6 +90,10 @@ void Renderer::initialize()
 	model_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), FileType::obj);
 	model_combo_items_list.push_front(make_pair("None", "none"));
 	model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_list);
+
+	// Load list of particle texture images found in particles-textures folder and turn them into combo items vectors
+	particle_image_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
+	particle_image_combo_items = FileLoader::get_vector_items_to_array(particle_image_combo_items_list);
 
 	cout << "Ending Renderer Initialization..." << endl;
 }
@@ -378,6 +385,8 @@ void Renderer::render_object_window()
 			particle_payload_info.scale_random_offset = 0.1f;
 		}
 		ImGui::SliderFloat("Range", &particle_payload_info.range, 0.0f, 10.0f);
+
+		ImGui::Combo("Image Selection", &particle_payload_info.texture_selection, particle_image_combo_items.data(), static_cast<int>(particle_image_combo_items.size()));
 		
 		if (current_particle_system)
 		{

@@ -55,22 +55,28 @@ public:
 
 	static void render_demo_window();
 
+	static const char* map_combo_items[];
+	static int render_current;
 	static bool is_full_render_selected;
 	static bool is_diffuse_render_selected;
 	static bool is_specular_selected;
 	static bool is_normal_map_selected;
 	static bool is_gamma_enabled;
 	static float shininess;
+
 	static const char* object_combo_items[];
 	static int object_current;
+
 	static std::list<std::pair<std::string, std::string>> model_combo_items_list;
 	static std::vector<char*> model_combo_items;
 	static int model_current;
 	static CurrentModelInfo current_model_info;
+
 	static ParticleGenerator* current_particle_system;
 	static particle_info particle_payload_info;
-	static const char* map_combo_items[];
-	static int render_current;
+	static std::list<std::pair<std::string, std::string>> particle_image_combo_items_list;
+	static std::vector<char*> particle_image_combo_items;
+	static int particle_image_current;
 
 	static bool is_grid_rendering;
 	static glm::vec3 background_color;

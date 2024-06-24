@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <filesystem>
 #include <shader.h>
 #include <vector>
 #include <mesh.h>
@@ -34,6 +35,7 @@ struct particle_info
     float lifetime;
     float scale;
     float range;
+    int texture_selection;
 
     bool randomize_lifetime;
     float lifetime_random_offset;
@@ -49,6 +51,7 @@ struct particle_info
         lifetime(3.0f),
         scale(0.5f),
         range(1.0f),
+        texture_selection(1),
         randomize_lifetime(false),
         lifetime_random_offset(0.0f),
         randomize_color(false),
@@ -65,7 +68,7 @@ class ParticleGenerator
 {
 public:
     // constructor
-    ParticleGenerator(std::string text_path, Camera& camera, particle_info info = particle_info());
+    ParticleGenerator(Camera& camera, particle_info info = particle_info());
     ~ParticleGenerator();
     void sort_particles();
     float random_float(float min, float max);
@@ -78,6 +81,7 @@ public:
 private:
     // particle state
     std::vector<particle> m_particles;
+    std::vector<texture> m_textures_loaded;
 
     GLuint m_amount;
     glm::vec3 m_position;

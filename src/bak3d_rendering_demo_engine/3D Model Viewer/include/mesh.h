@@ -46,6 +46,8 @@ struct texture {
     GLuint id;
     string type;
     string path;
+
+    texture() : id(0), type(""), path("") {}
 };
 
 struct material {

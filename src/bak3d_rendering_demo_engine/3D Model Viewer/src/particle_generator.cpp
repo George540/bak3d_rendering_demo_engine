@@ -1,19 +1,18 @@
 #include <iostream>
-#include <filesystem>
 #include <random>
 
 #include "stb_image.h"
 #include "particle_generator.h"
+#include <file_loader.h>
 
 using namespace std;
 
 GLuint last_used_particle = 0;
 
-ParticleGenerator::ParticleGenerator(std::string text_path, Camera& camera, particle_info info) : m_camera(&camera)
+ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
 {
     m_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vs").string().c_str(),
                       std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
-    m_texture.path = text_path;
     particles_payload_info = info;
     m_amount = particles_payload_info.amount;
     m_lifetime = particles_payload_info.lifetime;
@@ -68,8 +67,20 @@ void ParticleGenerator::initialize()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
     glBindVertexArray(0);
 
-    m_texture.id = texture_from_file(m_texture.path);
-    m_texture.type = aiTextureType_DIFFUSE;
+    auto particle_texture_data = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
+    for (const auto& pair : particle_texture_data)
+    {
+        texture t;
+        t.id = texture_from_file(pair.second);
+        t.path = pair.second;
+        t.type = aiTextureType_DIFFUSE;
+        m_textures_loaded.push_back(t);
+    }
+
+    auto texture_info = m_textures_loaded[particles_payload_info.texture_selection];
+    m_texture.path = texture_info.path;
+    m_texture.id = texture_info.id;
+    m_texture.type = texture_info.type;
 
     for (GLuint i = 0; i < m_amount; ++i)
     {
@@ -176,7 +187,9 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     {
         if (!particles_payload_info.randomize_color)
         {
-            p.color = particles_payload_info.color;
+            p.color.r = particles_payload_info.color.r;
+            p.color.g = particles_payload_info.color.g;
+            p.color.b = particles_payload_info.color.b;
         }
 
         if (!particles_payload_info.randomize_scale)
@@ -218,7 +231,7 @@ void ParticleGenerator::draw()
             m_shader->set_vec4("color", p.color);
             m_shader->set_mat4("projection", m_camera->get_projection_matrix());
             m_shader->set_mat4("view", m_camera->get_view_matrix());
-            glBindTexture(GL_TEXTURE_2D, m_texture.id);
+            glBindTexture(GL_TEXTURE_2D, m_textures_loaded[particles_payload_info.texture_selection].id);
             glBindVertexArray(m_VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
