@@ -222,6 +222,9 @@ void ParticleGenerator::draw()
     sort_particles();
     m_shader->use();
 
+    // Disable depth mask to prevent writing to the depth buffer
+    glDepthMask(GL_FALSE);
+
     for (const particle& p : m_particles)
     {
         if (p.lifetime > 0.0f)
@@ -238,7 +241,9 @@ void ParticleGenerator::draw()
         }
     }
     // don't forget to reset to default blending mode
+    glDepthMask(GL_TRUE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
 }
 
 GLuint ParticleGenerator::first_unused_particle()
