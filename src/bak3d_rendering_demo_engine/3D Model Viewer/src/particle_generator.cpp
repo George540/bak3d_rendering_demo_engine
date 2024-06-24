@@ -9,17 +9,18 @@ using namespace std;
 
 GLuint last_used_particle = 0;
 
-ParticleGenerator::ParticleGenerator(std::string text_path, GLuint amount, Camera& camera) : m_amount(amount), m_camera(&camera)
+ParticleGenerator::ParticleGenerator(std::string text_path, Camera& camera, particle_info info) : m_camera(&camera)
 {
     m_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vs").string().c_str(),
                       std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
     m_texture.path = text_path;
-    particles_payload_info = particle_info();
+    particles_payload_info = info;
+    m_amount = particles_payload_info.amount;
+    m_lifetime = particles_payload_info.lifetime;
     m_position = glm::vec3(0.0f);
     m_velocity = particles_payload_info.velocity;
     m_color = particles_payload_info.color;
-    m_lifetime = particles_payload_info.lifetime;
-    m_range = 3.0f;
+    m_range = particles_payload_info.range;
     m_scale = particles_payload_info.scale;
     initialize();
 }
@@ -73,11 +74,11 @@ void ParticleGenerator::initialize()
     for (GLuint i = 0; i < m_amount; ++i)
     {
         auto p = particle();
-        p.lifetime = m_lifetime;
-        p.color = m_color;
-        p.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(-m_range, m_range), random_float(-m_range, m_range));
+        p.lifetime = particles_payload_info.randomize_lifetime ? m_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_lifetime;
+        p.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f) : m_color;
+        p.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(0.0f, m_range), random_float(-m_range, m_range));
         p.velocity = m_velocity;
-        p.scale = m_scale;
+        p.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
         m_particles.push_back(p);
     }
 
@@ -169,11 +170,20 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
         }
     }
 
+    m_range = particles_payload_info.range;
     // update all particles
     for (particle& p : m_particles)
     {
-        p.color = particles_payload_info.color;
-        p.scale = particles_payload_info.scale;
+        if (!particles_payload_info.randomize_color)
+        {
+            p.color = particles_payload_info.color;
+        }
+
+        if (!particles_payload_info.randomize_scale)
+        {
+            p.scale = particles_payload_info.scale;
+        }
+
         p.velocity = particles_payload_info.velocity;
 
         p.lifetime -= dt; // reduce life
@@ -181,7 +191,10 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
         if (p.lifetime > 0.0f)
         {	
             p.position += p.velocity * dt; // particle is alive, thus update
-            //p.color.a -= dt * 2.5f;
+            if (particles_payload_info.is_color_faded)
+            {
+                p.color.a -= (dt / p.lifetime);
+            }
         }
     }
 }
@@ -190,11 +203,10 @@ void ParticleGenerator::draw()
 {
     if (!m_shader) return;
 
-    sort_particles();
-
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    sort_particles();
     m_shader->use();
 
     for (const particle& p : m_particles)
@@ -244,10 +256,10 @@ GLuint ParticleGenerator::first_unused_particle()
 void ParticleGenerator::respawn_particle(particle& particle)
 {
     particle.position = m_position + glm::vec3(random_float(-m_range, m_range), random_float(0, m_range), random_float(-m_range, m_range));
-    particle.color = particles_payload_info.color;
-    particle.lifetime = particles_payload_info.lifetime;
+    particle.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f) : m_color;
+    particle.lifetime = particles_payload_info.randomize_lifetime ? m_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_lifetime;
     particle.velocity = particles_payload_info.velocity;
-    particle.scale = particles_payload_info.scale;
+    particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : particles_payload_info.scale;
 }
 
 void ParticleGenerator::delete_vao_vbo() const

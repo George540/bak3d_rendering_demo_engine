@@ -33,13 +33,29 @@ struct particle_info
     glm::vec4 color;
     float lifetime;
     float scale;
+    float range;
+
+    bool randomize_lifetime;
+    float lifetime_random_offset;
+    bool randomize_color;
+    bool is_color_faded;
+    bool randomize_scale;
+    float scale_random_offset;
 
     particle_info() :
         amount(50),
         velocity(0.0f, 1.0f, 0.0f),
         color(1.0f),
-        lifetime(4.0f),
-        scale(0.5f) {}
+        lifetime(3.0f),
+        scale(0.5f),
+        range(1.0f),
+        randomize_lifetime(false),
+        lifetime_random_offset(0.0f),
+        randomize_color(false),
+        is_color_faded(false),
+        randomize_scale(false),
+        scale_random_offset(0.1f)
+        {}
 };
 
 // ParticleGenerator acts as a container for rendering a large number of 
@@ -49,7 +65,7 @@ class ParticleGenerator
 {
 public:
     // constructor
-    ParticleGenerator(std::string text_path, GLuint amount, Camera& camera);
+    ParticleGenerator(std::string text_path, Camera& camera, particle_info info = particle_info());
     ~ParticleGenerator();
     void sort_particles();
     float random_float(float min, float max);
