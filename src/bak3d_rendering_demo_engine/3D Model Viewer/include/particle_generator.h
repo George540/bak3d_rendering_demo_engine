@@ -53,6 +53,7 @@ public:
     ~ParticleGenerator();
     void sort_particles();
     float random_float(float min, float max);
+    const GLuint get_particle_amount() const { return m_amount; }
     void update(float dt, GLuint new_particles);
     void draw();
     void delete_vao_vbo() const;

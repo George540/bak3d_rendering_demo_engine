@@ -81,7 +81,7 @@ void ParticleGenerator::initialize()
         m_particles.push_back(p);
     }
 
-    std::cout << "Particle System has been activated." << std::endl;
+    std::cout << "Particle System has been activated with " << m_amount << " particles." << std::endl;
 }
 
 // TODO: Create Texture2D class with appropriate loading functions

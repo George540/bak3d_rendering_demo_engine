@@ -17,8 +17,11 @@ void main()
     vec3 cameraRight = vec3(view[0][0], view[1][0], view[2][0]);
     vec3 cameraUp = vec3(view[0][1], view[1][1], view[2][1]);
 
+    // Adjust the vertex positions to be centered around (0, 0)
+    vec2 centeredVertex = vertex.xy - vec2(0.5, 0.5);
+
     // Apply the billboarding technique by modifying the vertex position
-    vec3 worldPosition = position + (cameraRight * vertex.x + cameraUp * vertex.y) * scale;
+    vec3 worldPosition = position + (cameraRight * centeredVertex.x + cameraUp * centeredVertex.y) * scale;
 
     // Set texture coordinates and particle color
     TexCoords = vertex.zw;

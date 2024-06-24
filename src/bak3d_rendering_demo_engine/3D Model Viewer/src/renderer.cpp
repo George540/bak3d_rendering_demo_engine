@@ -338,11 +338,11 @@ void Renderer::render_object_window()
 	else if (object_current == 2)
 	{
 		//ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Particle System has been selected. Do stuff here!");
-		ImGui::DragInt("Generator Amount", &particle_payload_info.amount, 1);
-		ImGui::DragFloat("Particle Lifetime", &particle_payload_info.lifetime);
+		ImGui::DragInt("Generator Amount", &particle_payload_info.amount, 1, 1, 10000);
+		ImGui::DragFloat("Particle Lifetime", &particle_payload_info.lifetime, 0.01f, 0.01f, 100.0f);
 
 		float velocity[3] = { particle_payload_info.velocity.x, particle_payload_info.velocity.y, particle_payload_info.velocity.z };
-		ImGui::DragFloat3("Velocity", &velocity[3], 0.1f);
+		ImGui::DragFloat3("Velocity", &velocity[3], 0.1f, 0.0f, 1000.0f);
 		particle_payload_info.velocity.x = velocity[0];
 		particle_payload_info.velocity.y = velocity[1];
 		particle_payload_info.velocity.z = velocity[2];
@@ -353,7 +353,7 @@ void Renderer::render_object_window()
 		particle_payload_info.color.g = bg_col[1];
 		particle_payload_info.color.b = bg_col[2];
 
-		ImGui::DragFloat("Scale", &particle_payload_info.scale, 0.1f);
+		ImGui::DragFloat("Scale", &particle_payload_info.scale, 0.1f, 0.1f, 20.0f);
 		
 		if (current_particle_system)
 		{
