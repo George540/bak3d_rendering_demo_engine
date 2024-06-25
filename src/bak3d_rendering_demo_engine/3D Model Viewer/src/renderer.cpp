@@ -382,7 +382,16 @@ void Renderer::render_object_window()
 			particle_payload_info.color.b = bg_col[2];
 		}
 		ImGui::Checkbox("Randomize Color?", &particle_payload_info.randomize_color);
-		ImGui::Checkbox("Fade Particles", &particle_payload_info.is_color_faded);
+
+		ImGui::Checkbox("Fade Particles?", &particle_payload_info.is_color_faded);
+		if (particle_payload_info.is_color_faded)
+		{
+			ImGui::SliderFloat("Initial Transparency", &particle_payload_info.color.a, 0.0f, 1.0f);
+		}
+		else
+		{
+			ImGui::SliderFloat("Transparency", &particle_payload_info.color.a, 0.0f, 1.0f);
+		}
 
 		ImGui::SliderFloat("Scale", &particle_payload_info.scale, 0.1f, 20.0f);
 		ImGui::Checkbox("Randomize Scale?", &particle_payload_info.randomize_scale);
