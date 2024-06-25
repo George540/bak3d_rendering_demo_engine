@@ -17,6 +17,7 @@ ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_cam
     m_amount = particles_payload_info.amount;
     m_lifetime = particles_payload_info.lifetime;
     m_position = glm::vec3(0.0f);
+    m_rotation = particles_payload_info.rotation;
     m_velocity = particles_payload_info.velocity;
     m_color = particles_payload_info.color;
     m_range = particles_payload_info.range;
@@ -88,6 +89,7 @@ void ParticleGenerator::initialize()
         p.lifetime = particles_payload_info.randomize_lifetime ? m_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_lifetime;
         p.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f) : m_color;
         p.position = m_position + glm::vec3(random_float(-m_range, m_range), 0.0f, random_float(-m_range, m_range));
+        p.rotation = m_rotation;
         p.velocity = m_velocity;
         p.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
         m_particles.push_back(p);
@@ -182,6 +184,9 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     }
 
     m_range = particles_payload_info.range;
+    m_rotation = particles_payload_info.rotation;
+    m_scale = particles_payload_info.scale;
+
     // update all particles
     for (particle& p : m_particles)
     {
@@ -190,6 +195,11 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
             p.color.r = particles_payload_info.color.r;
             p.color.g = particles_payload_info.color.g;
             p.color.b = particles_payload_info.color.b;
+        }
+
+        if (!particles_payload_info.randomize_rotation)
+        {
+            p.rotation = m_rotation;
         }
 
         if (!particles_payload_info.randomize_scale)
@@ -218,7 +228,7 @@ void ParticleGenerator::draw()
 
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     sort_particles();
     m_shader->use();
 
@@ -230,6 +240,7 @@ void ParticleGenerator::draw()
         if (p.lifetime > 0.0f)
         {
             m_shader->set_vec3("position", p.position);
+            m_shader->set_float("rotation", p.rotation);
             m_shader->set_float("scale", p.scale);
             m_shader->set_vec4("color", p.color);
             m_shader->set_mat4("projection", m_camera->get_projection_matrix());
@@ -274,10 +285,11 @@ GLuint ParticleGenerator::first_unused_particle()
 void ParticleGenerator::respawn_particle(particle& particle)
 {
     particle.position = m_position + glm::vec3(random_float(-m_range, m_range), 0.0f, random_float(-m_range, m_range));
+    particle.rotation = particles_payload_info.randomize_rotation ? random_float(0.0f, 360.0f) : m_rotation;
     particle.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f) : m_color;
     particle.lifetime = particles_payload_info.randomize_lifetime ? m_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_lifetime;
     particle.velocity = particles_payload_info.velocity;
-    particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : particles_payload_info.scale;
+    particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
 }
 
 void ParticleGenerator::delete_vao_vbo() const

@@ -19,17 +19,26 @@
 struct particle
 {
 	glm::vec3 position;
+    float rotation;
 	glm::vec3 velocity;
 	glm::vec4 color;
 	float lifetime;
     float scale;
 
-    particle() : position(0.0f), velocity(0.0f), color(1.0f), lifetime(0.0f), scale(0.0f) {}
+    particle() : 
+        position(0.0f),
+        rotation(0.0f),
+        velocity(0.0f),
+        color(1.0f),
+        lifetime(0.0f),
+        scale(0.0f)
+    {}
 };
 
 struct particle_info
 {
     int amount;
+    float rotation;
     glm::vec3 velocity;
     glm::vec4 color;
     float lifetime;
@@ -37,6 +46,7 @@ struct particle_info
     float range;
     int texture_selection;
 
+    bool randomize_rotation;
     bool randomize_lifetime;
     float lifetime_random_offset;
     bool randomize_color;
@@ -46,12 +56,14 @@ struct particle_info
 
     particle_info() :
         amount(50),
+        rotation(0.0f),
         velocity(0.0f, 1.0f, 0.0f),
         color(1.0f),
         lifetime(3.0f),
         scale(0.5f),
         range(1.0f),
         texture_selection(1),
+        randomize_rotation(false),
         randomize_lifetime(false),
         lifetime_random_offset(0.0f),
         randomize_color(false),
@@ -85,6 +97,7 @@ private:
 
     GLuint m_amount;
     glm::vec3 m_position;
+    float m_rotation;
     glm::vec3 m_velocity;
     glm::vec4 m_color;
     float m_lifetime;

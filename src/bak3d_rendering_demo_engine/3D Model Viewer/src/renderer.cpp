@@ -357,6 +357,16 @@ void Renderer::render_object_window()
 			particle_payload_info.lifetime_random_offset = 0.0f;
 		}
 
+		ImGui::Checkbox("Randomize Rotation?", &particle_payload_info.randomize_rotation);
+		if (!particle_payload_info.randomize_rotation)
+		{
+			ImGui::SliderFloat("Rotation", &particle_payload_info.rotation, 0.0f, 360.0f);
+		}
+		else
+		{
+			particle_payload_info.rotation = 0.0f;
+		}
+
 		float velocity[3] = { particle_payload_info.velocity.x, particle_payload_info.velocity.y, particle_payload_info.velocity.z };
 		ImGui::DragFloat3("Velocity", &velocity[0], 0.1f, 0.1f, 100.0f);
 		particle_payload_info.velocity.x = velocity[0];
