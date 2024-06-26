@@ -90,6 +90,9 @@
     <ClCompile Include="src\particle_generator.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Tools\shader.h">
@@ -156,6 +159,9 @@
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
     <ClInclude Include="include\particle_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

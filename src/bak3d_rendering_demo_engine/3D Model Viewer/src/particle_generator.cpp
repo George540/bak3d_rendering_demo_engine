@@ -71,17 +71,12 @@ void ParticleGenerator::initialize()
     auto particle_texture_data = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
     for (const auto& pair : particle_texture_data)
     {
-        texture t;
-        t.id = texture_from_file(pair.second);
-        t.path = pair.second;
-        t.type = aiTextureType_DIFFUSE;
+        const auto& path = pair.second;
+        Texture2D t = Texture2D(path, aiTextureType_DIFFUSE);
         m_textures_loaded.push_back(t);
     }
 
-    auto texture_info = m_textures_loaded[particles_payload_info.texture_selection];
-    m_texture.path = texture_info.path;
-    m_texture.id = texture_info.id;
-    m_texture.type = texture_info.type;
+    m_texture = m_textures_loaded[particles_payload_info.texture_selection];
 
     for (GLuint i = 0; i < m_amount; ++i)
     {
@@ -96,60 +91,6 @@ void ParticleGenerator::initialize()
     }
 
     std::cout << "Particle System has been activated with " << m_amount << " particles." << std::endl;
-}
-
-// TODO: Create Texture2D class with appropriate loading functions
-GLuint ParticleGenerator::texture_from_file(const string& path)
-{
-    auto filename = string(path);
-    std::cout << "Loading texture file: " << filename << std::endl;
-
-    GLuint texture_color_buffer;
-    glGenTextures(1, &texture_color_buffer);
-
-    int width, height, nr_components;
-    const auto data = stbi_load(filename.c_str(), &width, &height, &nr_components, 0);
-
-    if (data)
-    {
-        GLenum format;
-        switch (nr_components)
-        {
-        case 1:
-            format = GL_RED;
-            break;
-        case 3:
-            format = GL_RGB;
-            break;
-        case 4:
-            format = GL_RGBA;
-            break;
-        default:
-            format = GL_RGB;
-            break;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        cout << "ERROR::PARTICLEGENERATOR::FILE_NOT_SUCCESSFULLY_READ: Texture failed to load at path: " << path << endl;
-        stbi_image_free(data);
-    }
-
-    return texture_color_buffer;
 }
 
 void ParticleGenerator::sort_particles()
@@ -252,7 +193,14 @@ void ParticleGenerator::draw()
             m_shader->set_vec4("color", p.color);
             m_shader->set_mat4("projection", m_camera->get_projection_matrix());
             m_shader->set_mat4("view", m_camera->get_view_matrix());
-            glBindTexture(GL_TEXTURE_2D, m_textures_loaded[particles_payload_info.texture_selection].id);
+
+            auto selected_texture = m_textures_loaded[particles_payload_info.texture_selection];
+            if (m_texture != selected_texture)
+            {
+                m_texture = selected_texture;
+            }
+            m_texture.bind();
+
             glBindVertexArray(m_VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);

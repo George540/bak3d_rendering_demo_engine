@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <map>
 #include <list>
+#include <filesystem>
 
 enum FileType 
 {
@@ -36,6 +37,8 @@ public:
 	static std::vector<std::string> get_directories(const std::filesystem::path& path);
 	static std::vector<std::string> get_files_by_type(const std::filesystem::path& path, FileType type);
 	static std::list<std::pair<std::string, std::string>> get_files_by_type_with_path(const std::filesystem::path& path, FileType type);
+	static std::string get_filename_from_path(const std::filesystem::path& path);
+	static std::string get_filename_from_path(const std::string path);
 	static std::string get_name_from_filename(const std::string filename);
 	static std::string enum_to_string(FileType type);
 	static std::vector<char*> get_vector_items_to_array(const std::list<std::pair<std::string, std::string>>);

@@ -466,6 +466,12 @@ void Renderer::shutdown()
 		delete[] model_combo_items[i];
 	}
 
+	// Free up particle image combo items stored in memory
+	for (size_t i = 0; i < particle_image_combo_items_list.size(); ++i)
+	{
+		delete[] particle_image_combo_items[i];
+	}
+
 	// Managed by EventManager
 	r_window = nullptr;
 }

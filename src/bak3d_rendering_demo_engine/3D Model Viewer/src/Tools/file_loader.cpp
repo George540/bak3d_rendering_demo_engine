@@ -1,5 +1,4 @@
 #include <iostream>
-#include <filesystem>
 
 #include "file_loader.h"
 
@@ -81,6 +80,16 @@ list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesys
 	}
 
 	return files_list;
+}
+
+std::string FileLoader::get_filename_from_path(const std::filesystem::path& path)
+{
+	return path.filename().generic_string();
+}
+
+std::string FileLoader::get_filename_from_path(const std::string path)
+{
+	return filesystem::absolute(path).filename().generic_string();
 }
 
 string FileLoader::get_name_from_filename(const string filename)

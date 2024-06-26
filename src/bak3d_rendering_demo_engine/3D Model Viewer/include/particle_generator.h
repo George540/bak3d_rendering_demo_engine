@@ -13,7 +13,7 @@
 #include <filesystem>
 #include <shader.h>
 #include <vector>
-#include <mesh.h>
+#include <texture.h>
 #include <camera.h>
 
 struct particle
@@ -97,7 +97,7 @@ public:
 private:
     // particle state
     std::vector<particle> m_particles;
-    std::vector<texture> m_textures_loaded;
+    std::vector<Texture2D> m_textures_loaded;
 
     GLuint m_amount;
     glm::vec3 m_position;
@@ -111,12 +111,11 @@ private:
     // render state
     Shader* m_shader;
     Camera* m_camera;
-    texture m_texture;
+    Texture2D m_texture;
     GLuint m_VAO;
     GLuint m_VBO;
     
     void initialize(); // initializes buffer and vertex attributes
-    GLuint texture_from_file(const string& path); // load texture from file (code based from model class)
     GLuint first_unused_particle(); // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
     void respawn_particle(particle& particle); // respawns particle
 };

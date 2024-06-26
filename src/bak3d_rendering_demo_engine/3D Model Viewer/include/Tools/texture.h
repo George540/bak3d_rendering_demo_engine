@@ -1,0 +1,35 @@
+// =====================================================================================
+// Texture2D class was made by George Mavroeidis as a utility class for texture loading.
+// It contains a set of data that are loaded in the constructor of the class and stored
+// within the declared object. It can be used by all objects that load texture files
+// =====================================================================================
+
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
+#include <glad/glad.h>
+#include <assimp/material.h>
+
+
+// Texture2D is able to store and configure a texture in OpenGL.
+// It also hosts utility functions for easy management.
+class Texture2D
+{
+public:
+    Texture2D();
+    Texture2D(const std::string& path, aiTextureType type);
+    ~Texture2D() = default;
+    void bind() const; // binds the texture as the current active GL_TEXTURE_2D texture object
+
+    bool operator==(const Texture2D& other);
+    bool operator!=(const Texture2D& other);
+private:
+    std::string m_filename;
+    std::string m_filepath;
+    aiTextureType m_texture_type;
+    GLuint m_ID; // holds the ID of the texture object, used for all texture operations to reference to this particular texture
+    int m_width, m_height; // texture image dimensions: width and height of loaded image in pixels
+    int m_nb_color_channels; // the number of color components in the loaded image
+};
+
+#endif
