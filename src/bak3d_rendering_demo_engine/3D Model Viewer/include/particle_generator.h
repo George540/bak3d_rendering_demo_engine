@@ -48,6 +48,8 @@ struct particle_info
 
     bool randomize_rotation;
     bool randomize_lifetime;
+    bool randomize_velocity;
+    glm::vec3 velocity_random_offset;
     float lifetime_random_offset;
     bool randomize_color;
     bool is_color_faded;
@@ -65,6 +67,8 @@ struct particle_info
         texture_selection(1),
         randomize_rotation(false),
         randomize_lifetime(false),
+        randomize_velocity(false),
+        velocity_random_offset(1.0f, 1.0f, 1.0f),
         lifetime_random_offset(0.0f),
         randomize_color(false),
         is_color_faded(false),

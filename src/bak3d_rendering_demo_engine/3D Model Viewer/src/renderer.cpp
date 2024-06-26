@@ -367,11 +367,23 @@ void Renderer::render_object_window()
 			particle_payload_info.rotation = 0.0f;
 		}
 
-		float velocity[3] = { particle_payload_info.velocity.x, particle_payload_info.velocity.y, particle_payload_info.velocity.z };
-		ImGui::DragFloat3("Velocity", &velocity[0], 0.1f, 0.1f, 100.0f);
-		particle_payload_info.velocity.x = velocity[0];
-		particle_payload_info.velocity.y = velocity[1];
-		particle_payload_info.velocity.z = velocity[2];
+		ImGui::Checkbox("Randomize Velocity?", &particle_payload_info.randomize_velocity);
+		if (particle_payload_info.randomize_velocity)
+		{
+			float velocity[3] = { particle_payload_info.velocity_random_offset.x, particle_payload_info.velocity_random_offset.y, particle_payload_info.velocity_random_offset.z };
+			ImGui::DragFloat3("Velocity Random Offsets", &velocity[0], 0.1f, 0.1f, 100.0f);
+			particle_payload_info.velocity_random_offset.x = velocity[0];
+			particle_payload_info.velocity_random_offset.y = velocity[1];
+			particle_payload_info.velocity_random_offset.z = velocity[2];
+		}
+		else
+		{
+			float velocity[3] = { particle_payload_info.velocity.x, particle_payload_info.velocity.y, particle_payload_info.velocity.z };
+			ImGui::DragFloat3("Velocity", &velocity[0], 0.1f, -100.0f, 100.0f);
+			particle_payload_info.velocity.x = velocity[0];
+			particle_payload_info.velocity.y = velocity[1];
+			particle_payload_info.velocity.z = velocity[2];
+		}
 		
 		if (!particle_payload_info.randomize_color)
 		{

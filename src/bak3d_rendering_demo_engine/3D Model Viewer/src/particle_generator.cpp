@@ -207,7 +207,10 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
             p.scale = particles_payload_info.scale;
         }
 
-        p.velocity = particles_payload_info.velocity;
+        if (!particles_payload_info.randomize_velocity)
+        {
+            p.velocity = particles_payload_info.velocity;
+        }
 
         p.lifetime -= dt; // reduce life
 
@@ -289,10 +292,19 @@ GLuint ParticleGenerator::first_unused_particle()
 void ParticleGenerator::respawn_particle(particle& particle)
 {
     particle.position = m_position + glm::vec3(random_float(-m_range, m_range), 0.0f, random_float(-m_range, m_range));
+
     particle.rotation = particles_payload_info.randomize_rotation ? random_float(0.0f, 360.0f) : m_rotation;
+
     particle.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), particles_payload_info.color.a) : particles_payload_info.color;
+
     particle.lifetime = particles_payload_info.randomize_lifetime ? m_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_lifetime;
-    particle.velocity = particles_payload_info.velocity;
+
+    particle.velocity = particles_payload_info.randomize_velocity ?
+        glm::vec3(random_float(-particles_payload_info.velocity_random_offset.x, particles_payload_info.velocity_random_offset.x),
+                  random_float(-particles_payload_info.velocity_random_offset.y, particles_payload_info.velocity_random_offset.y),
+                  random_float(-particles_payload_info.velocity_random_offset.z, particles_payload_info.velocity_random_offset.z))
+        : particles_payload_info.velocity;
+
     particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
 }
 
