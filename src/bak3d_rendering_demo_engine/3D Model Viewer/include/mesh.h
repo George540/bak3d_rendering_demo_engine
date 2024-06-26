@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "shader.h"
+#include "texture.h"
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -42,14 +43,6 @@ struct vertex {
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
-struct texture {
-    GLuint id;
-    string type;
-    string path;
-
-    texture() : id(0), type(""), path("") {}
-};
-
 struct material {
     float diffuse;
     float specular;
@@ -67,10 +60,10 @@ public:
     material m_material{};
     vector<vertex> vertices;
     vector<unsigned int> indices;
-    vector<texture> textures;
+    vector<Texture2D> textures;
 
     // constructor
-    Mesh(vector<vertex> vertices, vector<unsigned int> indices, vector<texture> textures);
+    Mesh(vector<vertex> vertices, vector<unsigned int> indices, vector<Texture2D> textures);
     void draw(const Shader& shader) const; // render the mesh
     void delete_vao_vbo() const;
 private:

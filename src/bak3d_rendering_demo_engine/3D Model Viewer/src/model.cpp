@@ -187,7 +187,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// data to fill
 	vector<vertex> vertices;
 	vector<unsigned int> indices;
-	vector<texture> textures;
+	vector<Texture2D> textures;
 
 	// walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -292,34 +292,34 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// normal: texture_normalN
 
 	// 1. diffuse maps
-	auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+	auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE);
 	textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
 	// 2. specular maps
-	auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR, "texture_specular");
+	auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR);
 	textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 	// 3. normal maps
-	auto normal_maps = load_material_textures(material, aiTextureType_HEIGHT, "texture_normal");
+	auto normal_maps = load_material_textures(material, aiTextureType_HEIGHT);
 	textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 	// 4. height maps
-	auto height_maps = load_material_textures(material, aiTextureType_AMBIENT, "texture_height");
+	auto height_maps = load_material_textures(material, aiTextureType_AMBIENT);
 	textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
 	return Mesh(vertices, indices, textures);
 }
 
-vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType type, string typeName)
+vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 {
-	vector<texture> textures;
+	vector<Texture2D> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
 	{
-		aiString str;
-		mat->GetTexture(type, i, &str);
+		aiString filename;
+		mat->GetTexture(type, i, &filename);
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
 		for (auto& text_loaded : textures_loaded)
 		{
-			if (std::strcmp(text_loaded.path.data(), str.C_Str()) == 0)
+			if (std::strcmp(text_loaded.get_file_name().data(), filename.C_Str()) == 0)
 			{
 				textures.push_back(text_loaded);
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
@@ -328,69 +328,13 @@ vector<texture> Model::load_material_textures(aiMaterial* mat, aiTextureType typ
 		}
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
-			texture texture;
-			texture.id = texture_from_file(str.C_Str(), this->directory);
-			texture.type = typeName;
-			texture.path = str.C_Str();
+			string path = directory + '/' + filename.C_Str();
+			Texture2D texture = Texture2D(path, type);
 			textures.push_back(texture);
 			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
 		}
 	}
 	return textures;
-}
-
-unsigned int texture_from_file(const char* path, const string& directory)
-{
-	auto filename = string(path);
-	std::cout << "Loading texture file: " << filename << std::endl;
-	filename = directory + '/' + filename;
-
-	unsigned int texture_color_buffer;
-	glGenTextures(1, &texture_color_buffer);
-
-	int width, height, nr_components;
-	const auto data = stbi_load(filename.c_str(), &width, &height, &nr_components, 0);
-
-	if (data)
-	{
-		GLenum format;
-		switch (nr_components)
-		{
-		case 1:
-			format = GL_RED;
-			break;
-		case 3:
-			format = GL_RGB;
-			break;
-		case 4:
-			format = GL_RGBA;
-			break;
-		default:
-			format = GL_RGB;
-			break;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, texture_color_buffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		stbi_image_free(data);
-	}
-	else
-	{
-		cout << "Texture failed to load at path: " << path << endl;
-		stbi_image_free(data);
-	}
-
-	return texture_color_buffer;
 }
 
 void Model::delete_mesh_vaos() const

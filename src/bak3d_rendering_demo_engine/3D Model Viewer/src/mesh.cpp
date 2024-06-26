@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 
-Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<texture> textures) :
+Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<Texture2D> textures) :
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	textures(std::move(textures))
@@ -26,29 +26,34 @@ void Mesh::draw(const Shader& shader) const
         glActiveTexture(GL_TEXTURE0 + i);
 
         // retrieve texture number (the N in diffuse_textureN)
+        auto type = textures[i].get_texture_type();
         string number;
-        string name = textures[i].type;
-        if (name == "texture_diffuse")
+        string name;
+        if (type == aiTextureType_DIFFUSE)
         {
             number = std::to_string(diffuse_nr++);
+            name = "texture_diffuse";
         }
-        else if (name == "texture_specular")
+        else if (type == aiTextureType_SPECULAR)
         {
             number = std::to_string(specular_nr++);
+            name = "texture_specular";
         }
-        else if (name == "texture_normal")
+        else if (type == aiTextureType_NORMALS)
         {
             number = std::to_string(normal_nr++);
+            name = "texture_normal";
         }
-        else if (name == "texture_height")
+        else if (type == aiTextureType_HEIGHT)
         {
             number = std::to_string(height_nr++);
+            name = "texture_height";
         }
 
         // now set the sampler to the correct texture unit
         glUniform1i(glGetUniformLocation(shader.get_id(), (name + number).c_str()), i);
         // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, textures[i].get_id());
     }
 
     // draw mesh

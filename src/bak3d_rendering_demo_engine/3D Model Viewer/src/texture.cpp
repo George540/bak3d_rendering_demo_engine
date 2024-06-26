@@ -6,15 +6,27 @@
 
 using namespace std;
 
-Texture2D::Texture2D() : m_filepath(""), m_texture_type(aiTextureType_DIFFUSE) {}
+Texture2D::Texture2D()
+    :
+    m_filename(""),
+    m_filepath(""),
+    m_texture_type(aiTextureType_NONE),
+    m_ID(-1),
+    m_width(0),
+    m_height(0),
+    m_nb_color_channels(0)
+{}
 
-Texture2D::Texture2D(const std::string& path, aiTextureType type)
+Texture2D::Texture2D(const std::string& path, aiTextureType type, bool verbose)
     :
     m_filepath(path),
     m_texture_type(type)
 {
     m_filename = FileLoader::get_filename_from_path(m_filepath);
-    std::cout << "Loading texture file: " << m_filename << std::endl;
+    if (verbose)
+    {
+        std::cout << "Loading texture file: " << m_filename << std::endl;
+    }
 
     glGenTextures(1, &m_ID);
     

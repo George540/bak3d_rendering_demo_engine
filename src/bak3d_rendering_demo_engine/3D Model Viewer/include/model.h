@@ -10,6 +10,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
+#include "texture.h"
 #include "mesh.h"
 #include "camera.h"
 #include "light.h"
@@ -17,13 +18,11 @@
 #include <string>
 #include <vector>
 
-unsigned int texture_from_file(const char* path, const string& directory);
-
 class Model
 {
 public:
     // model data
-    std::vector<texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    std::vector<Texture2D> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     std::vector<Mesh> meshes; // a model is made out of one or more meshes
     std::string directory;
     std::string m_name;
@@ -45,7 +44,7 @@ private:
     Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    vector<texture> load_material_textures(aiMaterial* mat, aiTextureType type, string typeName);
+    vector<Texture2D> load_material_textures(aiMaterial* mat, aiTextureType type);
     void update_light_properties() const;
     void update_material_properties(const Mesh& mesh) const;
     void update_breakdown_shader() const;

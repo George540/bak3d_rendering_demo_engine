@@ -17,9 +17,17 @@ class Texture2D
 {
 public:
     Texture2D();
-    Texture2D(const std::string& path, aiTextureType type);
+    Texture2D(const std::string& path, aiTextureType type, bool verbose = true);
     ~Texture2D() = default;
     void bind() const; // binds the texture as the current active GL_TEXTURE_2D texture object
+
+    inline const std::string get_file_path() const { return m_filepath; }
+    inline const std::string get_file_name() const { return m_filename; }
+    inline const aiTextureType get_texture_type() const { return m_texture_type; }
+    inline const GLuint get_id() const { return m_ID; }
+    inline const int get_width() const { return m_width; }
+    inline const int get_height() const { return m_height; }
+    inline const int get_nb_color_channels() const { return m_nb_color_channels; }
 
     bool operator==(const Texture2D& other);
     bool operator!=(const Texture2D& other);
