@@ -250,6 +250,10 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 			{
 				vertex.color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 			}
+			else
+			{
+				vertex.color = glm::vec4(1.0f, 0.75f, 0.796f, 1.0f);
+			}
 
 			vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0 ? true : false;
 			EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;

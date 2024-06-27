@@ -49,6 +49,7 @@ struct particle_info
     bool randomize_rotation;
     bool randomize_lifetime;
     bool randomize_velocity;
+    bool render_bounding_box;
     glm::vec3 velocity_random_offset;
     float lifetime_random_offset;
     bool randomize_color;
@@ -68,6 +69,7 @@ struct particle_info
         randomize_rotation(false),
         randomize_lifetime(false),
         randomize_velocity(false),
+        render_bounding_box(false),
         velocity_random_offset(1.0f, 1.0f, 1.0f),
         lifetime_random_offset(0.0f),
         randomize_color(false),
@@ -95,7 +97,7 @@ public:
 
     particle_info particles_payload_info;
 private:
-    // particle state
+    // particle properties
     std::vector<particle> m_particles;
     std::vector<Texture2D> m_textures_loaded;
 
@@ -108,12 +110,18 @@ private:
     float m_range;
     float m_scale;
 
-    // render state
-    Shader* m_shader;
+    // particle render state
+    Shader* m_particle_shader;
     Camera* m_camera;
     Texture2D m_texture;
-    GLuint m_VAO;
-    GLuint m_VBO;
+    GLuint m_particle_VAO;
+    GLuint m_particle_VBO;
+    
+    // particle bounding box
+    Shader* m_bounding_box_shader;
+    GLuint m_bb_VAO;
+    GLuint m_bb_VBO;
+    GLuint m_bb_EBO;
     
     void initialize(); // initializes buffer and vertex attributes
     GLuint first_unused_particle(); // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
