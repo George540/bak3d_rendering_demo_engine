@@ -263,9 +263,9 @@ void ParticleGenerator::draw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
 
-    // Bounding Box
-    if (!particles_payload_info.randomize_velocity && particles_payload_info.render_bounding_box)
+    if (particles_payload_info.render_bounding_box)
     {
+        // Bounding Box
         glDepthFunc(GL_ALWAYS);
 
         m_bounding_box_shader->use();
@@ -273,9 +273,18 @@ void ParticleGenerator::draw()
         m_bounding_box_shader->set_mat4("view", m_camera->get_view_matrix());
 
         auto model = glm::mat4(1.0f);
-        auto horizontal_scale = m_range * 2;
-        model = glm::scale(model, glm::vec3(horizontal_scale, m_lifetime * m_velocity.y, horizontal_scale));
-        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
+        if (particles_payload_info.randomize_velocity)
+        {
+            auto velocity_offset = particles_payload_info.velocity_random_offset;
+            model = glm::scale(model, (glm::vec3(velocity_offset) * m_lifetime) + (m_range * 2.0f));
+        }
+        else
+        {
+            auto horizontal_scale = m_range * 2;
+            model = glm::scale(model, (glm::vec3(m_velocity) * m_lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale));
+            model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
+        }
+
         m_bounding_box_shader->set_mat4("model", model);
         m_bounding_box_shader->set_vec3("color", glm::vec3(1.0f));
 
@@ -314,7 +323,10 @@ GLuint ParticleGenerator::first_unused_particle()
 
 void ParticleGenerator::respawn_particle(particle& particle)
 {
-    particle.position = m_position + glm::vec3(random_float(-m_range, m_range), 0.0f, random_float(-m_range, m_range));
+    particle.position = particles_payload_info.randomize_velocity ?
+        glm::vec3(random_float(-m_range, m_range), random_float(-m_range, m_range), random_float(-m_range, m_range))
+            :
+        glm::vec3(random_float(-m_range, m_range), 0.0f, random_float(-m_range, m_range));
 
     particle.rotation = particles_payload_info.randomize_rotation ? random_float(0.0f, 360.0f) : m_rotation;
 

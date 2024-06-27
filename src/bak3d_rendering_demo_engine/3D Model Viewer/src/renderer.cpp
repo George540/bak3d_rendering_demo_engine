@@ -384,8 +384,9 @@ void Renderer::render_object_window()
 			particle_payload_info.velocity.y = velocity[1];
 			particle_payload_info.velocity.z = velocity[2];
 			
-			ImGui::Checkbox("Render Bounding Box", &particle_payload_info.render_bounding_box);
 		}
+
+		ImGui::Checkbox("Render Bounding Box", &particle_payload_info.render_bounding_box);
 		
 		if (!particle_payload_info.randomize_color)
 		{
