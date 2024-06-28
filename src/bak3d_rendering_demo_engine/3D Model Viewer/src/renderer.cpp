@@ -252,8 +252,13 @@ void Renderer::render_object_window()
 		{
 			auto current_model = current_model_info.current_model;
 
+			ImGui::Text("Vertices: %d", current_model->m_num_vertices);
+			//ImGui::Text("Edges: %d", current_model->m_unique_edges.size());
+			ImGui::Text("Faces: %d", current_model->m_num_faces);
+			ImGui::Text("Triangles: %d", current_model->m_num_triangles);
+
 			// Toggle map breakdowns
-			ImGui::Text("Render Breakdown"); // Display some text (you can use a format strings too)
+			ImGui::Text("Render Breakdown");
 			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
 			ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
 			ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);

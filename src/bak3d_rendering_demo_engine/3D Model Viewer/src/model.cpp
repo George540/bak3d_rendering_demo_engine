@@ -145,7 +145,7 @@ void Model::load_model(string const& path)
 {
 	// read file via ASSIMP
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) //if it's not zero
@@ -172,6 +172,10 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		// the node object only contains indices to index the actual objects in the scene.
 		// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 		aiMesh * mesh = scene->mMeshes[node->mMeshes[i]];
+
+		m_num_vertices += mesh->mNumVertices;
+		m_num_faces += mesh->mNumFaces;
+
 		meshes.push_back(process_mesh(mesh, scene));
 	}
 
@@ -279,10 +283,16 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
 		auto face = mesh->mFaces[i];
+		// If the face is made up of three vertices only, it's a triangle
+		m_num_triangles += (face.mNumIndices == 3) ? 1 : 0;
+
 		// retrieve all indices of the face and store them in the indices vector
 		for (unsigned int j = 0; j < face.mNumIndices; ++j)
 		{
 			indices.push_back(face.mIndices[j]);
+			GLuint v1 = face.mIndices[j];
+			GLuint v2 = face.mIndices[(j + 1) % face.mNumIndices];
+			m_unique_edges.insert(edge(v1, v2));
 		}
 	}
 

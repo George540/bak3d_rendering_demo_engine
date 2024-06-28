@@ -43,6 +43,26 @@ struct vertex {
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+struct edge
+{
+    GLuint v1_index;
+    GLuint v2_index;
+
+    edge(unsigned int a, unsigned int b) : v1_index(a), v2_index(b)
+    {
+        if (v1_index > v2_index)
+        {
+            std::swap(v1_index, v2_index); // Ensure consistent ordering
+        }
+    }
+
+    // Comparison operator for set uniqueness
+    bool operator<(const edge& other) const
+    {
+        return v1_index < other.v1_index || (v1_index == other.v1_index && v2_index < other.v2_index);
+    }
+};
+
 struct material {
     float diffuse;
     float specular;

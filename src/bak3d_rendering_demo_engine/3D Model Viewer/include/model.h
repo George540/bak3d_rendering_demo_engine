@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class Model
 {
@@ -28,6 +29,12 @@ public:
     std::string m_name;
     int m_combo_index;
     bool gamma_correction{};
+
+    // model stats
+    int m_num_vertices;
+    std::set<edge> m_unique_edges; // with a set, an edge is ensured to be stored only once
+    int m_num_faces;
+    int m_num_triangles;
 
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, Camera& cam, Light& light, int index);
