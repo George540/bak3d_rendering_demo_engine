@@ -1,16 +1,16 @@
 #version 330 core
 
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
+layout (location = 1) in vec3 instancePosition;
+layout (location = 2) in float instanceRotation;
+layout (location = 3) in vec4 instanceColor;
+layout (location = 4) in float instanceScale;
 
 out vec2 TexCoords;
 out vec4 ParticleColor;
 
 uniform mat4 projection;
 uniform mat4 view;
-uniform vec3 position;
-uniform float rotation;
-uniform float scale;
-uniform vec4 color;
 
 void main()
 {
@@ -22,7 +22,7 @@ void main()
     vec2 centeredVertex = vertex.xy - vec2(0.5, 0.5);
 
     // Convert rotation angle from degrees to radians
-    float rotationRadians = radians(rotation);
+    float rotationRadians = radians(instanceRotation);
 
     // Apply rotation using cos and sin from transformation matrix
     float cosTheta = cos(rotationRadians);
@@ -33,11 +33,11 @@ void main()
     );
 
     // Apply the billboarding technique by modifying the vertex position
-    vec3 worldPosition = position + (cameraRight * rotatedVertex.x + cameraUp * rotatedVertex.y) * scale;
+    vec3 worldPosition = instancePosition + (cameraRight * rotatedVertex.x + cameraUp * rotatedVertex.y) * instanceScale;
 
     // Set texture coordinates and particle color
     TexCoords = vertex.zw;
-    ParticleColor = color;
+    ParticleColor = instanceColor;
 
     // Apply the projection and view matrices
     gl_Position = projection * view * vec4(worldPosition, 1.0);

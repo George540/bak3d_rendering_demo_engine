@@ -116,6 +116,7 @@ private:
     Texture2D m_texture;
     GLuint m_particle_VAO;
     GLuint m_particle_VBO;
+    GLuint m_instance_VBO;
     
     // particle bounding box
     Shader* m_bounding_box_shader;
@@ -123,9 +124,12 @@ private:
     GLuint m_bb_VBO;
     GLuint m_bb_EBO;
     
-    void initialize(); // initializes buffer and vertex attributes
+    void initialize(); // initializes particle data
+    void set_up_particle_buffers(); // initializes particle buffers
+    void initialize_bounding_box(); // initializes bound box buffer and data
     GLuint first_unused_particle(); // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
     void respawn_particle(particle& particle); // respawns particle
+    void draw_bounding_box();
 };
 
 #endif

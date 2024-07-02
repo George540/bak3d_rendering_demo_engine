@@ -8,6 +8,7 @@
 
 using namespace std;
 
+static const int MAX_PARTICLES = 10000;
 GLuint last_used_particle = 0;
 
 ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
@@ -23,7 +24,12 @@ ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_cam
     m_color = particles_payload_info.color;
     m_range = particles_payload_info.range;
     m_scale = particles_payload_info.scale;
+
     initialize();
+    set_up_particle_buffers();
+    initialize_bounding_box();
+
+    cout << "Particle System has been activated with " << m_amount << " particles." << endl;
 }
 
 ParticleGenerator::~ParticleGenerator()
@@ -44,40 +50,23 @@ ParticleGenerator::~ParticleGenerator()
 
 void ParticleGenerator::initialize()
 {
-    // set up mesh and attribute properties
-    float particle_quad[] =
-    {
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
-    };
-
-    glGenVertexArrays(1, &m_particle_VAO);
-    glGenBuffers(1, &m_particle_VBO);
-    glBindVertexArray(m_particle_VAO);
-
-    // fill mesh buffer
-    glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
-
-    // set mesh attributes
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-    glBindVertexArray(0);
-
     auto particle_texture_data = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
     for (const auto& pair : particle_texture_data)
     {
         const auto& path = pair.second;
         Texture2D t = Texture2D(path, aiTextureType_DIFFUSE);
         m_textures_loaded.push_back(t);
+
+        if (glGetError() != GL_NO_ERROR) {
+            std::cerr << "OpenGL error occurred while loading texture: " << path << std::endl;
+        }
     }
 
     m_texture = m_textures_loaded[particles_payload_info.texture_selection];
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "OpenGL error occurred after selecting texture" << std::endl;
+        return;
+    }
 
     for (GLuint i = 0; i < m_amount; ++i)
     {
@@ -90,13 +79,93 @@ void ParticleGenerator::initialize()
         p.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
         m_particles.push_back(p);
     }
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "OpenGL error occured after initializing particles" << std::endl;
+        return;
+    }
+}
 
-    std::cout << "Particle System has been activated with " << m_amount << " particles." << std::endl;
+void ParticleGenerator::set_up_particle_buffers()
+{
+    cout << "Setting up particle buffer data..." << endl;
 
-    // BOUNDING BOX DATA
-    
+    // set up particle quad vertex data
+    float particle_quad[] =
+    {
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f
+    };
+
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "OpenGL error occurred before generating buffers" << std::endl;
+        return;
+    }
+
+    glGenVertexArrays(1, &m_particle_VAO);
+    glGenBuffers(1, &m_particle_VBO);
+    glGenBuffers(1, &m_instance_VBO);
+
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error after generating buffers" << std::endl;
+    }
+
+    glBindVertexArray(m_particle_VAO);
+
+    // Vertex buffer (particle quad)
+    glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error after binding and buffering particle quad" << std::endl;
+    }
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error after setting vertex attribute pointer for particle quad" << std::endl;
+    }
+
+    // Instance buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_amount * sizeof(particle), nullptr, GL_DYNAMIC_DRAW);
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error after binding and buffering instance data" << std::endl;
+    }
+
+    // Instance attributes
+    // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, position));
+    glEnableVertexAttribArray(1);
+    glVertexAttribDivisor(1, 1); // advance once per instance
+
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, rotation));
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
+
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, color));
+    glEnableVertexAttribArray(3);
+    glVertexAttribDivisor(3, 1);
+
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, scale));
+    glEnableVertexAttribArray(4);
+    glVertexAttribDivisor(4, 1);
+
+    if (glGetError() != GL_NO_ERROR) {
+        std::cerr << "Error after setting vertex attribute pointers for instance data" << std::endl;
+    }
+
+    glBindVertexArray(0);
+}
+
+void ParticleGenerator::initialize_bounding_box()
+{
+    cout << "Initializing Particle System Bounding Box data..." << endl;
+
     m_bounding_box_shader = new Shader(std::filesystem::absolute("shaders/GridShader.vs").string().c_str(),
-                        std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
+        std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
 
     // Define the 8 vertices of the cube
     GLfloat vertices[] = {
@@ -220,6 +289,10 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
             }
         }
     }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * sizeof(particle), m_particles.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleGenerator::draw()
@@ -231,33 +304,24 @@ void ParticleGenerator::draw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     sort_particles();
     m_particle_shader->use();
+    glBindVertexArray(m_particle_VAO);
 
     // Disable depth mask to prevent writing to the depth buffer
     glDepthMask(GL_FALSE);
 
-    for (const particle& p : m_particles)
+    m_particle_shader->set_mat4("projection", m_camera->get_projection_matrix());
+    m_particle_shader->set_mat4("view", m_camera->get_view_matrix());
+
+    auto selected_texture = m_textures_loaded[particles_payload_info.texture_selection];
+    if (m_texture != selected_texture)
     {
-        if (p.lifetime > 0.0f)
-        {
-            m_particle_shader->set_vec3("position", p.position);
-            m_particle_shader->set_float("rotation", p.rotation);
-            m_particle_shader->set_float("scale", p.scale);
-            m_particle_shader->set_vec4("color", p.color);
-            m_particle_shader->set_mat4("projection", m_camera->get_projection_matrix());
-            m_particle_shader->set_mat4("view", m_camera->get_view_matrix());
-
-            auto selected_texture = m_textures_loaded[particles_payload_info.texture_selection];
-            if (m_texture != selected_texture)
-            {
-                m_texture = selected_texture;
-            }
-            m_texture.bind();
-
-            glBindVertexArray(m_particle_VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
-        }
+        m_texture = selected_texture;
     }
+    m_texture.bind();
+    // Draw particles using instancing
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
+    glBindVertexArray(0);
+
     // don't forget to reset to default blending mode
     glDepthMask(GL_TRUE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -265,35 +329,39 @@ void ParticleGenerator::draw()
 
     if (particles_payload_info.render_bounding_box)
     {
-        // Bounding Box
-        glDepthFunc(GL_ALWAYS);
-
-        m_bounding_box_shader->use();
-        m_bounding_box_shader->set_mat4("projection", m_camera->get_projection_matrix());
-        m_bounding_box_shader->set_mat4("view", m_camera->get_view_matrix());
-
-        auto model = glm::mat4(1.0f);
-        if (particles_payload_info.randomize_velocity)
-        {
-            auto velocity_offset = particles_payload_info.velocity_random_offset;
-            model = glm::scale(model, (glm::vec3(velocity_offset) * m_lifetime) + (m_range * 2.0f));
-        }
-        else
-        {
-            auto horizontal_scale = m_range * 2;
-            model = glm::scale(model, (glm::vec3(m_velocity) * m_lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale));
-            model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
-        }
-
-        m_bounding_box_shader->set_mat4("model", model);
-        m_bounding_box_shader->set_vec3("color", glm::vec3(1.0f));
-
-        glBindVertexArray(m_bb_VAO);
-        glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
-
-        glDepthFunc(GL_LESS);
+        draw_bounding_box();
     }
+}
+
+void ParticleGenerator::draw_bounding_box()
+{
+    glDepthFunc(GL_ALWAYS);
+
+    m_bounding_box_shader->use();
+    m_bounding_box_shader->set_mat4("projection", m_camera->get_projection_matrix());
+    m_bounding_box_shader->set_mat4("view", m_camera->get_view_matrix());
+
+    auto model = glm::mat4(1.0f);
+    if (particles_payload_info.randomize_velocity)
+    {
+        auto velocity_offset = particles_payload_info.velocity_random_offset;
+        model = glm::scale(model, (glm::vec3(velocity_offset) * m_lifetime) + (m_range * 2.0f));
+    }
+    else
+    {
+        auto horizontal_scale = m_range * 2;
+        model = glm::scale(model, (glm::vec3(m_velocity) * m_lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale));
+        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
+    }
+
+    m_bounding_box_shader->set_mat4("model", model);
+    m_bounding_box_shader->set_vec3("color", glm::vec3(1.0f));
+
+    glBindVertexArray(m_bb_VAO);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+
+    glDepthFunc(GL_LESS);
 }
 
 GLuint ParticleGenerator::first_unused_particle()
@@ -347,6 +415,7 @@ void ParticleGenerator::delete_vao_vbo() const
 {
     glDeleteVertexArrays(1, &m_particle_VAO);
     glDeleteBuffers(1, &m_particle_VBO);
+    glDeleteBuffers(1, &m_instance_VBO);
     glDeleteVertexArrays(1, &m_bb_VAO);
     glDeleteBuffers(1, &m_bb_VBO);
 }

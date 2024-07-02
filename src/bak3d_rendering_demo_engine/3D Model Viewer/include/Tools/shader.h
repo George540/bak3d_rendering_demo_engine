@@ -27,6 +27,7 @@ public:
 	[[nodiscard]] unsigned int get_index() const { return index; }
     void set_index(int i) { index = i; }
     void use() const;
+    void unuse() const;
 
     // Utility Functions
     void set_bool(const std::string& name, bool value) const;
