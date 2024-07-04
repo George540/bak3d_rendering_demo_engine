@@ -9,6 +9,9 @@
 using namespace std;
 
 static const int MAX_PARTICLES = 10000;
+GLsizei vec3_size = sizeof(glm::vec3);
+GLsizei float_size = sizeof(float);
+GLsizei vec4_size = sizeof(glm::vec4);
 GLuint last_used_particle = 0;
 
 ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
@@ -99,34 +102,34 @@ void ParticleGenerator::set_up_particle_buffers()
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
 
+    // Vertex attributes (vertex position, texture coordinates)
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
+    glEnableVertexAttribArray(0);
+
     // Instance buffer
     glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_particles.size(), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_particles.size() * sizeof(particle), nullptr, GL_DYNAMIC_DRAW);
 
     // Instance attributes
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
 
-    // Vertex Positions (vertex attribute corresponds directly to vertex data, no need for instancing)
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), static_cast<void*>(nullptr));
-    glEnableVertexAttribArray(0);
-
     // Particle Position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, position)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vec3_size, reinterpret_cast<void*>(offsetof(particle, position)));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1); // advance once per instance
 
     // Particle Rotation
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, rotation)));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle, rotation)));
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
 
     // Particle Color
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, color)));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, vec4_size, reinterpret_cast<void*>(offsetof(particle, color)));
     glEnableVertexAttribArray(3);
     glVertexAttribDivisor(3, 1);
 
     // Particle Scale
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, scale)));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle, scale)));
     glEnableVertexAttribArray(4);
     glVertexAttribDivisor(4, 1);
 
@@ -263,8 +266,25 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
         }
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_particles.size() * sizeof(particle), m_particles.data());
+    // Update instance buffer
+    vector<glm::vec3> positions(m_amount);
+    vector<float> rotations(m_amount);
+    vector<glm::vec4> colors(m_amount);
+    vector<float> scales(m_amount);
+
+    for (GLuint i = 0; i < m_amount; ++i)
+    {
+        positions[i] = m_particles[i].position;
+        rotations[i] = m_particles[i].rotation;
+        colors[i] = m_particles[i].color;
+        scales[i] = m_particles[i].scale;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * vec3_size, positions.data());
+    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size, m_amount * float_size, rotations.data());
+    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size + m_amount * float_size, m_amount * vec4_size, colors.data());
+    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size + m_amount * float_size + m_amount * vec4_size, m_amount * float_size, rotations.data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -277,6 +297,7 @@ void ParticleGenerator::draw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     sort_particles();
     m_particle_shader->use();
+    // Update instance buffer
     glBindVertexArray(m_particle_VAO);
 
     // Disable depth mask to prevent writing to the depth buffer
@@ -292,7 +313,7 @@ void ParticleGenerator::draw()
     }
     m_texture.bind();
     // Draw particles using instancing
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_particles.size());
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
     glBindVertexArray(0);
 
     // don't forget to reset to default blending mode

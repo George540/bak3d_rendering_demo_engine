@@ -1,6 +1,9 @@
 #version 330 core
 
+// Particle quad vertex attributes
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
+
+// Particle instance attributes
 layout (location = 1) in vec3 instancePosition;
 layout (location = 2) in float instanceRotation;
 layout (location = 3) in vec4 instanceColor;
