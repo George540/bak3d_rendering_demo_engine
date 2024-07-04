@@ -56,17 +56,9 @@ void ParticleGenerator::initialize()
         const auto& path = pair.second;
         Texture2D t = Texture2D(path, aiTextureType_DIFFUSE);
         m_textures_loaded.push_back(t);
-
-        if (glGetError() != GL_NO_ERROR) {
-            std::cerr << "OpenGL error occurred while loading texture: " << path << std::endl;
-        }
     }
 
     m_texture = m_textures_loaded[particles_payload_info.texture_selection];
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "OpenGL error occurred after selecting texture" << std::endl;
-        return;
-    }
 
     for (GLuint i = 0; i < m_amount; ++i)
     {
@@ -78,10 +70,6 @@ void ParticleGenerator::initialize()
         p.velocity = m_velocity;
         p.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
         m_particles.push_back(p);
-    }
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "OpenGL error occured after initializing particles" << std::endl;
-        return;
     }
 }
 
@@ -101,61 +89,46 @@ void ParticleGenerator::set_up_particle_buffers()
         1.0f, 0.0f, 1.0f, 0.0f
     };
 
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "OpenGL error occurred before generating buffers" << std::endl;
-        return;
-    }
-
     glGenVertexArrays(1, &m_particle_VAO);
     glGenBuffers(1, &m_particle_VBO);
     glGenBuffers(1, &m_instance_VBO);
-
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error after generating buffers" << std::endl;
-    }
 
     glBindVertexArray(m_particle_VAO);
 
     // Vertex buffer (particle quad)
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error after binding and buffering particle quad" << std::endl;
-    }
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error after setting vertex attribute pointer for particle quad" << std::endl;
-    }
 
     // Instance buffer
     glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_amount * sizeof(particle), nullptr, GL_DYNAMIC_DRAW);
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error after binding and buffering instance data" << std::endl;
-    }
+    glBufferData(GL_ARRAY_BUFFER, m_particles.size(), nullptr, GL_DYNAMIC_DRAW);
 
     // Instance attributes
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, position));
+
+    // Vertex Positions (vertex attribute corresponds directly to vertex data, no need for instancing)
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), static_cast<void*>(nullptr));
+    glEnableVertexAttribArray(0);
+
+    // Particle Position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, position)));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1); // advance once per instance
 
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, rotation));
+    // Particle Rotation
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, rotation)));
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
 
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, color));
+    // Particle Color
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, color)));
     glEnableVertexAttribArray(3);
     glVertexAttribDivisor(3, 1);
 
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(particle), (void*)offsetof(particle, scale));
+    // Particle Scale
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(particle), reinterpret_cast<void*>(offsetof(particle, scale)));
     glEnableVertexAttribArray(4);
     glVertexAttribDivisor(4, 1);
-
-    if (glGetError() != GL_NO_ERROR) {
-        std::cerr << "Error after setting vertex attribute pointers for instance data" << std::endl;
-    }
 
     glBindVertexArray(0);
 }
@@ -291,7 +264,7 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * sizeof(particle), m_particles.data());
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_particles.size() * sizeof(particle), m_particles.data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -319,7 +292,7 @@ void ParticleGenerator::draw()
     }
     m_texture.bind();
     // Draw particles using instancing
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_particles.size());
     glBindVertexArray(0);
 
     // don't forget to reset to default blending mode
