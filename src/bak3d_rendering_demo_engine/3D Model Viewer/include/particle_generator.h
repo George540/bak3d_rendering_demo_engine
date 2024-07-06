@@ -35,20 +35,20 @@ struct particle
     {}
 };
 
-//struct particle_instances_data
-//{
-//    glm::vec3 position;
-//    float rotation;
-//    glm::vec4 color;
-//    float scale;
-//
-//    particle_instances_data() :
-//        position(0.0f),
-//        rotation(0.0f),
-//        color(1.0f),
-//        scale(1.0f)
-//    {}
-//};
+struct particle_instance_data
+{
+    glm::vec3 position;
+    float rotation;
+    glm::vec4 color;
+    float scale;
+
+    particle_instance_data() :
+        position(0.0f),
+        rotation(0.0f),
+        color(1.0f),
+        scale(1.0f)
+    {}
+};
 
 struct particle_info
 {
@@ -114,12 +114,8 @@ public:
 private:
     // particle properties
     std::vector<particle> m_particles;
-    //std::vector<particle_instances_data> m_particle_instance_data;
     std::vector<Texture2D> m_textures_loaded;
-    std::vector<glm::vec3> m_particle_positions;
-    std::vector<float> m_particle_rotations;
-    std::vector<glm::vec4> m_particle_colors;
-    std::vector<float> m_particle_scales;
+    std::vector<particle_instance_data> m_particle_instance_data;
 
     GLuint m_amount;
     glm::vec3 m_position;

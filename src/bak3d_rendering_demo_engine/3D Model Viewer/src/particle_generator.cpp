@@ -103,37 +103,40 @@ void ParticleGenerator::set_up_particle_buffers()
     glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
 
     // Vertex attributes (vertex position, texture coordinates)
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr);
     glEnableVertexAttribArray(0);
 
     // Instance buffer
     glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_particles.size() * sizeof(particle), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_amount * sizeof(particle_instance_data), nullptr, GL_DYNAMIC_DRAW);
 
     // Instance attributes
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
 
     // Particle Position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vec3_size, reinterpret_cast<void*>(offsetof(particle, position)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vec3_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1); // advance once per instance
 
     // Particle Rotation
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle, rotation)));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)));
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
 
     // Particle Color
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, vec4_size, reinterpret_cast<void*>(offsetof(particle, color)));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, vec4_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)));
     glEnableVertexAttribArray(3);
     glVertexAttribDivisor(3, 1);
 
     // Particle Scale
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle, scale)));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)));
     glEnableVertexAttribArray(4);
     glVertexAttribDivisor(4, 1);
 
     glBindVertexArray(0);
+
+    // Set size of particle instance data payload
+    m_particle_instance_data.resize(m_amount);
 }
 
 void ParticleGenerator::initialize_bounding_box()
@@ -205,6 +208,19 @@ float ParticleGenerator::random_float(float min, float max)
 
 void ParticleGenerator::update(float dt, GLuint new_particles)
 {
+    // Update instance buffer 
+    for (GLuint i = 0; i < m_amount; ++i)
+    {
+        m_particle_instance_data[i].position = m_particles[i].position;
+        m_particle_instance_data[i].rotation = m_particles[i].rotation;
+        m_particle_instance_data[i].color = m_particles[i].color;
+        m_particle_instance_data[i].scale = m_particles[i].scale;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * sizeof(particle_instance_data), m_particle_instance_data.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     // add new particles 
     for (GLuint i = 0; i < new_particles; ++i)
     {
@@ -265,27 +281,6 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
             }
         }
     }
-
-    // Update instance buffer
-    vector<glm::vec3> positions(m_amount);
-    vector<float> rotations(m_amount);
-    vector<glm::vec4> colors(m_amount);
-    vector<float> scales(m_amount);
-
-    for (GLuint i = 0; i < m_amount; ++i)
-    {
-        positions[i] = m_particles[i].position;
-        rotations[i] = m_particles[i].rotation;
-        colors[i] = m_particles[i].color;
-        scales[i] = m_particles[i].scale;
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * vec3_size, positions.data());
-    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size, m_amount * float_size, rotations.data());
-    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size + m_amount * float_size, m_amount * vec4_size, colors.data());
-    glBufferSubData(GL_ARRAY_BUFFER, m_amount * vec3_size + m_amount * float_size + m_amount * vec4_size, m_amount * float_size, rotations.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleGenerator::draw()
