@@ -19,23 +19,23 @@ int main()
     EventManager::initialize();
     Renderer::initialize();
 
-    auto world = World();
+    auto scene = Scene();
 
     do
     {
         // Update Event Manager - Frame time / input / events processing 
         EventManager::update();
 
-        // Update World
+        // Update Scene
         const float dt = EventManager::get_frame_time();
-        world.process_object_activation();
-        world.update(dt);
+        scene.process_object_activation();
+        scene.update(dt);
 
-        world.draw();
+        scene.draw();
     } while (EventManager::is_exit_requested() == false);
 
     Renderer::shutdown();
-    world.delete_arrays_and_buffers();
+    scene.delete_arrays_and_buffers();
     EventManager::shutdown();
 
     return 0;

@@ -13,7 +13,7 @@ GLsizei vec4_size = sizeof(glm::vec4);
 GLsizei pid_size = sizeof(particle_instance_data);
 GLuint last_used_particle = 0;
 
-ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
+ParticleSystem::ParticleSystem(Camera& camera, particle_info info) : m_camera(&camera)
 {
     m_particle_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vs").string().c_str(),
                       std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
@@ -34,7 +34,7 @@ ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_cam
     cout << "Particle System has been activated with " << m_amount << " particles." << endl;
 }
 
-ParticleGenerator::~ParticleGenerator()
+ParticleSystem::~ParticleSystem()
 {
     if (m_particle_shader)
     {
@@ -50,7 +50,7 @@ ParticleGenerator::~ParticleGenerator()
     delete_vao_vbo();
 }
 
-void ParticleGenerator::initialize()
+void ParticleSystem::initialize()
 {
     auto particle_texture_data = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
     for (const auto& pair : particle_texture_data)
@@ -75,7 +75,7 @@ void ParticleGenerator::initialize()
     }
 }
 
-void ParticleGenerator::set_up_particle_buffers()
+void ParticleSystem::set_up_particle_buffers()
 {
     cout << "Setting up particle buffer data..." << endl;
 
@@ -138,7 +138,7 @@ void ParticleGenerator::set_up_particle_buffers()
     m_particle_instance_data.resize(m_amount);
 }
 
-void ParticleGenerator::initialize_bounding_box()
+void ParticleSystem::initialize_bounding_box()
 {
     cout << "Initializing Particle System Bounding Box data..." << endl;
 
@@ -186,7 +186,7 @@ void ParticleGenerator::initialize_bounding_box()
     glBindVertexArray(0);
 }
 
-void ParticleGenerator::sort_particles()
+void ParticleSystem::sort_particles()
 {
     auto cameraPos = m_camera->get_camera_position();
     std::sort(m_particles.begin(), m_particles.end(),
@@ -197,7 +197,7 @@ void ParticleGenerator::sort_particles()
         });
 }
 
-float ParticleGenerator::random_float(float min, float max)
+float ParticleSystem::random_float(float min, float max)
 {
     static random_device rd;
     static mt19937 generator(rd());
@@ -205,7 +205,7 @@ float ParticleGenerator::random_float(float min, float max)
     return distribution(generator);
 }
 
-void ParticleGenerator::update(float dt, GLuint new_particles)
+void ParticleSystem::update(float dt, GLuint new_particles)
 {
     // Update instance buffer 
     for (GLuint i = 0; i < m_amount; ++i)
@@ -282,7 +282,7 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
     }
 }
 
-void ParticleGenerator::draw()
+void ParticleSystem::draw()
 {
     if (!m_particle_shader) return;
 
@@ -321,7 +321,7 @@ void ParticleGenerator::draw()
     }
 }
 
-void ParticleGenerator::draw_bounding_box()
+void ParticleSystem::draw_bounding_box()
 {
     glDepthFunc(GL_ALWAYS);
 
@@ -352,7 +352,7 @@ void ParticleGenerator::draw_bounding_box()
     glDepthFunc(GL_LESS);
 }
 
-GLuint ParticleGenerator::first_unused_particle()
+GLuint ParticleSystem::first_unused_particle()
 {
     // first search from last used particle, this will usually return almost instantly
     for (GLuint i = last_used_particle; i < m_amount; ++i)
@@ -377,7 +377,7 @@ GLuint ParticleGenerator::first_unused_particle()
     return last_used_particle;
 }
 
-void ParticleGenerator::respawn_particle(particle& particle)
+void ParticleSystem::respawn_particle(particle& particle)
 {
     particle.position = particles_payload_info.randomize_velocity ?
         glm::vec3(random_float(-m_range, m_range), random_float(-m_range, m_range), random_float(-m_range, m_range))
@@ -399,7 +399,7 @@ void ParticleGenerator::respawn_particle(particle& particle)
     particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
 }
 
-void ParticleGenerator::delete_vao_vbo() const
+void ParticleSystem::delete_vao_vbo() const
 {
     glDeleteVertexArrays(1, &m_particle_VAO);
     glDeleteBuffers(1, &m_particle_VBO);

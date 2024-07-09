@@ -43,7 +43,7 @@ const char* Renderer::map_combo_items[] = { "Full Render", "Albedo", "Specular",
 int Renderer::render_current = 0;
 
 // Particle system
-ParticleGenerator* Renderer::current_particle_system = nullptr;
+ParticleSystem* Renderer::current_particle_system = nullptr;
 particle_info Renderer::particle_payload_info = particle_info();
 list<pair<string, string>> Renderer::particle_image_combo_items_list;
 vector<char*> Renderer::particle_image_combo_items;

@@ -9,11 +9,11 @@
 
 using namespace std;
 
-World* World::instance;
+Scene* Scene::instance;
 
 const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
 
-World::World()
+Scene::Scene()
 {
 	instance = this;
 
@@ -38,7 +38,7 @@ World::World()
 	Renderer::environment_point_light = m_light;
 }
 
-World::~World()
+Scene::~Scene()
 {
 	delete m_grid;
 	delete m_camera;
@@ -48,13 +48,13 @@ World::~World()
 	delete m_axis;
 }
 
-void World::process_object_activation()
+void Scene::process_object_activation()
 {
 	process_model_activation();
 	process_particle_activation();
 }
 
-void World::process_model_activation()
+void Scene::process_model_activation()
 {
 	// MODEL INSTANTIATION AND DELETION
 	if (Renderer::object_current == 1 && Renderer::model_current != 0)
@@ -74,7 +74,7 @@ void World::process_model_activation()
 	}
 }
 
-void World::activate_current_model()
+void Scene::activate_current_model()
 {
 	auto model_absolute_path = Renderer::current_model_info.model_file_path;
 	m_model = new Model(model_absolute_path, *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
@@ -83,7 +83,7 @@ void World::activate_current_model()
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
 }
 
-void World::deactivate_current_model()
+void Scene::deactivate_current_model()
 {
 	Renderer::current_model_info.current_model = nullptr;
 	delete m_model;
@@ -93,7 +93,7 @@ void World::deactivate_current_model()
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been deactivated." << endl;
 }
 
-void World::replace_current_model()
+void Scene::replace_current_model()
 {
 	cout << "Model " << m_model->m_name << " is being deactivated." << endl;
 	Renderer::current_model_info.current_model = nullptr;
@@ -107,11 +107,11 @@ void World::replace_current_model()
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
 }
 
-void World::process_particle_activation()
+void Scene::process_particle_activation()
 {
 	if (Renderer::object_current == 2 && !Renderer::current_particle_system)
 	{
-		m_particle_system = new ParticleGenerator(*m_camera);
+		m_particle_system = new ParticleSystem(*m_camera);
 		Renderer::current_particle_system = m_particle_system;
 
 		cout << "Particle System has been activated." << endl;
@@ -131,12 +131,12 @@ void World::process_particle_activation()
 		delete m_particle_system;
 		m_particle_system = nullptr;
 
-		m_particle_system = new ParticleGenerator(*m_camera, Renderer::particle_payload_info);
+		m_particle_system = new ParticleSystem(*m_camera, Renderer::particle_payload_info);
 		Renderer::current_particle_system = m_particle_system;
 	}
 }
 
-void World::update(float dt) const
+void Scene::update(float dt) const
 {
 	m_camera->update(dt);
 	m_light->update(dt);
@@ -147,7 +147,7 @@ void World::update(float dt) const
 	}
 }
 
-void World::draw() const
+void Scene::draw() const
 {
 	Renderer::begin_frame();
 
@@ -181,7 +181,7 @@ void World::draw() const
 	Renderer::end_frame();
 }
 
-void World::delete_arrays_and_buffers() const
+void Scene::delete_arrays_and_buffers() const
 {
 	m_model->delete_mesh_vaos();
 	m_grid->delete_vao_vbo();

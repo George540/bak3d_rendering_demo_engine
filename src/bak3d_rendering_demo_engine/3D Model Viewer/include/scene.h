@@ -16,15 +16,15 @@
 #include "light.h"
 #include "particle_generator.h"
 
-class World
+class Scene
 {
 public:
-	World();
-	~World();
+	Scene();
+	~Scene();
 
-	static World* get_instance()
+	static Scene* get_instance()
 	{
-		static World* instance;
+		static Scene* instance;
 		return instance;
 	}
 
@@ -34,7 +34,7 @@ public:
 	Model* get_model() const { return m_model; }
 	void delete_arrays_and_buffers() const;
 private:
-	static World* instance;
+	static Scene* instance;
 
 	void process_model_activation();
 	void process_particle_activation();
@@ -44,7 +44,7 @@ private:
 	void replace_current_model();
 
 	Model* m_model;
-	ParticleGenerator* m_particle_system;
+	ParticleSystem* m_particle_system;
 	Camera* m_camera;
 	Light* m_light;
 	Grid* m_grid;

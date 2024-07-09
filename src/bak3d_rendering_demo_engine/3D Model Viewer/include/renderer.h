@@ -72,7 +72,7 @@ public:
 	static int model_current;
 	static CurrentModelInfo current_model_info;
 
-	static ParticleGenerator* current_particle_system;
+	static ParticleSystem* current_particle_system;
 	static particle_info particle_payload_info;
 	static std::list<std::pair<std::string, std::string>> particle_image_combo_items_list;
 	static std::vector<char*> particle_image_combo_items;

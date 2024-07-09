@@ -94,15 +94,15 @@ struct particle_info
         {}
 };
 
-// ParticleGenerator acts as a container for rendering a large number of 
+// ParticleSystem acts as a container for rendering a large number of 
 // particles by repeatedly spawning and updating particles and killing 
 // them after a given amount of time.
-class ParticleGenerator
+class ParticleSystem
 {
 public:
     // constructor
-    ParticleGenerator(Camera& camera, particle_info info = particle_info());
-    ~ParticleGenerator();
+    ParticleSystem(Camera& camera, particle_info info = particle_info());
+    ~ParticleSystem();
     void sort_particles();
     float random_float(float min, float max);
     const GLuint get_particle_amount() const { return m_amount; }
