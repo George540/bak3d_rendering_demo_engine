@@ -105,6 +105,7 @@ In v1.2 a histograph that shows the frame time for the last 90 frames was introd
 - Anti-Aliasing
 - Model I/O
 - Improve editor with DreamGUI (multiple panels)
+- Wireframe view of the model
 
 Possibly in **v1.4 - The Animated Universe Update**, the following updates will be made:
 - GPU Accelerated Particle System
