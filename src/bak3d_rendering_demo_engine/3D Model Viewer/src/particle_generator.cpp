@@ -9,9 +9,8 @@
 using namespace std;
 
 static const int MAX_PARTICLES = 10000;
-GLsizei vec3_size = sizeof(glm::vec3);
-GLsizei float_size = sizeof(float);
 GLsizei vec4_size = sizeof(glm::vec4);
+GLsizei pid_size = sizeof(particle_instance_data);
 GLuint last_used_particle = 0;
 
 ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
@@ -114,22 +113,22 @@ void ParticleGenerator::set_up_particle_buffers()
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
 
     // Particle Position
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vec3_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1); // advance once per instance
 
     // Particle Rotation
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)));
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
 
     // Particle Color
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, vec4_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)));
     glEnableVertexAttribArray(3);
     glVertexAttribDivisor(3, 1);
 
     // Particle Scale
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)));
     glEnableVertexAttribArray(4);
     glVertexAttribDivisor(4, 1);
 
