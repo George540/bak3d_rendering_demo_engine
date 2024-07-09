@@ -9,10 +9,9 @@
 using namespace std;
 
 static const int MAX_PARTICLES = 10000;
-static const GLsizei VEC3_SIZE = sizeof(glm::vec3);
-static const GLsizei FLOAT_SIZE = sizeof(float);
-static const GLsizei VEC4_SIZE = sizeof(glm::vec4);
-static const GLsizei PARTICLE_INSTANCE_DATA_SIZE = sizeof(particle_instance_data);
+GLsizei vec3_size = sizeof(glm::vec3);
+GLsizei float_size = sizeof(float);
+GLsizei vec4_size = sizeof(glm::vec4);
 GLuint last_used_particle = 0;
 
 ParticleGenerator::ParticleGenerator(Camera& camera, particle_info info) : m_camera(&camera)
@@ -103,37 +102,37 @@ void ParticleGenerator::set_up_particle_buffers()
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
 
-    // Vertex attribute 1: vector4(vertex position (xy), texture coordinates(zw))
+    // Vertex attributes (vertex position, texture coordinates)
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
 
     // Instance buffer
     glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_amount * PARTICLE_INSTANCE_DATA_SIZE, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_amount * sizeof(particle_instance_data), nullptr, GL_DYNAMIC_DRAW);
 
     // Instance attributes
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
 
-    // Instance Attribute 1: Color (vec4)
+    // Particle Position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vec3_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, reinterpret_cast<void*>(offsetof(particle_instance_data, color)));
     glVertexAttribDivisor(1, 1); // advance once per instance
 
-    // Instance Attribute 2 to 5: World Matrix (mat4)
-    for (auto i = 0; i < 4; ++i)
-    {
-        glEnableVertexAttribArray(2 + i);
-        glVertexAttribPointer(2 + i,
-                              4,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              VEC4_SIZE,
-                              reinterpret_cast<void*>(offsetof(particle_instance_data, world_matrix) + i * VEC4_SIZE));
-        glVertexAttribDivisor(2 + i, 1); // Update per instance
-    }
+    // Particle Rotation
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
 
+    // Particle Color
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, vec4_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)));
+    glEnableVertexAttribArray(3);
+    glVertexAttribDivisor(3, 1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // Particle Scale
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, float_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribDivisor(4, 1);
+
     glBindVertexArray(0);
 
     // Set size of particle instance data payload
@@ -209,6 +208,19 @@ float ParticleGenerator::random_float(float min, float max)
 
 void ParticleGenerator::update(float dt, GLuint new_particles)
 {
+    // Update instance buffer 
+    for (GLuint i = 0; i < m_amount; ++i)
+    {
+        m_particle_instance_data[i].position = m_particles[i].position;
+        m_particle_instance_data[i].rotation = m_particles[i].rotation;
+        m_particle_instance_data[i].color = m_particles[i].color;
+        m_particle_instance_data[i].scale = m_particles[i].scale;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * sizeof(particle_instance_data), m_particle_instance_data.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     // add new particles 
     for (GLuint i = 0; i < new_particles; ++i)
     {
@@ -269,24 +281,6 @@ void ParticleGenerator::update(float dt, GLuint new_particles)
             }
         }
     }
-
-    sort_particles();
-
-    // Update instance buffer 
-    for (GLuint i = 0; i < m_amount; ++i)
-    {
-        m_particle_instance_data[i].color = m_particles[i].color;
-
-        auto model = glm::mat4(1.0f);
-        model = glm::translate(model, m_particles[i].position);
-        model = glm::rotate(model, glm::radians(m_particles[i].rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::scale(model, glm::vec3(m_particles[i].scale));
-        m_particle_instance_data[i].world_matrix = model;
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * PARTICLE_INSTANCE_DATA_SIZE, m_particle_instance_data.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ParticleGenerator::draw()
@@ -296,6 +290,7 @@ void ParticleGenerator::draw()
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    sort_particles();
     m_particle_shader->use();
     // Update instance buffer
     glBindVertexArray(m_particle_VAO);
