@@ -83,7 +83,7 @@ void EventManager::initialize()
 	glfwWindowHint(GLFW_BLUE_BITS, m_vid_mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, m_vid_mode->refreshRate);
 
-	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "          Bak3D Rendering Demo Engine (WIP)", nullptr, nullptr);
+	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "          Bak3D Engine v1.2", nullptr, nullptr);
 
 	if (m_window == nullptr)
 	{
