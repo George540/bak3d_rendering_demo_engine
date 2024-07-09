@@ -68,7 +68,7 @@ void Scene::process_model_activation()
 			replace_current_model();
 		}
 	}
-	else if (Renderer::model_current == 0 && m_model || Renderer::object_current == 0)
+	else if ((Renderer::model_current == 0 && m_model) || (m_model && Renderer::object_current == 0))
 	{
 		deactivate_current_model();
 	}
