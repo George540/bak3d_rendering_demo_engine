@@ -103,7 +103,6 @@ In v1.2 a histograph that shows the frame time for the last 90 frames was introd
 - SSAO
 - Deferred Rendering
 - Anti-Aliasing
-- Model I/O
 - Improve editor with DreamGUI (multiple panels)
 - Wireframe view of the model
 
