@@ -19,7 +19,9 @@ enum FileType
 	png,
 	jpg,
 	vs,
+	vert,
 	fs,
+	frag,
 	obj,
 	mtl,
 	fbx

@@ -112,8 +112,10 @@ string FileLoader::enum_to_string(FileType type)
 	{
 		case png: return ".png";
 		case jpg: return ".jpg";
-		case vs: return ".vs";
+		case vs: return ".vert";
+		case vert: return ".vert";
 		case fs: return ".fs";
+		case frag: return ".frag";
 		case obj: return ".obj";
 		case mtl: return ".mtl";
 		case fbx: return ".fbx";

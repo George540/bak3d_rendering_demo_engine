@@ -197,20 +197,20 @@
     <ClInclude Include="src\event_manager.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\DissectShader.fs" />
-    <None Include="shaders\DissectShader.vs" />
-    <None Include="shaders\GridShader.fs" />
-    <None Include="shaders\GridShader.vs" />
-    <None Include="shaders\LightShader.fs" />
-    <None Include="shaders\LightShader.vs" />
-    <None Include="shaders\LineShader.fs" />
-    <None Include="shaders\LineShader.vs" />
-    <None Include="shaders\MainShader.fs" />
-    <None Include="shaders\MainShader.vs" />
-    <None Include="shaders\ModelShader.fs" />
-    <None Include="shaders\ModelShader.vs" />
-    <None Include="shaders\ParticleShader.fs" />
-    <None Include="shaders\ParticleShader.vs" />
+    <None Include="shaders\DissectShader.frag" />
+    <None Include="shaders\DissectShader.vert" />
+    <None Include="shaders\GridShader.frag" />
+    <None Include="shaders\GridShader.vert" />
+    <None Include="shaders\LightShader.frag" />
+    <None Include="shaders\LightShader.vert" />
+    <None Include="shaders\LineShader.frag" />
+    <None Include="shaders\LineShader.vert" />
+    <None Include="shaders\MainShader.frag" />
+    <None Include="shaders\MainShader.vert" />
+    <None Include="shaders\ModelShader.frag" />
+    <None Include="shaders\ModelShader.vert" />
+    <None Include="shaders\ParticleShader.frag" />
+    <None Include="shaders\ParticleShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

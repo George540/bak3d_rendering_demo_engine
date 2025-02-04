@@ -9,8 +9,8 @@
 Grid::Grid(Camera& cam) : m_camera(&cam), number_of_slices(40), grid_size(20.0f)
 {
 	m_shader = new Shader(
-		std::filesystem::absolute("shaders/GridShader.vs").string().c_str(),
-		std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
+		std::filesystem::absolute("shaders/GridShader.vert").string().c_str(),
+		std::filesystem::absolute("shaders/GridShader.frag").string().c_str());
 
 	// GRID LINE SETUP
 	// Grid setup used indices and EBOs for proper identification of each line

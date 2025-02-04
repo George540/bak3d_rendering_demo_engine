@@ -15,8 +15,8 @@ GLuint last_used_particle = 0;
 
 ParticleSystem::ParticleSystem(Camera& camera, particle_info info) : m_camera(&camera)
 {
-    m_particle_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vs").string().c_str(),
-                      std::filesystem::absolute("shaders/ParticleShader.fs").string().c_str());
+    m_particle_shader = new Shader(std::filesystem::absolute("shaders/ParticleShader.vert").string().c_str(),
+                      std::filesystem::absolute("shaders/ParticleShader.frag").string().c_str());
     particles_payload_info = info;
     m_amount = particles_payload_info.amount;
     m_lifetime = particles_payload_info.lifetime;
@@ -142,8 +142,8 @@ void ParticleSystem::initialize_bounding_box()
 {
     cout << "Initializing Particle System Bounding Box data..." << endl;
 
-    m_bounding_box_shader = new Shader(std::filesystem::absolute("shaders/GridShader.vs").string().c_str(),
-        std::filesystem::absolute("shaders/GridShader.fs").string().c_str());
+    m_bounding_box_shader = new Shader(std::filesystem::absolute("shaders/GridShader.vert").string().c_str(),
+        std::filesystem::absolute("shaders/GridShader.frag").string().c_str());
 
     // Define the 8 vertices of the cube
     GLfloat vertices[] = {

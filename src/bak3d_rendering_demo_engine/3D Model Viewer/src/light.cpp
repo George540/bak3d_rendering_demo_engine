@@ -34,8 +34,8 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	build_vertex_buffer();
 
 	m_shader = new Shader(
-		std::filesystem::absolute("shaders/LightShader.vs").string().c_str(),
-		std::filesystem::absolute("shaders/LightShader.fs").string().c_str());
+		std::filesystem::absolute("shaders/LightShader.vert").string().c_str(),
+		std::filesystem::absolute("shaders/LightShader.frag").string().c_str());
 	std::cout << "Light created..." << std::endl;
 }
 

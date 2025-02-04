@@ -13,14 +13,14 @@
 
 Model::Model(string const& path, Camera& cam, Light& light, int index) : m_camera(&cam), m_light(&light), m_combo_index(index)
 {
-	auto shader = new Shader(std::filesystem::absolute("shaders/ModelShader.vs").string().c_str(),
-							 std::filesystem::absolute("shaders/ModelShader.fs").string().c_str());
+	auto shader = new Shader(std::filesystem::absolute("shaders/ModelShader.vert").string().c_str(),
+							 std::filesystem::absolute("shaders/ModelShader.frag").string().c_str());
 	shader->set_index(0);
 	m_shaders.push_back(shader);
 	shader = nullptr;
 	shader = new Shader(
-		std::filesystem::absolute("shaders/DissectShader.vs").string().c_str(),
-		std::filesystem::absolute("shaders/DissectShader.fs").string().c_str());
+		std::filesystem::absolute("shaders/DissectShader.vert").string().c_str(),
+		std::filesystem::absolute("shaders/DissectShader.frag").string().c_str());
 	shader->set_index(1);
 	m_shaders.push_back(shader);
 	load_model(path);

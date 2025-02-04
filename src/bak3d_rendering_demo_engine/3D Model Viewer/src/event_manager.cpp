@@ -87,7 +87,7 @@ void EventManager::initialize()
 
 	if (m_window == nullptr)
 	{
-		cerr << "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version.\n";
+		cerr << "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3+ compatible. Try the 2.1 version.\n";
 		glfwTerminate();
 		exit(-1);  // NOLINT(concurrency-mt-unsafe)
 	}

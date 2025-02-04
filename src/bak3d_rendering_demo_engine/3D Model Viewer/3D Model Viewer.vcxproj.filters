@@ -166,46 +166,46 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\DissectShader.fs">
+    <None Include="shaders\DissectShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\DissectShader.vs">
+    <None Include="shaders\DissectShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\GridShader.fs">
+    <None Include="shaders\GridShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\GridShader.vs">
+    <None Include="shaders\GridShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\LightShader.fs">
+    <None Include="shaders\LightShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\LightShader.vs">
+    <None Include="shaders\LightShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\LineShader.fs">
+    <None Include="shaders\LineShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\LineShader.vs">
+    <None Include="shaders\LineShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\MainShader.fs">
+    <None Include="shaders\MainShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\MainShader.vs">
+    <None Include="shaders\MainShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\ModelShader.fs">
+    <None Include="shaders\ModelShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\ModelShader.vs">
+    <None Include="shaders\ModelShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\ParticleShader.fs">
+    <None Include="shaders\ParticleShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\ParticleShader.vs">
+    <None Include="shaders\ParticleShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -10,8 +10,8 @@ Axis::Axis(Camera& camera)
 {
 	m_camera = &camera;
 	m_shader = new Shader(
-		std::filesystem::absolute("shaders/LineShader.vs").string().c_str(),
-		std::filesystem::absolute("shaders/LineShader.fs").string().c_str());
+		std::filesystem::absolute("shaders/LineShader.vert").string().c_str(),
+		std::filesystem::absolute("shaders/LineShader.frag").string().c_str());
 	constexpr glm::vec3 vertices[] = { // position, color
 									glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), // X red line
 									glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
