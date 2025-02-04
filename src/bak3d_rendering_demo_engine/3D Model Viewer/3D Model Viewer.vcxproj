@@ -166,6 +166,7 @@
     <ClCompile Include="src\particle_generator.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\Tools\buffer.cpp" />
     <ClCompile Include="src\Tools\file_loader.cpp" />
     <ClCompile Include="src\Tools\glad.c" />
     <ClCompile Include="src\Tools\shader.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="include\particle_generator.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\Tools\buffer.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
     <ClInclude Include="include\Tools\globject.h" />
     <ClInclude Include="include\Tools\shader.h" />
