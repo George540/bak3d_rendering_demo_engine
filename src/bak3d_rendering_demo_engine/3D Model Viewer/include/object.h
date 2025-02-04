@@ -16,26 +16,61 @@
 #include "buffer.h"
 #include "vertex_array.h"
 
-struct GLObjectData
-{
-    VertexArray m_vao;
-    VertexBuffer m_vbo;
-    ElementBuffer m_ebo;
-    InstanceBuffer m_ibo;
-};
-
 class Object
 {
 public:
     Object(Camera& camera);
-    ~Object();
+    Object(Camera& camera, const string shader_name);
+    virtual ~Object();
 
-    void draw() const;
-    void delete_globjects() const;
+    virtual void draw() const;
+    virtual void delete_globjects() const;
 protected:
-    GLObjectData* m_globject_data;
+    VertexArray* m_vao;
+    VertexBuffer* m_vbo;
+
     Shader* m_shader;
     Camera* m_camera;
+};
+
+class IndexedObject : Object
+{
+public:
+    IndexedObject(Camera& camera);
+    IndexedObject(Camera& camera, const string shader_name);
+    ~IndexedObject();
+
+    void draw() const override;
+    void delete_globjects() const override;
+protected:
+    ElementBuffer* m_ebo;
+};
+
+class InstancedObject : Object
+{
+public:
+    InstancedObject(Camera& camera);
+    InstancedObject(Camera& camera, const string shader_name);
+    ~InstancedObject();
+
+    void draw() const override;
+    void delete_globjects() const override;
+protected:
+    InstanceBuffer* m_ibo;
+};
+
+class OptimizedObject : Object
+{
+public:
+    OptimizedObject(Camera& camera);
+    OptimizedObject(Camera& camera, const string shader_name);
+    ~OptimizedObject();
+
+    void draw() const override;
+    void delete_globjects() const override;
+protected:
+    ElementBuffer* m_ebo;
+    InstanceBuffer* m_ibo;
 };
 
 #endif
