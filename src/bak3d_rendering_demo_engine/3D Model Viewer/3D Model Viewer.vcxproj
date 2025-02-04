@@ -183,6 +183,7 @@
     <ClInclude Include="..\..\..\lib\imgui\include\imstb_truetype.h" />
     <ClInclude Include="include\axis.h" />
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\event_manager.h" />
     <ClInclude Include="include\grid.h" />
     <ClInclude Include="include\light.h" />
     <ClInclude Include="include\mesh.h" />
@@ -194,7 +195,6 @@
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="include\Tools\texture.h" />
-    <ClInclude Include="src\event_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag" />

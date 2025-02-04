@@ -4,6 +4,8 @@
 // Joe de Vries on twitter: https://twitter.com/JoeyDeVriez
 // =====================================================================================
 
+#pragma once
+
 #ifndef MESH_H
 #define MESH_H
 

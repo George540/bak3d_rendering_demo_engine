@@ -3,6 +3,8 @@
 // EventManager class from the COMP 371 lab 10. It was only used as an inspiration for
 // =====================================================================================
 
+#pragma once
+
 #ifndef EVENT_MANAGER_H
 #define EVENT_MANAGER_H
 

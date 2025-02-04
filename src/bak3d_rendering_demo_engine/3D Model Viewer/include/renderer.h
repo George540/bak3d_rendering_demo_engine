@@ -3,6 +3,8 @@
 // only from the COMP 371 lab 10
 // =====================================================================================
 
+#pragma once
+
 #ifndef RENDERER_H
 #define RENDERER_H
 

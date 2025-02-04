@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "renderer.h"
-#include "src/event_manager.h"
+#include "event_manager.h"
 #include "scene.h"
 
 int main()

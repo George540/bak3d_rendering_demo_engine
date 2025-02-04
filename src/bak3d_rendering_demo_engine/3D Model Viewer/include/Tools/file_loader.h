@@ -4,6 +4,8 @@
 // textures, and generally folders and directories in order to get content to the engine.
 // =====================================================================================
 
+#pragma once
+
 #ifndef FILELOADER_H
 #define FILELOADER_H
 

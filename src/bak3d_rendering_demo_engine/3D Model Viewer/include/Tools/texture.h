@@ -4,6 +4,8 @@
 // within the declared object. It can be used by all objects that load texture files
 // =====================================================================================
 
+#pragma once
+
 #ifndef TEXTURE_H
 #define TEXTURE_H
 

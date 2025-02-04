@@ -3,6 +3,8 @@
 // Mostly the structure of update and draw functions is inspired by the lab.
 // =====================================================================================
 
+#pragma once
+
 #ifndef SCENE_H
 #define SCENE_H
 

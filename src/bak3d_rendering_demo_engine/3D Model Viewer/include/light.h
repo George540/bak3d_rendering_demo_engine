@@ -3,6 +3,8 @@
 // Class made by George Mavroeidis, 2022
 // =====================================================================================
 
+#pragma once
+
 #ifndef LIGHT_H
 #define LIGHT_H
 

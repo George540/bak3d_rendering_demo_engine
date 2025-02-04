@@ -3,6 +3,8 @@
 // Class made by George Mavroeidis, 2022
 // =====================================================================================
 
+#pragma once
+
 #ifndef AXIS_H
 #define AXIS_H
 
