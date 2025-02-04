@@ -14,7 +14,8 @@
 
 #include "globject.h"
 
-class VertexArray : public GLObject {
+class VertexArray : public GLObject
+{
 public:
     VertexArray();
     ~VertexArray();
