@@ -90,7 +90,10 @@
     <ClCompile Include="src\particle_generator.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\texture.cpp">
+    <ClCompile Include="src\Tools\texture.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tools\vertex_array.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,11 +161,17 @@
     <ClInclude Include="include\particle_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Tools\texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\event_manager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\texture.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\vertex_array.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\globject.h">
+      <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

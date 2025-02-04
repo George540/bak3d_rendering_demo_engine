@@ -166,10 +166,11 @@
     <ClCompile Include="src\particle_generator.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\scene.cpp" />
-    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\Tools\file_loader.cpp" />
     <ClCompile Include="src\Tools\glad.c" />
     <ClCompile Include="src\Tools\shader.cpp" />
+    <ClCompile Include="src\Tools\texture.cpp" />
+    <ClCompile Include="src\Tools\vertex_array.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\lib\imgui\include\imconfig.h" />
@@ -192,9 +193,11 @@
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
+    <ClInclude Include="include\Tools\globject.h" />
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="include\Tools\texture.h" />
+    <ClInclude Include="include\Tools\vertex_array.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag" />
