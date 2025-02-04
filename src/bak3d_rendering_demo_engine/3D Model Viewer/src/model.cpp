@@ -189,14 +189,14 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
 	// data to fill
-	vector<vertex> vertices;
+	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	vector<Texture2D> textures;
 
 	// walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
-		vertex vertex{};
+		Vertex vertex{};
 		glm::vec3 vector; // temp glm::vec3 vector for parsing data to Assimp using the vertex payload
 
 		// positions
@@ -292,7 +292,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 			GLuint v1 = face.mIndices[j];
 			GLuint v2 = face.mIndices[(j + 1) % face.mNumIndices];
-			m_unique_edges.insert(edge(v1, v2));
+			m_unique_edges.insert(Edge(v1, v2));
 		}
 	}
 

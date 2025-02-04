@@ -190,12 +190,14 @@
     <ClInclude Include="include\light.h" />
     <ClInclude Include="include\mesh.h" />
     <ClInclude Include="include\model.h" />
+    <ClInclude Include="include\object.h" />
     <ClInclude Include="include\particle_generator.h" />
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\Tools\buffer.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
     <ClInclude Include="include\Tools\globject.h" />
+    <ClInclude Include="include\Tools\mesh_data.h" />
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="include\Tools\texture.h" />

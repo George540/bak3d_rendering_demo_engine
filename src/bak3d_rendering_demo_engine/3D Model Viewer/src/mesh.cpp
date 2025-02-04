@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 
-Mesh::Mesh(vector<vertex> vertices, vector<unsigned> indices, vector<Texture2D> textures) :
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, vector<Texture2D> textures) :
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	textures(std::move(textures))
@@ -78,7 +78,7 @@ void Mesh::set_up_mesh()
     // A great thing about structs is that their memory layout is sequential for all its items.
     // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
     // again translates to 3/2 floats which translates to a byte array.
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
@@ -86,25 +86,25 @@ void Mesh::set_up_mesh()
     // set the vertex attribute pointers
     // vertex Positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), static_cast<void*>(nullptr));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
     // vertex normals
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, normal)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
     // vertex texture coords
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, tex_coords)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coords)));
     // vertex tangent
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, tangent)));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
     // vertex bitangent
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, bitangent)));
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
     // ids
     glEnableVertexAttribArray(5);
-    glVertexAttribIPointer(5, 4, GL_INT, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, m_BoneIDs)));
+    glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_BoneIDs)));
     // weights
     glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*>(offsetof(vertex, m_Weights)));
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_Weights)));
 
 	glBindVertexArray(0);
 }

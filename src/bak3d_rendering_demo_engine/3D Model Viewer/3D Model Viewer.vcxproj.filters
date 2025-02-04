@@ -179,6 +179,12 @@
     <ClInclude Include="include\Tools\buffer.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="include\object.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tools\mesh_data.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag">

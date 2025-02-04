@@ -34,7 +34,7 @@ public:
 
     // model stats
     int m_num_vertices;
-    std::set<edge> m_unique_edges; // with a set, an edge is ensured to be stored only once
+    std::set<Edge> m_unique_edges; // with a set, an edge is ensured to be stored only once
     int m_num_faces;
     int m_num_triangles;
 
