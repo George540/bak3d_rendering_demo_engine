@@ -10,22 +10,14 @@
 
 #include <glad/glad.h> 
 
-#include "camera.h"
-#include "shader.h"
+#include "object.h"
 
-class Axis
+class Axis : public Object
 {
 public:
 	Axis(Camera& camera);
-	~Axis();
+	~Axis() {};
 
 	void draw() const;
-	void delete_vao_vbo() const;
-private:
-	Camera* m_camera;
-	Shader* m_shader;
-	GLuint m_vao{};
-	GLuint m_vbo{};
 };
-
 #endif

@@ -31,7 +31,7 @@ Object::~Object()
 
 void Object::update(float dt)
 {
-	set_model_matrix(glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f), 0.0f);
+	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);
 }
 
 void Object::draw() const

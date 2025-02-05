@@ -1,7 +1,4 @@
 #include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <glm/ext/matrix_transform.hpp>
 
 #include "light.h"
 #include "Tools/primitive_mesh_data.h"
@@ -76,6 +73,5 @@ void Light::draw() const
 
 	m_vao->bind_object();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(CUBE_INDICES_SOLID.size()), GL_UNSIGNED_INT, nullptr);
-	//glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)
 	m_vao->unbind_object();
 }

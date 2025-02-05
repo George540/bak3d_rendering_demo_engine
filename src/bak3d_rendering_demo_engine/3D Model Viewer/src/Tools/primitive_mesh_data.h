@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 
 // Unique cube vertices (8 total)
-std::vector<glm::vec3> CUBE_VERTICES_SOLID =
+static std::vector<glm::vec3> CUBE_VERTICES_SOLID =
 {
     {-0.5f, -0.5f, -0.5f}, // 0
     { 0.5f, -0.5f, -0.5f}, // 1
@@ -18,7 +18,7 @@ std::vector<glm::vec3> CUBE_VERTICES_SOLID =
 };
 
 // Indices for the Element Buffer Object (EBO) - 12 triangles (36 indices)
-std::vector<GLuint> CUBE_INDICES_SOLID =
+static std::vector<GLuint> CUBE_INDICES_SOLID =
 {
     0, 1, 2, 2, 3, 0,  // Front face
     1, 5, 6, 6, 2, 1,  // Right face
@@ -29,7 +29,7 @@ std::vector<GLuint> CUBE_INDICES_SOLID =
 };
 
 // Vector of glm::vec3 for cube vertices
-std::vector<glm::vec3> CUBE_VERTICES_EDGED =
+static std::vector<glm::vec3> CUBE_VERTICES_EDGED =
 {
     {-0.5f, -0.5f, -0.5f},  // 0
     { 0.5f, -0.5f, -0.5f},  // 1
@@ -42,7 +42,7 @@ std::vector<glm::vec3> CUBE_VERTICES_EDGED =
 };
 
 // Vector of GLuint for cube indices (edges)
-std::vector<GLuint> CUBE_INDICES_EDGED =
+static std::vector<GLuint> CUBE_INDICES_EDGED =
 {
     0, 1,  1, 2,  2, 3,  3, 0,  // Bottom face edges
     4, 5,  5, 6,  6, 7,  7, 4,  // Top face edges
@@ -50,14 +50,39 @@ std::vector<GLuint> CUBE_INDICES_EDGED =
 };
 
 // Unique vertices for the line (only position)
-std::vector<glm::vec3> LINE_VERTICES =
+static std::vector<glm::vec3> LINE_VERTICES =
 {
     {-1.0f, 0.0f, 0.0f}, // 0: Start point
     {1.0f, 0.0f, 0.0f}   // 1: End point
 };
 
 // Indices for the Element Buffer Object (EBO)
-std::vector<GLuint> LINE_INDICES =
+static std::vector<GLuint> LINE_INDICES =
 {
     0, 1  // Single line connecting two points
+};
+
+struct AxisVertex
+{
+    glm::vec3 position;
+    glm::vec3 color;
+};
+
+static std::vector<AxisVertex> AXIS_VERTICES =
+{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // X red line
+    {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+
+    {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}, // Y green line
+    {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+
+    {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}, // Z blue line
+    {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}
+};
+
+static std::vector<GLuint> AXIS_INDICES =
+{
+    0, 1,  // X-axis (Red)
+    2, 3,  // Y-axis (Green)
+    4, 5   // Z-axis (Blue)
 };
