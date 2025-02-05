@@ -11,70 +11,29 @@
 
 #include <glad/glad.h>
 
+#include "transform.h"
 #include "camera.h"
 #include "shader.h"
 #include "buffer.h"
 #include "vertex_array.h"
 
-class Object
+class Object : public Transform
 {
+protected:
+    VertexArray* m_vao;
+    VertexBuffer* m_vbo;
+    ElementBuffer* m_ebo;
+
+    Shader* m_shader;
+    Camera* m_camera;
 public:
     Object(Camera& camera);
     Object(Camera& camera, const string shader_name);
     virtual ~Object();
 
-    virtual void initialize();
+    virtual void update(float dt) override;
     virtual void draw() const;
-    virtual void delete_globjects() const;
-protected:
-    VertexArray* m_vao;
-    VertexBuffer* m_vbo;
-
-    Shader* m_shader;
-    Camera* m_camera;
-};
-
-class IndexedObject : Object
-{
-public:
-    IndexedObject(Camera& camera);
-    IndexedObject(Camera& camera, const string shader_name);
-    ~IndexedObject();
-
-    virtual void initialize() override;
-    void draw() const override;
-    void delete_globjects() const override;
-protected:
-    ElementBuffer* m_ebo;
-};
-
-class InstancedObject : Object
-{
-public:
-    InstancedObject(Camera& camera);
-    InstancedObject(Camera& camera, const string shader_name);
-    ~InstancedObject();
-
-    virtual void initialize() override;
-    void draw() const override;
-    void delete_globjects() const override;
-protected:
-    InstanceBuffer* m_ibo;
-};
-
-class OptimizedObject : Object
-{
-public:
-    OptimizedObject(Camera& camera);
-    OptimizedObject(Camera& camera, const string shader_name);
-    ~OptimizedObject();
-
-    virtual void initialize() override;
-    void draw() const override;
-    void delete_globjects() const override;
-protected:
-    ElementBuffer* m_ebo;
-    InstanceBuffer* m_ibo;
+    void delete_globjects() const;
 };
 
 #endif

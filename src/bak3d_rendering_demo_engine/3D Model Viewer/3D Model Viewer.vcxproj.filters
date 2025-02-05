@@ -191,6 +191,9 @@
     <ClInclude Include="include\Tools\transform.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="src\Tools\primitive_mesh_data.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag">

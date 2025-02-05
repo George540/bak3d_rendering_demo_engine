@@ -4,18 +4,23 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "light.h"
+#include "Tools/primitive_mesh_data.h"
 
-#include "shader.h"
 #include "event_manager.h"
 #include "renderer.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
-	m_position(position),
-	m_scaling(scaling),
-	m_camera(&camera)
+	Object(camera, "LightShader")
 {
-	m_vao = NULL;
-	m_vbo = NULL;
+	m_position = position;
+	m_scaling = scaling;
+	m_vao->bind_object();
+
+	m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_SOLID.size(), &CUBE_VERTICES_SOLID[0]);
+	m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_SOLID.size(), &CUBE_INDICES_SOLID[0]);
+
+	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
+	m_vao->unbind_object();
 
 	m_properties.position = m_position;
 	m_properties.diffuse = glm::vec3(1.0f);
@@ -30,19 +35,7 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
 	Renderer::light_vertical_rotation = 135.0f;
 	Renderer::light_origin_distance = m_distance_offset;
 
-
-	build_vertex_buffer();
-
-	m_shader = new Shader(
-		std::filesystem::absolute("shaders/LightShader.vert").string().c_str(),
-		std::filesystem::absolute("shaders/LightShader.frag").string().c_str());
 	std::cout << "Light created..." << std::endl;
-}
-
-Light::~Light()
-{
-	delete m_shader;
-	delete m_camera;
 }
 
 void Light::update(float dt)
@@ -70,95 +63,19 @@ void Light::update(float dt)
 	}
 	m_position *= m_distance_offset;
 	m_properties.position = m_position;
+
+	set_model_matrix(m_position, get_scaling(), get_rotation(), 0.0f);
 }
 
 
 void Light::draw() const
 {
-	m_shader->use();
-
-	// MVP Update
-	m_shader->set_mat4("projection", m_camera->get_projection_matrix());
-	m_shader->set_mat4("view", m_camera->get_view_matrix());
-	auto model = glm::mat4(1.0f);
-	model = translate(model, m_position) * scale(model, m_scaling);
-	m_shader->set_mat4("model", model);
+	Object::draw();
 
 	m_shader->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
 
-	// Draw the triangles !
-	glBindVertexArray(m_vao);
-	glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)
-	glBindVertexArray(0);
-}
-
-void Light::build_vertex_buffer()
-{
-	//cube model, since it's just a cube, no need to load model
-	constexpr float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-	};
-
-	// Create a vertex array
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
-
-	// Upload Vertex Buffer to the GPU, keep a reference to it (mVertexBufferID)
-	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(0);
-
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBindVertexArray(0);
-}
-
-void Light::delete_vao_vbo() const
-{
-	glDeleteVertexArrays(1, &m_vao);
-	glDeleteBuffers(1, &m_vbo);
+	m_vao->bind_object();
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(CUBE_INDICES_SOLID.size()), GL_UNSIGNED_INT, nullptr);
+	//glDrawArrays(GL_TRIANGLES, 0, 36); // 36 vertices: 3 * 2 * 6 (3 per triangle, 2 triangles per face, 6 faces)
+	m_vao->unbind_object();
 }

@@ -5,9 +5,6 @@
 
 #pragma once
 
-#ifndef GLOBJECT_H
-#define GLOBJECT_H
-
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -70,5 +67,3 @@ struct Material
     bool use_specular_texture;
     bool use_normal_texture;
 };
-
-#endif

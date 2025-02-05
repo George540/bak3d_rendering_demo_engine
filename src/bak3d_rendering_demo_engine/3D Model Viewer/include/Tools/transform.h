@@ -18,7 +18,7 @@ class Transform
 {
 protected:
     glm::vec3 m_position = glm::vec3(0.0f);
-    glm::vec3 m_euler_rotation = glm::vec3(0.0f); //In degrees
+    glm::vec3 m_euler_rotation = glm::vec3(0.0f, 1.0f, 0.0f); // up vector
     glm::vec3 m_scaling = glm::vec3(1.0f);
 
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
@@ -36,10 +36,14 @@ public:
     inline void set_scaling(const glm::vec3& scaling) { m_scaling = scaling; }
 
     inline glm::mat4 get_model_matrix() const { return m_model_matrix; }
-    inline void set_model_matrix(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scaling)
+    inline void set_model_matrix(const glm::vec3& position, const glm::vec3& scaling, const glm::vec3& rotation_axis, const float rotation_angle_degrees)
     { 
-        m_model_matrix = glm::translate(m_model_matrix, m_position) * glm::rotate(m_model_matrix, 0.0f, rotation) * glm::scale(m_model_matrix, m_scaling);
-    };
+        m_model_matrix = glm::mat4(1.0f);
+        m_model_matrix =
+            glm::translate(m_model_matrix, m_position) *
+            glm::rotate(m_model_matrix, glm::radians(rotation_angle_degrees), rotation_axis) *
+            glm::scale(m_model_matrix, m_scaling);
+    }
 
     virtual void update(float dt) = 0;
 };

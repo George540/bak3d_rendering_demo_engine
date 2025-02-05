@@ -204,6 +204,7 @@
     <ClInclude Include="include\Tools\texture.h" />
     <ClInclude Include="include\Tools\transform.h" />
     <ClInclude Include="include\Tools\vertex_array.h" />
+    <ClInclude Include="src\Tools\primitive_mesh_data.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag" />

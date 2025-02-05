@@ -8,16 +8,11 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <vector>
-#include <glm/fwd.hpp>
-#include <glm/vec3.hpp>
-#include <glm/glm.hpp>
-
-#include "shader.h"
-#include "camera.h"
+#include "object.h"
 
 // Payload struct for light properties
-struct light {
+struct light
+{
 	glm::vec3 position;
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
@@ -25,36 +20,24 @@ struct light {
 	float intensity;
 };
 
-class Light
+class Light : public Object
 {
 	// ORIENTATION
-	glm::vec3 m_position;
-	glm::vec3 m_scaling;
 	float m_horizontal_angle;
 	float m_vertical_angle;
 	float m_distance_offset;
-
-	// MESH
-	unsigned int m_vao;
-	unsigned int m_vbo;
-	std::vector<glm::vec3> mVertexPositions;
-
-	// EXTERNAL
-	Shader* m_shader;
-	Camera* m_camera;
 
 	// PROPERTIES
 	light m_properties{};
 
 public:
 	Light(glm::vec3 position, glm::vec3 scaling, Camera& camera);
-	~Light();
+	~Light() {};
 
-	void update(float dt);
-	void draw() const;
+	void update(float dt) override;
+	void draw() const override;
+
 	[[nodiscard]] light get_light_properties() const { return m_properties; }
-	void set_position(const glm::vec3& position) { m_position = position; }
-	void set_scaling(const glm::vec3& scaling) { m_scaling = scaling; }
 
 	[[nodiscard]] float get_horizontal_angle() const { return m_horizontal_angle; }
 	void set_horizontal_angle(const float angle) { m_horizontal_angle = angle; }
@@ -70,9 +53,6 @@ public:
 
 	[[nodiscard]] glm::vec3 get_position() const { return m_position; }
 	[[nodiscard]] glm::vec3 get_scaling() const { return m_scaling; }
-
-	void build_vertex_buffer();
-	void delete_vao_vbo() const;
 };
 
 #endif

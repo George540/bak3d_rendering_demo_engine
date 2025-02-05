@@ -14,64 +14,24 @@ Object::Object(Camera& camera, const string shader_name)
 		std::filesystem::absolute("shaders/" + shader_name + ".vert").string().c_str(),
 		std::filesystem::absolute("shaders/" + shader_name + ".frag").string().c_str());
 
-	//cube model, since it's just a cube, no need to load model
-	constexpr float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-	};
-
 	m_vao = new VertexArray();
-
-	m_vbo = new VertexBuffer(3 * sizeof(float), vertices);
+	m_vbo = nullptr; // properly assign in subclasses
+	m_ebo = nullptr;
 }
 
-void Object::initialize()
+Object::~Object()
 {
-	m_vao->bind_object();
+	delete m_vao;
+	delete m_vbo;
+	delete m_ebo;
 
-	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	delete m_shader;
+	delete m_camera;
+}
 
-	m_vbo->bind_object();
-	m_vao->unbind_object();
+void Object::update(float dt)
+{
+	set_model_matrix(glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f), 0.0f);
 }
 
 void Object::draw() const
@@ -80,11 +40,7 @@ void Object::draw() const
 
 	m_shader->set_mat4("projection", m_camera->get_projection_matrix());
 	m_shader->set_mat4("view", m_camera->get_view_matrix());
-	
-	// DON'T FORGET model matrix
-	// Follow up with other uniforms
-	// binding, drawing and unbinding
-	// TODO: add translation, rotation and scaling based on Transform class
+	m_shader->set_mat4("model", m_model_matrix);
 }
 
 void Object::delete_globjects() const
@@ -92,3 +48,15 @@ void Object::delete_globjects() const
 	delete m_vao;
 	delete m_vbo;
 }
+
+/*
+IndexedObject::IndexedObject(Camera& camera) : IndexedObject(camera, "LineShader")
+{
+
+}
+
+IndexedObject::IndexedObject(Camera& camera, const string shader_name) : Object(camera, shader_name)
+{
+	m_ebo = new ElementBuffer()
+}
+*/
