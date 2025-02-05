@@ -202,6 +202,7 @@
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="include\Tools\texture.h" />
+    <ClInclude Include="include\Tools\transform.h" />
     <ClInclude Include="include\Tools\vertex_array.h" />
   </ItemGroup>
   <ItemGroup>

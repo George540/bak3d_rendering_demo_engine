@@ -23,6 +23,7 @@ public:
     Object(Camera& camera, const string shader_name);
     virtual ~Object();
 
+    virtual void initialize();
     virtual void draw() const;
     virtual void delete_globjects() const;
 protected:
@@ -40,6 +41,7 @@ public:
     IndexedObject(Camera& camera, const string shader_name);
     ~IndexedObject();
 
+    virtual void initialize() override;
     void draw() const override;
     void delete_globjects() const override;
 protected:
@@ -53,6 +55,7 @@ public:
     InstancedObject(Camera& camera, const string shader_name);
     ~InstancedObject();
 
+    virtual void initialize() override;
     void draw() const override;
     void delete_globjects() const override;
 protected:
@@ -66,6 +69,7 @@ public:
     OptimizedObject(Camera& camera, const string shader_name);
     ~OptimizedObject();
 
+    virtual void initialize() override;
     void draw() const override;
     void delete_globjects() const override;
 protected:

@@ -60,9 +60,14 @@ Object::Object(Camera& camera, const string shader_name)
 	};
 
 	m_vao = new VertexArray();
+
+	m_vbo = new VertexBuffer(3 * sizeof(float), vertices);
+}
+
+void Object::initialize()
+{
 	m_vao->bind_object();
 
-	m_vbo = new VertexBuffer(sizeof(vertices), vertices);
 	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
 	m_vbo->bind_object();
