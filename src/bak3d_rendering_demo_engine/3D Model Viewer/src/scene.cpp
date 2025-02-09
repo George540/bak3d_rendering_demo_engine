@@ -184,6 +184,5 @@ void Scene::draw() const
 void Scene::delete_arrays_and_buffers() const
 {
 	m_model->delete_mesh_vaos();
-	m_grid->delete_vao_vbo();
 	m_particle_system->delete_vao_vbo();
 }

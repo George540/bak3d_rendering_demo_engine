@@ -10,25 +10,19 @@
 
 #include <glad/glad.h>
 
-#include "shader.h"
-#include "camera.h"
+#include "object.h"
 
-class Grid
+class Grid : public Object
 {
 public:
 	Grid(Camera& cam);
 	~Grid() = default;
 
 	void draw() const;
-	void delete_vao_vbo() const;
 private:
-	GLuint m_vao{};
-	GLuint m_vbo{};
-	Shader* m_shader;
-	Camera* m_camera;
-	int number_of_elements;
-	int number_of_slices;
-	float grid_size;
+	int m_number_of_elements;
+	int m_number_of_slices;
+	float m_grid_size;
 };
 
 #endif
