@@ -1,5 +1,5 @@
 // =====================================================================================
-// Basic axis class that draws the XZ plane grid
+// Basic grid class that draws the XZ plane grid with a certain size
 // Class made by George Mavroeidis, 2022
 // =====================================================================================
 
@@ -15,10 +15,10 @@
 class Grid : public Object
 {
 public:
-	Grid(Camera& cam);
+	Grid(Camera& cam, Shader* shader);
 	~Grid() = default;
 
-	void draw() const;
+	void draw() const override;
 private:
 	int m_number_of_elements;
 	int m_number_of_slices;

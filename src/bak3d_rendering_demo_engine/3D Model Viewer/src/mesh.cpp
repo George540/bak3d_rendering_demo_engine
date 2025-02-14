@@ -3,30 +3,44 @@
 #include <iostream>
 #include <utility>
 
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, vector<Texture2D> textures) :
-	vertices(std::move(vertices)),
-	indices(std::move(indices)),
-	textures(std::move(textures))
+Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures) :
+    Object(cam),
+	m_vertices(std::move(vertices)),
+	m_indices(std::move(indices)),
+	m_textures(std::move(textures))
 {
-	// now that we have all the required data, set the vertex buffers and its attribute pointers.
-	set_up_mesh();
+    // create buffers/arrays
+    m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), &m_vertices[0]);
+    m_ebo = new ElementBuffer(sizeof(GLuint) * m_indices.size(), &m_indices[0]);
+
+    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
+    m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
+    m_vao->set_attrib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coords)));
+    m_vao->set_attrib_pointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
+    m_vao->set_attrib_pointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
+    m_vao->set_attrib_pointer(5, 4, GL_INT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_BoneIDs)));
+    m_vao->set_attrib_pointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_Weights)));
+
+    m_vao->unbind_object();
 }
 
-void Mesh::draw(const Shader& shader) const
+void Mesh::draw() const
 {
+    Object::draw();
+
     // bind appropriate textures
     unsigned int diffuse_nr = 1;
     unsigned int specular_nr = 1;
     unsigned int normal_nr = 1;
     unsigned int height_nr = 1;
 
-    for (auto i = 0; i < textures.size(); ++i)
+    for (auto i = 0; i < m_textures.size(); ++i)
     {
         // active proper texture unit before binding
         glActiveTexture(GL_TEXTURE0 + i);
 
         // retrieve texture number (the N in diffuse_textureN)
-        auto type = textures[i].get_texture_type();
+        auto type = m_textures[i].get_texture_type();
         string number;
         string name;
         if (type == aiTextureType_DIFFUSE)
@@ -51,67 +65,16 @@ void Mesh::draw(const Shader& shader) const
         }
 
         // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader.get_id(), (name + number).c_str()), i);
+        m_shader->set_int((name + number).c_str(), i);
         // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].get_id());
+        glBindTexture(GL_TEXTURE_2D, m_textures[i].get_id());
     }
 
     // draw mesh
-    glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    m_vao->bind_object();
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
+    m_vao->unbind_object();
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
-}
-
-void Mesh::set_up_mesh()
-{
-    // create buffers/arrays
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &m_vbo);
-    glGenBuffers(1, &m_ebo);
-
-    glBindVertexArray(m_vao);
-    // load data into vertex buffers
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    // A great thing about structs is that their memory layout is sequential for all its items.
-    // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-    // again translates to 3/2 floats which translates to a byte array.
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-    // set the vertex attribute pointers
-    // vertex Positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
-    // vertex normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
-    // vertex texture coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coords)));
-    // vertex tangent
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
-    // vertex bitangent
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bitangent)));
-    // ids
-    glEnableVertexAttribArray(5);
-    glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_BoneIDs)));
-    // weights
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_Weights)));
-
-	glBindVertexArray(0);
-}
-
-void Mesh::delete_vao_vbo() const
-{
-    glDeleteVertexArrays(1, &m_vao);
-    glDeleteBuffers(1, &m_vbo);
-    glDeleteBuffers(1, &m_ebo);
 }

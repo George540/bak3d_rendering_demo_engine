@@ -2,20 +2,21 @@
 
 #include "object.h"
 
-Object::Object(Camera& camera) : Object(camera, "LineShader")
+Object::Object(Camera& camera) : Object(camera, nullptr)
 {
 	
 }
 
-Object::Object(Camera& camera, const string shader_name)
+Object::Object(Camera& camera, Shader* shader)
 {
 	m_camera = &camera;
-	m_shader = new Shader(
-		std::filesystem::absolute("shaders/" + shader_name + ".vert").string().c_str(),
-		std::filesystem::absolute("shaders/" + shader_name + ".frag").string().c_str());
+	m_shader = shader;
 
 	m_vao = new VertexArray();
-	m_vbo = nullptr; // properly assign in subclasses
+	m_vao->bind_object();
+
+	// Will be handled by derived class
+	m_vbo = nullptr;
 	m_ebo = nullptr;
 }
 
@@ -25,7 +26,10 @@ Object::~Object()
 	delete m_vbo;
 	delete m_ebo;
 
-	delete m_shader;
+	if (m_shader)
+	{
+		delete m_shader;
+	}
 	delete m_camera;
 }
 
@@ -36,6 +40,8 @@ void Object::update(float dt)
 
 void Object::draw() const
 {
+	if (!m_shader) return;
+
 	m_shader->use();
 
 	m_shader->set_mat4("projection", m_camera->get_projection_matrix());

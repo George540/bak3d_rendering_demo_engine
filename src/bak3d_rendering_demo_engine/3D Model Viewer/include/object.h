@@ -28,7 +28,7 @@ protected:
     Camera* m_camera;
 public:
     Object(Camera& camera);
-    Object(Camera& camera, const string shader_name);
+    Object(Camera& camera, Shader* shader);
     virtual ~Object();
 
     virtual void update(float dt) override;

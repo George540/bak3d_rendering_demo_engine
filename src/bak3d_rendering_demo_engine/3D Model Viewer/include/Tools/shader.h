@@ -16,18 +16,21 @@ using namespace std;
 
 class Shader
 {
-	unsigned int id;
-	unsigned int index;
+	GLuint m_id;
+	GLuint m_index;
+	std::string m_name;
 	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
 	// Constructor
-	Shader(const char* vertex_shader_source, const char* fragment_shader_source);
+	Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name);
 	~Shader();
 
 	// Core functions
-	[[nodiscard]] unsigned int get_id() const { return id; }
-	[[nodiscard]] unsigned int get_index() const { return index; }
-	void set_index(int i) { index = i; }
+	[[nodiscard]] GLuint get_id() const { return m_id; }
+	[[nodiscard]] GLuint get_index() const { return m_index; }
+	[[nodiscard]] std::string get_name() const { return m_name; }
+	void set_index(int i) { m_index = i; }
+	void set_name(std::string name) { m_name = name; }
 	void use() const;
 	void unuse() const;
 

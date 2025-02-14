@@ -11,39 +11,16 @@
 #include "event_manager.h"
 #include "renderer.h"
 
-Model::Model(string const& path, Camera& cam, Light& light, int index) : m_camera(&cam), m_light(&light), m_combo_index(index)
+Model::Model(string const& path, Shader* model_shader, Shader* dissect_shader, Camera& cam, Light& light, int index)
+	: m_camera(&cam), m_light(&light), m_combo_index(index)
 {
-	auto shader = new Shader(std::filesystem::absolute("shaders/ModelShader.vert").string().c_str(),
-							 std::filesystem::absolute("shaders/ModelShader.frag").string().c_str());
-	shader->set_index(0);
-	m_shaders.push_back(shader);
-	shader = nullptr;
-	shader = new Shader(
-		std::filesystem::absolute("shaders/DissectShader.vert").string().c_str(),
-		std::filesystem::absolute("shaders/DissectShader.frag").string().c_str());
-	shader->set_index(1);
-	m_shaders.push_back(shader);
+	m_toggle_shaders[0] = model_shader;
+	m_toggle_shaders[1] = dissect_shader;
 	load_model(path);
-
-	std::cout << "Number of shaders compiled: " << m_shaders.size() << std::endl;
-
-	if (m_shaders.empty())
-	{
-		throw std::runtime_error("ERROR::SHADER_COMPILATION_ERROR: No shaders loaded!");
-	}
-
-	set_current_shader(0);
 }
 
 Model::~Model()
 {
-	// Delete and free shaders in memory
-	for (const auto s : m_shaders)
-	{
-		delete s;
-	}
-	m_shaders.clear();
-
 	// Free texture data
 	textures_loaded.clear();
 	cout << "Texture data of model " << m_name << " have been cleared" << endl;
@@ -52,40 +29,34 @@ Model::~Model()
 	m_camera = nullptr;
 	m_light = nullptr;
 	
-	// Delete all mesh VAO data
-	delete_mesh_vaos();
 	meshes.clear();
 	cout << "Model " << m_name <<" mesh data have been safely deleted" << endl;
 }
 
-void Model::draw() const
+void Model::draw()
 {
 	for (auto& mesh : meshes)
 	{
-		m_current_shader->use();
+		if (m_toggle_shaders[m_current_shader_index] != mesh->get_current_shader())
+		{
+			mesh->set_current_shader(m_toggle_shaders[m_current_shader_index]);
+		}
 
-		// Set MVP matrix
-		glm::mat4 model = glm::mat4(1.0f);
-		m_current_shader->set_mat4("projection", m_camera->get_projection_matrix());
-		m_current_shader->set_mat4("view", m_camera->get_view_matrix());
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-		m_current_shader->set_mat4("model", model);
-
-		if (m_current_shader->get_index() == 0
+		if (m_current_shader_index == 0
 			&& Renderer::is_full_render_selected
 			&& !Renderer::is_diffuse_render_selected
 			&& !Renderer::is_specular_selected
 			&& !Renderer::is_normal_map_selected)
 		{
 			update_light_properties();
-			update_material_properties(mesh);
+			update_material_properties();
 		}
 		else
 		{
 			update_breakdown_shader();
 		}
 
-		mesh.draw(*m_current_shader);
+		mesh->draw();
 	}
 }
 
@@ -93,30 +64,34 @@ void Model::update_light_properties() const
 {
 	const auto light = m_light->get_light_properties();
 
+	auto current_shader = m_toggle_shaders[0];
+
 	// VERTEX
-	m_current_shader->set_vec3("viewPos", m_camera->get_camera_position());
-	m_current_shader->set_vec3("lightPos", light.position);
+	current_shader->set_vec3("viewPos", m_camera->get_camera_position());
+	current_shader->set_vec3("lightPos", light.position);
 
 	// FRAGMENT
-	m_current_shader->set_vec3("light.position", light.position);
-	m_current_shader->set_vec3("light.diffuse", light.diffuse);
-	m_current_shader->set_vec3("light.specular", light.specular);
-	m_current_shader->set_vec3("light.ambient", light.ambient);
-	m_current_shader->set_float("light.intensity", light.intensity);
+	current_shader->set_vec3("light.position", light.position);
+	current_shader->set_vec3("light.diffuse", light.diffuse);
+	current_shader->set_vec3("light.specular", light.specular);
+	current_shader->set_vec3("light.ambient", light.ambient);
+	current_shader->set_float("light.intensity", light.intensity);
 }
 
-void Model::update_material_properties(const Mesh& mesh) const
+void Model::update_material_properties() const
 {
+	auto current_shader = m_toggle_shaders[0];
+
 	// FRAGMENT MATERIAL
-	m_current_shader->set_int("material.diffuse", 0);
-	m_current_shader->set_int("material.specular", 1);
-	m_current_shader->set_int("material.normal", 2);
-	m_current_shader->set_float("material.ambient", 0.5f);
-	m_current_shader->set_float("material.shininess", Renderer::shininess);
-	m_current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
-	m_current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
-	m_current_shader->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
-	m_current_shader->set_bool("material.gamma", Renderer::is_gamma_enabled);
+	current_shader->set_int("material.diffuse", 0);
+	current_shader->set_int("material.specular", 1);
+	current_shader->set_int("material.normal", 2);
+	current_shader->set_float("material.ambient", 0.5f);
+	current_shader->set_float("material.shininess", Renderer::shininess);
+	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
+	current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
+	current_shader->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
+	current_shader->set_bool("material.gamma", Renderer::is_gamma_enabled);
 }
 
 void Model::update_breakdown_shader() const
@@ -138,7 +113,7 @@ void Model::update_breakdown_shader() const
 	{
 		texture_id = 0;
 	}
-	m_current_shader->set_int("textureSampler", texture_id);
+	m_toggle_shaders[m_current_shader_index]->set_int("textureSampler", texture_id);
 }
 
 void Model::load_model(string const& path)
@@ -176,7 +151,9 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		m_num_vertices += mesh->mNumVertices;
 		m_num_faces += mesh->mNumFaces;
 
-		meshes.push_back(process_mesh(mesh, scene));
+		auto mesh_object = process_mesh(mesh, scene);
+		mesh_object->set_current_shader(m_toggle_shaders[0]);
+		meshes.push_back(mesh_object);
 	}
 
 	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
@@ -186,7 +163,7 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 	}
 }
 
-Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
+Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
 	// data to fill
 	vector<Vertex> vertices;
@@ -319,7 +296,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
-	return Mesh(vertices, indices, textures);
+	return new Mesh(*m_camera, vertices, indices, textures);
 }
 
 vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
@@ -349,12 +326,4 @@ vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType t
 		}
 	}
 	return textures;
-}
-
-void Model::delete_mesh_vaos() const
-{
-	for (auto& mesh : meshes)
-	{
-		mesh.delete_vao_vbo();
-	}
 }

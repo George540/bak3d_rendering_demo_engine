@@ -15,9 +15,9 @@
 class Axis : public Object
 {
 public:
-	Axis(Camera& camera);
-	~Axis() {};
+	Axis(Camera& camera, Shader* shader);
+	~Axis() = default;
 
-	void draw() const;
+	void draw() const override;
 };
 #endif

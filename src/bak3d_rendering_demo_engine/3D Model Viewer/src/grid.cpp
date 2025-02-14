@@ -6,7 +6,7 @@
 
 #include "grid.h"
 
-Grid::Grid(Camera& cam) : Object(cam, "GridShader"), m_number_of_slices(40), m_grid_size(20.0f)
+Grid::Grid(Camera& cam, Shader* shader) : Object(cam, shader), m_number_of_slices(40), m_grid_size(20.0f)
 {
 	// GRID LINE SETUP
 	// Grid setup used indices and EBOs for proper identification of each line
@@ -35,8 +35,6 @@ Grid::Grid(Camera& cam) : Object(cam, "GridShader"), m_number_of_slices(40), m_g
 			indices.emplace_back(row2 + i + 1, row2 + i, row2 + i, row1 + i);
 		}
 	}
-
-	m_vao->bind_object();
 
 	m_vbo = new VertexBuffer(sizeof(glm::vec3) * vertices.size(), &vertices[0]);
 	m_ebo = new ElementBuffer(sizeof(glm::uvec4) * indices.size(), &indices[0]);

@@ -285,7 +285,7 @@ void Renderer::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_shader(0);
+					current_model->set_current_toggle_shader(0);
 				}
 
 				cout << "Full Render View" << endl;
@@ -303,7 +303,7 @@ void Renderer::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_shader(1);
+					current_model->set_current_toggle_shader(1);
 				}
 				cout << "Albedo Preview" << endl;
 			}
@@ -320,7 +320,7 @@ void Renderer::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_shader(1);
+					current_model->set_current_toggle_shader(1);
 				}
 				cout << "Specular Map Preview" << endl;
 			}
@@ -337,7 +337,7 @@ void Renderer::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_shader(1);
+					current_model->set_current_toggle_shader(1);
 				}
 				cout << "Normal Map Preview" << endl;
 			}

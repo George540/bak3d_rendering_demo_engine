@@ -16,28 +16,26 @@
 #include <vector>
 
 #include "mesh_data.h"
+#include "object.h"
 #include "shader.h"
 #include "texture.h"
 
-class Mesh
+class Mesh : public Object
 {
 public:
     // mesh Data
     Material m_material{};
-    vector<Vertex> vertices;
-    vector<unsigned int> indices;
-    vector<Texture2D> textures;
+    vector<Vertex> m_vertices;
+    vector<GLuint> m_indices;
+    vector<Texture2D> m_textures;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture2D> textures);
-    void draw(const Shader& shader) const; // render the mesh
-    void delete_vao_vbo() const;
-private:
-    // render data 
-    GLuint m_vao{};
-    GLuint m_vbo{};
-	GLuint m_ebo{};
-    void set_up_mesh();
+    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures);
+    ~Mesh() = default;
+    void draw() const override;
+
+    inline Shader* get_current_shader() const { return m_shader; }
+    inline void set_current_shader(Shader* shader) { m_shader = shader; }
 };
 
 #endif

@@ -31,7 +31,7 @@ class Light : public Object
 	light m_properties{};
 
 public:
-	Light(glm::vec3 position, glm::vec3 scaling, Camera& camera);
+	Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader* shader);
 	~Light() {};
 
 	void update(float dt) override;

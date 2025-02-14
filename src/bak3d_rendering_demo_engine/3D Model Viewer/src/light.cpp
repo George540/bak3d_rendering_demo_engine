@@ -6,12 +6,11 @@
 #include "event_manager.h"
 #include "renderer.h"
 
-Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera) :
-	Object(camera, "LightShader")
+Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader* shader) :
+	Object(camera, shader)
 {
 	m_position = position;
 	m_scaling = scaling;
-	m_vao->bind_object();
 
 	m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_SOLID.size(), &CUBE_VERTICES_SOLID[0]);
 	m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_SOLID.size(), &CUBE_INDICES_SOLID[0]);
