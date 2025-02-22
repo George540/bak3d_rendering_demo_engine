@@ -2,7 +2,7 @@
 //
 // Framework created by: George Mavroeidis
 // 
-// Date created on on 09/08/2022.
+// Date created on 09/08/2022.
 // 
 // All dependencies and libraries used listed on README.md and Project Report
 

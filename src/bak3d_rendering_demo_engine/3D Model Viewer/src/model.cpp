@@ -64,7 +64,7 @@ void Model::update_light_properties() const
 {
 	const auto light = m_light->get_light_properties();
 
-	auto current_shader = m_toggle_shaders[0];
+	auto current_shader = m_toggle_shaders[m_current_shader_index];
 
 	// VERTEX
 	current_shader->set_vec3("viewPos", m_camera->get_camera_position());
@@ -80,7 +80,7 @@ void Model::update_light_properties() const
 
 void Model::update_material_properties() const
 {
-	auto current_shader = m_toggle_shaders[0];
+	auto current_shader = m_toggle_shaders[m_current_shader_index];
 
 	// FRAGMENT MATERIAL
 	current_shader->set_int("material.diffuse", 0);

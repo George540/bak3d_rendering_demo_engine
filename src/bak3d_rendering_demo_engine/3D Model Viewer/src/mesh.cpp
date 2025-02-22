@@ -24,6 +24,17 @@ Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<
     m_vao->unbind_object();
 }
 
+Mesh::~Mesh()
+{
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    vector<GLuint> texture_ids(m_textures.size());
+    for (int i = 0; i < m_textures.size(); ++i)
+    {
+        texture_ids[i] = m_textures[i].get_id();
+    }
+    glDeleteTextures(static_cast<GLsizei>(m_textures.size()), texture_ids.data());
+}
+
 void Mesh::draw() const
 {
     Object::draw();
@@ -46,28 +57,25 @@ void Mesh::draw() const
         if (type == aiTextureType_DIFFUSE)
         {
             number = std::to_string(diffuse_nr++);
-            name = "texture_diffuse";
+            name = "diffuse";
         }
         else if (type == aiTextureType_SPECULAR)
         {
             number = std::to_string(specular_nr++);
-            name = "texture_specular";
+            name = "specular";
         }
         else if (type == aiTextureType_NORMALS)
         {
             number = std::to_string(normal_nr++);
-            name = "texture_normal";
+            name = "normal";
         }
         else if (type == aiTextureType_HEIGHT)
         {
             number = std::to_string(height_nr++);
-            name = "texture_height";
+            name = "height";
         }
-
-        // now set the sampler to the correct texture unit
-        m_shader->set_int((name + number).c_str(), i);
-        // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, m_textures[i].get_id());
+        
+        m_textures[i].bind();
     }
 
     // draw mesh
@@ -76,5 +84,10 @@ void Mesh::draw() const
     m_vao->unbind_object();
 
     // always good practice to set everything back to defaults once configured.
+    for (auto i = 0; i < m_textures.size(); ++i)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        m_textures[i].unbind();
+    }
     glActiveTexture(GL_TEXTURE0);
 }

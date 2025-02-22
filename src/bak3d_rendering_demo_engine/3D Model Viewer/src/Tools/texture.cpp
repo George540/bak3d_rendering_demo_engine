@@ -72,9 +72,20 @@ Texture2D::Texture2D(const std::string& path, aiTextureType type, bool verbose)
     }
 }
 
+Texture2D::~Texture2D()
+{
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    //glDeleteTextures(1, &m_ID);
+}
+
 void Texture2D::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, m_ID);
+}
+
+void Texture2D::unbind() const
+{
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 bool Texture2D::operator==(const Texture2D& other)

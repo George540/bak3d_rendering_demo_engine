@@ -31,7 +31,7 @@ public:
 
     // constructor
     Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures);
-    ~Mesh() = default;
+    ~Mesh();
     void draw() const override;
 
     inline Shader* get_current_shader() const { return m_shader; }
