@@ -20,6 +20,7 @@ enum FileType
 {
 	png,
 	jpg,
+	jpeg,
 	vs,
 	vert,
 	fs,
@@ -41,6 +42,7 @@ public:
 	static std::vector<std::string> get_directories(const std::filesystem::path& path);
 	static std::vector<std::string> get_files_by_type(const std::filesystem::path& path, FileType type);
 	static std::list<std::pair<std::string, std::string>> get_files_by_type_with_path(const std::filesystem::path& path, FileType type);
+	static std::list<std::pair<std::string, std::string>> get_files_by_types_with_path(const std::filesystem::path& path, const std::vector<FileType>& types);
 	static std::string get_filename_from_path(const std::filesystem::path& path);
 	static std::string get_filename_from_path(const std::string path);
 	static std::string get_name_from_filename(const std::string filename);

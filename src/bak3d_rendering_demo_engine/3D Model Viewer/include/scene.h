@@ -36,12 +36,8 @@ public:
 	void process_object_activation();
 	Model* get_model() const { return m_model; }
 	void delete_arrays_and_buffers() const;
-
-	unordered_map<string, Shader*> shader_library;
 private:
 	static Scene* instance;
-
-	void set_up_shader_library();
 
 	void process_model_activation();
 	void process_particle_activation();

@@ -6,6 +6,7 @@
 #include "renderer.h"
 #include "model.h"
 #include "file_loader.h"
+#include "resource_manager.h"
 
 using namespace std;
 
@@ -17,8 +18,6 @@ Scene::Scene()
 {
 	instance = this;
 
-	set_up_shader_library();
-
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 5.0f, 10.0f), // position
 						  glm::vec3(0.0f, 0.0f, 0.0f),   // lookat
@@ -28,15 +27,15 @@ Scene::Scene()
 						  30.0f,  // vertical angle
 						  45.0f); // zoom
 	// Grid Setup
-	m_grid = new Grid(*m_camera, shader_library["GridShader"]);
-	m_axis = new Axis(*m_camera, shader_library["LineShader"]);
+	m_grid = new Grid(*m_camera, *ResourceManager::get_shader("GridShader"));
+	m_axis = new Axis(*m_camera, *ResourceManager::get_shader("LineShader"));
 
 	// Object setup (will be later assigned during model selection process)
 	m_model = nullptr;
 	m_particle_system = nullptr;
 
 	// Light Setup
-	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera, shader_library["LightShader"]);
+	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera, *ResourceManager::get_shader("LightShader"));
 	Renderer::environment_point_light = m_light;
 }
 
@@ -48,39 +47,6 @@ Scene::~Scene()
 	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
-
-	// Delete and free shaders in memory
-	for (const auto& s : shader_library)
-	{
-		delete s.second;
-	}
-	shader_library.clear();
-}
-
-void Scene::set_up_shader_library()
-{
-	constexpr const char* shader_names[] = { "LineShader", "GridShader", "LightShader", "ModelShader", "DissectShader", "ParticleShader" };
-	constexpr size_t library_size = sizeof(shader_names) / sizeof(shader_names[0]);
-
-	for (int i = 0; i < library_size; ++i)
-	{
-		auto shader_name = string(shader_names[i]);
-		shader_library[shader_name] = new Shader(
-			std::filesystem::absolute("shaders/" + shader_name + ".vert").string().c_str(),
-			std::filesystem::absolute("shaders/" + shader_name + ".frag").string().c_str(),
-			shader_name);
-	}
-
-	std::cout << "Number of shaders compiled: " << shader_library.size() << std::endl;
-
-	if (shader_library.empty())
-	{
-		throw std::runtime_error("ERROR::SHADER_COMPILATION_ERROR: No shaders loaded!");
-	}
-	else if (shader_library.size() != library_size)
-	{
-		throw std::runtime_error("ERROR::SHADER_COMPILATION_ERROR: Not all shaders have been compiled!");
-	}
 }
 
 void Scene::process_object_activation()
@@ -112,7 +78,7 @@ void Scene::process_model_activation()
 void Scene::activate_current_model()
 {
 	auto model_absolute_path = Renderer::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, shader_library["ModelShader"], shader_library["DissectShader"], *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
+	m_model = new Model(model_absolute_path, *ResourceManager::get_shader("ModelShader"), *ResourceManager::get_shader("DissectShader"), *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
 	Renderer::current_model_info.current_model = m_model;
 
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
@@ -136,7 +102,7 @@ void Scene::replace_current_model()
 	m_model = nullptr;
 
 	auto model_absolute_path = Renderer::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, shader_library["ModelShader"] ,shader_library["DissectShader"], *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
+	m_model = new Model(model_absolute_path, *ResourceManager::get_shader("ModelShader"), *ResourceManager::get_shader("DissectShader"), *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
 	Renderer::current_model_info.current_model = m_model;
 	
 	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;

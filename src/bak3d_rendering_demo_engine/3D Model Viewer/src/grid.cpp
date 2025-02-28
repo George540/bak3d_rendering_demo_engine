@@ -6,7 +6,7 @@
 
 #include "grid.h"
 
-Grid::Grid(Camera& cam, Shader* shader) : Object(cam, shader), m_number_of_slices(40), m_grid_size(20.0f)
+Grid::Grid(Camera& cam, Shader& shader) : Object(cam, shader), m_number_of_slices(40), m_grid_size(20.0f)
 {
 	// GRID LINE SETUP
 	// Grid setup used indices and EBOs for proper identification of each line

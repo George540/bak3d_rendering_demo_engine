@@ -40,7 +40,7 @@ public:
 
 	// constructor, expects a filepath to a 3D model.
 
-	Model(string const& path, Shader* model_shader, Shader* dissect_shader, Camera& cam, Light& light, int index);
+	Model(string const& path, Shader& model_shader, Shader& dissect_shader, Camera& cam, Light& light, int index);
 	~Model();
 
 	void draw(); // draws the model, and thus all its meshes

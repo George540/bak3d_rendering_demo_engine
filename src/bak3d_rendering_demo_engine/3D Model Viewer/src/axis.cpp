@@ -5,7 +5,7 @@
 
 #include "renderer.h"
 
-Axis::Axis(Camera& camera, Shader* shader) :
+Axis::Axis(Camera& camera, Shader& shader) :
 	Object(camera, shader)
 {
 	m_scaling = glm::vec3(3.0f);

@@ -3,15 +3,17 @@
 #include <iostream>
 #include <utility>
 
+#include "resource_manager.h"
+
 Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures) :
-    Object(cam),
+    Object(cam, *ResourceManager::get_shader("ModelShader")),
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices)),
 	m_textures(std::move(textures))
 {
     // create buffers/arrays
-    m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), &m_vertices[0]);
-    m_ebo = new ElementBuffer(sizeof(GLuint) * m_indices.size(), &m_indices[0]);
+    m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), m_vertices.data());
+    m_ebo = new ElementBuffer(sizeof(GLuint) * m_indices.size(), m_indices.data());
 
     m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
     m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
@@ -54,28 +56,36 @@ void Mesh::draw() const
         auto type = m_textures[i].get_texture_type();
         string number;
         string name;
+        int nr;
         if (type == aiTextureType_DIFFUSE)
         {
             number = std::to_string(diffuse_nr++);
             name = "diffuse";
+            nr = diffuse_nr;
         }
         else if (type == aiTextureType_SPECULAR)
         {
             number = std::to_string(specular_nr++);
             name = "specular";
+            nr = specular_nr;
         }
         else if (type == aiTextureType_NORMALS)
         {
             number = std::to_string(normal_nr++);
             name = "normal";
+            nr = normal_nr;
         }
         else if (type == aiTextureType_HEIGHT)
         {
             number = std::to_string(height_nr++);
             name = "height";
+            nr = height_nr;
         }
         
-        m_textures[i].bind();
+        if (nr > 1)
+        {
+            m_textures[i].bind();
+        }
     }
 
     // draw mesh

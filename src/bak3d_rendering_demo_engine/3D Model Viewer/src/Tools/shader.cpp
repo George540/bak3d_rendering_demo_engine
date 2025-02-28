@@ -1,10 +1,16 @@
 #include "shader.h"
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 #include <glm/glm.hpp>
+
+Shader::Shader() : Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(), filesystem::absolute("shaders/LineShader.frag").string().c_str(), "LineShader")
+{
+    
+}
 
 /**
  * \brief Constructor for Shader class

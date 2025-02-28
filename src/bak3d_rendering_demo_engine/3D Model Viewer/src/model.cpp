@@ -11,11 +11,11 @@
 #include "event_manager.h"
 #include "renderer.h"
 
-Model::Model(string const& path, Shader* model_shader, Shader* dissect_shader, Camera& cam, Light& light, int index)
-	: m_camera(&cam), m_light(&light), m_combo_index(index)
+Model::Model(string const& path, Shader& model_shader, Shader& dissect_shader, Camera& cam, Light& light, int index)
+	: m_combo_index(index), m_camera(&cam), m_light(&light)
 {
-	m_toggle_shaders[0] = model_shader;
-	m_toggle_shaders[1] = dissect_shader;
+	m_toggle_shaders[0] = &model_shader;
+	m_toggle_shaders[1] = &dissect_shader;
 	load_model(path);
 }
 
@@ -96,7 +96,7 @@ void Model::update_material_properties() const
 
 void Model::update_breakdown_shader() const
 {
-	int texture_id = 0;
+	int texture_id;
 	if (Renderer::is_diffuse_render_selected)
 	{
 		texture_id = 0;

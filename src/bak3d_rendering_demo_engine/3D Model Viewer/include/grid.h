@@ -15,8 +15,8 @@
 class Grid : public Object
 {
 public:
-	Grid(Camera& cam, Shader* shader);
-	~Grid() = default;
+	Grid(Camera& cam, Shader& shader);
+	~Grid() override = default;
 
 	void draw() const override;
 private:

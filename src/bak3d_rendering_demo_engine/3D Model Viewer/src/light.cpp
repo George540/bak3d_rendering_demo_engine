@@ -6,7 +6,7 @@
 #include "event_manager.h"
 #include "renderer.h"
 
-Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader* shader) :
+Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader& shader) :
 	Object(camera, shader)
 {
 	m_position = position;

@@ -60,16 +60,50 @@ list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesys
 	list<pair<string, string>> files_list;
 	try
 	{
-		if (filesystem::exists(path) && filesystem::is_directory(path))
+		if (exists(path) && is_directory(path))
 		{
 			for (const auto& entry : filesystem::recursive_directory_iterator(path))
 			{
-				if (filesystem::is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
+				if (is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
 				{
 					auto path = entry.path();
 					auto filepath = path.generic_string();
 					auto filename = path.filename().generic_string();
-					files_list.push_back(make_pair(filename, filepath));
+					files_list.emplace_back(filename, filepath);
+				}
+			}
+		}
+	}
+	catch (const filesystem::filesystem_error& e)
+	{
+		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+	}
+
+	return files_list;
+}
+
+list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesystem::path& path, const vector<FileType>& types)
+{
+	list<pair<string, string>> files_list;
+	try
+	{
+		if (exists(path) && is_directory(path))
+		{
+			for (const auto& entry : filesystem::recursive_directory_iterator(path))
+			{
+				if (is_regular_file(entry.path()))
+				{
+					auto file_ext = entry.path().extension();
+                    
+					// Check if the file extension matches any in the provided types
+					if (ranges::any_of(types, 
+					                   [&](const FileType& type) { return file_ext == enum_to_string(type); }))
+					{
+						auto path = entry.path();
+						auto filepath = path.generic_string();
+						auto filename = path.filename().generic_string();
+						files_list.emplace_back(filename, filepath);
+					}
 				}
 			}
 		}

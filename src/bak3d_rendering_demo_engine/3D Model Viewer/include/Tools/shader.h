@@ -22,6 +22,7 @@ class Shader
 	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
 	// Constructor
+	Shader();
 	Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name);
 	~Shader();
 

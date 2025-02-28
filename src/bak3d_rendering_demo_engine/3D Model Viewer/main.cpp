@@ -10,6 +10,7 @@
 
 #include "renderer.h"
 #include "event_manager.h"
+#include "resource_manager.h"
 #include "scene.h"
 
 int main()
@@ -18,6 +19,7 @@ int main()
 
     EventManager::initialize();
     Renderer::initialize();
+    ResourceManager::initialize();
 
     auto scene = Scene();
 
@@ -37,6 +39,7 @@ int main()
     Renderer::shutdown();
     scene.delete_arrays_and_buffers();
     EventManager::shutdown();
+    ResourceManager::shutdown();
 
     return 0;
 }

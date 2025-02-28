@@ -2,15 +2,10 @@
 
 #include "object.h"
 
-Object::Object(Camera& camera) : Object(camera, nullptr)
-{
-	
-}
-
-Object::Object(Camera& camera, Shader* shader)
+Object::Object(Camera& camera, Shader& shader)
 {
 	m_camera = &camera;
-	m_shader = shader;
+	m_shader = &shader;
 
 	m_vao = new VertexArray();
 	m_vao->bind_object();
@@ -25,11 +20,7 @@ Object::~Object()
 	delete m_vao;
 	delete m_vbo;
 	delete m_ebo;
-
-	if (m_shader)
-	{
-		delete m_shader;
-	}
+	delete m_shader;
 	delete m_camera;
 }
 

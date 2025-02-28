@@ -55,7 +55,7 @@ void main()
     }
     else
     {
-        ambient *= light.ambient * vec3(material.ambient);
+        ambient = light.ambient * vec3(material.ambient);
     }
 
     // normal
