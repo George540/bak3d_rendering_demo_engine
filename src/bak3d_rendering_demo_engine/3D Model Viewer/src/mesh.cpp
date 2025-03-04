@@ -5,7 +5,7 @@
 
 #include "resource_manager.h"
 
-Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures) :
+Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures) :
     Object(cam, *ResourceManager::get_shader("ModelShader")),
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices)),
@@ -32,7 +32,7 @@ Mesh::~Mesh()
     vector<GLuint> texture_ids(m_textures.size());
     for (int i = 0; i < m_textures.size(); ++i)
     {
-        texture_ids[i] = m_textures[i].get_id();
+        texture_ids[i] = ResourceManager::get_texture(m_textures[i])->get_id();
     }
     glDeleteTextures(static_cast<GLsizei>(m_textures.size()), texture_ids.data());
 }
@@ -53,7 +53,8 @@ void Mesh::draw() const
         glActiveTexture(GL_TEXTURE0 + i);
 
         // retrieve texture number (the N in diffuse_textureN)
-        auto type = m_textures[i].get_texture_type();
+        auto texture = ResourceManager::get_texture(m_textures[i]);
+        auto type = texture->get_texture_type();
         string number;
         string name;
         int nr;
@@ -84,7 +85,7 @@ void Mesh::draw() const
         
         if (nr > 1)
         {
-            m_textures[i].bind();
+            texture->bind();
         }
     }
 
@@ -94,10 +95,10 @@ void Mesh::draw() const
     m_vao->unbind_object();
 
     // always good practice to set everything back to defaults once configured.
-    for (auto i = 0; i < m_textures.size(); ++i)
+    /*for (auto i = 0; i < m_textures.size(); ++i)
     {
         glActiveTexture(GL_TEXTURE0 + i);
         m_textures[i].unbind();
     }
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);*/
 }

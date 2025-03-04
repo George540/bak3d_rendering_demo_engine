@@ -27,15 +27,15 @@ public:
     Material m_material{};
     vector<Vertex> m_vertices;
     vector<GLuint> m_indices;
-    vector<Texture2D> m_textures;
+    vector<std::string> m_textures;
 
     // constructor
-    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<Texture2D> textures);
+    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures);
     ~Mesh() override;
     void draw() const override;
 
-    inline Shader* get_current_shader() const { return m_shader; }
-    inline void set_current_shader(Shader* shader) { m_shader = shader; }
+    Shader* get_current_shader() const { return m_shader; }
+    void set_current_shader(Shader* shader) { m_shader = shader; }
 };
 
 #endif

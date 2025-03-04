@@ -5,35 +5,41 @@
 #include <iostream>
 #include <ostream>
 #include <filesystem>
-#include <glm/ext/matrix_transform.hpp>
 
 #include "model.h"
 #include "event_manager.h"
-#include "renderer.h"
+#include "resource_manager.h"
+#include "user_interface.h"
 
-Model::Model(string const& path, Shader& model_shader, Shader& dissect_shader, Camera& cam, Light& light, int index)
+Model::Model(string const& path, Camera& cam, Light& light, int index)
 	: m_combo_index(index), m_camera(&cam), m_light(&light)
 {
-	m_toggle_shaders[0] = &model_shader;
-	m_toggle_shaders[1] = &dissect_shader;
+	m_toggle_shaders[0] = ResourceManager::get_shader("ModelShader");
+	m_toggle_shaders[1] = ResourceManager::get_shader("DissectShader");
 	load_model(path);
 }
 
 Model::~Model()
 {
+	m_toggle_shaders[0]->set_int("material.diffuse", -1);
+	m_toggle_shaders[0]->set_int("material.specular", -1);
+	m_toggle_shaders[0]->set_int("material.normal", -1);
+
+	m_toggle_shaders[0]->set_int("textureSampler", -1);
+	
 	// Free texture data
 	textures_loaded.clear();
-	cout << "Texture data of model " << m_name << " have been cleared" << endl;
+	cout << "Texture data of model " << m_file_name << " have been cleared" << endl;
 	
 	// Safely dereference camera and light addresses from pointers
 	m_camera = nullptr;
 	m_light = nullptr;
 	
 	meshes.clear();
-	cout << "Model " << m_name <<" mesh data have been safely deleted" << endl;
+	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << endl;
 }
 
-void Model::draw()
+void Model::draw() const
 {
 	for (auto& mesh : meshes)
 	{
@@ -43,10 +49,10 @@ void Model::draw()
 		}
 
 		if (m_current_shader_index == 0
-			&& Renderer::is_full_render_selected
-			&& !Renderer::is_diffuse_render_selected
-			&& !Renderer::is_specular_selected
-			&& !Renderer::is_normal_map_selected)
+			&& UserInterface::is_full_render_selected
+			&& !UserInterface::is_diffuse_render_selected
+			&& !UserInterface::is_specular_selected
+			&& !UserInterface::is_normal_map_selected)
 		{
 			update_light_properties();
 			update_material_properties();
@@ -83,29 +89,30 @@ void Model::update_material_properties() const
 	auto current_shader = m_toggle_shaders[m_current_shader_index];
 
 	// FRAGMENT MATERIAL
-	current_shader->set_int("material.diffuse", 0);
-	current_shader->set_int("material.specular", 1);
-	current_shader->set_int("material.normal", 2);
+	auto resources = ResourceManager::Textures;
+	current_shader->set_int("material.diffuse", ResourceManager::get_texture(m_model_name + '.' + "diffuse")->get_id());
+	current_shader->set_int("material.specular", ResourceManager::get_texture(m_model_name + '.' + "specular")->get_id());
+	current_shader->set_int("material.normal", ResourceManager::get_texture(m_model_name + '.' + "normal")->get_id());
 	current_shader->set_float("material.ambient", 0.5f);
-	current_shader->set_float("material.shininess", Renderer::shininess);
+	current_shader->set_float("material.shininess", UserInterface::shininess);
 	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
 	current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
 	current_shader->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
-	current_shader->set_bool("material.gamma", Renderer::is_gamma_enabled);
+	current_shader->set_bool("material.gamma", UserInterface::is_gamma_enabled);
 }
 
 void Model::update_breakdown_shader() const
 {
 	int texture_id;
-	if (Renderer::is_diffuse_render_selected)
+	if (UserInterface::is_diffuse_render_selected)
 	{
 		texture_id = 0;
 	}
-	else if (Renderer::is_specular_selected)
+	else if (UserInterface::is_specular_selected)
 	{
 		texture_id = 1;
 	}
-	else if (Renderer::is_normal_map_selected)
+	else if (UserInterface::is_normal_map_selected)
 	{
 		texture_id = 2;
 	}
@@ -131,8 +138,9 @@ void Model::load_model(string const& path)
 
 	// retrieve the directory path of the filepath
 	directory = path.substr(0, path.find_last_of('/'));
-	m_name = path.substr(path.find_last_of('/') + 1, path.size());
-	std::cout << "Loading model with name: " << m_name << std::endl;
+	m_file_name = path.substr(path.find_last_of('/') + 1, path.size());
+	m_model_name = m_file_name.substr(0, m_file_name.find('.'));
+	std::cout << "Loading model with name: " << m_file_name << std::endl;
 
 	// process ASSIMP's root node recursively
 	process_node(scene->mRootNode, scene);
@@ -168,7 +176,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// data to fill
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
-	vector<Texture2D> textures;
+	vector<string> textures;
 
 	// walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -299,9 +307,9 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	return new Mesh(*m_camera, vertices, indices, textures);
 }
 
-vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
+vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 {
-	vector<Texture2D> textures;
+	vector<string> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
 	{
 		aiString filename;
@@ -310,7 +318,10 @@ vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType t
 		bool skip = false;
 		for (auto& text_loaded : textures_loaded)
 		{
-			if (std::strcmp(text_loaded.get_file_name().data(), filename.C_Str()) == 0)
+			auto file_model_name = string(filename.C_Str());
+			file_model_name = file_model_name.substr(0, file_model_name.find('.'));
+			file_model_name = m_model_name + '.' + file_model_name;
+			if (std::strcmp(text_loaded.c_str(), file_model_name.c_str()) == 0)
 			{
 				textures.push_back(text_loaded);
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
@@ -320,9 +331,13 @@ vector<Texture2D> Model::load_material_textures(aiMaterial* mat, aiTextureType t
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
 			string path = directory + '/' + filename.C_Str();
+			string texture_name = string(filename.C_Str());
+			texture_name = texture_name.substr(0, texture_name.find('.'));
+			texture_name = m_model_name + '.' + texture_name;
 			Texture2D texture = Texture2D(path, type);
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+			ResourceManager::add_texture(texture_name, texture);
+			textures.push_back(texture_name);
+			textures_loaded.push_back(texture_name);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
 		}
 	}
 	return textures;

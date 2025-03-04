@@ -21,7 +21,8 @@ public:
     static Shader* get_shader(const std::string& shader_name) { return &Shaders[shader_name]; }
     
     static Texture2D load_texture(const char *file, std::string name);
-    static Texture2D get_texture(std::string name);
+    static void add_texture(const std::string name, const Texture2D texture) { Textures[name] = texture; }
+    static Texture2D* get_texture(std::string name) { return &Textures[name]; };
     
     static void shutdown();
 private:

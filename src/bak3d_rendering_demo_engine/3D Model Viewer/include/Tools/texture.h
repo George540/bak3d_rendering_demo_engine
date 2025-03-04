@@ -24,13 +24,13 @@ public:
     void bind() const; // binds the texture as the current active GL_TEXTURE_2D texture object
     void unbind() const;
 
-    inline std::string get_file_path() const { return m_filepath; }
-    inline std::string get_file_name() const { return m_filename; }
-    inline aiTextureType get_texture_type() const { return m_texture_type; }
-    inline GLuint get_id() const { return m_ID; }
-    inline int get_width() const { return m_width; }
-    inline int get_height() const { return m_height; }
-    inline int get_nb_color_channels() const { return m_nb_color_channels; }
+    std::string get_file_path() const { return m_filepath; }
+    std::string get_file_name() const { return m_filename; }
+    aiTextureType get_texture_type() const { return m_texture_type; }
+    GLuint get_id() const { return m_ID; }
+    int get_width() const { return m_width; }
+    int get_height() const { return m_height; }
+    int get_nb_color_channels() const { return m_nb_color_channels; }
 
     bool operator==(const Texture2D& other);
     bool operator!=(const Texture2D& other);

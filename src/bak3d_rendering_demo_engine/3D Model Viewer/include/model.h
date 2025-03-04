@@ -25,10 +25,11 @@ class Model
 {
 public:
 	// model data
-	std::vector<Texture2D> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+	std::vector<std::string> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	std::vector<Mesh*> meshes; // a model is made out of one or more meshes
 	std::string directory;
-	std::string m_name;
+	std::string m_file_name;
+	std::string m_model_name;
 	int m_combo_index;
 	bool gamma_correction{};
 
@@ -40,10 +41,10 @@ public:
 
 	// constructor, expects a filepath to a 3D model.
 
-	Model(string const& path, Shader& model_shader, Shader& dissect_shader, Camera& cam, Light& light, int index);
+	Model(string const& path, Camera& cam, Light& light, int index);
 	~Model();
 
-	void draw(); // draws the model, and thus all its meshes
+	void draw() const; // draws the model, and thus all its meshes
 	inline void set_toggle_shaders(Shader* model_shader, Shader* dissect_shader) { m_toggle_shaders[0] = model_shader; m_toggle_shaders[1] = dissect_shader; }
 	inline void set_current_toggle_shader(GLuint shader_index) { m_current_shader_index = shader_index; }
 private:
@@ -54,7 +55,7 @@ private:
 	Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
 	// checks all material textures of a given type and loads the textures if they're not loaded yet.
 	// the required info is returned as a Texture struct.
-	vector<Texture2D> load_material_textures(aiMaterial* mat, aiTextureType type);
+	vector<std::string> load_material_textures(aiMaterial* mat, aiTextureType type);
 	void update_light_properties() const;
 	void update_material_properties() const;
 	void update_breakdown_shader() const;

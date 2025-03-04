@@ -12,6 +12,7 @@
 #include "event_manager.h"
 #include "resource_manager.h"
 #include "scene.h"
+#include "user_interface.h"
 
 int main()
 {
@@ -20,6 +21,7 @@ int main()
     EventManager::initialize();
     Renderer::initialize();
     ResourceManager::initialize();
+    UserInterface::initialize();
 
     auto scene = Scene();
 
@@ -36,6 +38,7 @@ int main()
         scene.draw();
     } while (EventManager::is_exit_requested() == false);
 
+    UserInterface::shutdown();
     Renderer::shutdown();
     scene.delete_arrays_and_buffers();
     EventManager::shutdown();

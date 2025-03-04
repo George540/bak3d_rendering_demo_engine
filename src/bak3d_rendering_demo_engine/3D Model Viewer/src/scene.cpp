@@ -7,6 +7,7 @@
 #include "model.h"
 #include "file_loader.h"
 #include "resource_manager.h"
+#include "user_interface.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ Scene::Scene()
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera, *ResourceManager::get_shader("LightShader"));
-	Renderer::environment_point_light = m_light;
+	UserInterface::environment_point_light = m_light;
 }
 
 Scene::~Scene()
@@ -58,18 +59,18 @@ void Scene::process_object_activation()
 void Scene::process_model_activation()
 {
 	// MODEL INSTANTIATION AND DELETION
-	if (Renderer::object_current == 1 && Renderer::model_current != 0)
+	if (UserInterface::object_current == 1 && UserInterface::model_current != 0)
 	{
 		if (!m_model)
 		{
 			activate_current_model();
 		}
-		else if (m_model && Renderer::current_model_info.model_combo_index != m_model->m_combo_index)
+		else if (m_model && UserInterface::current_model_info.model_combo_index != m_model->m_combo_index)
 		{
 			replace_current_model();
 		}
 	}
-	else if ((Renderer::model_current == 0 && m_model) || (m_model && Renderer::object_current == 0))
+	else if ((UserInterface::model_current == 0 && m_model) || (m_model && UserInterface::object_current == 0))
 	{
 		deactivate_current_model();
 	}
@@ -77,63 +78,63 @@ void Scene::process_model_activation()
 
 void Scene::activate_current_model()
 {
-	auto model_absolute_path = Renderer::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, *ResourceManager::get_shader("ModelShader"), *ResourceManager::get_shader("DissectShader"), *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
-	Renderer::current_model_info.current_model = m_model;
+	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
+	m_model = new Model(model_absolute_path, *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
+	UserInterface::current_model_info.current_model = m_model;
 
-	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
+	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;
 }
 
 void Scene::deactivate_current_model()
 {
-	Renderer::current_model_info.current_model = nullptr;
+	UserInterface::current_model_info.current_model = nullptr;
 	delete m_model;
 	m_model = nullptr;
-	Renderer::current_model_info.set_info("None", "none", 0);
+	UserInterface::current_model_info.set_info("None", "none", 0);
 
-	cout << "Model " << Renderer::current_model_info.model_file_name << " has been deactivated." << endl;
+	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been deactivated." << endl;
 }
 
 void Scene::replace_current_model()
 {
-	cout << "Model " << m_model->m_name << " is being deactivated." << endl;
-	Renderer::current_model_info.current_model = nullptr;
+	cout << "Model " << m_model->m_file_name << " is being deactivated." << endl;
+	UserInterface::current_model_info.current_model = nullptr;
 	delete m_model;
 	m_model = nullptr;
 
-	auto model_absolute_path = Renderer::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, *ResourceManager::get_shader("ModelShader"), *ResourceManager::get_shader("DissectShader"), *m_camera, *m_light, Renderer::current_model_info.model_combo_index);
-	Renderer::current_model_info.current_model = m_model;
+	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
+	m_model = new Model(model_absolute_path, *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
+	UserInterface::current_model_info.current_model = m_model;
 	
-	cout << "Model " << Renderer::current_model_info.model_file_name << " has been activated." << endl;
+	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;
 }
 
 void Scene::process_particle_activation()
 {
-	if (Renderer::object_current == 2 && !Renderer::current_particle_system)
+	if (UserInterface::object_current == 2 && !UserInterface::current_particle_system)
 	{
 		m_particle_system = new ParticleSystem(*m_camera);
-		Renderer::current_particle_system = m_particle_system;
+		UserInterface::current_particle_system = m_particle_system;
 
 		cout << "Particle System has been activated." << endl;
 	}
-	else if (Renderer::current_particle_system && Renderer::object_current != 2)
+	else if (UserInterface::current_particle_system && UserInterface::object_current != 2)
 	{
-		Renderer::particle_payload_info = particle_info();
-		Renderer::current_particle_system = nullptr;
+		UserInterface::particle_payload_info = particle_info();
+		UserInterface::current_particle_system = nullptr;
 		delete m_particle_system;
 		m_particle_system = nullptr;
 
 		cout << "Particle System has been deactivated." << endl;
 	}
-	else if (Renderer::object_current == 2 && m_particle_system && m_particle_system->get_particle_amount() != Renderer::particle_payload_info.amount)
+	else if (UserInterface::object_current == 2 && m_particle_system && m_particle_system->get_particle_amount() != UserInterface::particle_payload_info.amount)
 	{
-		Renderer::current_particle_system = nullptr;
+		UserInterface::current_particle_system = nullptr;
 		delete m_particle_system;
 		m_particle_system = nullptr;
 
-		m_particle_system = new ParticleSystem(*m_camera, Renderer::particle_payload_info);
-		Renderer::current_particle_system = m_particle_system;
+		m_particle_system = new ParticleSystem(*m_camera, UserInterface::particle_payload_info);
+		UserInterface::current_particle_system = m_particle_system;
 	}
 }
 
@@ -151,10 +152,11 @@ void Scene::update(float dt) const
 void Scene::draw() const
 {
 	Renderer::begin_frame();
+	UserInterface::begin_frame();
 
-	Renderer::render_demo_window();
+	UserInterface::render_demo_window();
 
-	if (Renderer::is_grid_rendering)
+	if (UserInterface::is_grid_rendering)
 	{
 		// Set depth test for axis to render in front of grid
 		glDepthFunc(GL_ALWAYS);
@@ -163,7 +165,7 @@ void Scene::draw() const
 		glDepthFunc(GL_LESS);
 	}
 
-	if (!Renderer::current_particle_system && Renderer::is_full_render_selected)
+	if (!UserInterface::current_particle_system && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
 	}
@@ -178,6 +180,7 @@ void Scene::draw() const
 		m_particle_system->draw();
 	}
 
+	UserInterface::end_frame();
 	//Renderer::post_processing();
 	Renderer::end_frame();
 }

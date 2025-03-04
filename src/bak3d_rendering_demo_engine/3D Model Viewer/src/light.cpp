@@ -5,6 +5,7 @@
 
 #include "event_manager.h"
 #include "renderer.h"
+#include "user_interface.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader& shader) :
 	Object(camera, shader)
@@ -27,9 +28,9 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader& shad
 	m_vertical_angle = m_position.y;
 	m_distance_offset = glm::distance(m_position, glm::vec3(0.0f));
 
-	Renderer::light_horizontal_rotation = 45.0f;
-	Renderer::light_vertical_rotation = 135.0f;
-	Renderer::light_origin_distance = m_distance_offset;
+	UserInterface::light_horizontal_rotation = 45.0f;
+	UserInterface::light_vertical_rotation = 135.0f;
+	UserInterface::light_origin_distance = m_distance_offset;
 
 	std::cout << "Light created..." << std::endl;
 }
