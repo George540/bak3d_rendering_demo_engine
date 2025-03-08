@@ -96,8 +96,7 @@ list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesy
 					auto file_ext = entry.path().extension();
                     
 					// Check if the file extension matches any in the provided types
-					if (ranges::any_of(types, 
-					                   [&](const FileType& type) { return file_ext == enum_to_string(type); }))
+					if (ranges::any_of(types, [&](const FileType& type) { return file_ext == enum_to_string(type); }))
 					{
 						auto path = entry.path();
 						auto filepath = path.generic_string();

@@ -53,12 +53,12 @@ void UserInterface::initialize()
     initialize_imgui();
 
     // Load list of model assets found in assets folder and turn them into combo items vectors
-    model_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), FileType::obj);
-    model_combo_items_list.push_front(make_pair("None", "none"));
+    model_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
+    model_combo_items_list.emplace_front("None", "none");
     model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_list);
 
     // Load list of particle texture images found in particles-textures folder and turn them into combo items vectors
-    particle_image_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
+    particle_image_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), png);
     particle_image_combo_items = FileLoader::get_vector_items_to_array(particle_image_combo_items_list);
 }
 

@@ -30,7 +30,7 @@ public:
     vector<std::string> m_textures;
 
     // constructor
-    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures);
+    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices);
     ~Mesh() override;
     void draw() const override;
 

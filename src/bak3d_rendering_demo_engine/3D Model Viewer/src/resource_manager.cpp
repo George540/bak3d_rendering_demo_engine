@@ -4,6 +4,8 @@
 #include <iostream>
 #include <ranges>
 
+#include "file_loader.h"
+
 using namespace std;
 
 // Instantiate static variables
@@ -11,6 +13,13 @@ unordered_map<string, Shader> ResourceManager::Shaders;
 unordered_map<string, Texture2D> ResourceManager::Textures;
 
 void ResourceManager::initialize()
+{
+    initialize_shaders();
+    initialize_predefined_textures();
+    initialize_models();
+}
+
+void ResourceManager::initialize_shaders()
 {
     //Shaders will be precompiled before engine is initialized
     constexpr const char* shader_names[] = { "LineShader", "GridShader", "LightShader", "ModelShader", "DissectShader", "ParticleShader" };
@@ -34,6 +43,29 @@ void ResourceManager::initialize()
     if (Shaders.size() != library_size)
     {
         throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: Not all shaders have been compiled!");
+    }
+}
+
+void ResourceManager::initialize_predefined_textures()
+{
+    auto image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
+    for (auto [file_name, file_path] : image_files)
+    {
+        auto texture_name = file_name.substr(0, texture_name.find('.'));
+        Textures[texture_name] = Texture2D(file_path, aiTextureType_DIFFUSE);
+    }
+}
+
+
+void ResourceManager::initialize_models()
+{
+    auto model_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
+    int index = 1;
+    for (const auto& model_pair : model_files)
+    {
+        auto model_file_name = model_pair.first;
+        auto model_name = model_file_name.substr(0, model_file_name.find('.'));
+        Models[model_file_name] = Model(model_pair.second, model_file_name, model_name, index++);
     }
 }
 

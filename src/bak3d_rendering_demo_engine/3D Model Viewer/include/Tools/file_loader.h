@@ -20,7 +20,6 @@ enum FileType
 {
 	png,
 	jpg,
-	jpeg,
 	vs,
 	vert,
 	fs,

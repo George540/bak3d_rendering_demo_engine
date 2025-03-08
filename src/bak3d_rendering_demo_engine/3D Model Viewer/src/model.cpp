@@ -11,9 +11,12 @@
 #include "resource_manager.h"
 #include "user_interface.h"
 
-Model::Model(string const& path, Camera& cam, Light& light, int index)
-	: m_combo_index(index), m_camera(&cam), m_light(&light)
+Model::Model(const string& path, const string& file_name, const string& model_name, int index) :
+	m_file_name(file_name),
+	m_model_name(model_name),
+	m_combo_index(index)
 {
+	m_directory = path.substr(0, path.find_last_of('/'));
 	m_toggle_shaders[0] = ResourceManager::get_shader("ModelShader");
 	m_toggle_shaders[1] = ResourceManager::get_shader("DissectShader");
 	load_model(path);
@@ -68,6 +71,8 @@ void Model::draw() const
 
 void Model::update_light_properties() const
 {
+	if (!m_light) return;
+	
 	const auto light = m_light->get_light_properties();
 
 	auto current_shader = m_toggle_shaders[m_current_shader_index];
@@ -137,9 +142,6 @@ void Model::load_model(string const& path)
 	}
 
 	// retrieve the directory path of the filepath
-	directory = path.substr(0, path.find_last_of('/'));
-	m_file_name = path.substr(path.find_last_of('/') + 1, path.size());
-	m_model_name = m_file_name.substr(0, m_file_name.find('.'));
 	std::cout << "Loading model with name: " << m_file_name << std::endl;
 
 	// process ASSIMP's root node recursively
@@ -244,7 +246,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 				vertex.color = glm::vec4(1.0f, 0.75f, 0.796f, 1.0f);
 			}
 
-			vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0 ? true : false;
+			vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0;
 			EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;
 
 			// Check if specular texture exists
@@ -253,11 +255,11 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 				vertex.color = glm::vec4(specular.r, specular.g, specular.b, specular.a);
 			}
 
-			vertex.useSpecularTexture = mat->GetTextureCount(aiTextureType_SPECULAR) > 0 ? true : false;
+			vertex.useSpecularTexture = mat->GetTextureCount(aiTextureType_SPECULAR) > 0;
 			EventManager::is_using_specular_texture = vertex.useSpecularTexture;
 
 			// Check if normals texture exists
-			vertex.useNormalsTexture = mat->GetTextureCount(aiTextureType_HEIGHT) > 0 ? true : false;
+			vertex.useNormalsTexture = mat->GetTextureCount(aiTextureType_HEIGHT) > 0;
 			EventManager::is_using_normals_texture = vertex.useNormalsTexture;
 		}
 
@@ -269,7 +271,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	{
 		auto face = mesh->mFaces[i];
 		// If the face is made up of three vertices only, it's a triangle
-		m_num_triangles += (face.mNumIndices == 3) ? 1 : 0;
+		m_num_triangles += face.mNumIndices == 3 ? 1 : 0;
 
 		// retrieve all indices of the face and store them in the indices vector
 		for (unsigned int j = 0; j < face.mNumIndices; ++j)
@@ -320,7 +322,7 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 		{
 			auto file_model_name = string(filename.C_Str());
 			file_model_name = file_model_name.substr(0, file_model_name.find('.'));
-			file_model_name = m_model_name + '.' + file_model_name;
+			file_model_name = format("{}.{}",m_model_name, file_model_name);
 			if (std::strcmp(text_loaded.c_str(), file_model_name.c_str()) == 0)
 			{
 				textures.push_back(text_loaded);
@@ -330,10 +332,10 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 		}
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
-			string path = directory + '/' + filename.C_Str();
+			string path = m_directory + '/' + filename.C_Str();
 			string texture_name = string(filename.C_Str());
 			texture_name = texture_name.substr(0, texture_name.find('.'));
-			texture_name = m_model_name + '.' + texture_name;
+			texture_name = format("{}.{}",m_model_name, texture_name);
 			Texture2D texture = Texture2D(path, type);
 			ResourceManager::add_texture(texture_name, texture);
 			textures.push_back(texture_name);

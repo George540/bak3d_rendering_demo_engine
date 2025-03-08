@@ -5,17 +5,16 @@
 
 #include "resource_manager.h"
 
-Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures) :
+Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices) :
     Object(cam, *ResourceManager::get_shader("ModelShader")),
 	m_vertices(std::move(vertices)),
-	m_indices(std::move(indices)),
-	m_textures(std::move(textures))
+	m_indices(std::move(indices))
 {
     // create buffers/arrays
     m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), m_vertices.data());
     m_ebo = new ElementBuffer(sizeof(GLuint) * m_indices.size(), m_indices.data());
 
-    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
+    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
     m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
     m_vao->set_attrib_pointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tex_coords)));
     m_vao->set_attrib_pointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tangent)));
@@ -28,13 +27,7 @@ Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices, vector<
 
 Mesh::~Mesh()
 {
-    //glBindTexture(GL_TEXTURE_2D, 0);
-    vector<GLuint> texture_ids(m_textures.size());
-    for (int i = 0; i < m_textures.size(); ++i)
-    {
-        texture_ids[i] = ResourceManager::get_texture(m_textures[i])->get_id();
-    }
-    glDeleteTextures(static_cast<GLsizei>(m_textures.size()), texture_ids.data());
+    m_textures.clear();
 }
 
 void Mesh::draw() const
@@ -95,10 +88,5 @@ void Mesh::draw() const
     m_vao->unbind_object();
 
     // always good practice to set everything back to defaults once configured.
-    /*for (auto i = 0; i < m_textures.size(); ++i)
-    {
-        glActiveTexture(GL_TEXTURE0 + i);
-        m_textures[i].unbind();
-    }
-    glActiveTexture(GL_TEXTURE0);*/
+    glActiveTexture(GL_TEXTURE0);
 }

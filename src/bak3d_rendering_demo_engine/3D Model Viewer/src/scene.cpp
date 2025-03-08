@@ -79,7 +79,7 @@ void Scene::process_model_activation()
 void Scene::activate_current_model()
 {
 	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
+	m_model = new Model(model_absolute_path, "", "", *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
 	UserInterface::current_model_info.current_model = m_model;
 
 	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;
@@ -103,7 +103,7 @@ void Scene::replace_current_model()
 	m_model = nullptr;
 
 	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
+	m_model = new Model(model_absolute_path, "", "", *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
 	UserInterface::current_model_info.current_model = m_model;
 	
 	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;

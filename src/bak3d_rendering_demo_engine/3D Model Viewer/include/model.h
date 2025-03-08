@@ -25,11 +25,8 @@ class Model
 {
 public:
 	// model data
-	std::vector<std::string> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+	std::vector<std::string> textures_loaded; // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	std::vector<Mesh*> meshes; // a model is made out of one or more meshes
-	std::string directory;
-	std::string m_file_name;
-	std::string m_model_name;
 	int m_combo_index;
 	bool gamma_correction{};
 
@@ -41,12 +38,17 @@ public:
 
 	// constructor, expects a filepath to a 3D model.
 
-	Model(string const& path, Camera& cam, Light& light, int index);
+	Model() = default;
+	Model(const string& path, const string& file_name, const string& model_name, int index);
 	~Model();
 
 	void draw() const; // draws the model, and thus all its meshes
-	inline void set_toggle_shaders(Shader* model_shader, Shader* dissect_shader) { m_toggle_shaders[0] = model_shader; m_toggle_shaders[1] = dissect_shader; }
-	inline void set_current_toggle_shader(GLuint shader_index) { m_current_shader_index = shader_index; }
+	void set_toggle_shaders(Shader* model_shader, Shader* dissect_shader) { m_toggle_shaders[0] = model_shader; m_toggle_shaders[1] = dissect_shader; }
+	void set_current_toggle_shader(GLuint shader_index) { m_current_shader_index = shader_index; }
+
+	std::string get_directory() const { return m_directory; }
+	std::string get_file_name() const { return m_file_name; }
+	std::string get_model_name() const { return m_model_name; }
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void load_model(string const& path);
@@ -64,6 +66,10 @@ private:
 	GLuint m_current_shader_index;
 	Camera* m_camera;
 	Light* m_light;
+
+	std::string m_directory;
+	std::string m_file_name;
+	std::string m_model_name;
 };
 
 #endif

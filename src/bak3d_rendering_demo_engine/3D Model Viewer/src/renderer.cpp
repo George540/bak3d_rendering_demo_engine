@@ -1,18 +1,14 @@
 #include <iostream>
 #include <filesystem>
-#include <cstring>
 
 #include "renderer.h"
 #include "event_manager.h"
-#include "file_loader.h"
+#include "user_interface.h"
 
 #include <GLFW/glfw3.h>
 
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 #include "stb_image.h"
-#include "user_interface.h"
 
 
 using namespace std;
@@ -65,10 +61,6 @@ void Renderer::begin_frame()
 
 void Renderer::end_frame()
 {
-	/*// Render ImGui window
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
-
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	glfwSwapBuffers(r_window);
