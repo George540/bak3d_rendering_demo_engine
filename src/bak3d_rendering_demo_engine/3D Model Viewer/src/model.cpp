@@ -11,6 +11,8 @@
 #include "resource_manager.h"
 #include "user_interface.h"
 
+using namespace std;
+
 Model::Model(const string& path, const string& file_name, const string& model_name, int index) :
 	m_file_name(file_name),
 	m_model_name(model_name),

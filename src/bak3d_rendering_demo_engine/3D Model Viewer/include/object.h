@@ -1,6 +1,6 @@
 // =====================================================================================
 // Object class was made by George Mavroeidis as a base class for engine objects.
-// It contains a set of virtual functions and data that help with initializing, binding
+// It contains a set of virtual functions and data that help with initializing, binding,
 // drawing and cleaning up the object in the scene.
 // =====================================================================================
 
@@ -28,7 +28,7 @@ public:
     Object(Camera& camera, Shader& shader);
     virtual ~Object();
 
-    virtual void update(float dt) override;
+    void update(float dt) override;
     virtual void draw() const;
     void delete_globjects() const;
 };

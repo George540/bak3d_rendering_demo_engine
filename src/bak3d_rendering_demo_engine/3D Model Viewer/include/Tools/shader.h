@@ -8,30 +8,26 @@
 
 #ifndef SHADER_H
 #define SHADER_H
-#include <string>
+
 #include <glad/glad.h> 
 #include <glm/fwd.hpp>
+#include <string>
 
-using namespace std;
+#include "asset.h"
 
-class Shader
+class Shader : Asset
 {
-	GLuint m_id;
 	GLuint m_index;
-	std::string m_name;
 	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
 	// Constructor
 	Shader();
-	Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name);
-	~Shader();
+	Shader(const char* vertex_shader_source, const char* fragment_shader_source, std::string shader_name);
+	~Shader() override;
 
 	// Core functions
-	[[nodiscard]] GLuint get_id() const { return m_id; }
 	[[nodiscard]] GLuint get_index() const { return m_index; }
-	[[nodiscard]] std::string get_name() const { return m_name; }
 	void set_index(int i) { m_index = i; }
-	void set_name(std::string name) { m_name = name; }
 	void use() const;
 	void unuse() const;
 

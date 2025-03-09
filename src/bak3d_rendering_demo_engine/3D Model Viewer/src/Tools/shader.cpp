@@ -3,23 +3,27 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-
 #include <glm/glm.hpp>
 
-Shader::Shader() : Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(), filesystem::absolute("shaders/LineShader.frag").string().c_str(), "LineShader")
-{
-    
-}
+using namespace std;
+
+Shader::Shader() : Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(), filesystem::absolute("shaders/LineShader.frag").string().c_str(), "LineShader") {}
 
 /**
  * \brief Constructor for Shader class
  * \param vertex_shader_source path for vertex shader
  * \param fragment_shader_source path for fragment shader
+ * \param shader_name name of shader based on file name
  */
 Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name)
 {
-    m_name = shader_name;
+    auto vertex_path = string(vertex_shader_source);
+    m_path = vertex_path;
+    m_directory = vertex_path.substr(0, vertex_path.find('.'));
+    m_file_name = vertex_path.substr(vertex_path.find('.') + 1);
+    m_asset_name = shader_name;
+    m_index = 0;
+    
     // 1. retrieve the vertex/fragment source code from filePath
 	string vertexCode;
     string fragmentCode;
@@ -80,12 +84,12 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
-    std::cout << "Shader " << m_name << " with ID " << m_id << " has compiled..." << std::endl;
+    cout << "Shader " << m_asset_name << " with ID " << m_id << " has compiled..." << endl;
 }
 
 Shader::~Shader()
 {
-    cout << "Shader " << m_name << " with ID " << m_id << " has been deleted..." << endl;
+    cout << "Shader " << m_asset_name << " with ID " << m_id << " has been deleted..." << endl;
 }
 
 /**
