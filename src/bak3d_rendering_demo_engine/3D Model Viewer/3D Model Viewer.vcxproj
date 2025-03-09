@@ -424,6 +424,7 @@
     <ClInclude Include="include\renderer.h" />
     <ClInclude Include="include\resource_manager.h" />
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\Tools\asset.h" />
     <ClInclude Include="include\Tools\buffer.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
     <ClInclude Include="include\Tools\globject.h" />

@@ -52,10 +52,9 @@ void ResourceManager::initialize_predefined_textures()
     for (auto [file_name, file_path] : image_files)
     {
         auto texture_name = file_name.substr(0, texture_name.find('.'));
-        Textures[texture_name] = Texture2D(file_path, aiTextureType_DIFFUSE);
+        Textures[texture_name] = Texture2D(file_path, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
 }
-
 
 void ResourceManager::initialize_models()
 {

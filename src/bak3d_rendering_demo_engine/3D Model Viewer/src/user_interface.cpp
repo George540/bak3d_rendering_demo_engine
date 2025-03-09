@@ -9,6 +9,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "resource_manager.h"
 #include "stb_image.h"
 
 using namespace std;
@@ -27,8 +28,7 @@ bool UserInterface::is_gamma_enabled = false;
 float UserInterface::shininess = 64.0f;
 const char* UserInterface::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int UserInterface::object_current = 0;
-list<pair<string, string>> UserInterface::model_combo_items_list;
-vector<char*> UserInterface::model_combo_items;
+vector<string> UserInterface::model_combo_items;
 int UserInterface::model_current = 0;
 const char* UserInterface::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int UserInterface::render_current = 0;
@@ -52,14 +52,19 @@ void UserInterface::initialize()
 {
     initialize_imgui();
 
-    // Load list of model assets found in assets folder and turn them into combo items vectors
-    model_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
-    model_combo_items_list.emplace_front("None", "none");
-    model_combo_items = FileLoader::get_vector_items_to_array(model_combo_items_list);
+	model_combo_items.emplace_back("None");
+	for (pair<string, Model> model_pair : ResourceManager::Models)
+	{
+		model_combo_items.emplace_back(model_pair.first);
+	}
 
-    // Load list of particle texture images found in particles-textures folder and turn them into combo items vectors
-    particle_image_combo_items_list = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), png);
-    particle_image_combo_items = FileLoader::get_vector_items_to_array(particle_image_combo_items_list);
+	for (pair<string, Texture2D>  texture_pair : ResourceManager::Textures)
+	{
+		if (texture_pair.second.get_texture_use_type() == TextureUseType::Particle)
+		{
+			model_combo_items.emplace_back(texture_pair.first);
+		}
+	}
 }
 
 void UserInterface::initialize_imgui()
@@ -191,7 +196,7 @@ void UserInterface::render_object_window()
 
 	if (object_current == 1)
 	{
-		ImGui::Combo("Model Selection", &model_current, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
+		ImGui::Combo("Model Selection", &model_current, model_combo_items.data()->data(), static_cast<int>(model_combo_items.size()));
 		string current_model_name = model_combo_items[model_current];
 
 		// Find currently selected dropdown item into list and store its dropdown info

@@ -54,11 +54,9 @@ public:
 
     static const char* object_combo_items[];
     static int object_current;
-
-    static list<std::pair<std::string, std::string>> model_combo_items_list;
-    static std::vector<char*> model_combo_items;
+    
+    static std::vector<string> model_combo_items;
     static int model_current;
-    static CurrentModelInfo current_model_info;
 
     static ParticleSystem* current_particle_system;
     static particle_info particle_payload_info;

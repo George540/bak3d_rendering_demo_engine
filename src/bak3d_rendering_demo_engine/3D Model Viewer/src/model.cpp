@@ -336,7 +336,7 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 			string texture_name = string(filename.C_Str());
 			texture_name = texture_name.substr(0, texture_name.find('.'));
 			texture_name = format("{}.{}",m_model_name, texture_name);
-			Texture2D texture = Texture2D(path, type);
+			Texture2D texture = Texture2D(path, type, TextureUseType::Model);
 			ResourceManager::add_texture(texture_name, texture);
 			textures.push_back(texture_name);
 			textures_loaded.push_back(texture_name);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
