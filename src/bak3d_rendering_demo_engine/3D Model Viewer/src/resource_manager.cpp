@@ -72,6 +72,6 @@ void ResourceManager::shutdown()
 {
     for (const auto& val : Shaders | views::values)
     {
-        glDeleteProgram(val.get_id());
+        glDeleteProgram(val.get_asset_id());
     }
 }

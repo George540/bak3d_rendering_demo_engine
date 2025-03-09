@@ -18,7 +18,7 @@ public:
     [[nodiscard]] std::string get_directory() const { return m_directory; }
     [[nodiscard]] std::string get_file_name() const { return m_file_name; }
     [[nodiscard]] std::string get_asset_name() const { return m_asset_name; }
-    [[nodiscard]] int get_asset_id() const { return m_id; }
+    [[nodiscard]] GLuint get_asset_id() const { return m_id; }
 
     void set_path(const std::string& path) { m_path = path; }
     void set_directory(const std::string& directory) { m_directory = directory; }
