@@ -22,6 +22,7 @@ void ResourceManager::initialize()
 
 void ResourceManager::initialize_shaders()
 {
+    // Get directory and files
     auto directory = filesystem::absolute("shaders");
     auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert );
     auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag );
@@ -31,19 +32,29 @@ void ResourceManager::initialize_shaders()
         throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: Vertex-fragment binding miss-match!");
     }
 
+    // Get absolute paths for both vert and frag files
     auto vertex_paths = FileLoader::get_vector_items_to_array(vertex_shader_files);
     auto fragment_paths = FileLoader::get_vector_items_to_array(fragment_shader_files);
-    
-    for (const auto shader_file_pair : vertex_shader_files)
+
+    // Combine vert and frag paths in pairs
+    vector<pair<char*, char*>> vert_frag_sources;
+    vert_frag_sources.reserve(vertex_shader_files.size());
+    for (int i = 0; i < vertex_shader_files.size(); ++i)
     {
-        auto shader_name = shader_file_pair.first.substr(0, shader_file_pair.first.find('.'));
+        vert_frag_sources.emplace_back(vertex_paths[i], fragment_paths[i]);
+    }
+
+    // Create and bind shaders.
+    for (const auto shader_file_pair : vert_frag_sources)
+    {
+        auto vert_path_string = string(shader_file_pair.first);
+        auto shader_name = vert_path_string.substr(vert_path_string.find_last_of('/') + 1);
+        shader_name = shader_name.substr(0, shader_name.find('.'));
         if (!Shaders.contains(shader_name))
         {
-            auto vertex_shader_source = shader_file_pair.second;
-            auto fragment_shader_source = 
             Shaders[shader_name] = Shader(
-            string(directory.generic_string() + "/"+ shader_name + ".vert").c_str(),
-            string(directory.generic_string() + "/"+ shader_name + ".frag").c_str(),
+            shader_file_pair.first,
+            shader_file_pair.second,
             shader_name);
         }
     }
@@ -68,7 +79,7 @@ void ResourceManager::initialize_predefined_textures()
 void ResourceManager::initialize_models()
 {
     auto model_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
-    int index = 0;
+    int index = 1;
     for (const auto& model_pair : model_files)
     {
         auto model_file_name = model_pair.first;

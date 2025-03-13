@@ -22,7 +22,7 @@ Shader::Shader() :
  * \param fragment_shader_source path for fragment shader
  * \param shader_name name of shader based on file name
  */
-Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(string(vertex_shader_source), move(shader_name), 0)
+Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(vertex_shader_source, shader_name, 0)
 {
     m_index = 0;
     

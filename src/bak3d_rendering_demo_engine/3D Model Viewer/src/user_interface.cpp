@@ -61,7 +61,7 @@ void UserInterface::initialize()
 	{
 		if (texture_path.get_texture_use_type() == TextureUseType::Particle)
 		{
-			model_combo_items.emplace_back(texture_file_name);
+			//particle_image_combo_items.emplace_back(texture_file_name);
 		}
 	}
 }
@@ -198,9 +198,9 @@ void UserInterface::render_object_window()
 		ImGui::Combo("Model Selection", &model_current, model_combo_items.data()->data(), static_cast<int>(model_combo_items.size()));
 		string current_model_name = model_combo_items[model_current];
 
-		if (model_current != -1)
+		if (model_current > 0)
 		{
-			auto current_model = ResourceManager::get_model(model_combo_items[model_current + 1]);
+			auto current_model = ResourceManager::get_model(model_combo_items[model_current]);
 			
 			ImGui::Text("Vertices: %d", current_model->m_num_vertices);
 			//ImGui::Text("Edges: %d", current_model->m_unique_edges.size());

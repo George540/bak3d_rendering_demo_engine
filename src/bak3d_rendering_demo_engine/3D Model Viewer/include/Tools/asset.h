@@ -13,13 +13,13 @@ class Asset
 {
 public:
     Asset() = default;
-    Asset(std::string path, std::string asset_name, GLuint id) : m_path(std::move(path)), m_id(id)
+    Asset(const std::string& path, const std::string& asset_name, const GLuint id) : m_path(path), m_id(id)
     {
         m_id = 0;
         m_path = path;
         m_directory = m_path.substr(0, m_path.find_last_of('/'));
-        m_file_name = path.substr(m_path.find_last_of('/' + 1));
-        m_asset_name = std::move(asset_name);
+        m_file_name = path.substr(m_path.find_last_of('/') + 1);
+        m_asset_name = asset_name;
     }
     
     virtual ~Asset() = 0;

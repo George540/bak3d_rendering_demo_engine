@@ -353,9 +353,10 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 			string texture_file_name = string(filename.C_Str());
 			Texture2D texture = Texture2D(path, texture_file_name, type, TextureUseType::Model);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
-			ResourceManager::add_texture(m_asset_name + '.' + texture_name, texture);
+			auto texture_key = format("{}.{}",m_asset_name, texture_name);
+			ResourceManager::add_texture(texture_key, texture);
 			textures.push_back(texture_file_name);
-			textures_loaded.push_back(texture_file_name); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
+			textures_loaded.push_back(texture_key); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
 		}
 	}
 	return textures;
