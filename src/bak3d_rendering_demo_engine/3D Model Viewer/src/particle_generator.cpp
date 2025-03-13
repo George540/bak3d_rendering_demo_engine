@@ -56,7 +56,7 @@ void ParticleSystem::initialize()
     for (const auto& pair : particle_texture_data)
     {
         const auto& path = pair.second;
-        Texture2D t = Texture2D(path, aiTextureType_DIFFUSE);
+        Texture2D t = Texture2D(path, pair.first, aiTextureType_DIFFUSE, TextureUseType::Particle);
         m_textures_loaded.push_back(t);
     }
 

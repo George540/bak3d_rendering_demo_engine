@@ -15,7 +15,7 @@
 
 #include "asset.h"
 
-class Shader : Asset
+class Shader : public Asset
 {
 	GLuint m_index;
 	static void check_compile_errors(unsigned int shader, const std::string& type);

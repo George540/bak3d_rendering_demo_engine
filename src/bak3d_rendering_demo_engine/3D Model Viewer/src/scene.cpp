@@ -27,16 +27,20 @@ Scene::Scene()
 						  315.0f, // horizontal angle
 						  30.0f,  // vertical angle
 						  45.0f); // zoom
+
+	ResourceManager::set_camera(*m_camera);
+	
 	// Grid Setup
-	m_grid = new Grid(*m_camera, *ResourceManager::get_shader("GridShader"));
-	m_axis = new Axis(*m_camera, *ResourceManager::get_shader("LineShader"));
+	m_grid = new Grid(*ResourceManager::get_shader("GridShader"));
+	m_grid->set_camera(*m_camera);
+	m_axis = new Axis(*ResourceManager::get_shader("LineShader"));
+	m_axis->set_camera(*m_camera);
 
 	// Object setup (will be later assigned during model selection process)
-	m_model = nullptr;
 	m_particle_system = nullptr;
 
 	// Light Setup
-	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *m_camera, *ResourceManager::get_shader("LightShader"));
+	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *ResourceManager::get_shader("LightShader"));
 	UserInterface::environment_point_light = m_light;
 }
 
@@ -44,7 +48,6 @@ Scene::~Scene()
 {
 	delete m_grid;
 	delete m_camera;
-	delete m_model;
 	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
@@ -52,61 +55,7 @@ Scene::~Scene()
 
 void Scene::process_object_activation()
 {
-	process_model_activation();
 	process_particle_activation();
-}
-
-void Scene::process_model_activation()
-{
-	// MODEL INSTANTIATION AND DELETION
-	if (UserInterface::object_current == 1 && UserInterface::model_current != 0)
-	{
-		if (!m_model)
-		{
-			activate_current_model();
-		}
-		else if (m_model && UserInterface::current_model_info.model_combo_index != m_model->m_combo_index)
-		{
-			replace_current_model();
-		}
-	}
-	else if ((UserInterface::model_current == 0 && m_model) || (m_model && UserInterface::object_current == 0))
-	{
-		deactivate_current_model();
-	}
-}
-
-void Scene::activate_current_model()
-{
-	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, "", "", *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
-	UserInterface::current_model_info.current_model = m_model;
-
-	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;
-}
-
-void Scene::deactivate_current_model()
-{
-	UserInterface::current_model_info.current_model = nullptr;
-	delete m_model;
-	m_model = nullptr;
-	UserInterface::current_model_info.set_info("None", "none", 0);
-
-	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been deactivated." << endl;
-}
-
-void Scene::replace_current_model()
-{
-	cout << "Model " << m_model->m_file_name << " is being deactivated." << endl;
-	UserInterface::current_model_info.current_model = nullptr;
-	delete m_model;
-	m_model = nullptr;
-
-	auto model_absolute_path = UserInterface::current_model_info.model_file_path;
-	m_model = new Model(model_absolute_path, "", "", *m_camera, *m_light, UserInterface::current_model_info.model_combo_index);
-	UserInterface::current_model_info.current_model = m_model;
-	
-	cout << "Model " << UserInterface::current_model_info.model_file_name << " has been activated." << endl;
 }
 
 void Scene::process_particle_activation()
@@ -168,11 +117,6 @@ void Scene::draw() const
 	if (!UserInterface::current_particle_system && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
-	}
-
-	if (m_model)
-	{
-		m_model->draw();
 	}
 
 	if (m_particle_system)

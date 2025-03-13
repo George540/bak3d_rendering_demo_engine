@@ -25,8 +25,6 @@ struct CurrentModelInfo
     };
 };
 
-
-
 class UserInterface
 {
 private:
@@ -55,7 +53,7 @@ public:
     static const char* object_combo_items[];
     static int object_current;
     
-    static std::vector<string> model_combo_items;
+    static std::vector<std::string> model_combo_items;
     static int model_current;
 
     static ParticleSystem* current_particle_system;

@@ -11,6 +11,7 @@ using namespace std;
 // Instantiate static variables
 unordered_map<string, Shader> ResourceManager::Shaders;
 unordered_map<string, Texture2D> ResourceManager::Textures;
+unordered_map<string, Model> ResourceManager::Models;
 
 void ResourceManager::initialize()
 {
@@ -21,17 +22,30 @@ void ResourceManager::initialize()
 
 void ResourceManager::initialize_shaders()
 {
-    //Shaders will be precompiled before engine is initialized
-    constexpr const char* shader_names[] = { "LineShader", "GridShader", "LightShader", "ModelShader", "DissectShader", "ParticleShader" };
-    constexpr size_t library_size = size(shader_names);
+    auto directory = filesystem::absolute("shaders");
+    auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert );
+    auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag );
 
-    for (const auto i : shader_names)
+    if (vertex_shader_files.size() != fragment_shader_files.size())
     {
-        auto shader_name = string(i);
-        Shaders[shader_name] = Shader(
-            filesystem::absolute("shaders/" + shader_name + ".vert").string().c_str(),
-            filesystem::absolute("shaders/" + shader_name + ".frag").string().c_str(),
+        throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: Vertex-fragment binding miss-match!");
+    }
+
+    auto vertex_paths = FileLoader::get_vector_items_to_array(vertex_shader_files);
+    auto fragment_paths = FileLoader::get_vector_items_to_array(fragment_shader_files);
+    
+    for (const auto shader_file_pair : vertex_shader_files)
+    {
+        auto shader_name = shader_file_pair.first.substr(0, shader_file_pair.first.find('.'));
+        if (!Shaders.contains(shader_name))
+        {
+            auto vertex_shader_source = shader_file_pair.second;
+            auto fragment_shader_source = 
+            Shaders[shader_name] = Shader(
+            string(directory.generic_string() + "/"+ shader_name + ".vert").c_str(),
+            string(directory.generic_string() + "/"+ shader_name + ".frag").c_str(),
             shader_name);
+        }
     }
 
     cout << "Number of shaders compiled: " << Shaders.size() << endl;
@@ -40,33 +54,36 @@ void ResourceManager::initialize_shaders()
     {
         throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: No shaders loaded!");
     }
-    if (Shaders.size() != library_size)
-    {
-        throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: Not all shaders have been compiled!");
-    }
 }
 
 void ResourceManager::initialize_predefined_textures()
 {
-    auto image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
+    auto image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), png);
     for (auto [file_name, file_path] : image_files)
     {
-        auto texture_name = file_name.substr(0, texture_name.find('.'));
-        Textures[texture_name] = Texture2D(file_path, aiTextureType_DIFFUSE, TextureUseType::Particle);
+        Textures[file_name] = Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
 }
 
 void ResourceManager::initialize_models()
 {
     auto model_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
-    int index = 1;
+    int index = 0;
     for (const auto& model_pair : model_files)
     {
         auto model_file_name = model_pair.first;
-        auto model_name = model_file_name.substr(0, model_file_name.find('.'));
-        Models[model_file_name] = Model(model_pair.second, model_file_name, model_name, index++);
+        Models[model_file_name] = Model(model_pair.second, model_file_name, index++);
     }
 }
+
+void ResourceManager::set_camera(Camera& camera)
+{
+    for (auto model : Models)
+    {
+        model.second.set_camera(camera);
+    }
+}
+
 
 void ResourceManager::shutdown()
 {
@@ -74,4 +91,8 @@ void ResourceManager::shutdown()
     {
         glDeleteProgram(val.get_asset_id());
     }
+
+    Shaders.clear();
+    Textures.clear();
+    Models.clear();
 }

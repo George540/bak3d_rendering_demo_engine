@@ -5,8 +5,8 @@
 
 #include "renderer.h"
 
-Axis::Axis(Camera& camera, Shader& shader) :
-	Object(camera, shader)
+Axis::Axis(Shader& shader) :
+	Object(shader)
 {
 	m_scaling = glm::vec3(3.0f);
 	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);

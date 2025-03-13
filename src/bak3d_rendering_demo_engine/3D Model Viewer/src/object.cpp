@@ -2,9 +2,8 @@
 
 #include "object.h"
 
-Object::Object(Camera& camera, Shader& shader)
+Object::Object(Shader& shader)
 {
-	m_camera = &camera;
 	m_shader = &shader;
 
 	m_vao = new VertexArray();
@@ -31,7 +30,7 @@ void Object::update(float dt)
 
 void Object::draw() const
 {
-	if (!m_shader) return;
+	if (!m_shader || !m_camera) return;
 
 	m_shader->use();
 

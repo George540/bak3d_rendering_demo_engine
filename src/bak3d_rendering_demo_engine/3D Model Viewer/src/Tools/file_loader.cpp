@@ -101,7 +101,8 @@ list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesy
 						auto path = entry.path();
 						auto filepath = path.generic_string();
 						auto filename = path.filename().generic_string();
-						files_list.emplace_back(filename, filepath);
+						auto assetname = filename.substr(0, filename.find_last_of('/'));
+						files_list.emplace_back(assetname, filepath);
 					}
 				}
 			}
@@ -156,12 +157,12 @@ string FileLoader::enum_to_string(FileType type)
 	}
 }
 
-vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, string>> list_items)
+vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, string>> list_items) // <file_name, file_path>
 {
 	vector<string> vector_items;
 	for (const auto& item : list_items)
 	{
-		vector_items.push_back(item.first);
+		vector_items.push_back(item.second);
 	}
 
 	vector<char*> c_str_items;

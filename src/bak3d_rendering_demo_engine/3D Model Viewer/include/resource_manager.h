@@ -19,6 +19,7 @@ public:
     static std::unordered_map<std::string, Model> Models;
 
     static void initialize();
+    static void set_camera(Camera& camera);
     
     static Shader* get_shader(const std::string& shader_name) { return &Shaders[shader_name]; }
     

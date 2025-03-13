@@ -7,8 +7,8 @@
 #include "renderer.h"
 #include "user_interface.h"
 
-Light::Light(glm::vec3 position, glm::vec3 scaling, Camera& camera, Shader& shader) :
-	Object(camera, shader)
+Light::Light(glm::vec3 position, glm::vec3 scaling, Shader& shader) :
+	Object(shader)
 {
 	m_position = position;
 	m_scaling = scaling;

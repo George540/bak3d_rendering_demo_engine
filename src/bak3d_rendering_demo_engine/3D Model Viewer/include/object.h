@@ -25,9 +25,10 @@ protected:
     Shader* m_shader;
     Camera* m_camera;
 public:
-    Object(Camera& camera, Shader& shader);
+    Object(Shader& shader);
     virtual ~Object();
 
+    void set_camera(Camera& camera) { m_camera = &camera; }
     void update(float dt) override;
     virtual void draw() const;
     void delete_globjects() const;

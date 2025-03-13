@@ -19,7 +19,6 @@ bool UserInterface::is_grid_rendering = true;
 glm::vec3 UserInterface::background_color = glm::vec3(0.3f);
 
 // Model
-CurrentModelInfo UserInterface::current_model_info = CurrentModelInfo();
 bool UserInterface::is_full_render_selected = true;
 bool UserInterface::is_diffuse_render_selected = false;
 bool UserInterface::is_specular_selected = false;
@@ -28,7 +27,7 @@ bool UserInterface::is_gamma_enabled = false;
 float UserInterface::shininess = 64.0f;
 const char* UserInterface::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int UserInterface::object_current = 0;
-vector<string> UserInterface::model_combo_items;
+vector<string> UserInterface::model_combo_items; // backpack, mushroom, etc
 int UserInterface::model_current = 0;
 const char* UserInterface::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int UserInterface::render_current = 0;
@@ -53,16 +52,16 @@ void UserInterface::initialize()
     initialize_imgui();
 
 	model_combo_items.emplace_back("None");
-	for (pair<string, Model> model_pair : ResourceManager::Models)
+	for (auto [model_file_name, model_path] : ResourceManager::Models)
 	{
-		model_combo_items.emplace_back(model_pair.first);
+		model_combo_items.emplace_back(model_file_name);
 	}
 
-	for (pair<string, Texture2D>  texture_pair : ResourceManager::Textures)
+	for (auto [texture_file_name, texture_path] : ResourceManager::Textures)
 	{
-		if (texture_pair.second.get_texture_use_type() == TextureUseType::Particle)
+		if (texture_path.get_texture_use_type() == TextureUseType::Particle)
 		{
-			model_combo_items.emplace_back(texture_pair.first);
+			model_combo_items.emplace_back(texture_file_name);
 		}
 	}
 }
@@ -199,20 +198,10 @@ void UserInterface::render_object_window()
 		ImGui::Combo("Model Selection", &model_current, model_combo_items.data()->data(), static_cast<int>(model_combo_items.size()));
 		string current_model_name = model_combo_items[model_current];
 
-		// Find currently selected dropdown item into list and store its dropdown info
-		auto model_info = find_if(model_combo_items_list.begin(), model_combo_items_list.end(), [&current_model_name](const auto& pair)
-			{
-				return pair.first == current_model_name;
-			});
-		if (model_info != model_combo_items_list.end())
+		if (model_current != -1)
 		{
-			current_model_info.set_info(model_info->first, model_info->second, model_current);
-		}
-
-		if (current_model_info.current_model && model_current != 0)
-		{
-			auto current_model = current_model_info.current_model;
-
+			auto current_model = ResourceManager::get_model(model_combo_items[model_current + 1]);
+			
 			ImGui::Text("Vertices: %d", current_model->m_num_vertices);
 			//ImGui::Text("Edges: %d", current_model->m_unique_edges.size());
 			ImGui::Text("Faces: %d", current_model->m_num_faces);
@@ -400,11 +389,7 @@ void UserInterface::render_object_window()
 	else
 	{
 		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Object settings disabled. Selected an object type to view.");
-		if (!current_model_info.current_model)
-		{
-			current_model_info.current_model = nullptr;
-			model_current = 0;
-		}
+		model_current = 0;
 	}
 
 	ImGui::End();
@@ -423,12 +408,6 @@ void UserInterface::shutdown()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-
-	// Free up model combo items stored in memory
-	for (size_t i = 0; i < model_combo_items_list.size(); ++i)
-	{
-		delete[] model_combo_items[i];
-	}
 
 	// Free up particle image combo items stored in memory
 	for (size_t i = 0; i < particle_image_combo_items_list.size(); ++i)

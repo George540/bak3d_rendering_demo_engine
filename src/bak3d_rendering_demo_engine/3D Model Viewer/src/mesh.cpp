@@ -5,10 +5,13 @@
 
 #include "resource_manager.h"
 
-Mesh::Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices) :
-    Object(cam, *ResourceManager::get_shader("ModelShader")),
-	m_vertices(std::move(vertices)),
-	m_indices(std::move(indices))
+using namespace std;
+
+Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures) :
+    Object(*ResourceManager::get_shader("ModelShader")),
+	m_vertices(move(vertices)),
+	m_indices(move(indices)),
+    m_textures(move(textures))
 {
     // create buffers/arrays
     m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), m_vertices.data());

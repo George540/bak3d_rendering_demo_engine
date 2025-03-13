@@ -34,19 +34,12 @@ public:
 	void update(float dt) const;
 	void draw() const;
 	void process_object_activation();
-	Model* get_model() const { return m_model; }
 	void delete_arrays_and_buffers() const;
 private:
 	static Scene* instance;
-
-	void process_model_activation();
+	
 	void process_particle_activation();
-
-	void activate_current_model();
-	void deactivate_current_model();
-	void replace_current_model();
-
-	Model* m_model;
+	
 	ParticleSystem* m_particle_system;
 	Camera* m_camera;
 	Light* m_light;

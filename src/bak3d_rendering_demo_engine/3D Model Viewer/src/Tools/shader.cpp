@@ -4,10 +4,17 @@
 #include <fstream>
 #include <iostream>
 #include <glm/glm.hpp>
+#include <utility>
 
 using namespace std;
 
-Shader::Shader() : Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(), filesystem::absolute("shaders/LineShader.frag").string().c_str(), "LineShader") {}
+Shader::Shader() :
+    Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(),
+        filesystem::absolute("shaders/LineShader.frag").string().c_str(),
+        "LineShader")
+{
+    
+}
 
 /**
  * \brief Constructor for Shader class
@@ -15,13 +22,8 @@ Shader::Shader() : Shader(filesystem::absolute("shaders/LineShader.vert").string
  * \param fragment_shader_source path for fragment shader
  * \param shader_name name of shader based on file name
  */
-Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name)
+Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(string(vertex_shader_source), move(shader_name), 0)
 {
-    auto vertex_path = string(vertex_shader_source);
-    m_path = vertex_path;
-    m_directory = vertex_path.substr(0, vertex_path.find('.'));
-    m_file_name = vertex_path.substr(vertex_path.find('.') + 1);
-    m_asset_name = shader_name;
     m_index = 0;
     
     // 1. retrieve the vertex/fragment source code from filePath
@@ -63,13 +65,13 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
 
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
     check_compile_errors(vertex, "VERTEX");
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
     check_compile_errors(fragment, "FRAGMENT");
 

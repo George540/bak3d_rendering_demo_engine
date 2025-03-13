@@ -18,19 +18,18 @@
 #include "mesh_data.h"
 #include "object.h"
 #include "shader.h"
-#include "texture.h"
 
 class Mesh : public Object
 {
 public:
     // mesh Data
     Material m_material{};
-    vector<Vertex> m_vertices;
-    vector<GLuint> m_indices;
-    vector<std::string> m_textures;
+    std::vector<Vertex> m_vertices;
+    std::vector<GLuint> m_indices;
+    std::vector<std::string> m_textures;
 
     // constructor
-    Mesh(Camera& cam, vector<Vertex> vertices, vector<GLuint> indices);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::string> textures);
     ~Mesh() override;
     void draw() const override;
 

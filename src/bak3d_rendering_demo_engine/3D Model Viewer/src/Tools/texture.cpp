@@ -7,26 +7,20 @@
 
 using namespace std;
 
-Texture2D::Texture2D(const std::string& path, aiTextureType type, TextureUseType textureUse, bool verbose)
+Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType type, TextureUseType textureUse, bool verbose)
     :
+    Asset(path, file_name, 0),
     m_texture_type(type),
     m_texture_use_type(textureUse)
 {
-    m_path = path;
-    m_directory = m_path.substr(0, m_path.find('.'));
-    m_file_name = m_path.substr(m_path.find('.') + 1);
-    m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
-    
     if (verbose)
     {
         std::cout << "Loading texture file: " << m_file_name << std::endl;
     }
 
     glGenTextures(1, &m_id);
-    
-    const auto data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_nb_color_channels, 0);
 
-    if (data)
+    if (const auto data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_nb_color_channels, 0))
     {
         GLenum format;
         switch (m_nb_color_channels)

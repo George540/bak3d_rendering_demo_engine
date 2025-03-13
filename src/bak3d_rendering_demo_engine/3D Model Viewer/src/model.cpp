@@ -13,12 +13,16 @@
 
 using namespace std;
 
-Model::Model(const string& path, const string& file_name, const string& model_name, int index) :
-	m_file_name(file_name),
-	m_model_name(model_name),
-	m_combo_index(index)
+Model::Model(const string& path, const std::string& file_name, int index) :
+	m_combo_index(index),
+	m_camera(nullptr),
+	m_light(nullptr)
 {
-	m_directory = path.substr(0, path.find_last_of('/'));
+	m_path = path;
+	m_directory = m_path.substr(0, m_path.find_last_of('/'));
+	m_file_name = file_name;
+	m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
+	
 	m_toggle_shaders[0] = ResourceManager::get_shader("ModelShader");
 	m_toggle_shaders[1] = ResourceManager::get_shader("DissectShader");
 	load_model(path);
@@ -44,8 +48,19 @@ Model::~Model()
 	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << endl;
 }
 
+void Model::set_camera(Camera& camera)
+{
+	m_camera = &camera;
+	for (auto mesh : meshes)
+	{
+		mesh->set_camera(camera);
+	}
+}
+
 void Model::draw() const
 {
+	if (!m_is_visible || !m_camera || !m_light) return;
+	
 	for (auto& mesh : meshes)
 	{
 		if (m_toggle_shaders[m_current_shader_index] != mesh->get_current_shader())
@@ -73,7 +88,7 @@ void Model::draw() const
 
 void Model::update_light_properties() const
 {
-	if (!m_light) return;
+	if (!m_light || !m_camera) return;
 	
 	const auto light = m_light->get_light_properties();
 
@@ -97,9 +112,9 @@ void Model::update_material_properties() const
 
 	// FRAGMENT MATERIAL
 	auto resources = ResourceManager::Textures;
-	current_shader->set_int("material.diffuse", ResourceManager::get_texture(m_model_name + '.' + "diffuse")->get_id());
-	current_shader->set_int("material.specular", ResourceManager::get_texture(m_model_name + '.' + "specular")->get_id());
-	current_shader->set_int("material.normal", ResourceManager::get_texture(m_model_name + '.' + "normal")->get_id());
+	current_shader->set_int("material.diffuse", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "diffuse")->get_asset_id()));
+	current_shader->set_int("material.specular", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "specular")->get_asset_id()));
+	current_shader->set_int("material.normal", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "normal")->get_asset_id()));
 	current_shader->set_float("material.ambient", 0.5f);
 	current_shader->set_float("material.shininess", UserInterface::shininess);
 	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
@@ -168,7 +183,7 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		meshes.push_back(mesh_object);
 	}
 
-	// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
+	// after we've processed all the meshes (if any) we then recursively process each of the children nodes
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
 		process_node(node->mChildren[i], scene);
@@ -179,7 +194,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
 	// data to fill
 	vector<Vertex> vertices;
-	vector<unsigned int> indices;
+	vector<GLuint> indices;
 	vector<string> textures;
 
 	// walk through each of the mesh's vertices
@@ -308,7 +323,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
-	return new Mesh(*m_camera, vertices, indices, textures);
+	return new Mesh(vertices, indices, textures);
 }
 
 vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
@@ -324,7 +339,7 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 		{
 			auto file_model_name = string(filename.C_Str());
 			file_model_name = file_model_name.substr(0, file_model_name.find('.'));
-			file_model_name = format("{}.{}",m_model_name, file_model_name);
+			file_model_name = format("{}.{}",m_asset_name, file_model_name);
 			if (std::strcmp(text_loaded.c_str(), file_model_name.c_str()) == 0)
 			{
 				textures.push_back(text_loaded);
@@ -335,13 +350,12 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
 			string path = m_directory + '/' + filename.C_Str();
-			string texture_name = string(filename.C_Str());
-			texture_name = texture_name.substr(0, texture_name.find('.'));
-			texture_name = format("{}.{}",m_model_name, texture_name);
-			Texture2D texture = Texture2D(path, type, TextureUseType::Model);
-			ResourceManager::add_texture(texture_name, texture);
-			textures.push_back(texture_name);
-			textures_loaded.push_back(texture_name);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+			string texture_file_name = string(filename.C_Str());
+			Texture2D texture = Texture2D(path, texture_file_name, type, TextureUseType::Model);
+			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
+			ResourceManager::add_texture(m_asset_name + '.' + texture_name, texture);
+			textures.push_back(texture_file_name);
+			textures_loaded.push_back(texture_file_name); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
 		}
 	}
 	return textures;
