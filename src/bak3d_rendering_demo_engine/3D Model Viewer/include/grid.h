@@ -15,7 +15,7 @@
 class Grid : public Object
 {
 public:
-	Grid(Shader& shader);
+	Grid(Shader* shader);
 	~Grid() override = default;
 
 	void draw() const override;

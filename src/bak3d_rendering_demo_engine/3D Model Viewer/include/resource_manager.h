@@ -14,19 +14,19 @@ class ResourceManager
 {
 public:
     // resource storage
-    static std::unordered_map<std::string, Shader> Shaders;
-    static std::unordered_map<std::string, Texture2D> Textures;
-    static std::unordered_map<std::string, Model> Models;
+    static std::unordered_map<std::string, Shader*> Shaders;
+    static std::unordered_map<std::string, Texture2D*> Textures;
+    static std::unordered_map<std::string, Model*> Models;
 
     static void initialize();
-    static void set_camera(Camera& camera);
+    static void set_camera(Camera& camera, Light& light);
     
-    static Shader* get_shader(const std::string& shader_name) { return &Shaders[shader_name]; }
+    static Shader* get_shader(const std::string& shader_name) { return Shaders[shader_name]; }
     
-    static void add_texture(const std::string name, const Texture2D texture) { Textures[name] = texture; }
-    static Texture2D* get_texture(const std::string& texture_name) { return &Textures[texture_name]; }
+    static void add_texture(const std::string name, Texture2D* texture) { Textures[name] = texture; }
+    static Texture2D* get_texture(const std::string& texture_name) { return Textures[texture_name]; }
     
-    static Model* get_model(const std::string& model_name) { return &Models[model_name]; }
+    static Model* get_model(const std::string& model_name) { return Models[model_name]; }
     
     static void shutdown();
 private:

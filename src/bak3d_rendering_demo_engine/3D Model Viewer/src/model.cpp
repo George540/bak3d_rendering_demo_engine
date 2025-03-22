@@ -23,34 +23,29 @@ Model::Model(const string& path, const std::string& file_name, int index) :
 	m_file_name = file_name;
 	m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
 	
-	m_toggle_shaders[0] = ResourceManager::get_shader("ModelShader");
-	m_toggle_shaders[1] = ResourceManager::get_shader("DissectShader");
+	m_toggle_shaders[0] = new Shader(*ResourceManager::get_shader("ModelShader"));
+	m_toggle_shaders[1] = new Shader(*ResourceManager::get_shader("DissectShader"));
 	load_model(path);
 }
 
 Model::~Model()
 {
-	m_toggle_shaders[0]->set_int("material.diffuse", -1);
-	m_toggle_shaders[0]->set_int("material.specular", -1);
-	m_toggle_shaders[0]->set_int("material.normal", -1);
-
-	m_toggle_shaders[0]->set_int("textureSampler", -1);
-	
 	// Free texture data
 	textures_loaded.clear();
-	cout << "Texture data of model " << m_file_name << " have been cleared" << endl;
+	cout << "Texture data of model " << m_file_name << " have been cleared" << '\n';
 	
 	// Safely dereference camera and light addresses from pointers
 	m_camera = nullptr;
 	m_light = nullptr;
 	
 	meshes.clear();
-	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << endl;
+	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << '\n';
 }
 
-void Model::set_camera(Camera& camera)
+void Model::set_camera_and_light(Camera& camera, Light& light)
 {
 	m_camera = &camera;
+	m_light = &light;
 	for (auto mesh : meshes)
 	{
 		mesh->set_camera(camera);
@@ -111,10 +106,9 @@ void Model::update_material_properties() const
 	auto current_shader = m_toggle_shaders[m_current_shader_index];
 
 	// FRAGMENT MATERIAL
-	auto resources = ResourceManager::Textures;
-	current_shader->set_int("material.diffuse", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "diffuse")->get_asset_id()));
-	current_shader->set_int("material.specular", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "specular")->get_asset_id()));
-	current_shader->set_int("material.normal", static_cast<int>(ResourceManager::get_texture(m_asset_name + '.' + "normal")->get_asset_id()));
+	current_shader->set_int("material.diffuse", 0);
+	current_shader->set_int("material.specular", 1);
+	current_shader->set_int("material.normal", 2);
 	current_shader->set_float("material.ambient", 0.5f);
 	current_shader->set_float("material.shininess", UserInterface::shininess);
 	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
@@ -351,11 +345,11 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 		{   // if texture hasn't been loaded already, load it
 			string path = m_directory + '/' + filename.C_Str();
 			string texture_file_name = string(filename.C_Str());
-			Texture2D texture = Texture2D(path, texture_file_name, type, TextureUseType::Model);
+			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
 			auto texture_key = format("{}.{}",m_asset_name, texture_name);
 			ResourceManager::add_texture(texture_key, texture);
-			textures.push_back(texture_file_name);
+			textures.push_back(texture_key);
 			textures_loaded.push_back(texture_key); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
 		}
 	}

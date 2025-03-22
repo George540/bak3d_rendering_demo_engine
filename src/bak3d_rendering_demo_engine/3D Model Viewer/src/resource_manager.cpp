@@ -9,9 +9,9 @@
 using namespace std;
 
 // Instantiate static variables
-unordered_map<string, Shader> ResourceManager::Shaders;
-unordered_map<string, Texture2D> ResourceManager::Textures;
-unordered_map<string, Model> ResourceManager::Models;
+unordered_map<string, Shader*> ResourceManager::Shaders;
+unordered_map<string, Texture2D*> ResourceManager::Textures;
+unordered_map<string, Model*> ResourceManager::Models;
 
 void ResourceManager::initialize()
 {
@@ -52,7 +52,7 @@ void ResourceManager::initialize_shaders()
         shader_name = shader_name.substr(0, shader_name.find('.'));
         if (!Shaders.contains(shader_name))
         {
-            Shaders[shader_name] = Shader(
+            Shaders[shader_name] = new Shader(
             shader_file_pair.first,
             shader_file_pair.second,
             shader_name);
@@ -72,7 +72,7 @@ void ResourceManager::initialize_predefined_textures()
     auto image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), png);
     for (auto [file_name, file_path] : image_files)
     {
-        Textures[file_name] = Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
+        Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
 }
 
@@ -83,15 +83,15 @@ void ResourceManager::initialize_models()
     for (const auto& model_pair : model_files)
     {
         auto model_file_name = model_pair.first;
-        Models[model_file_name] = Model(model_pair.second, model_file_name, index++);
+        Models[model_file_name] = new Model(model_pair.second, model_file_name, index++);
     }
 }
 
-void ResourceManager::set_camera(Camera& camera)
+void ResourceManager::set_camera(Camera& camera, Light& light)
 {
     for (auto model : Models)
     {
-        model.second.set_camera(camera);
+        model.second->set_camera_and_light(camera, light);
     }
 }
 
@@ -100,7 +100,7 @@ void ResourceManager::shutdown()
 {
     for (const auto& val : Shaders | views::values)
     {
-        glDeleteProgram(val.get_asset_id());
+        glDeleteProgram(val->get_asset_id());
     }
 
     Shaders.clear();

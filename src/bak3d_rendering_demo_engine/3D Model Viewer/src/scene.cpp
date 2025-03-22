@@ -27,21 +27,22 @@ Scene::Scene()
 						  315.0f, // horizontal angle
 						  30.0f,  // vertical angle
 						  45.0f); // zoom
-
-	ResourceManager::set_camera(*m_camera);
 	
 	// Grid Setup
-	m_grid = new Grid(*ResourceManager::get_shader("GridShader"));
+	m_grid = new Grid(ResourceManager::get_shader("GridShader"));
 	m_grid->set_camera(*m_camera);
-	m_axis = new Axis(*ResourceManager::get_shader("LineShader"));
+	m_axis = new Axis(ResourceManager::get_shader("LineShader"));
 	m_axis->set_camera(*m_camera);
 
 	// Object setup (will be later assigned during model selection process)
 	m_particle_system = nullptr;
 
 	// Light Setup
-	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), *ResourceManager::get_shader("LightShader"));
+	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_shader("LightShader"));
+	m_light->set_camera(*m_camera);
 	UserInterface::environment_point_light = m_light;
+
+	ResourceManager::set_camera(*m_camera, *m_light);
 }
 
 Scene::~Scene()
@@ -117,6 +118,11 @@ void Scene::draw() const
 	if (!UserInterface::current_particle_system && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
+	}
+
+	if (auto current_model = ResourceManager::get_model(UserInterface::model_combo_items[UserInterface::model_current_index]))
+	{
+		current_model->draw();
 	}
 
 	if (m_particle_system)

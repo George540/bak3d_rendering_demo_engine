@@ -25,7 +25,7 @@ protected:
     Shader* m_shader;
     Camera* m_camera;
 public:
-    Object(Shader& shader);
+    Object(Shader* shader);
     virtual ~Object();
 
     void set_camera(Camera& camera) { m_camera = &camera; }

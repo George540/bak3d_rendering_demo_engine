@@ -25,6 +25,8 @@ Shader::Shader() :
 Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(vertex_shader_source, shader_name, 0)
 {
     m_index = 0;
+    m_vert_path = vertex_shader_source;
+    m_frag_path = fragment_shader_source;
     
     // 1. retrieve the vertex/fragment source code from filePath
 	string vertexCode;
@@ -87,6 +89,11 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     glDeleteShader(fragment);
 
     cout << "Shader " << m_asset_name << " with ID " << m_id << " has compiled..." << endl;
+}
+
+Shader::Shader(const Shader& otherShader) : Shader(otherShader.get_vert_path(), otherShader.get_frag_path(), otherShader.get_asset_name())
+{
+    
 }
 
 Shader::~Shader()

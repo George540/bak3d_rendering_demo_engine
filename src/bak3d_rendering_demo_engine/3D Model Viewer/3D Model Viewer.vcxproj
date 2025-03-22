@@ -115,7 +115,7 @@
       <AdditionalIncludeDirectories>D:\GitRepositories\bak3d_rendering_demo_engine\lib\imgui\include;D:\GitRepositories\assimp\build\include\assimp;D:\GitRepositories\bak3d_rendering_demo_engine\lib\assimp\include;&amp;(SolutionDir);D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include;D:\GitRepositories\bak3d_rendering_demo_engine\lib;D:\GitRepositories\bak3d_rendering_demo_engine\lib\KHR;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glad;D:\GitRepositories\bak3d_rendering_demo_engine\src\bak3d_rendering_demo_engine\3D Model Viewer\include\Tools;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glm;D:\GitRepositories\bak3d_rendering_demo_engine\lib\glfw-3.3.8.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <Optimization>Full</Optimization>
+      <Optimization>Disabled</Optimization>
       <AdditionalOptions>/FS</AdditionalOptions>
     </ClCompile>
     <Link>

@@ -8,7 +8,7 @@
 using namespace std;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures) :
-    Object(*ResourceManager::get_shader("ModelShader")),
+    Object(nullptr),
 	m_vertices(move(vertices)),
 	m_indices(move(indices)),
     m_textures(move(textures))

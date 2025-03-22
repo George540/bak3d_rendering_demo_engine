@@ -15,7 +15,7 @@
 class Axis : public Object
 {
 public:
-	Axis(Shader& shader);
+	Axis(Shader* shader);
 	~Axis() override = default;
 
 	void draw() const override;

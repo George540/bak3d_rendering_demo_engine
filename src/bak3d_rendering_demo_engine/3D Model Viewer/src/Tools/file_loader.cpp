@@ -157,12 +157,19 @@ string FileLoader::enum_to_string(FileType type)
 	}
 }
 
-vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, string>> list_items) // <file_name, file_path>
+vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, string>> list_items, bool is_returning_path) // <file_name, file_path>
 {
 	vector<string> vector_items;
 	for (const auto& item : list_items)
 	{
-		vector_items.push_back(item.second);
+		if (is_returning_path)
+		{
+			vector_items.push_back(item.second);
+		}
+		else
+		{
+			vector_items.push_back(item.first);
+		}
 	}
 
 	vector<char*> c_str_items;

@@ -1,6 +1,7 @@
 ﻿#include "user_interface.h"
 
 #include <iostream>
+#include <ranges>
 
 #include "event_manager.h"
 #include "renderer.h"
@@ -27,8 +28,9 @@ bool UserInterface::is_gamma_enabled = false;
 float UserInterface::shininess = 64.0f;
 const char* UserInterface::object_combo_items[] = { "None", "Model", "Particle System", "GPU Particles" };
 int UserInterface::object_current = 0;
-vector<string> UserInterface::model_combo_items; // backpack, mushroom, etc
-int UserInterface::model_current = 0;
+vector<const char*> UserInterface::model_combo_items; // backpack, mushroom, etc
+Model* UserInterface::model_current_object = nullptr;
+int UserInterface::model_current_index = 0;
 const char* UserInterface::map_combo_items[] = { "Full Render", "Albedo", "Specular", "Normal" };
 int UserInterface::render_current = 0;
 
@@ -50,16 +52,23 @@ float UserInterface::light_intensity = 1.0f;
 void UserInterface::initialize()
 {
     initialize_imgui();
-
+	
 	model_combo_items.emplace_back("None");
-	for (auto [model_file_name, model_path] : ResourceManager::Models)
+	list<pair<string, string>> models_file_path_names;
+	for (auto model_pair : ResourceManager::Models)
 	{
-		model_combo_items.emplace_back(model_file_name);
+		models_file_path_names.emplace_back(model_pair.first, model_pair.second->get_path());
+	}
+	auto model_file_names = FileLoader::get_vector_items_to_array(models_file_path_names, false);
+
+	for (auto file_name : model_file_names)
+	{
+		model_combo_items.push_back(file_name);
 	}
 
 	for (auto [texture_file_name, texture_path] : ResourceManager::Textures)
 	{
-		if (texture_path.get_texture_use_type() == TextureUseType::Particle)
+		if (texture_path->get_texture_use_type() == TextureUseType::Particle)
 		{
 			//particle_image_combo_items.emplace_back(texture_file_name);
 		}
@@ -195,12 +204,19 @@ void UserInterface::render_object_window()
 
 	if (object_current == 1)
 	{
-		ImGui::Combo("Model Selection", &model_current, model_combo_items.data()->data(), static_cast<int>(model_combo_items.size()));
-		string current_model_name = model_combo_items[model_current];
-
-		if (model_current > 0)
+		auto updated_model = ResourceManager::get_model(model_combo_items[model_current_index]);
+		if (updated_model && model_current_object && updated_model->get_asset_name() != model_current_object->get_asset_name())
 		{
-			auto current_model = ResourceManager::get_model(model_combo_items[model_current]);
+			model_current_object->set_visible(false);
+			model_current_object = updated_model;
+			model_current_object->set_visible(true);
+		}
+		ImGui::Combo("Model Selection", &model_current_index, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
+
+		if (model_current_index > 0)
+		{
+			auto current_model = ResourceManager::get_model(model_combo_items[model_current_index]);
+			current_model->set_visible(true);
 			
 			ImGui::Text("Vertices: %d", current_model->m_num_vertices);
 			//ImGui::Text("Edges: %d", current_model->m_unique_edges.size());
@@ -389,7 +405,7 @@ void UserInterface::render_object_window()
 	else
 	{
 		ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Object settings disabled. Selected an object type to view.");
-		model_current = 0;
+		model_current_index = 0;
 	}
 
 	ImGui::End();

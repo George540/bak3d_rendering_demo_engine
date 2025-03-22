@@ -2,9 +2,9 @@
 
 #include "object.h"
 
-Object::Object(Shader& shader)
+Object::Object(Shader* shader)
 {
-	m_shader = &shader;
+	m_shader = shader;
 
 	m_vao = new VertexArray();
 	m_vao->bind_object();

@@ -35,7 +35,6 @@ public:
 	std::set<Edge> m_unique_edges; // with a set, an edge is ensured to be stored only once
 	int m_num_faces;
 	int m_num_triangles;
-	bool m_is_visible;
 
 	// constructor, expects a filepath to a 3D model.
 
@@ -44,7 +43,7 @@ public:
 	~Model() override;
 
 	void draw() const; // draws the model, and thus all its meshes
-	void set_camera(Camera& camera);
+	void set_camera_and_light(Camera& camera, Light& light);
 	void set_toggle_shaders(Shader* model_shader, Shader* dissect_shader) { m_toggle_shaders[0] = model_shader; m_toggle_shaders[1] = dissect_shader; }
 	void set_current_toggle_shader(GLuint shader_index) { m_current_shader_index = shader_index; }
 	void set_visible(bool visible) { m_is_visible = visible; };
@@ -66,6 +65,8 @@ private:
 	GLuint m_current_shader_index;
 	Camera* m_camera;
 	Light* m_light;
+
+	bool m_is_visible;
 };
 
 #endif

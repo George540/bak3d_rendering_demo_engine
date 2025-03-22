@@ -17,16 +17,23 @@
 
 class Shader : public Asset
 {
+private:
+	const char* m_vert_path;
+	const char* m_frag_path;
+	
 	GLuint m_index;
 	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
 	// Constructor
 	Shader();
 	Shader(const char* vertex_shader_source, const char* fragment_shader_source, std::string shader_name);
+	Shader(const Shader& otherShader);
 	~Shader() override;
 
 	// Core functions
 	[[nodiscard]] GLuint get_index() const { return m_index; }
+	[[nodiscard]] const char* get_vert_path() const { return m_vert_path; }
+	[[nodiscard]] const char* get_frag_path() const { return m_frag_path; }
 	void set_index(int i) { m_index = i; }
 	void use() const;
 	void unuse() const;

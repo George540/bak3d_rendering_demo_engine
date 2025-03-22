@@ -31,8 +31,8 @@ class Light : public Object
 	light m_properties{};
 
 public:
-	Light(glm::vec3 position, glm::vec3 scaling, Shader& shader);
-	~Light() override {};
+	Light(glm::vec3 position, glm::vec3 scaling, Shader* shader);
+	~Light() override = default;
 
 	void update(float dt) override;
 	void draw() const override;
