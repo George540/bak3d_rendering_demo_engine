@@ -7,8 +7,8 @@
 #include "renderer.h"
 #include "user_interface.h"
 
-Light::Light(glm::vec3 position, glm::vec3 scaling, Shader* shader) :
-	Object(shader)
+Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
+	Object(material)
 {
 	m_position = position;
 	m_scaling = scaling;
@@ -69,7 +69,7 @@ void Light::draw() const
 {
 	Object::draw();
 
-	m_shader->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
+	m_material->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
 
 	m_vao->bind_object();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(CUBE_INDICES_SOLID.size()), GL_UNSIGNED_INT, nullptr);

@@ -24,8 +24,6 @@ Model::Model(const string& path, const std::string& file_name, int index) :
 	m_file_name = file_name;
 	m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
 	
-	m_toggle_shaders[0] = new Shader(*ResourceManager::get_shader("ModelShader"));
-	m_toggle_shaders[1] = new Shader(*ResourceManager::get_shader("DissectShader"));
 	load_model(path);
 }
 
@@ -38,6 +36,7 @@ Model::~Model()
 	// Safely dereference camera and light addresses from pointers
 	m_camera = nullptr;
 	m_light = nullptr;
+	m_current_material = nullptr;
 	
 	meshes.clear();
 	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << '\n';
@@ -55,26 +54,22 @@ void Model::set_camera_and_light(Camera& camera, Light& light)
 
 void Model::draw() const
 {
-	if (!m_is_visible || !m_camera || !m_light) return;
+	if (!m_is_visible || !m_camera || !m_light || !m_current_material) return;
 	
 	for (auto& mesh : meshes)
 	{
-		if (m_toggle_shaders[m_current_shader_index] != mesh->get_current_shader())
-		{
-			mesh->set_current_shader(m_toggle_shaders[m_current_shader_index]);
-		}
-
-		if (m_current_shader_index == 0
-			&& UserInterface::is_full_render_selected
+		if (UserInterface::is_full_render_selected
 			&& !UserInterface::is_diffuse_render_selected
 			&& !UserInterface::is_specular_selected
 			&& !UserInterface::is_normal_map_selected)
 		{
+			// UPDATE MODEL MATERIAL
 			update_light_properties();
 			update_material_properties();
 		}
 		else
 		{
+			// UPDATE DISSECT MATERIAL
 			update_breakdown_shader();
 		}
 
@@ -88,31 +83,27 @@ void Model::update_light_properties() const
 	
 	const auto light = m_light->get_light_properties();
 
-	auto current_shader = m_toggle_shaders[m_current_shader_index];
-
 	// VERTEX
-	current_shader->set_vec3("viewPos", m_camera->get_camera_position());
-	current_shader->set_vec3("lightPos", light.position);
+	m_current_material->set_vec3("viewPos", m_camera->get_camera_position());
+	m_current_material->set_vec3("lightPos", light.position);
 
 	// FRAGMENT
-	current_shader->set_vec3("light.position", light.position);
-	current_shader->set_vec3("light.diffuse", light.diffuse);
-	current_shader->set_vec3("light.specular", light.specular);
-	current_shader->set_vec3("light.ambient", light.ambient);
-	current_shader->set_float("light.intensity", light.intensity);
+	m_current_material->set_vec3("light.position", light.position);
+	m_current_material->set_vec3("light.diffuse", light.diffuse);
+	m_current_material->set_vec3("light.specular", light.specular);
+	m_current_material->set_vec3("light.ambient", light.ambient);
+	m_current_material->set_float("light.intensity", light.intensity);
 }
 
 void Model::update_material_properties() const
 {
-	auto current_shader = m_toggle_shaders[m_current_shader_index];
-
 	// FRAGMENT MATERIAL
-	current_shader->set_float("material.ambient", 0.5f);
-	current_shader->set_float("material.shininess", UserInterface::shininess);
-	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
-	current_shader->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
-	current_shader->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
-	current_shader->set_bool("material.gamma", UserInterface::is_gamma_enabled);
+	m_current_material->set_float("material.ambient", 0.5f);
+	m_current_material->set_float("material.shininess", UserInterface::shininess);
+	m_current_material->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
+	m_current_material->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
+	m_current_material->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
+	m_current_material->set_bool("material.gamma", UserInterface::is_gamma_enabled);
 }
 
 void Model::update_breakdown_shader() const
@@ -134,7 +125,7 @@ void Model::update_breakdown_shader() const
 	{
 		texture_id = ResourceManager::get_texture(textures_loaded[0])->get_asset_id();
 	}
-	m_toggle_shaders[m_current_shader_index]->set_int("textureSampler", texture_id);
+	m_current_material->set_int("textureSampler", texture_id);
 }
 
 void Model::load_model(string const& path)
@@ -171,7 +162,6 @@ void Model::process_node(aiNode* node, const aiScene* scene)
 		m_num_faces += mesh->mNumFaces;
 
 		auto mesh_object = process_mesh(mesh, scene);
-		mesh_object->set_current_shader(m_toggle_shaders[0]);
 		meshes.push_back(mesh_object);
 	}
 
@@ -315,7 +305,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
-	return new Mesh(vertices, indices, textures);
+	return new Mesh(vertices, indices);
 }
 
 vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
@@ -354,5 +344,22 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 			textures_loaded.push_back(texture_key); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
 		}
 	}
+
+	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader"), textures));
+	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader"), textures));
+	set_current_material(m_asset_name + ".model");
+	
 	return textures;
+}
+
+void Model::set_current_material(const std::string& material_name)
+{
+	if (m_current_material != ResourceManager::get_material(material_name))
+	{
+		m_current_material = ResourceManager::get_material(material_name);
+		for (auto mesh : meshes)
+		{
+			mesh->set_material(m_current_material);
+		}
+	}
 }

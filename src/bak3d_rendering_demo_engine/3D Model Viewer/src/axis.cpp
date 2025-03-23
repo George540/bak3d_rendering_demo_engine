@@ -1,12 +1,10 @@
 #include <iostream>
 
 #include "axis.h"
-#include "../src/Tools/primitive_mesh_data.h"
+#include "primitive_mesh_data.h"
 
-#include "renderer.h"
-
-Axis::Axis(Shader* shader) :
-	Object(shader)
+Axis::Axis(Material* material) :
+	Object(material)
 {
 	m_scaling = glm::vec3(3.0f);
 	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);

@@ -5,12 +5,16 @@
 #include <ranges>
 
 #include "file_loader.h"
+#include "model.h"
+#include "shader.h"
+#include "texture.h"
 
 using namespace std;
 
 // Instantiate static variables
 unordered_map<string, Shader*> ResourceManager::Shaders;
 unordered_map<string, Texture2D*> ResourceManager::Textures;
+unordered_map<string, Material*> ResourceManager::Materials;
 unordered_map<string, Model*> ResourceManager::Models;
 
 void ResourceManager::initialize()
@@ -101,7 +105,6 @@ void ResourceManager::set_camera(Camera& camera, Light& light)
     }
 }
 
-
 void ResourceManager::shutdown()
 {
     for (const auto& val : Shaders | views::values)
@@ -112,4 +115,5 @@ void ResourceManager::shutdown()
     Shaders.clear();
     Textures.clear();
     Models.clear();
+    Materials.clear();
 }

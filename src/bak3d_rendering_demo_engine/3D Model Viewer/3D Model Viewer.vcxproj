@@ -324,6 +324,7 @@
     <ClCompile Include="src\Tools\buffer.cpp" />
     <ClCompile Include="src\Tools\file_loader.cpp" />
     <ClCompile Include="src\Tools\glad.c" />
+    <ClCompile Include="src\Tools\material.cpp" />
     <ClCompile Include="src\Tools\shader.cpp" />
     <ClCompile Include="src\Tools\texture.cpp" />
     <ClCompile Include="src\Tools\vertex_array.cpp" />
@@ -429,14 +430,15 @@
     <ClInclude Include="include\Tools\buffer.h" />
     <ClInclude Include="include\Tools\file_loader.h" />
     <ClInclude Include="include\Tools\globject.h" />
+    <ClInclude Include="include\Tools\material.h" />
     <ClInclude Include="include\Tools\mesh_data.h" />
+    <ClInclude Include="include\Tools\primitive_mesh_data.h" />
     <ClInclude Include="include\Tools\shader.h" />
     <ClInclude Include="include\Tools\stb_image.h" />
     <ClInclude Include="include\Tools\texture.h" />
     <ClInclude Include="include\Tools\transform.h" />
     <ClInclude Include="include\Tools\vertex_array.h" />
     <ClInclude Include="include\user_interface.h" />
-    <ClInclude Include="src\Tools\primitive_mesh_data.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\DissectShader.frag" />

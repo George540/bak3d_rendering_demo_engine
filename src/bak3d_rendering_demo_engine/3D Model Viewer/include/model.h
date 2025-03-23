@@ -12,7 +12,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
-#include "texture.h"
 #include "mesh.h"
 #include "camera.h"
 #include "light.h"
@@ -44,9 +43,8 @@ public:
 
 	void draw() const; // draws the model, and thus all its meshes
 	void set_camera_and_light(Camera& camera, Light& light);
-	void set_toggle_shaders(Shader* model_shader, Shader* dissect_shader) { m_toggle_shaders[0] = model_shader; m_toggle_shaders[1] = dissect_shader; }
-	void set_current_toggle_shader(GLuint shader_index) { m_current_shader_index = shader_index; }
-	void set_visible(bool visible) { m_is_visible = visible; };
+	void set_current_material(const std::string& material_name);
+	void set_visible(bool visible) { m_is_visible = visible; }
 	bool is_visible() const { return m_is_visible; }
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -60,11 +58,10 @@ private:
 	void update_light_properties() const;
 	void update_material_properties() const;
 	void update_breakdown_shader() const;
-
-	Shader* m_toggle_shaders[2];
-	GLuint m_current_shader_index;
+	
 	Camera* m_camera;
 	Light* m_light;
+	Material* m_current_material;
 
 	bool m_is_visible;
 };

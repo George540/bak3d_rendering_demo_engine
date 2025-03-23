@@ -11,7 +11,7 @@
 
 #include "transform.h"
 #include "camera.h"
-#include "shader.h"
+#include "material.h"
 #include "buffer.h"
 #include "vertex_array.h"
 
@@ -22,13 +22,14 @@ protected:
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
 
-    Shader* m_shader;
+    Material* m_material;
     Camera* m_camera;
 public:
-    Object(Shader* shader);
+    Object(Material* material);
     virtual ~Object();
 
     void set_camera(Camera& camera) { m_camera = &camera; }
+    void set_material(Material* material) { m_material = material; }
     void update(float dt) override;
     virtual void draw() const;
     void delete_globjects() const;

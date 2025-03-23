@@ -23,18 +23,16 @@ class Mesh : public Object
 {
 public:
     // mesh Data
-    Material m_material{};
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;
-    std::vector<std::string> m_textures;
 
     // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<std::string> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
     ~Mesh() override;
     void draw() const override;
 
-    Shader* get_current_shader() const { return m_shader; }
-    void set_current_shader(Shader* shader) { m_shader = shader; }
+    /*Shader* get_current_shader() const { return m_material; }
+    void set_current_shader(Shader* shader) { m_material = shader; }*/
 };
 
 #endif

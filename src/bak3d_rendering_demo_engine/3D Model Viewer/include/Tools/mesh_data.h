@@ -59,7 +59,7 @@ struct Edge
     }
 };
 
-struct Material
+/*struct Material
 {
     Texture2D* diffuse = nullptr;
     Texture2D* specular = nullptr;
@@ -70,4 +70,4 @@ struct Material
     bool use_diffuse_texture = true;
     bool use_specular_texture = true;
     bool use_normal_texture = true;
-};
+};*/

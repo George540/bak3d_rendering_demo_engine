@@ -6,7 +6,7 @@
 
 #include "grid.h"
 
-Grid::Grid(Shader* shader) : Object(shader), m_number_of_slices(40), m_grid_size(20.0f)
+Grid::Grid(Material* material) : Object(material), m_number_of_slices(40), m_grid_size(20.0f)
 {
 	// GRID LINE SETUP
 	// Grid setup used indices and EBOs for proper identification of each line
@@ -52,7 +52,7 @@ void Grid::draw() const
 {
 	Object::draw();
 
-	m_shader->set_vec3("color", glm::vec3(0.5f));
+	m_material->set_vec3("color", glm::vec3(0.5f));
 
 	m_vao->bind_object();
 	glDrawElements(GL_LINES, m_number_of_elements, GL_UNSIGNED_INT, nullptr);

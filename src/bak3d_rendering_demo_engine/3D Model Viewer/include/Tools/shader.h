@@ -40,6 +40,7 @@ public:
 
 	// Utility Functions
 	void set_bool(const std::string& name, bool value) const;
+	void set_uint(const std::string& name, unsigned int value) const;
 	void set_int(const std::string& name, int value) const;
 	void set_float(const std::string& name, GLfloat value) const;
 

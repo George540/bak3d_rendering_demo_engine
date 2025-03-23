@@ -19,6 +19,11 @@ Scene::Scene()
 {
 	instance = this;
 
+	// Unique material resources setup
+	ResourceManager::add_material("grid", new Material(ResourceManager::get_shader("GridShader")));
+	ResourceManager::add_material("line", new Material(ResourceManager::get_shader("LineShader")));
+	ResourceManager::add_material("light", new Material(ResourceManager::get_shader("LightShader")));
+
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 5.0f, 10.0f), // position
 						  glm::vec3(0.0f, 0.0f, 0.0f),   // lookat
@@ -29,16 +34,17 @@ Scene::Scene()
 						  45.0f); // zoom
 	
 	// Grid Setup
-	m_grid = new Grid(ResourceManager::get_shader("GridShader"));
+	m_grid = new Grid(ResourceManager::get_material("grid"));
 	m_grid->set_camera(*m_camera);
-	m_axis = new Axis(ResourceManager::get_shader("LineShader"));
+	
+	m_axis = new Axis(ResourceManager::get_material("line"));
 	m_axis->set_camera(*m_camera);
 
 	// Object setup (will be later assigned during model selection process)
 	m_particle_system = nullptr;
 
 	// Light Setup
-	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_shader("LightShader"));
+	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_material("light"));
 	m_light->set_camera(*m_camera);
 	UserInterface::environment_point_light = m_light;
 

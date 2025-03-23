@@ -119,6 +119,11 @@ void Shader::set_bool(const string& name, bool value) const
     glUniform1i(glGetUniformLocation(m_id, name.c_str()), static_cast<int>(value));
 }
 
+void Shader::set_uint(const string& name, unsigned int value) const
+{
+    glUniform1ui(glGetUniformLocation(m_id, name.c_str()), value);
+}
+
 void Shader::set_int(const string& name, int value) const
 {
     glUniform1i(glGetUniformLocation(m_id, name.c_str()), value);

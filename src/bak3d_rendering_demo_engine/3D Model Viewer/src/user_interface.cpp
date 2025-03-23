@@ -209,7 +209,7 @@ void UserInterface::render_object_window()
 		{
 			model_current_object->set_visible(false);
 			model_current_object = updated_model;
-			model_current_object->set_visible(true);
+			//model_current_object->set_visible(true);
 		}
 		ImGui::Combo("Model Selection", &model_current_index, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
 
@@ -251,7 +251,7 @@ void UserInterface::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_toggle_shader(0);
+					current_model->set_current_material(current_model->get_asset_name() + ".model");
 				}
 
 				cout << "Full Render View" << endl;
@@ -269,7 +269,7 @@ void UserInterface::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_toggle_shader(1);
+					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
 				}
 				cout << "Albedo Preview" << endl;
 			}
@@ -286,7 +286,7 @@ void UserInterface::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_toggle_shader(1);
+					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
 				}
 				cout << "Specular Map Preview" << endl;
 			}
@@ -303,7 +303,7 @@ void UserInterface::render_object_window()
 
 				if (current_model)
 				{
-					current_model->set_current_toggle_shader(1);
+					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
 				}
 				cout << "Normal Map Preview" << endl;
 			}
