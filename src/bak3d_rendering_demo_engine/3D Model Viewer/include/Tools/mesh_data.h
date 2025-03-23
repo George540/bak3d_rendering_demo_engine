@@ -8,6 +8,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "texture.h"
+
 constexpr auto MAX_BONE_INFLUENCE = 4;
 
 // TODO: Turn into proper separate classes with all necessary methods
@@ -59,11 +61,13 @@ struct Edge
 
 struct Material
 {
-    float diffuse;
-    float specular;
-    float ambient;
-    float shininess;
-    bool use_diffuse_texture;
-    bool use_specular_texture;
-    bool use_normal_texture;
+    Texture2D* diffuse = nullptr;
+    Texture2D* specular = nullptr;
+    Texture2D* normal = nullptr;
+    Texture2D* height = nullptr;
+    float ambient = 0.0f;
+    float shininess = 0.0f;
+    bool use_diffuse_texture = true;
+    bool use_specular_texture = true;
+    bool use_normal_texture = true;
 };

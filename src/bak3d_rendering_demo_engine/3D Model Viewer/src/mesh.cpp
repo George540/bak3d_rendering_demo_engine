@@ -9,9 +9,9 @@ using namespace std;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<string> textures) :
     Object(nullptr),
-	m_vertices(move(vertices)),
-	m_indices(move(indices)),
-    m_textures(move(textures))
+	m_vertices(std::move(vertices)),
+	m_indices(std::move(indices)),
+    m_textures(std::move(textures))
 {
     // create buffers/arrays
     m_vbo = new VertexBuffer(sizeof(Vertex) * m_vertices.size(), m_vertices.data());
@@ -26,6 +26,33 @@ Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<string> textu
     m_vao->set_attrib_pointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_Weights)));
 
     m_vao->unbind_object();
+
+    for (const auto& texture_string : m_textures)
+    {
+        Texture2D* texture = ResourceManager::get_texture(texture_string);
+        
+        if (texture->get_texture_type() == aiTextureType_DIFFUSE && !m_material.diffuse)
+        {
+            m_material.diffuse = texture;
+        }
+        else if (texture->get_texture_type() == aiTextureType_SPECULAR && !m_material.specular)
+        {
+            m_material.specular = texture;
+        }
+        else if (texture->get_texture_type() == aiTextureType_NORMALS && !m_material.normal)
+        {
+            m_material.normal = texture;
+        }
+        else if (texture->get_texture_type() == aiTextureType_HEIGHT && !m_material.height)
+        {
+            m_material.height = texture;
+        }
+    }
+
+    if (!m_material.diffuse) m_material.diffuse = ResourceManager::get_texture("None.jpg");
+    if (!m_material.specular) m_material.specular = ResourceManager::get_texture("None.jpg");
+    if (!m_material.normal) m_material.normal = ResourceManager::get_texture("None.jpg");
+    if (!m_material.height) m_material.height = ResourceManager::get_texture("None.jpg");
 }
 
 Mesh::~Mesh()
@@ -35,55 +62,86 @@ Mesh::~Mesh()
 
 void Mesh::draw() const
 {
+    m_shader->set_int("material.diffuse", m_material.diffuse->get_asset_id());
+    m_material.diffuse->bind();
+    
+    m_shader->set_int("material.specular", m_material.specular->get_asset_id());
+    m_material.specular->bind();
+    
+    m_shader->set_int("material.normal", m_material.normal->get_asset_id());
+    m_material.normal->bind();
+    
+    m_shader->set_int("material.height", m_material.height->get_asset_id());
+    //m_material.height->bind();
+
     Object::draw();
 
     // bind appropriate textures
-    unsigned int diffuse_nr = 1;
-    unsigned int specular_nr = 1;
-    unsigned int normal_nr = 1;
-    unsigned int height_nr = 1;
+    /*unsigned int diffuse_nr = 0;
+    unsigned int specular_nr = 0;
+    unsigned int normal_nr = 0;
+    unsigned int height_nr = 0;
+    */
 
-    for (auto i = 0; i < m_textures.size(); ++i)
+    /*Texture2D* diffuse_texture = nullptr;
+    Texture2D* specular_texture = nullptr;
+    Texture2D* normal_texture = nullptr;
+    Texture2D* height_texture = nullptr;
+
+    for (const auto& m_texture : m_textures)
     {
-        // active proper texture unit before binding
-        glActiveTexture(GL_TEXTURE0 + i);
-
         // retrieve texture number (the N in diffuse_textureN)
-        auto texture = ResourceManager::get_texture(m_textures[i]);
+        auto texture = ResourceManager::get_texture(m_texture);
         auto type = texture->get_texture_type();
-        string number;
-        string name;
-        int nr;
-        if (type == aiTextureType_DIFFUSE)
+        
+        if (type == aiTextureType_DIFFUSE && !diffuse_texture)
         {
-            number = std::to_string(diffuse_nr++);
-            name = "diffuse";
-            nr = diffuse_nr;
+            diffuse_texture = texture;
+            //m_shader->set_int("material.diffuse", texture->get_asset_id());
         }
-        else if (type == aiTextureType_SPECULAR)
+        else if (type == aiTextureType_SPECULAR && !specular_texture)
         {
-            number = std::to_string(specular_nr++);
-            name = "specular";
-            nr = specular_nr;
+            specular_texture = texture;
+            //m_shader->set_int("material.specular", texture->get_asset_id());
         }
-        else if (type == aiTextureType_NORMALS)
+        else if (type == aiTextureType_NORMALS && !normal_texture)
         {
-            number = std::to_string(normal_nr++);
-            name = "normal";
-            nr = normal_nr;
+            normal_texture = texture;
+            //m_shader->set_int("material.normal", texture->get_asset_id());
         }
-        else if (type == aiTextureType_HEIGHT)
+        else if (type == aiTextureType_HEIGHT && !height_texture)
         {
-            number = std::to_string(height_nr++);
-            name = "height";
-            nr = height_nr;
+            height_texture = texture;
+            //m_shader->set_int("material.height", texture->get_asset_id());
         }
         
-        if (nr > 1)
-        {
-            texture->bind();
-        }
+        //texture->bind();
     }
+
+    if (!diffuse_texture)
+    {
+        diffuse_texture = ResourceManager::get_texture("None.jpg");
+    }
+    if (!specular_texture)
+    {
+        specular_texture = ResourceManager::get_texture("None.jpg");
+    }
+    if (!normal_texture)
+    {
+        normal_texture = ResourceManager::get_texture("None.jpg");
+    }
+    if (!height_texture)
+    {
+        height_texture = ResourceManager::get_texture("None.jpg");
+    }
+    m_shader->set_int("material.diffuse", static_cast<int>(diffuse_texture->get_asset_id()));
+    diffuse_texture->bind();
+    m_shader->set_int("material.specular", static_cast<int>(specular_texture->get_asset_id()));
+    specular_texture->bind();
+    m_shader->set_int("material.normal", static_cast<int>(normal_texture->get_asset_id()));
+    normal_texture->bind();
+    m_shader->set_int("material.height", static_cast<int>(height_texture->get_asset_id()));
+    height_texture->bind();*/
 
     // draw mesh
     m_vao->bind_object();
@@ -91,5 +149,5 @@ void Mesh::draw() const
     m_vao->unbind_object();
 
     // always good practice to set everything back to defaults once configured.
-    glActiveTexture(GL_TEXTURE0);
+    //glActiveTexture(GL_TEXTURE0);
 }

@@ -34,7 +34,6 @@ enum FileType
  */
 class FileLoader
 {
-private:
 public:
 	static std::unordered_map<FileType, std::string> enum_to_string_map;
 
@@ -47,6 +46,7 @@ public:
 	static std::string get_name_from_filename(const std::string filename);
 	static std::string enum_to_string(FileType type);
 	static std::vector<char*> get_vector_items_to_array(const std::list<std::pair<std::string, std::string>>, bool is_returning_path = true);
+	static std::string find_first_containing_string(const std::vector<std::string>& string_vector, const std::string& substring);
 };
 
 #endif

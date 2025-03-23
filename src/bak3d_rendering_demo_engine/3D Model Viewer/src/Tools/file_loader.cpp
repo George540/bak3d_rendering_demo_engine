@@ -177,10 +177,23 @@ vector<char*> FileLoader::get_vector_items_to_array(const list<pair<string, stri
 
 	for (const auto& item : vector_items)
 	{
-		char* c_str = new char[item.size() + 1]; // +1 for null terminator
+		auto c_str = new char[item.size() + 1]; // +1 for null terminator
 		strcpy_s(c_str, item.size() + 1, item.c_str());
 		c_str_items.push_back(c_str);
 	}
 
 	return c_str_items;
+}
+
+string FileLoader::find_first_containing_string(const vector<string>& string_vector, const string& substring)
+{
+	for (const string& string_entry : string_vector)
+	{
+		if (string_entry.find(substring) != string::npos)
+		{
+			return string_entry;
+		}
+	}
+
+	return "None.jpg";
 }

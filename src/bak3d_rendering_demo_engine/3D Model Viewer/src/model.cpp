@@ -8,6 +8,7 @@
 
 #include "model.h"
 #include "event_manager.h"
+#include "file_loader.h"
 #include "resource_manager.h"
 #include "user_interface.h"
 
@@ -106,9 +107,6 @@ void Model::update_material_properties() const
 	auto current_shader = m_toggle_shaders[m_current_shader_index];
 
 	// FRAGMENT MATERIAL
-	current_shader->set_int("material.diffuse", 0);
-	current_shader->set_int("material.specular", 1);
-	current_shader->set_int("material.normal", 2);
 	current_shader->set_float("material.ambient", 0.5f);
 	current_shader->set_float("material.shininess", UserInterface::shininess);
 	current_shader->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
@@ -122,19 +120,19 @@ void Model::update_breakdown_shader() const
 	int texture_id;
 	if (UserInterface::is_diffuse_render_selected)
 	{
-		texture_id = 0;
+		texture_id = ResourceManager::get_texture(textures_loaded[0])->get_asset_id();
 	}
 	else if (UserInterface::is_specular_selected)
 	{
-		texture_id = 1;
+		texture_id = ResourceManager::get_texture(textures_loaded[1])->get_asset_id();
 	}
 	else if (UserInterface::is_normal_map_selected)
 	{
-		texture_id = 2;
+		texture_id = ResourceManager::get_texture(textures_loaded[2])->get_asset_id();;
 	}
 	else
 	{
-		texture_id = 0;
+		texture_id = ResourceManager::get_texture(textures_loaded[0])->get_asset_id();
 	}
 	m_toggle_shaders[m_current_shader_index]->set_int("textureSampler", texture_id);
 }
@@ -257,8 +255,8 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 				vertex.color = glm::vec4(1.0f, 0.75f, 0.796f, 1.0f);
 			}
 
-			vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0;
-			EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;
+			//vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0;
+			//EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;
 
 			// Check if specular texture exists
 			if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular))
@@ -323,6 +321,8 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 {
 	vector<string> textures;
+	int texture_index = 0;
+	
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
 	{
 		aiString filename;
@@ -346,6 +346,7 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 			string path = m_directory + '/' + filename.C_Str();
 			string texture_file_name = string(filename.C_Str());
 			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
+			texture->set_texture_model_index(texture_index++);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
 			auto texture_key = format("{}.{}",m_asset_name, texture_name);
 			ResourceManager::add_texture(texture_key, texture);

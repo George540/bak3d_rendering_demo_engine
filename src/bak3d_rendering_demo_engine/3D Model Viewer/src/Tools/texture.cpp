@@ -15,7 +15,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
 {
     if (verbose)
     {
-        std::cout << "Loading texture file: " << m_file_name << std::endl;
+        cout << "Loading texture file: " << m_file_name << '\n';
     }
 
     glGenTextures(1, &m_id);
@@ -55,19 +55,14 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
     }
     else
     {
-        cout << "ERROR::PARTICLEGENERATOR::FILE_NOT_SUCCESSFULLY_READ: Texture failed to load at path: " << path << endl;
+        cout << "ERROR::PARTICLEGENERATOR::FILE_NOT_SUCCESSFULLY_READ: Texture failed to load at path: " << path << '\n';
         stbi_image_free(data);
     }
 }
 
-Texture2D::~Texture2D()
-{
-    //glBindTexture(GL_TEXTURE_2D, 0);
-    //glDeleteTextures(1, &m_ID);
-}
-
 void Texture2D::bind() const
 {
+    glActiveTexture(GL_TEXTURE0 + m_id);
     glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

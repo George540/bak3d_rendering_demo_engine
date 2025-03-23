@@ -74,6 +74,12 @@ void ResourceManager::initialize_predefined_textures()
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
+
+    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/none"), jpg);
+    for (auto [file_name, file_path] : image_files)
+    {
+        Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Model);
+    }
 }
 
 void ResourceManager::initialize_models()
