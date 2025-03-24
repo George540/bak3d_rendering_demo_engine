@@ -121,7 +121,7 @@ void Shader::set_bool(const string& name, bool value) const
 
 void Shader::set_uint(const string& name, unsigned int value) const
 {
-    glUniform1ui(glGetUniformLocation(m_id, name.c_str()), value);
+    glUniform1ui(glGetUniformLocation(m_id, name.c_str()), value); // Warning: DO NOT use for texture samplers. Use integer instead
 }
 
 void Shader::set_int(const string& name, int value) const

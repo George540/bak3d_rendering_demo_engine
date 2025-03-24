@@ -10,8 +10,6 @@
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp> 
 
-#include "texture.h"
-
 class Shader;
 class Texture2D;
 
@@ -36,6 +34,8 @@ class Material
 public:
     Material() = default;
     Material(Shader* shader);
+
+    Shader* get_shader() const { return m_shader; }
 
     void apply();
 

@@ -5,7 +5,7 @@ struct Material
     sampler2D diffuse;
     sampler2D specular;
     sampler2D normal;
-    //sampler2D height;
+
     float ambient;
     vec3 roughness;
     float shininess;

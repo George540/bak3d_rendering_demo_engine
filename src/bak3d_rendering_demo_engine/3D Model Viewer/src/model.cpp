@@ -101,16 +101,16 @@ void Model::update_material_properties() const
 {
 	// FRAGMENT MATERIAL
 	Texture2D* diffuse_texture = textures_cache.at(aiTextureType_DIFFUSE);
-	m_current_material->set_uint("material.diffuse", 0);
 	diffuse_texture->bind(0);
+	m_current_material->set_int("material.diffuse", 0);
 	
 	Texture2D* specular_texture = textures_cache.at(aiTextureType_SPECULAR);
-	m_current_material->set_uint("material.specular", 1);
 	specular_texture->bind(1);
+	m_current_material->set_int("material.specular", 1);
 	
 	Texture2D* normal_texture = textures_cache.at(aiTextureType_HEIGHT);
-	m_current_material->set_uint("material.normal", 2);
 	normal_texture->bind(2);
+	m_current_material->set_int("material.normal", 2);
 	
 	m_current_material->set_float("material.ambient", 0.5f);
 	m_current_material->set_float("material.shininess", UserInterface::shininess);
@@ -135,18 +135,16 @@ void Model::update_breakdown_shader() const
 	{
 		texture_type = aiTextureType_HEIGHT;
 	}
-	m_current_material->set_uint("textureSampler", 0);
+	m_current_material->set_int("textureSampler", 0);
 	Texture2D* texture = textures_cache.at(texture_type);
 	texture->bind(0);
-
-	Texture2D::unbind();
 }
 
 void Model::load_model(string const& path)
 {
 	// read file via ASSIMP
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) //if it's not zero
@@ -298,25 +296,13 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 
 	// process materials
 	auto material = scene->mMaterials[mesh->mMaterialIndex];
-	// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-	// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-	// Same applies to other texture as the following list summarizes:
-	// diffuse: texture_diffuseN
-	// specular: texture_specularN
-	// normal: texture_normalN
 
 	// 1. diffuse maps
 	load_material_textures(material, aiTextureType_DIFFUSE);
-	//textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
 	// 2. specular maps
 	load_material_textures(material, aiTextureType_SPECULAR);
-	//textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 	// 3. normal maps
 	load_material_textures(material, aiTextureType_HEIGHT);
-	//textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
-	// 4. height maps
-	//load_material_textures(material, aiTextureType_AMBIENT);
-	//textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
 	return new Mesh(vertices, indices);
@@ -341,34 +327,6 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 			ResourceManager::add_texture(texture_key, texture);
 			textures_cache[type] = texture;
 		}
-		
-		
-		/*// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		bool skip = false;
-		for (auto& text_loaded : textures_loaded)
-		{
-			auto file_model_name = string(filename.C_Str());
-			file_model_name = file_model_name.substr(0, file_model_name.find('.'));
-			file_model_name = format("{}.{}",m_asset_name, file_model_name);
-			if (std::strcmp(text_loaded.c_str(), file_model_name.c_str()) == 0)
-			{
-				textures.push_back(text_loaded);
-				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
-				break;
-			}
-		}
-		if (!skip)
-		{   // if texture hasn't been loaded already, load it
-			string path = m_directory + '/' + filename.C_Str();
-			string texture_file_name = string(filename.C_Str());
-			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
-			texture->set_texture_model_index(texture_index++);
-			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
-			auto texture_key = format("{}.{}",m_asset_name, texture_name);
-			ResourceManager::add_texture(texture_key, texture);
-			textures.push_back(texture_key);
-			textures_loaded.push_back(texture_key); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
-		}*/
 	}
 
 	if (!textures_cache.contains(type)) textures_cache[type] = ResourceManager::get_texture("None.jpg");

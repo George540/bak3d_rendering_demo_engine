@@ -22,7 +22,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
 
     if (const auto data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_nb_color_channels, 0))
     {
-        GLenum format = (m_nb_color_channels == 3) ? GL_RGB : GL_RGBA;
+        GLenum format = m_nb_color_channels == 3 ? GL_RGB : GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
