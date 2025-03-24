@@ -33,17 +33,9 @@ class Material
     std::unordered_map<std::string, glm::mat3> m_mat3_uniforms;
     std::unordered_map<std::string, glm::mat4> m_mat4_uniforms;
 
-    // Texture2D sample uniforms
-    std::unordered_map<aiTextureType, Texture2D*> m_textures; // texture type -> Texture2D addressed from ResourceManager (model only supports one texture per texture type)
-
-    // Default material properties
-    //float m_ambient = 0.1f;
-    //float m_shininess = 32.0f;
-
 public:
     Material() = default;
     Material(Shader* shader);
-    Material(Shader* shader, const std::vector<std::string>& textures);
 
     void apply();
 
@@ -60,7 +52,7 @@ public:
     void set_mat3(const std::string& key_name, const glm::mat3& value) { m_mat3_uniforms[key_name] = value; }
     void set_mat4(const std::string& key_name, const glm::mat4& value) { m_mat4_uniforms[key_name] = value; }
 
-    void set_texture(const aiTextureType texture_type, Texture2D* texture) { m_textures[texture_type] = texture; }
+    void set_texture_id(const std::string& key_name, const unsigned int value) { m_uint_uniforms[key_name] = value; }
 };
 
 #endif

@@ -28,11 +28,11 @@ struct Vertex
     // color
     glm::vec3 color;
     // use diffuse texture or not
-    bool useDiffuseTexture;
+    bool useDiffuseTexture = true;
     // use specular texture or not
-    bool useSpecularTexture;
+    bool useSpecularTexture = true;
     // use normal texture or not
-    bool useNormalsTexture;
+    bool useNormalsTexture = true;
     //bone indexes which will influence this vertex
     int m_BoneIDs[MAX_BONE_INFLUENCE];
     //weights from each bone

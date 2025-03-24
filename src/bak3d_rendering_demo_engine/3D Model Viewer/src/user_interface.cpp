@@ -225,7 +225,7 @@ void UserInterface::render_object_window()
 
 			// Toggle map breakdowns
 			ImGui::Text("Render Breakdown");
-			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);      // Edit bools storing our window open/close state
+			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);
 			ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
 			ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
 

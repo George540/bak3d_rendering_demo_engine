@@ -41,6 +41,5 @@ void Mesh::draw() const
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
     m_vao->unbind_object();
 
-    // always good practice to set everything back to defaults once configured.
-    //glActiveTexture(GL_TEXTURE0);
+    Texture2D::unbind();
 }

@@ -27,7 +27,7 @@ public:
     Texture2D() = default;
     Texture2D(const std::string& path, const std::string& file_name, aiTextureType type, TextureUseType textureUse, bool verbose = true);
     ~Texture2D() override = default;
-    void bind() const; // binds the texture as the current active GL_TEXTURE_2D texture object
+    void bind(int unit_slot) const; // binds the texture as the current active GL_TEXTURE_2D texture object
     
     static void unbind();
     

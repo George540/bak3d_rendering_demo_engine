@@ -305,7 +305,7 @@ void ParticleSystem::draw()
     {
         m_texture = selected_texture;
     }
-    m_texture.bind();
+    m_texture.bind(0);
     // Draw particles using instancing
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
     glBindVertexArray(0);

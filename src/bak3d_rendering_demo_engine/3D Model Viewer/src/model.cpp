@@ -55,24 +55,26 @@ void Model::set_camera_and_light(Camera& camera, Light& light)
 void Model::draw() const
 {
 	if (!m_is_visible || !m_camera || !m_light || !m_current_material) return;
-	
-	for (auto& mesh : meshes)
-	{
-		if (UserInterface::is_full_render_selected
+
+	if (UserInterface::is_full_render_selected
 			&& !UserInterface::is_diffuse_render_selected
 			&& !UserInterface::is_specular_selected
 			&& !UserInterface::is_normal_map_selected)
-		{
-			// UPDATE MODEL MATERIAL
-			update_light_properties();
-			update_material_properties();
-		}
-		else
-		{
-			// UPDATE DISSECT MATERIAL
-			update_breakdown_shader();
-		}
+	{
+		// UPDATE MODEL MATERIAL
+		update_light_properties();
+		update_material_properties();
+	}
+	else
+	{
+		// UPDATE DISSECT MATERIAL
+		update_breakdown_shader();
+	}
 
+	//m_current_material->apply();
+	
+	for (auto& mesh : meshes)
+	{
 		mesh->draw();
 	}
 }
@@ -98,6 +100,18 @@ void Model::update_light_properties() const
 void Model::update_material_properties() const
 {
 	// FRAGMENT MATERIAL
+	Texture2D* diffuse_texture = textures_cache.at(aiTextureType_DIFFUSE);
+	m_current_material->set_uint("material.diffuse", 0);
+	diffuse_texture->bind(0);
+	
+	Texture2D* specular_texture = textures_cache.at(aiTextureType_SPECULAR);
+	m_current_material->set_uint("material.specular", 1);
+	specular_texture->bind(1);
+	
+	Texture2D* normal_texture = textures_cache.at(aiTextureType_HEIGHT);
+	m_current_material->set_uint("material.normal", 2);
+	normal_texture->bind(2);
+	
 	m_current_material->set_float("material.ambient", 0.5f);
 	m_current_material->set_float("material.shininess", UserInterface::shininess);
 	m_current_material->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
@@ -108,24 +122,24 @@ void Model::update_material_properties() const
 
 void Model::update_breakdown_shader() const
 {
-	int texture_id;
+	aiTextureType texture_type = aiTextureType_DIFFUSE;
 	if (UserInterface::is_diffuse_render_selected)
 	{
-		texture_id = ResourceManager::get_texture(textures_loaded[0])->get_asset_id();
+		texture_type = aiTextureType_DIFFUSE;
 	}
 	else if (UserInterface::is_specular_selected)
 	{
-		texture_id = ResourceManager::get_texture(textures_loaded[1])->get_asset_id();
+		texture_type = aiTextureType_SPECULAR;
 	}
 	else if (UserInterface::is_normal_map_selected)
 	{
-		texture_id = ResourceManager::get_texture(textures_loaded[2])->get_asset_id();;
+		texture_type = aiTextureType_HEIGHT;
 	}
-	else
-	{
-		texture_id = ResourceManager::get_texture(textures_loaded[0])->get_asset_id();
-	}
-	m_current_material->set_int("textureSampler", texture_id);
+	m_current_material->set_uint("textureSampler", 0);
+	Texture2D* texture = textures_cache.at(texture_type);
+	texture->bind(0);
+
+	Texture2D::unbind();
 }
 
 void Model::load_model(string const& path)
@@ -292,32 +306,44 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	// normal: texture_normalN
 
 	// 1. diffuse maps
-	auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE);
-	textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
+	load_material_textures(material, aiTextureType_DIFFUSE);
+	//textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
 	// 2. specular maps
-	auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR);
-	textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
+	load_material_textures(material, aiTextureType_SPECULAR);
+	//textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 	// 3. normal maps
-	auto normal_maps = load_material_textures(material, aiTextureType_HEIGHT);
-	textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
+	load_material_textures(material, aiTextureType_HEIGHT);
+	//textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 	// 4. height maps
-	auto height_maps = load_material_textures(material, aiTextureType_AMBIENT);
-	textures.insert(textures.end(), height_maps.begin(), height_maps.end());
+	//load_material_textures(material, aiTextureType_AMBIENT);
+	//textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
 	// return a mesh object created from the extracted mesh data
 	return new Mesh(vertices, indices);
 }
 
-vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
+void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 {
-	vector<string> textures;
-	int texture_index = 0;
+	//vector<string> textures;
 	
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
 	{
 		aiString filename;
 		mat->GetTexture(type, i, &filename);
-		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
+
+		if (!textures_cache.contains(type)) // only one texture for each texture type at a time
+		{
+			string path = m_directory + '/' + filename.C_Str();
+			string texture_file_name = string(filename.C_Str());
+			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
+			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
+			auto texture_key = format("{}.{}",m_asset_name, texture_name);
+			ResourceManager::add_texture(texture_key, texture);
+			textures_cache[type] = texture;
+		}
+		
+		
+		/*// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
 		for (auto& text_loaded : textures_loaded)
 		{
@@ -342,14 +368,14 @@ vector<string> Model::load_material_textures(aiMaterial* mat, aiTextureType type
 			ResourceManager::add_texture(texture_key, texture);
 			textures.push_back(texture_key);
 			textures_loaded.push_back(texture_key); // store it as texture loaded for entire model, to ensure we won't unnecessarily load duplicate textures.
-		}
+		}*/
 	}
 
-	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader"), textures));
-	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader"), textures));
+	if (!textures_cache.contains(type)) textures_cache[type] = ResourceManager::get_texture("None.jpg");
+
+	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
+	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
 	set_current_material(m_asset_name + ".model");
-	
-	return textures;
 }
 
 void Model::set_current_material(const std::string& material_name)

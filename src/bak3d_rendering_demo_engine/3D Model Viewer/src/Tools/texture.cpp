@@ -22,22 +22,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
 
     if (const auto data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_nb_color_channels, 0))
     {
-        GLenum format;
-        switch (m_nb_color_channels)
-        {
-        case 1:
-            format = GL_RED;
-            break;
-        case 3:
-            format = GL_RGB;
-            break;
-        case 4:
-            format = GL_RGBA;
-            break;
-        default:
-            format = GL_RGB;
-            break;
-        }
+        GLenum format = (m_nb_color_channels == 3) ? GL_RGB : GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
@@ -60,15 +45,15 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
     }
 }
 
-void Texture2D::bind() const
+void Texture2D::bind(int unit_slot) const
 {
-    glActiveTexture(GL_TEXTURE0 + m_id);
+    glActiveTexture(GL_TEXTURE0 + unit_slot);
     glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
 void Texture2D::unbind()
 {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0);
 }
 
 bool Texture2D::operator==(const Texture2D& other) const
