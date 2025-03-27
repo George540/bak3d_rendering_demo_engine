@@ -209,35 +209,85 @@ void UserInterface::render_object_window()
 		{
 			model_current_object->set_visible(false);
 			model_current_object = updated_model;
-			//model_current_object->set_visible(true);
+			EventManager::is_using_diffuse_texture = model_current_object->has_texture_of_type(aiTextureType_DIFFUSE);
+			EventManager::is_using_specular_texture = model_current_object->has_texture_of_type(aiTextureType_SPECULAR);
+			EventManager::is_using_normals_texture = model_current_object->has_texture_of_type(aiTextureType_HEIGHT);
+
+			auto material_name = is_full_render_selected ? model_current_object->get_asset_name() + ".model" : model_current_object->get_asset_name() + ".dissect";
+			model_current_object->set_current_material(material_name);
 		}
 		ImGui::Combo("Model Selection", &model_current_index, model_combo_items.data(), static_cast<int>(model_combo_items.size()));
 
 		if (model_current_index > 0)
 		{
-			auto current_model = ResourceManager::get_model(model_combo_items[model_current_index]);
-			current_model->set_visible(true);
+			if (!model_current_object)
+			{
+				model_current_object = ResourceManager::get_model(model_combo_items[model_current_index]);
+				auto material_name = is_full_render_selected ? model_current_object->get_asset_name() + ".model" : model_current_object->get_asset_name() + ".dissect";
+				model_current_object->set_current_material(material_name);
+			}
 			
-			ImGui::Text("Vertices: %d", current_model->m_num_vertices);
-			//ImGui::Text("Edges: %d", current_model->m_unique_edges.size());
-			ImGui::Text("Faces: %d", current_model->m_num_faces);
-			ImGui::Text("Triangles: %d", current_model->m_num_triangles);
+			model_current_object->set_visible(true);
+			
+			ImGui::Text("Vertices: %d", model_current_object->m_num_vertices);
+			ImGui::Text("Edges: %d", model_current_object->m_unique_edges.size());
+			ImGui::Text("Faces: %d", model_current_object->m_num_faces);
+			ImGui::Text("Triangles: %d", model_current_object->m_num_triangles);
+
+			ImGui::Spacing();
+			ImGui::Spacing();
 
 			// Toggle map breakdowns
 			ImGui::Text("Render Breakdown");
-			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);
-			ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
-			ImGui::Checkbox("Normal", &EventManager::is_using_normals_texture);
 
+			// DIFFUSE TEXTURE
+			const bool is_diffuse_disabled = !model_current_object->has_texture_of_type(aiTextureType_DIFFUSE);
+			if (is_diffuse_disabled)
+			{
+				ImGui::BeginDisabled();
+				EventManager::is_using_diffuse_texture = false;
+			}
+			ImGui::Checkbox("Albedo", &EventManager::is_using_diffuse_texture);
+			if (is_diffuse_disabled)
+			{
+				ImGui::EndDisabled();
+			}
+
+			// SPECULAR TEXTURE
+			const bool is_specular_disabled = !model_current_object->has_texture_of_type(aiTextureType_SPECULAR);
+			if (is_specular_disabled)
+			{
+				ImGui::BeginDisabled();
+				EventManager::is_using_specular_texture = false;
+			}
+			ImGui::Checkbox("Specular", &EventManager::is_using_specular_texture);
+			if (is_specular_disabled)
+			{
+				ImGui::EndDisabled();
+			}
+			
+			// NORMAL TEXTURE
+			const bool is_normal_disabled = !model_current_object->has_texture_of_type(aiTextureType_HEIGHT);
+			if (is_normal_disabled)
+			{
+				ImGui::BeginDisabled();
+				EventManager::is_using_normals_texture = false;
+			}
+			ImGui::Checkbox("Normals", &EventManager::is_using_normals_texture);
+			if (is_normal_disabled)
+			{
+				ImGui::EndDisabled();
+			}
+			
 			// Toggle Material Settings
 			ImGui::Text("Material Properties");
 			ImGui::Checkbox("Gamma Correction", &is_gamma_enabled);
 			ImGui::SliderFloat("Shininess", &shininess, 0.0f, 256.0f);
-
-
+			
 			// Toggle Texture Maps
 			ImGui::Text("Texture Map View Selection");
 			ImGui::Combo("Map Selection", &render_current, map_combo_items, IM_ARRAYSIZE(map_combo_items));
+			
 			if (render_current == 0 && !is_full_render_selected)
 			{
 				is_full_render_selected = true;
@@ -249,14 +299,14 @@ void UserInterface::render_object_window()
 				EventManager::is_using_specular_texture = true;
 				EventManager::is_using_normals_texture = true;
 
-				if (current_model)
+				if (model_current_object)
 				{
-					current_model->set_current_material(current_model->get_asset_name() + ".model");
+					model_current_object->set_current_material(model_current_object->get_asset_name() + ".model");
 				}
 
 				cout << "Full Render View" << endl;
 			}
-			if (render_current == 1 && !is_diffuse_render_selected)
+			else if (render_current == 1 && !is_diffuse_render_selected && !is_diffuse_disabled)
 			{
 				is_full_render_selected = false;
 				is_diffuse_render_selected = true;
@@ -267,13 +317,13 @@ void UserInterface::render_object_window()
 				EventManager::is_using_specular_texture = false;
 				EventManager::is_using_normals_texture = false;
 
-				if (current_model)
+				if (model_current_object)
 				{
-					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
+					model_current_object->set_current_material(model_current_object->get_asset_name() + ".dissect");
 				}
 				cout << "Albedo Preview" << endl;
 			}
-			if (render_current == 2 && !is_specular_selected)
+			else if (render_current == 2 && !is_specular_selected && !is_specular_disabled)
 			{
 				is_full_render_selected = false;
 				is_diffuse_render_selected = false;
@@ -284,13 +334,13 @@ void UserInterface::render_object_window()
 				EventManager::is_using_specular_texture = false;
 				EventManager::is_using_normals_texture = false;
 
-				if (current_model)
+				if (model_current_object)
 				{
-					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
+					model_current_object->set_current_material(model_current_object->get_asset_name() + ".dissect");
 				}
 				cout << "Specular Map Preview" << endl;
 			}
-			if (render_current == 3 && !is_normal_map_selected)
+			else if (render_current == 3 && !is_normal_map_selected && !is_normal_disabled)
 			{
 				is_full_render_selected = false;
 				is_diffuse_render_selected = false;
@@ -301,15 +351,19 @@ void UserInterface::render_object_window()
 				EventManager::is_using_specular_texture = false;
 				EventManager::is_using_normals_texture = false;
 
-				if (current_model)
+				if (model_current_object)
 				{
-					current_model->set_current_material(current_model->get_asset_name() + ".dissect");
+					model_current_object->set_current_material(model_current_object->get_asset_name() + ".dissect");
 				}
 				cout << "Normal Map Preview" << endl;
 			}
 		}
 		else
 		{
+			if (model_current_object && model_current_object->is_visible())
+			{
+				model_current_object->set_visible(false);
+			}
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 0.3f), "Model settings disabled. Select imported model to view.");
 		}
 	}

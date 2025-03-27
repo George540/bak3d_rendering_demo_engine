@@ -25,12 +25,17 @@ Model::Model(const string& path, const std::string& file_name, int index) :
 	m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
 	
 	load_model(path);
+
+	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
+	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
+
+	set_current_material(m_asset_name + ".model");
 }
 
 Model::~Model()
 {
 	// Free texture data
-	textures_loaded.clear();
+	textures_cache.clear();
 	cout << "Texture data of model " << m_file_name << " have been cleared" << '\n';
 	
 	// Safely dereference camera and light addresses from pointers
@@ -70,8 +75,6 @@ void Model::draw() const
 		// UPDATE DISSECT MATERIAL
 		update_breakdown_shader();
 	}
-
-	//m_current_material->apply();
 	
 	for (auto& mesh : meshes)
 	{
@@ -100,17 +103,27 @@ void Model::update_light_properties() const
 void Model::update_material_properties() const
 {
 	// FRAGMENT MATERIAL
-	Texture2D* diffuse_texture = textures_cache.at(aiTextureType_DIFFUSE);
-	diffuse_texture->bind(0);
-	m_current_material->set_int("material.diffuse", 0);
+	if (textures_cache.contains(aiTextureType_DIFFUSE))
+	{
+		Texture2D* diffuse_texture = textures_cache.at(aiTextureType_DIFFUSE);
+		diffuse_texture->bind(0);
+		m_current_material->set_int("material.diffuse", 0);
+	}
 	
-	Texture2D* specular_texture = textures_cache.at(aiTextureType_SPECULAR);
-	specular_texture->bind(1);
-	m_current_material->set_int("material.specular", 1);
 	
-	Texture2D* normal_texture = textures_cache.at(aiTextureType_HEIGHT);
-	normal_texture->bind(2);
-	m_current_material->set_int("material.normal", 2);
+	if (textures_cache.contains(aiTextureType_SPECULAR))
+	{
+		Texture2D* specular_texture = textures_cache.at(aiTextureType_SPECULAR);
+		specular_texture->bind(1);
+		m_current_material->set_int("material.specular", 1);
+	}
+	
+	if (textures_cache.contains(aiTextureType_HEIGHT))
+	{
+		Texture2D* normal_texture = textures_cache.at(aiTextureType_HEIGHT);
+		normal_texture->bind(2);
+		m_current_material->set_int("material.normal", 2);
+	}
 	
 	m_current_material->set_float("material.ambient", 0.5f);
 	m_current_material->set_float("material.shininess", UserInterface::shininess);
@@ -135,8 +148,9 @@ void Model::update_breakdown_shader() const
 	{
 		texture_type = aiTextureType_HEIGHT;
 	}
+
 	m_current_material->set_int("textureSampler", 0);
-	Texture2D* texture = textures_cache.at(texture_type);
+	Texture2D* texture = textures_cache.contains(texture_type) ? textures_cache.at(texture_type) : ResourceManager::get_texture("None.jpg");
 	texture->bind(0);
 }
 
@@ -257,21 +271,11 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 				vertex.color = glm::vec4(1.0f, 0.75f, 0.796f, 1.0f);
 			}
 
-			//vertex.useDiffuseTexture = mat->GetTextureCount(aiTextureType_DIFFUSE) > 0;
-			//EventManager::is_using_diffuse_texture = vertex.useDiffuseTexture;
-
 			// Check if specular texture exists
 			if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular))
 			{
 				vertex.color = glm::vec4(specular.r, specular.g, specular.b, specular.a);
 			}
-
-			vertex.useSpecularTexture = mat->GetTextureCount(aiTextureType_SPECULAR) > 0;
-			EventManager::is_using_specular_texture = vertex.useSpecularTexture;
-
-			// Check if normals texture exists
-			vertex.useNormalsTexture = mat->GetTextureCount(aiTextureType_HEIGHT) > 0;
-			EventManager::is_using_normals_texture = vertex.useNormalsTexture;
 		}
 
 		vertices.push_back(vertex);
@@ -328,12 +332,6 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 			textures_cache[type] = texture;
 		}
 	}
-
-	if (!textures_cache.contains(type)) textures_cache[type] = ResourceManager::get_texture("None.jpg");
-
-	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
-	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
-	set_current_material(m_asset_name + ".model");
 }
 
 void Model::set_current_material(const std::string& material_name)
@@ -341,7 +339,7 @@ void Model::set_current_material(const std::string& material_name)
 	if (m_current_material != ResourceManager::get_material(material_name))
 	{
 		m_current_material = ResourceManager::get_material(material_name);
-		for (auto mesh : meshes)
+		for (const auto mesh : meshes)
 		{
 			mesh->set_material(m_current_material);
 		}

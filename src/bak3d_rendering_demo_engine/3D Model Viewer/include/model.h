@@ -24,7 +24,6 @@ class Model : public Asset
 {
 public:
 	// model data
-	std::vector<std::string> textures_loaded; // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	std::unordered_map<aiTextureType, Texture2D*> textures_cache;
 	std::vector<Mesh*> meshes; // a model is made out of one or more meshes
 	int m_combo_index;
@@ -47,14 +46,15 @@ public:
 	void set_current_material(const std::string& material_name);
 	void set_visible(bool visible) { m_is_visible = visible; }
 	bool is_visible() const { return m_is_visible; }
+
+	bool has_texture_of_type(const aiTextureType& texture_type) const { return textures_cache.contains(texture_type); }
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void load_model(std::string const& path);
 	// processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
 	void process_node(aiNode* node, const aiScene* scene);
 	Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
-	// checks all material textures of a given type and loads the textures if they're not loaded yet.
-	// the required info is returned as a Texture struct.
+
 	void load_material_textures(aiMaterial* mat, aiTextureType type);
 	void update_light_properties() const;
 	void update_material_properties() const;
