@@ -38,7 +38,7 @@ int UserInterface::render_current = 0;
 ParticleSystem* UserInterface::current_particle_system = nullptr;
 particle_info UserInterface::particle_payload_info = particle_info();
 list<pair<string, string>> UserInterface::particle_image_combo_items_list;
-vector<char*> UserInterface::particle_image_combo_items;
+vector<const char*> UserInterface::particle_image_combo_items;
 int UserInterface::particle_image_current = 1;
 
 // Light
@@ -52,26 +52,35 @@ float UserInterface::light_intensity = 1.0f;
 void UserInterface::initialize()
 {
     initialize_imgui();
-	
+
+	// Initialize model list
 	model_combo_items.emplace_back("None");
 	list<pair<string, string>> models_file_path_names;
-	for (auto model_pair : ResourceManager::Models)
+	for (auto [model_file_name, model_object] : ResourceManager::Models)
 	{
-		models_file_path_names.emplace_back(model_pair.first, model_pair.second->get_path());
+		models_file_path_names.emplace_back(model_file_name, model_object->get_path());
 	}
+	
 	auto model_file_names = FileLoader::get_vector_items_to_array(models_file_path_names, false);
-
 	for (auto file_name : model_file_names)
 	{
 		model_combo_items.push_back(file_name);
 	}
 
-	for (auto [texture_file_name, texture_path] : ResourceManager::Textures)
+	// Initialize particle texture list
+	list<pair<string, string>> particle_image_file_path_names;
+	for (auto [texture_file_name, texture_object] : ResourceManager::Textures)
 	{
-		if (texture_path->get_texture_use_type() == TextureUseType::Particle)
+		if (texture_object->get_texture_use_type() == TextureUseType::Particle)
 		{
-			//particle_image_combo_items.emplace_back(texture_file_name);
+			particle_image_file_path_names.emplace_back(texture_file_name, texture_object->get_path());
 		}
+	}
+	
+	auto particle_image_file_names = FileLoader::get_vector_items_to_array(particle_image_file_path_names, false);
+	for(auto file_name : particle_image_file_names)
+	{
+		particle_image_combo_items.push_back(file_name);
 	}
 }
 

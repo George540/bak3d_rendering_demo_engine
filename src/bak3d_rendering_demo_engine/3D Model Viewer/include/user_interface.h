@@ -60,7 +60,7 @@ public:
     static ParticleSystem* current_particle_system;
     static particle_info particle_payload_info;
     static std::list<std::pair<std::string, std::string>> particle_image_combo_items_list;
-    static std::vector<char*> particle_image_combo_items;
+    static std::vector<const char*> particle_image_combo_items;
     static int particle_image_current;
 
     static bool is_grid_rendering;
