@@ -26,13 +26,21 @@ protected:
     Camera* m_camera;
 public:
     Object(Material* material);
-    virtual ~Object();
+    ~Object() override;
 
     void set_camera(Camera& camera) { m_camera = &camera; }
     void set_material(Material* material) { m_material = material; }
     void update(float dt) override;
     virtual void draw() const;
-    void delete_globjects() const;
+};
+
+class InstancedObject : public Object
+{
+protected:
+    InstanceBuffer* m_ibo;
+public:
+    InstancedObject(Material* material);
+    ~InstancedObject() override;
 };
 
 #endif

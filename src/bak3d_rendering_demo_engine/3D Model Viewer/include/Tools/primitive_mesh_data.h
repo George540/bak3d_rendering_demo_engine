@@ -86,3 +86,17 @@ static std::vector<GLuint> AXIS_INDICES =
     2, 3,  // Y-axis (Green)
     4, 5   // Z-axis (Blue)
 };
+
+static std::vector<glm::vec3> QUAD_VERTICES =
+{
+    {0.0f, 1.0f, 0.0f},  // Top-left (0)
+    {1.0f, 0.0f, 0.0f},  // Bottom-right (1)
+    {0.0f, 0.0f, 0.0f},  // Bottom-left (2)
+    {1.0f, 1.0f, 0.0f}   // Top-right (3)
+};
+
+static std::vector<GLuint> QUAD_INDICES =
+{
+    0, 1, 2,  // First triangle
+    0, 3, 1   // Second triangle
+};

@@ -50,9 +50,6 @@ public:
 
 	void set_diffuse_color(const glm::vec3 col) { m_properties.diffuse = col; }
 	void set_light_intensity(const float intensity) { m_properties.intensity = intensity; }
-
-	[[nodiscard]] glm::vec3 get_position() const { return m_position; }
-	[[nodiscard]] glm::vec3 get_scaling() const { return m_scaling; }
 };
 
 #endif

@@ -23,8 +23,8 @@ protected:
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
 public:
-    Transform() {};
-    ~Transform() {};
+    Transform() = default;
+    virtual ~Transform() = default;
 
     glm::vec3 get_position() const { return m_position; }
     glm::vec3 get_rotation() const { return m_euler_rotation; }

@@ -41,20 +41,13 @@ void Object::draw() const
 	m_material->apply();
 }
 
-void Object::delete_globjects() const
+InstancedObject::InstancedObject(Material* material) : Object(material)
 {
-	delete m_vao;
-	delete m_vbo;
+	// Will be handled by derived class
+	m_ibo = nullptr;
 }
 
-/*
-IndexedObject::IndexedObject(Camera& camera) : IndexedObject(camera, "LineShader")
+InstancedObject::~InstancedObject()
 {
-
+	delete m_ibo;
 }
-
-IndexedObject::IndexedObject(Camera& camera, const string shader_name) : Object(camera, shader_name)
-{
-	m_ebo = new ElementBuffer()
-}
-*/

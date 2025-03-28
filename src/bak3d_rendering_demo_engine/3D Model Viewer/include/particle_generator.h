@@ -10,13 +10,13 @@
 #define PARTICLEGENERATOR_H
 
 #include <glm/glm.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <filesystem>
 #include <shader.h>
 #include <vector>
 #include <texture.h>
 #include <camera.h>
+
+#include "object.h"
 
 struct particle
 {
@@ -99,18 +99,21 @@ struct particle_info
 // ParticleSystem acts as a container for rendering a large number of 
 // particles by repeatedly spawning and updating particles and killing 
 // them after a given amount of time.
-class ParticleSystem
+class ParticleSystem : public InstancedObject
 {
 public:
     // constructor
-    ParticleSystem(Camera& camera, particle_info info = particle_info());
-    ~ParticleSystem();
+    ParticleSystem(Material* material, const particle_info& info = particle_info());
+    ~ParticleSystem() override;
+
+    void update(float dt) override;
+    void draw() const override;
+    
     void sort_particles();
     float random_float(float min, float max);
-    const GLuint get_particle_amount() const { return m_amount; }
+    GLuint get_particle_amount() const { return m_amount; }
     void update(float dt, GLuint new_particles);
     void draw();
-    void delete_vao_vbo() const;
 
     particle_info particles_payload_info;
 private:
@@ -129,18 +132,20 @@ private:
     float m_scale;
 
     // particle render state
-    Shader* m_particle_shader;
+    Texture2D* m_current_particle_sprite;
+    /*Shader* m_particle_shader;
     Camera* m_camera;
     Texture2D m_texture;
     GLuint m_particle_VAO;
     GLuint m_particle_VBO;
-    GLuint m_instance_VBO;
+    GLuint m_instance_VBO;*/
     
     // particle bounding box
-    Shader* m_bounding_box_shader;
+    Object* m_bounding_box;
+    /*Shader* m_bounding_box_shader;
     GLuint m_bb_VAO;
     GLuint m_bb_VBO;
-    GLuint m_bb_EBO;
+    GLuint m_bb_EBO;*/
     
     void initialize(); // initializes particle data
     void set_up_particle_buffers(); // initializes particle buffers
