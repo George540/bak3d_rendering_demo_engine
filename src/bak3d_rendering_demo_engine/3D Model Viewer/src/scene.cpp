@@ -23,6 +23,7 @@ Scene::Scene()
 	ResourceManager::add_material("grid", new Material(ResourceManager::get_shader("GridShader")));
 	ResourceManager::add_material("line", new Material(ResourceManager::get_shader("LineShader")));
 	ResourceManager::add_material("light", new Material(ResourceManager::get_shader("LightShader")));
+	ResourceManager::add_material("particle", new Material(ResourceManager::get_shader("ParticleShader")));
 
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 5.0f, 10.0f), // position
@@ -39,9 +40,10 @@ Scene::Scene()
 	
 	m_axis = new Axis(ResourceManager::get_material("line"));
 	m_axis->set_camera(*m_camera);
-
-	// Object setup (will be later assigned during model selection process)
-	m_particle_system = nullptr;
+	
+	m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("grid"));
+	m_particle_system->set_camera(*m_camera);
+	UserInterface::current_particle_system = m_particle_system;
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_material("light"));
@@ -60,49 +62,11 @@ Scene::~Scene()
 	delete m_axis;
 }
 
-void Scene::process_object_activation()
-{
-	process_particle_activation();
-}
-
-void Scene::process_particle_activation()
-{
-	if (UserInterface::object_current == 2 && !UserInterface::current_particle_system)
-	{
-		m_particle_system = new ParticleSystem(*m_camera);
-		UserInterface::current_particle_system = m_particle_system;
-
-		cout << "Particle System has been activated." << endl;
-	}
-	else if (UserInterface::current_particle_system && UserInterface::object_current != 2)
-	{
-		UserInterface::particle_payload_info = particle_info();
-		UserInterface::current_particle_system = nullptr;
-		delete m_particle_system;
-		m_particle_system = nullptr;
-
-		cout << "Particle System has been deactivated." << endl;
-	}
-	else if (UserInterface::object_current == 2 && m_particle_system && m_particle_system->get_particle_amount() != UserInterface::particle_payload_info.amount)
-	{
-		UserInterface::current_particle_system = nullptr;
-		delete m_particle_system;
-		m_particle_system = nullptr;
-
-		m_particle_system = new ParticleSystem(*m_camera, UserInterface::particle_payload_info);
-		UserInterface::current_particle_system = m_particle_system;
-	}
-}
-
 void Scene::update(float dt) const
 {
 	m_camera->update(dt);
 	m_light->update(dt);
-
-	if (m_particle_system)
-	{
-		m_particle_system->update(dt, 2);
-	}
+	m_particle_system->update(dt);
 }
 
 void Scene::draw() const
@@ -121,7 +85,7 @@ void Scene::draw() const
 		glDepthFunc(GL_LESS);
 	}
 
-	if (!UserInterface::current_particle_system && UserInterface::is_full_render_selected)
+	if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
 	}
@@ -137,11 +101,5 @@ void Scene::draw() const
 	}
 
 	UserInterface::end_frame();
-	//Renderer::post_processing();
 	Renderer::end_frame();
-}
-
-void Scene::delete_arrays_and_buffers() const
-{
-	m_particle_system->delete_vao_vbo();
 }

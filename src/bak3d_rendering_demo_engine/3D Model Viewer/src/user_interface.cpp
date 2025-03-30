@@ -213,6 +213,11 @@ void UserInterface::render_object_window()
 
 	if (object_current == 1)
 	{
+		if (current_particle_system && current_particle_system->is_visible())
+		{
+			current_particle_system->set_visible(false);
+		}
+		
 		auto updated_model = ResourceManager::get_model(model_combo_items[model_current_index]);
 		if (updated_model && model_current_object && updated_model->get_asset_name() != model_current_object->get_asset_name())
 		{
@@ -378,6 +383,11 @@ void UserInterface::render_object_window()
 	}
 	else if (object_current == 2)
 	{
+		if (current_particle_system && !current_particle_system->is_visible())
+		{
+			current_particle_system->set_visible(true);
+		}
+		
 		ImGui::DragInt("Generator Amount", &particle_payload_info.amount, 1, 1, 10000);
 
 		ImGui::DragFloat("Particle Lifetime", &particle_payload_info.lifetime, 0.01f, 0.01f, 100.0f);
@@ -454,7 +464,8 @@ void UserInterface::render_object_window()
 		}
 		ImGui::SliderFloat("Range", &particle_payload_info.range, 0.0f, 10.0f);
 
-		ImGui::Combo("Image Selection", &particle_payload_info.texture_selection, particle_image_combo_items.data(), static_cast<int>(particle_image_combo_items.size()));
+		ImGui::Combo("Image Selection", &particle_payload_info.texture_selection_index, particle_image_combo_items.data(), static_cast<int>(particle_image_combo_items.size()));
+		particle_payload_info.texture_selection_name = particle_image_combo_items[particle_payload_info.texture_selection_index];
 		
 		if (current_particle_system)
 		{

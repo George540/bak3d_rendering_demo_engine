@@ -33,8 +33,6 @@ public:
 
 	void update(float dt) const;
 	void draw() const;
-	void process_object_activation();
-	void delete_arrays_and_buffers() const;
 private:
 	static Scene* instance;
 	

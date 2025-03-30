@@ -1,8 +1,6 @@
 #include <iostream>
 #include <random>
-#include <glm/ext/matrix_transform.hpp>
 
-#include "stb_image.h"
 #include "particle_generator.h"
 #include "file_loader.h"
 #include "primitive_mesh_data.h"
@@ -10,12 +8,12 @@
 
 using namespace std;
 
-static const int MAX_PARTICLES = 10000;
+static constexpr int MAX_PARTICLES = 10000;
 GLsizei vec4_size = sizeof(glm::vec4);
 GLsizei pid_size = sizeof(particle_instance_data);
 GLuint last_used_particle = 0;
 
-ParticleSystem::ParticleSystem(Material* material, const particle_info& info) : InstancedObject(material)
+ParticleSystem::ParticleSystem(Material* particle_material, Material* box_material, const particle_info& info) : InstancedObject(particle_material)
 {
     particles_payload_info = info;
     m_amount = particles_payload_info.amount;
@@ -26,12 +24,13 @@ ParticleSystem::ParticleSystem(Material* material, const particle_info& info) : 
     m_color = particles_payload_info.color;
     m_range = particles_payload_info.range;
     m_scale = particles_payload_info.scale;
-
+    
     initialize();
     set_up_particle_buffers();
-    initialize_bounding_box();
 
-    cout << "Particle System has been activated with " << m_amount << " particles." << endl;
+    m_bounding_box = new BoundingBox(box_material);
+
+    cout << "Particle System has been activated with " << m_amount << " particles." << '\n';
 }
 
 ParticleSystem::~ParticleSystem()
@@ -44,15 +43,7 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::initialize()
 {
-    auto particle_texture_data = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), FileType::png);
-    for (const auto& pair : particle_texture_data)
-    {
-        const auto& path = pair.second;
-        Texture2D t = Texture2D(path, pair.first, aiTextureType_DIFFUSE, TextureUseType::Particle);
-        m_textures_loaded.push_back(t);
-    }
-
-    m_current_particle_sprite = ResourceManager::get_texture(particles_payload_info.texture_selection);
+    m_current_particle_sprite = ResourceManager::get_texture(particles_payload_info.texture_selection_name);
 
     for (GLuint i = 0; i < m_amount; ++i)
     {
@@ -69,7 +60,7 @@ void ParticleSystem::initialize()
 
 void ParticleSystem::set_up_particle_buffers()
 {
-    cout << "Setting up particle buffer data..." << endl;
+    cout << "Setting up particle buffer data..." << '\n';
 
     m_vbo = new VertexBuffer(QUAD_VERTICES.size() * sizeof(glm::vec3), QUAD_VERTICES.data());
     m_ebo = new ElementBuffer(QUAD_INDICES.size() * sizeof(GLuint), QUAD_INDICES.data());
@@ -85,82 +76,38 @@ void ParticleSystem::set_up_particle_buffers()
     m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)), 1);   // Particle Color
     m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)), 1);        // Particle Scale
 
-    m_vao->unbind_object();
+    if (m_camera && m_is_visible)
+    {
+        m_vao->unbind_object();
+    }
 
     // Set size of particle instance data payload
     m_particle_instance_data.resize(m_amount);
 }
 
-void ParticleSystem::initialize_bounding_box()
-{
-    cout << "Initializing Particle System Bounding Box data..." << endl;
-
-    m_bounding_box_shader = new Shader(std::filesystem::absolute("shaders/GridShader.vert").string().c_str(),
-        std::filesystem::absolute("shaders/GridShader.frag").string().c_str(), "GridShader");
-
-    // Define the 8 vertices of the cube
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, -0.5f,  // Vertex 0
-         0.5f, -0.5f, -0.5f,  // Vertex 1
-         0.5f,  0.5f, -0.5f,  // Vertex 2
-        -0.5f,  0.5f, -0.5f,  // Vertex 3
-        -0.5f, -0.5f,  0.5f,  // Vertex 4
-         0.5f, -0.5f,  0.5f,  // Vertex 5
-         0.5f,  0.5f,  0.5f,  // Vertex 6
-        -0.5f,  0.5f,  0.5f   // Vertex 7
-    };
-
-    // Define the edges of the cube (pairs of vertices)
-    GLuint indices[] = {
-        0, 1,  1, 2,  2, 3,  3, 0,  // Bottom face
-        4, 5,  5, 6,  6, 7,  7, 4,  // Top face
-        0, 4,  1, 5,  2, 6,  3, 7   // Side edges
-    };
-
-    // Create and bind the VAO
-    glGenVertexArrays(1, &m_bb_VAO);
-    glBindVertexArray(m_bb_VAO);
-
-    // Create and bind the VBO
-    glGenBuffers(1, &m_bb_VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_bb_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Create and bind the EBO
-    glGenBuffers(1, &m_bb_EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bb_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Define the vertex attribute data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
-
-    // Unbind the VAO
-    glBindVertexArray(0);
-}
-
-void ParticleSystem::sort_particles()
+void ParticleSystem::sort_particles() const
 {
     auto cameraPos = m_camera->get_camera_position();
-    std::sort(m_particles.begin(), m_particles.end(),
-        [cameraPos](const particle& a, const particle& b) {
-            float distA = glm::length(glm::vec3(a.position) - cameraPos);
-            float distB = glm::length(glm::vec3(b.position) - cameraPos);
-            return distA > distB; // Sort back to front
-        });
+    ranges::sort(m_particles,
+                 [cameraPos](const particle& a, const particle& b) {
+                     float distA = glm::length(glm::vec3(a.position) - cameraPos);
+                     float distB = glm::length(glm::vec3(b.position) - cameraPos);
+                     return distA > distB; // Sort back to front
+                 });
 }
 
 float ParticleSystem::random_float(float min, float max)
 {
     static random_device rd;
     static mt19937 generator(rd());
-    uniform_real_distribution<float> distribution(min, max);
+    uniform_real_distribution distribution(min, max);
     return distribution(generator);
 }
 
-void ParticleSystem::update(float dt, GLuint new_particles)
+void ParticleSystem::update(float dt)
 {
-    // Update instance buffer 
+    if (!m_is_visible) return;
+    
     for (GLuint i = 0; i < m_amount; ++i)
     {
         m_particle_instance_data[i].position = m_particles[i].position;
@@ -169,12 +116,13 @@ void ParticleSystem::update(float dt, GLuint new_particles)
         m_particle_instance_data[i].scale = m_particles[i].scale;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_instance_VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, m_amount * sizeof(particle_instance_data), m_particle_instance_data.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    m_ibo->bind_object();
+    m_ibo->set_data(m_particle_instance_data.data());
+    m_ibo->buffer_subdata();
+    m_ibo->unbind_object();
 
     // add new particles 
-    for (GLuint i = 0; i < new_particles; ++i)
+    for (GLuint i = 0; i < 2; ++i)
     {
         auto unused_particle = first_unused_particle();
         if (m_particles[unused_particle].lifetime <= 0.0f || m_particles[unused_particle].color.a <= 0.0f)
@@ -233,35 +181,34 @@ void ParticleSystem::update(float dt, GLuint new_particles)
             }
         }
     }
+    
+    InstancedObject::update(dt);
+    m_bounding_box->update(dt);
+
+    sort_particles();
 }
 
-void ParticleSystem::draw()
+void ParticleSystem::draw() const
 {
-    if (!m_particle_shader) return;
+    if (!m_material || !m_camera) return;
 
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    sort_particles();
-    m_particle_shader->use();
-    // Update instance buffer
-    glBindVertexArray(m_particle_VAO);
 
     // Disable depth mask to prevent writing to the depth buffer
     glDepthMask(GL_FALSE);
 
-    m_particle_shader->set_mat4("projection", m_camera->get_projection_matrix());
-    m_particle_shader->set_mat4("view", m_camera->get_view_matrix());
-
-    auto selected_texture = m_textures_loaded[particles_payload_info.texture_selection];
-    if (m_current_particle_sprite != selected_texture)
+    if (const auto selected_texture = ResourceManager::get_texture(particles_payload_info.texture_selection_name); m_current_particle_sprite != selected_texture)
     {
         m_current_particle_sprite = selected_texture;
+        m_current_particle_sprite->bind(0);
     }
-    m_current_particle_sprite.bind(0);
+    
     // Draw particles using instancing
+    m_vao->bind_object();
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
-    glBindVertexArray(0);
+    m_vao->unbind_object();
 
     // don't forget to reset to default blending mode
     glDepthMask(GL_TRUE);
@@ -270,42 +217,11 @@ void ParticleSystem::draw()
 
     if (particles_payload_info.render_bounding_box)
     {
-        draw_bounding_box();
+        m_bounding_box->draw();
     }
 }
 
-void ParticleSystem::draw_bounding_box()
-{
-    glDepthFunc(GL_ALWAYS);
-
-    m_bounding_box_shader->use();
-    m_bounding_box_shader->set_mat4("projection", m_camera->get_projection_matrix());
-    m_bounding_box_shader->set_mat4("view", m_camera->get_view_matrix());
-
-    auto model = glm::mat4(1.0f);
-    if (particles_payload_info.randomize_velocity)
-    {
-        auto velocity_offset = particles_payload_info.velocity_random_offset;
-        model = glm::scale(model, (glm::vec3(velocity_offset) * m_lifetime) + (m_range * 2.0f));
-    }
-    else
-    {
-        auto horizontal_scale = m_range * 2;
-        model = glm::scale(model, (glm::vec3(m_velocity) * m_lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale));
-        model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
-    }
-
-    m_bounding_box_shader->set_mat4("model", model);
-    m_bounding_box_shader->set_vec3("color", glm::vec3(1.0f));
-
-    glBindVertexArray(m_bb_VAO);
-    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-
-    glDepthFunc(GL_LESS);
-}
-
-GLuint ParticleSystem::first_unused_particle()
+GLuint ParticleSystem::first_unused_particle() const
 {
     // first search from last used particle, this will usually return almost instantly
     for (GLuint i = last_used_particle; i < m_amount; ++i)
@@ -350,4 +266,9 @@ void ParticleSystem::respawn_particle(particle& particle)
         : particles_payload_info.velocity;
 
     particle.scale = particles_payload_info.randomize_scale ? m_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_scale;
+}
+
+void ParticleSystem::reset_particle_generator()
+{
+    particles_payload_info = particle_info();
 }

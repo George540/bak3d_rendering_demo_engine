@@ -32,7 +32,6 @@ int main()
 
         // Update Scene
         const float dt = EventManager::get_frame_time();
-        scene.process_object_activation();
         scene.update(dt);
 
         scene.draw();
@@ -40,7 +39,6 @@ int main()
 
     UserInterface::shutdown();
     Renderer::shutdown();
-    scene.delete_arrays_and_buffers();
     EventManager::shutdown();
     ResourceManager::shutdown();
 

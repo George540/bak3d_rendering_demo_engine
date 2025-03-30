@@ -27,7 +27,7 @@ Object::~Object()
 
 void Object::update(float dt)
 {
-	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);
+	set_model_matrix(m_position, m_scaling, m_euler_rotation, 0.0f);
 }
 
 void Object::draw() const
@@ -41,11 +41,7 @@ void Object::draw() const
 	m_material->apply();
 }
 
-InstancedObject::InstancedObject(Material* material) : Object(material)
-{
-	// Will be handled by derived class
-	m_ibo = nullptr;
-}
+InstancedObject::InstancedObject(Material* material) : Object(material), m_ibo(nullptr) {}
 
 InstancedObject::~InstancedObject()
 {

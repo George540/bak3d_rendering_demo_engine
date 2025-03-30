@@ -22,11 +22,16 @@ class Buffer: GLObject
 public:
     Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
     ~Buffer();
+    void set_data(const void* data) { m_data = data; }
     void bind_object() const;
+    void buffer_subdata();
     void unbind_object() const;
 
 protected:
-    GLenum m_Target;
+    GLenum m_target;
+    GLsizeiptr m_size;
+    const void* m_data;
+    GLenum m_usage;
 };
 
 class VertexBuffer : public Buffer

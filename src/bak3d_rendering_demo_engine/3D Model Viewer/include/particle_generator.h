@@ -16,6 +16,7 @@
 #include <texture.h>
 #include <camera.h>
 
+#include "bounding_box.h"
 #include "object.h"
 
 struct particle
@@ -61,7 +62,8 @@ struct particle_info
     float lifetime;
     float scale;
     float range;
-    int texture_selection;
+    int texture_selection_index;
+    std::string texture_selection_name;
 
     bool randomize_rotation;
     bool randomize_lifetime;
@@ -82,7 +84,7 @@ struct particle_info
         lifetime(3.0f),
         scale(0.5f),
         range(1.0f),
-        texture_selection(1),
+        texture_selection_index(1),
         randomize_rotation(false),
         randomize_lifetime(false),
         randomize_velocity(false),
@@ -103,25 +105,26 @@ class ParticleSystem : public InstancedObject
 {
 public:
     // constructor
-    ParticleSystem(Material* material, const particle_info& info = particle_info());
+    ParticleSystem(Material* particle_material, Material* box_material, const particle_info& info = particle_info());
     ~ParticleSystem() override;
 
     void update(float dt) override;
     void draw() const override;
+
+    void set_visible(bool visible) { m_is_visible = visible; }
+    bool is_visible() const { return m_is_visible; }
     
-    void sort_particles();
-    float random_float(float min, float max);
+    void sort_particles() const;
+    static float random_float(float min, float max);
     GLuint get_particle_amount() const { return m_amount; }
     void update(float dt, GLuint new_particles);
-    void draw();
 
     particle_info particles_payload_info;
 private:
-    // particle properties
-    std::vector<particle> m_particles;
-    std::vector<Texture2D> m_textures_loaded;
+    mutable std::vector<particle> m_particles;
     std::vector<particle_instance_data> m_particle_instance_data;
-
+    bool m_is_visible;
+    
     GLuint m_amount;
     glm::vec3 m_position;
     float m_rotation;
@@ -131,28 +134,14 @@ private:
     float m_range;
     float m_scale;
 
-    // particle render state
-    Texture2D* m_current_particle_sprite;
-    /*Shader* m_particle_shader;
-    Camera* m_camera;
-    Texture2D m_texture;
-    GLuint m_particle_VAO;
-    GLuint m_particle_VBO;
-    GLuint m_instance_VBO;*/
-    
-    // particle bounding box
-    Object* m_bounding_box;
-    /*Shader* m_bounding_box_shader;
-    GLuint m_bb_VAO;
-    GLuint m_bb_VBO;
-    GLuint m_bb_EBO;*/
+    mutable Texture2D* m_current_particle_sprite;
+    BoundingBox* m_bounding_box;
     
     void initialize(); // initializes particle data
     void set_up_particle_buffers(); // initializes particle buffers
-    void initialize_bounding_box(); // initializes bound box buffer and data
-    GLuint first_unused_particle(); // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
+    GLuint first_unused_particle() const; // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
     void respawn_particle(particle& particle); // respawns particle
-    void draw_bounding_box();
+    void reset_particle_generator();
 };
 
 #endif
