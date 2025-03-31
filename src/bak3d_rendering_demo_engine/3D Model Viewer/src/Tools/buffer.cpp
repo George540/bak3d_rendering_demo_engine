@@ -22,11 +22,10 @@ void Buffer::bind_object() const
     glBindBuffer(m_target, m_ID);
 }
 
-void Buffer::buffer_subdata()
+void Buffer::buffer_subdata() const
 {
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_size, m_data);
 }
-
 
 void Buffer::unbind_object() const
 {

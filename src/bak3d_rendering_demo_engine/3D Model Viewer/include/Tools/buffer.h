@@ -24,7 +24,7 @@ public:
     ~Buffer();
     void set_data(const void* data) { m_data = data; }
     void bind_object() const;
-    void buffer_subdata();
+    void buffer_subdata() const;
     void unbind_object() const;
 
 protected:

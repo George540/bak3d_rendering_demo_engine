@@ -169,7 +169,7 @@ void ParticleSystem::update(float dt)
         p.lifetime -= dt; // reduce life
 
         if (p.lifetime > 0.0f)
-        {	
+        {
             p.position += p.velocity * dt; // particle is alive, thus update
             if (particles_payload_info.is_color_faded)
             {

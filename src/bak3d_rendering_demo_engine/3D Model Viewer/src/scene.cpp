@@ -24,6 +24,7 @@ Scene::Scene()
 	ResourceManager::add_material("line", new Material(ResourceManager::get_shader("LineShader")));
 	ResourceManager::add_material("light", new Material(ResourceManager::get_shader("LightShader")));
 	ResourceManager::add_material("particle", new Material(ResourceManager::get_shader("ParticleShader")));
+	ResourceManager::add_material("bounding-box", new Material(ResourceManager::get_shader("GridShader")));
 
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 5.0f, 10.0f), // position
@@ -41,7 +42,7 @@ Scene::Scene()
 	m_axis = new Axis(ResourceManager::get_material("line"));
 	m_axis->set_camera(*m_camera);
 	
-	m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("grid"));
+	m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("bounding-box"));
 	m_particle_system->set_camera(*m_camera);
 	UserInterface::current_particle_system = m_particle_system;
 
@@ -95,7 +96,7 @@ void Scene::draw() const
 		current_model->draw();
 	}
 
-	if (m_particle_system)
+	if (m_particle_system && m_particle_system->is_visible())
 	{
 		m_particle_system->draw();
 	}

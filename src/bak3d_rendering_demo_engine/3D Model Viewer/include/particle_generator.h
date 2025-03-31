@@ -84,7 +84,7 @@ struct particle_info
         lifetime(3.0f),
         scale(0.5f),
         range(1.0f),
-        texture_selection_index(1),
+        texture_selection_index(2),
         randomize_rotation(false),
         randomize_lifetime(false),
         randomize_velocity(false),
@@ -126,7 +126,6 @@ private:
     bool m_is_visible;
     
     GLuint m_amount;
-    glm::vec3 m_position;
     float m_rotation;
     glm::vec3 m_velocity;
     glm::vec4 m_color;

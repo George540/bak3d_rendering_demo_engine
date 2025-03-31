@@ -28,7 +28,7 @@ void BoundingBox::update(float dt)
         m_scaling = (glm::vec3(particles_info.velocity) * particles_info.lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale);
     }
 
-    set_model_matrix(m_position, m_euler_rotation, m_scaling, 0.0f);
+    Object::update(dt);
 }
 
 void BoundingBox::draw() const

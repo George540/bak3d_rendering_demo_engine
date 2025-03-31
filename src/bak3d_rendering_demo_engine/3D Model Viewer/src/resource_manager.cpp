@@ -28,8 +28,8 @@ void ResourceManager::initialize_shaders()
 {
     // Get directory and files
     auto directory = filesystem::absolute("shaders");
-    auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert );
-    auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag );
+    auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert);
+    auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag);
 
     if (vertex_shader_files.size() != fragment_shader_files.size())
     {
