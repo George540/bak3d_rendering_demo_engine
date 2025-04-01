@@ -11,6 +11,7 @@ using namespace std;
 static constexpr int MAX_PARTICLES = 10000;
 GLsizei vec4_size = sizeof(glm::vec4);
 GLsizei pid_size = sizeof(particle_instance_data);
+GLsizei ui_size = sizeof(GLuint);
 GLuint last_used_particle = 0;
 
 ParticleSystem::ParticleSystem(Material* particle_material, Material* box_material, const particle_info& info) : InstancedObject(particle_material)
@@ -62,12 +63,12 @@ void ParticleSystem::set_up_particle_buffers()
 {
     cout << "Setting up particle buffer data..." << '\n';
 
-    m_vbo = new VertexBuffer(QUAD_VERTICES.size() * sizeof(glm::vec3), QUAD_VERTICES.data());
-    m_ebo = new ElementBuffer(QUAD_INDICES.size() * sizeof(GLuint), QUAD_INDICES.data());
-    m_ibo = new InstanceBuffer(m_amount * sizeof(particle_instance_data), nullptr);
+    m_vbo = new VertexBuffer(QUAD_VERTICES.size() * vec4_size, QUAD_VERTICES.data());
+    m_ebo = new ElementBuffer(QUAD_INDICES.size() * ui_size, QUAD_INDICES.data());
+    m_ibo = new InstanceBuffer(m_amount * pid_size, nullptr);
 
     // Vertex attributes (vertex position, texture coordinates)
-    m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr, 1);
+    m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr);
 
     // Instance attributes
     // Attribute pointer parameters order: index, size, type, normalized, stride, pointer
@@ -202,12 +203,13 @@ void ParticleSystem::draw() const
     if (const auto selected_texture = ResourceManager::get_texture(particles_payload_info.texture_selection_name); m_current_particle_sprite != selected_texture)
     {
         m_current_particle_sprite = selected_texture;
-        m_current_particle_sprite->bind(0);
     }
+
+    m_current_particle_sprite->bind(0);
     
     // Draw particles using instancing
     m_vao->bind_object();
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_amount);
+    glDrawElementsInstanced(GL_TRIANGLES, QUAD_INDICES.size(), GL_UNSIGNED_INT, nullptr, m_amount);
     m_vao->unbind_object();
 
     // don't forget to reset to default blending mode

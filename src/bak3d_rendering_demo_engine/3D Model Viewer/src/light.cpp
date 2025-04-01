@@ -13,8 +13,8 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	m_position = position;
 	m_scaling = scaling;
 
-	m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_SOLID.size(), &CUBE_VERTICES_SOLID[0]);
-	m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_SOLID.size(), &CUBE_INDICES_SOLID[0]);
+	m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_SOLID.size(), CUBE_VERTICES_SOLID.data());
+	m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_SOLID.size(), CUBE_INDICES_SOLID.data());
 
 	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 	m_vao->unbind_object();
