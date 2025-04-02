@@ -63,9 +63,9 @@ void ParticleSystem::set_up_particle_buffers()
 {
     cout << "Setting up particle buffer data..." << '\n';
 
-    m_vbo = new VertexBuffer(QUAD_VERTICES.size() * vec4_size, QUAD_VERTICES.data());
-    m_ebo = new ElementBuffer(QUAD_INDICES.size() * ui_size, QUAD_INDICES.data());
-    m_ibo = new InstanceBuffer(m_amount * pid_size, nullptr);
+    m_vbo = new VertexBuffer(static_cast<GLsizei>(QUAD_VERTICES.size()) * vec4_size, QUAD_VERTICES.data());
+    m_ebo = new ElementBuffer(static_cast<GLsizei>(QUAD_INDICES.size()) * ui_size, QUAD_INDICES.data());
+    m_ibo = new InstanceBuffer(static_cast<GLsizei>(m_amount) * pid_size, nullptr);
 
     // Vertex attributes (vertex position, texture coordinates)
     m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr);
@@ -77,10 +77,7 @@ void ParticleSystem::set_up_particle_buffers()
     m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)), 1);   // Particle Color
     m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)), 1);        // Particle Scale
 
-    if (m_camera && m_is_visible)
-    {
-        m_vao->unbind_object();
-    }
+    m_vao->unbind_object();
 
     // Set size of particle instance data payload
     m_particle_instance_data.resize(m_amount);
@@ -116,11 +113,6 @@ void ParticleSystem::update(float dt)
         m_particle_instance_data[i].color = m_particles[i].color;
         m_particle_instance_data[i].scale = m_particles[i].scale;
     }
-
-    m_ibo->bind_object();
-    m_ibo->set_data(m_particle_instance_data.data());
-    m_ibo->buffer_subdata();
-    m_ibo->unbind_object();
 
     // add new particles 
     for (GLuint i = 0; i < 2; ++i)
@@ -193,6 +185,10 @@ void ParticleSystem::draw() const
 {
     if (!m_material || !m_camera) return;
 
+    m_ibo->bind_object();
+    m_ibo->set_buffer_data(m_particle_instance_data);
+    m_ibo->unbind_object();
+
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -209,7 +205,7 @@ void ParticleSystem::draw() const
     
     // Draw particles using instancing
     m_vao->bind_object();
-    glDrawElementsInstanced(GL_TRIANGLES, QUAD_INDICES.size(), GL_UNSIGNED_INT, nullptr, m_amount);
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(QUAD_INDICES.size()), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_particles.size()));
     m_vao->unbind_object();
 
     // don't forget to reset to default blending mode

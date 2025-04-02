@@ -14,6 +14,8 @@
 #define BUFFER_H
 
 #include <glad/glad.h>
+#include <stdexcept>
+#include <vector>
 
 #include "globject.h"
 
@@ -21,17 +23,36 @@ class Buffer: GLObject
 {
 public:
     Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
-    ~Buffer();
-    void set_data(const void* data) { m_data = data; }
-    void bind_object() const;
-    void buffer_subdata() const;
-    void unbind_object() const;
-
+    ~Buffer() override;
+    void bind_object() const override;
+    void unbind_object() const override;
 protected:
     GLenum m_target;
     GLsizeiptr m_size;
     const void* m_data;
     GLenum m_usage;
+public:
+    template <typename T>
+    void set_buffer_data(const std::vector<T>& data)
+    {
+        m_data = data.data();
+        m_size = data.size() * sizeof(T);
+        glBufferData(m_target, data.size() * sizeof(T), data.data(), m_usage);
+    }
+
+    template <typename T>
+    void set_buffer_sub_data(size_t offset, const std::vector<T>& data)
+    {
+        if (offset + data.size() * sizeof(T) > m_size)
+        {
+            // Prevent out-of-bounds GPU memory write
+            throw std::runtime_error("Buffer overflow: set_buffer_sub_data(...) exceeds allocated size");
+        }
+
+        m_data = data.data();
+        m_size = data.size() * sizeof(T);
+        glBufferSubData(m_target, offset, data.size() * sizeof(T), data.data());
+    }
 };
 
 class VertexBuffer : public Buffer

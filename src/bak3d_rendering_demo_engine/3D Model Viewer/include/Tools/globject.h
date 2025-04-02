@@ -17,7 +17,7 @@ public:
     virtual ~GLObject() {}
     virtual void bind_object() const = 0;
     virtual void unbind_object() const = 0;
-    inline GLuint get_id() const { return m_ID; }
+    GLuint get_id() const { return m_ID; }
 
 protected:
     GLuint m_ID = 0;
