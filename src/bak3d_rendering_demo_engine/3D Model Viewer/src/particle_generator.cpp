@@ -31,6 +31,8 @@ ParticleSystem::ParticleSystem(Material* particle_material, Material* box_materi
 
     m_bounding_box = new BoundingBox(box_material);
 
+    static_assert(sizeof(particle_instance_data) == 36, "ERROR::PARTICLESYSTEM::WRONG_STRUCT_SIZE");
+
     cout << "Particle System has been activated with " << m_amount << " particles." << '\n';
 }
 
@@ -183,12 +185,6 @@ void ParticleSystem::update(float dt)
 
 void ParticleSystem::draw() const
 {
-    if (!m_material || !m_camera) return;
-
-    m_ibo->bind_object();
-    m_ibo->set_buffer_data(m_particle_instance_data);
-    m_ibo->unbind_object();
-
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -200,12 +196,18 @@ void ParticleSystem::draw() const
     {
         m_current_particle_sprite = selected_texture;
     }
-
-    m_current_particle_sprite->bind(0);
     
+    m_material->set_int("sprite", 0);
+    m_current_particle_sprite->bind(0);
+    Object::draw();
+
+    m_ibo->bind_object();
+    m_ibo->set_buffer_data(m_particle_instance_data);
+    m_ibo->unbind_object();
+
     // Draw particles using instancing
     m_vao->bind_object();
-    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(QUAD_INDICES.size()), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_particles.size()));
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(QUAD_INDICES.size()), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(m_amount));
     m_vao->unbind_object();
 
     // don't forget to reset to default blending mode
@@ -217,6 +219,8 @@ void ParticleSystem::draw() const
     {
         m_bounding_box->draw();
     }
+
+    Texture2D::unbind();
 }
 
 GLuint ParticleSystem::first_unused_particle() const

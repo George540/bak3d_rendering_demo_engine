@@ -77,7 +77,7 @@ struct particle_info
     float scale_random_offset;
 
     particle_info() :
-        amount(50),
+        amount(1),
         rotation(0.0f),
         velocity(0.0f, 1.0f, 0.0f),
         color(1.0f),

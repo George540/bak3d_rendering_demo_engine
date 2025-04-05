@@ -37,7 +37,7 @@ public:
     {
         m_data = data.data();
         m_size = data.size() * sizeof(T);
-        glBufferData(m_target, data.size() * sizeof(T), data.data(), m_usage);
+        glBufferData(m_target, m_size, m_data, m_usage);
     }
 
     template <typename T>
@@ -51,7 +51,7 @@ public:
 
         m_data = data.data();
         m_size = data.size() * sizeof(T);
-        glBufferSubData(m_target, offset, data.size() * sizeof(T), data.data());
+        glBufferSubData(m_target, offset, m_size, m_data);
     }
 };
 
