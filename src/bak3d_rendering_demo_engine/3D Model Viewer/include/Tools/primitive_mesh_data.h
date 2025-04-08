@@ -87,22 +87,18 @@ static std::vector<GLuint> AXIS_INDICES =
     4, 5   // Z-axis (Blue)
 };
 
-// Quad vertex data (vec2 position + vec2 texture coords)
+// Quad vertex data: vec4(position.xy, texCoord.xy)
 static std::vector<glm::vec4> QUAD_VERTICES =
 {
-    // Top-left
-    { 0.0f, 1.0f, 0.0f, 1.0f },
-    // Bottom-right
-    { 1.0f, 0.0f, 1.0f, 0.0f },
-    // Bottom-left
-    { 0.0f, 0.0f, 0.0f, 0.0f },
-    // Top-right
-    { 1.0f, 1.0f, 1.0f, 1.0f }
+    {0.0f, 0.0f, 0.0f, 0.0f},  // Bottom-left  (pos: 0,0, tex: 0,0)
+    {1.0f, 0.0f, 1.0f, 0.0f},  // Bottom-right (pos: 1,0, tex: 1,0)
+    {1.0f, 1.0f, 1.0f, 1.0f},  // Top-right    (pos: 1,1, tex: 1,1)
+    {0.0f, 1.0f, 0.0f, 1.0f}   // Top-left     (pos: 0,1, tex: 0,1)
 };
 
 // Quad element indices (EBO)
 static std::vector<GLuint> QUAD_INDICES =
 {
-    0, 1, 2,  // First triangle
-    0, 3, 1   // Second triangle
+    0, 1, 2,  // First triangle (bottom-left, bottom-right, top-right)
+    2, 3, 0   // Second triangle (top-right, top-left, bottom-left)
 };

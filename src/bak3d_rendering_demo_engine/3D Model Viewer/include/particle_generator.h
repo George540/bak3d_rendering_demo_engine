@@ -77,7 +77,7 @@ struct particle_info
     float scale_random_offset;
 
     particle_info() :
-        amount(1),
+        amount(50),
         rotation(0.0f),
         velocity(0.0f, 1.0f, 0.0f),
         color(1.0f),
@@ -116,7 +116,7 @@ public:
     
     void sort_particles() const;
     static float random_float(float min, float max);
-    GLuint get_particle_amount() const { return m_amount; }
+    GLuint get_particle_amount() const { return m_particle_amount; }
     void update(float dt, GLuint new_particles);
 
     particle_info particles_payload_info;
@@ -125,13 +125,13 @@ private:
     std::vector<particle_instance_data> m_particle_instance_data;
     bool m_is_visible;
     
-    GLuint m_amount;
-    float m_rotation;
-    glm::vec3 m_velocity;
-    glm::vec4 m_color;
-    float m_lifetime;
-    float m_range;
-    float m_scale;
+    GLint m_particle_amount;
+    float m_particle_rotation;
+    glm::vec3 m_particle_velocity;
+    glm::vec4 m_particle_color;
+    float m_particle_lifetime;
+    float m_particle_range;
+    float m_particle_scale;
 
     mutable Texture2D* m_current_particle_sprite;
     BoundingBox* m_bounding_box;

@@ -47,3 +47,13 @@ InstancedObject::~InstancedObject()
 {
 	delete m_ibo;
 }
+
+void InstancedObject::draw() const
+{
+	if (!m_material || !m_camera) return;
+	
+	m_material->set_mat4("projection", m_camera->get_projection_matrix());
+	m_material->set_mat4("view", m_camera->get_view_matrix());
+
+	m_material->apply();
+}

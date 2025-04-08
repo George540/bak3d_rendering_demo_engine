@@ -41,6 +41,8 @@ protected:
 public:
     InstancedObject(Material* material);
     ~InstancedObject() override;
+
+    void draw() const override;
 };
 
 #endif
