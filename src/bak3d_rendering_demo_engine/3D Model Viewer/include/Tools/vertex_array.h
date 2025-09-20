@@ -18,7 +18,7 @@ class VertexArray : public GLObject
 {
 public:
     VertexArray();
-    ~VertexArray();
+    ~VertexArray() override;
 
     void bind_object() const override;
     void unbind_object() const override;

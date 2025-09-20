@@ -176,14 +176,14 @@ void ParticleSystem::update(float dt)
         m_particle_instance_data[i].scale = m_particles[i].scale;
     }
 
-    Object::update(dt);
-    m_bounding_box->update(dt);
-
     sort_particles();
 
     m_ibo->bind_object();
     m_ibo->set_buffer_sub_data(0, m_particle_instance_data);
     m_ibo->unbind_object();
+
+    Object::update(dt);
+    m_bounding_box->update(dt);
 }
 
 void ParticleSystem::draw() const
@@ -191,21 +191,20 @@ void ParticleSystem::draw() const
     // use additive blending to give it a 'glow' effect
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    m_vao->bind_object();
     // Disable depth mask to prevent writing to the depth buffer
     glDepthMask(GL_FALSE);
-
+    
+    m_material->set_int("sprite", 0);
+    InstancedObject::draw();
+    
     if (const auto selected_texture = ResourceManager::get_texture(particles_payload_info.texture_selection_name); m_current_particle_sprite != selected_texture)
     {
         m_current_particle_sprite = selected_texture;
     }
-    
-    m_material->set_int("sprite", 0);
-    InstancedObject::draw();
     m_current_particle_sprite->bind(0);
 
     // Draw particles using instancing
-    m_vao->bind_object();
     glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(QUAD_INDICES.size()), GL_UNSIGNED_INT, nullptr, m_particle_amount);
     m_vao->unbind_object();
 
