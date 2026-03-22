@@ -28,7 +28,7 @@ public:
     Object(Material* material);
     ~Object() override;
 
-    void set_camera(Camera& camera) { m_camera = &camera; }
+    virtual void set_camera(Camera& camera) { m_camera = &camera; }
     void set_material(Material* material) { m_material = material; }
     void update(float dt) override;
     virtual void draw() const;

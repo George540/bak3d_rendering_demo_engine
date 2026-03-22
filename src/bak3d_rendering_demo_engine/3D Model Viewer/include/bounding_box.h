@@ -6,7 +6,7 @@
 #include "object.h"
 
 // TODO: Make a generic Cube class that inherits from Object (to be used for making a BoundingBox and inheriting to Light)
-class BoundingBox : Object
+class BoundingBox : public Object
 {
 public:
     BoundingBox(Material* material);

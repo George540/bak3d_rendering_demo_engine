@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 
 // Unique cube vertices (8 total)
-static std::vector<glm::vec3> CUBE_VERTICES_SOLID =
+static const std::vector<glm::vec3> CUBE_VERTICES_SOLID =
 {
     {-0.5f, -0.5f, -0.5f}, // 0
     { 0.5f, -0.5f, -0.5f}, // 1
@@ -18,7 +18,7 @@ static std::vector<glm::vec3> CUBE_VERTICES_SOLID =
 };
 
 // Indices for the Element Buffer Object (EBO) - 12 triangles (36 indices)
-static std::vector<GLuint> CUBE_INDICES_SOLID =
+static const std::vector<GLuint> CUBE_INDICES_SOLID =
 {
     0, 1, 2, 2, 3, 0,  // Front face
     1, 5, 6, 6, 2, 1,  // Right face
@@ -29,7 +29,7 @@ static std::vector<GLuint> CUBE_INDICES_SOLID =
 };
 
 // Vector of glm::vec3 for cube vertices
-static std::vector<glm::vec3> CUBE_VERTICES_EDGED =
+static const std::vector<glm::vec3> CUBE_VERTICES_EDGED =
 {
     {-0.5f, -0.5f, -0.5f},  // 0
     { 0.5f, -0.5f, -0.5f},  // 1
@@ -42,22 +42,41 @@ static std::vector<glm::vec3> CUBE_VERTICES_EDGED =
 };
 
 // Vector of GLuint for cube indices (edges)
-static std::vector<GLuint> CUBE_INDICES_EDGED =
+static const std::vector<GLuint> CUBE_INDICES_EDGED =
 {
     0, 1,  1, 2,  2, 3,  3, 0,  // Bottom face edges
     4, 5,  5, 6,  6, 7,  7, 4,  // Top face edges
     0, 4,  1, 5,  2, 6,  3, 7   // Vertical edges
 };
 
+static const std::vector<glm::vec3> CUBE_VERTICES_WIREFRAME =
+{
+    {-0.5f, -0.5f, -0.5f},  // 0 bottom-left-back
+    { 0.5f, -0.5f, -0.5f},  // 1 bottom-right-back
+    { 0.5f,  0.5f, -0.5f},  // 2 top-right-back
+    {-0.5f,  0.5f, -0.5f},  // 3 top-left-back
+    {-0.5f, -0.5f,  0.5f},  // 4 bottom-left-front
+    { 0.5f, -0.5f,  0.5f},  // 5 bottom-right-front
+    { 0.5f,  0.5f,  0.5f},  // 6 top-right-front
+    {-0.5f,  0.5f,  0.5f},  // 7 top-left-front
+};
+
+static const std::vector<GLuint> CUBE_INDICES_WIREFRAME =
+{
+    0, 1,  1, 2,  2, 3,  3, 0,  // back face
+    4, 5,  5, 6,  6, 7,  7, 4,  // front face
+    0, 4,  1, 5,  2, 6,  3, 7   // connecting edges
+};
+
 // Unique vertices for the line (only position)
-static std::vector<glm::vec3> LINE_VERTICES =
+static const std::vector<glm::vec3> LINE_VERTICES =
 {
     {-1.0f, 0.0f, 0.0f}, // 0: Start point
     {1.0f, 0.0f, 0.0f}   // 1: End point
 };
 
 // Indices for the Element Buffer Object (EBO)
-static std::vector<GLuint> LINE_INDICES =
+static const std::vector<GLuint> LINE_INDICES =
 {
     0, 1  // Single line connecting two points
 };
@@ -68,7 +87,7 @@ struct AxisVertex
     glm::vec3 color;
 };
 
-static std::vector<AxisVertex> AXIS_VERTICES =
+static const std::vector<AxisVertex> AXIS_VERTICES =
 {
     {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // X red line
     {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
@@ -80,7 +99,7 @@ static std::vector<AxisVertex> AXIS_VERTICES =
     {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}
 };
 
-static std::vector<GLuint> AXIS_INDICES =
+static const std::vector<GLuint> AXIS_INDICES =
 {
     0, 1,  // X-axis (Red)
     2, 3,  // Y-axis (Green)
@@ -88,7 +107,7 @@ static std::vector<GLuint> AXIS_INDICES =
 };
 
 // Quad vertex data: vec4(position.xy, texCoord.xy)
-static std::vector<glm::vec4> QUAD_VERTICES =
+static const std::vector<glm::vec4> QUAD_VERTICES =
 {
     {0.0f, 0.0f, 0.0f, 1.0f},  // Bottom-left  (pos: 0,0, tex: 0,0)
     {1.0f, 0.0f, 1.0f, 1.0f},  // Bottom-right (pos: 1,0, tex: 1,0)
@@ -97,7 +116,7 @@ static std::vector<glm::vec4> QUAD_VERTICES =
 };
 
 // Quad element indices (EBO)
-static std::vector<GLuint> QUAD_INDICES =
+static const std::vector<GLuint> QUAD_INDICES =
 {
     0, 1, 2,  // First triangle (bottom-left, bottom-right, top-right)
     2, 3, 0   // Second triangle (top-right, top-left, bottom-left)

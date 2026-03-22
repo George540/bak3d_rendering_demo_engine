@@ -224,6 +224,12 @@ void ParticleSystem::draw() const
     Texture2D::unbind();
 }
 
+void ParticleSystem::set_camera(Camera& camera)
+{
+    Object::set_camera(camera);
+    m_bounding_box->set_camera(camera);
+}
+
 GLuint ParticleSystem::first_unused_particle() const
 {
     // first search from last used particle, this will usually return almost instantly

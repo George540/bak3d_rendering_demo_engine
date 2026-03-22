@@ -5,8 +5,9 @@
 
 BoundingBox::BoundingBox(Material* material) : Object(material)
 {
-    m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_SOLID.size(), CUBE_VERTICES_SOLID.data());
-    m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_SOLID.size(), CUBE_INDICES_SOLID.data());
+    m_vao->bind_object();
+    m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_WIREFRAME.size(), CUBE_VERTICES_WIREFRAME.data());
+    m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_WIREFRAME.size(), CUBE_INDICES_WIREFRAME.data());
 
     m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
     m_vao->unbind_object();

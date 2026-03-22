@@ -111,6 +111,7 @@ public:
     void update(float dt) override;
     void draw() const override;
 
+    void set_camera(Camera& camera) override;
     void set_visible(bool visible) { m_is_visible = visible; }
     bool is_visible() const { return m_is_visible; }
     
