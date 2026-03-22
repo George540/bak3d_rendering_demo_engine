@@ -536,4 +536,23 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <Target Name="CopyDLLs" AfterTargets="Build">
+  <Copy
+      SourceFiles="E:\Repositories\Libraries\vcpkg\installed\x64-windows\debug\bin\zlibd1.dll"
+      DestinationFolder="$(OutDir)"
+      DestinationFiles="$(OutDir)zlib.dll"
+      SkipUnchangedFiles="true"
+  />
+  <Copy
+      SourceFiles="D:\GitRepositories\assimp\build\bin\Debug\assimp-vc143-mtd.dll"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+  />
+  </Target><Target Name="CopyDLLs" AfterTargets="Build">
+  <Copy
+      SourceFiles="D:\GitRepositories\assimp\build\bin\Debug\assimp-vc143-mtd.dll"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="true"
+  />
+  </Target>
 </Project>
