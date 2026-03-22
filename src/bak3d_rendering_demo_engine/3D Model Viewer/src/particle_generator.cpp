@@ -68,15 +68,17 @@ void ParticleSystem::set_up_particle_buffers()
     m_vbo = new VertexBuffer(static_cast<GLsizei>(QUAD_VERTICES.size()) * vec4_size, QUAD_VERTICES.data());
     m_ebo = new ElementBuffer(static_cast<GLsizei>(QUAD_INDICES.size()) * ui_size, QUAD_INDICES.data());
     m_ibo = new InstanceBuffer(m_particle_amount * pid_size, nullptr, GL_DYNAMIC_DRAW);
-    
-    m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr); // Vertex Attribute: vertexPosition/TextCoords (vec4) -> layout(location = 0)
 
-    // Instance attributes
-    // Attribute pointer parameters order: index, size, type, normalized, stride, pointer, divisor (0 by default)
-    m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)), 1); // Vertex Attribute: instancePosition (vec3)  -> layout(location = 1)
-    m_vao->set_attrib_pointer(2, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)), 1); // Vertex Attribute: instanceRotation (float) -> layout(location = 2)
-    m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)), 1);    // Vertex Attribute: instanceColor    (vec4)  -> layout(location = 3)
-    m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)), 1);    // Vertex Attribute: instanceScale    (float) -> layout(location = 4)
+    // Bind VBO before setting vertex attributes
+    m_vbo->bind_object();
+    m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, vec4_size, nullptr);
+
+    // Bind IBO before setting instance attributes
+    m_ibo->bind_object();
+    m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, position)), 1);
+    m_vao->set_attrib_pointer(2, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, rotation)), 1);
+    m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, color)), 1);
+    m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, pid_size, reinterpret_cast<void*>(offsetof(particle_instance_data, scale)), 1);
 
     m_vao->unbind_object();
 
@@ -202,6 +204,7 @@ void ParticleSystem::draw() const
     {
         m_current_particle_sprite = selected_texture;
     }
+
     m_current_particle_sprite->bind(0);
 
     // Draw particles using instancing

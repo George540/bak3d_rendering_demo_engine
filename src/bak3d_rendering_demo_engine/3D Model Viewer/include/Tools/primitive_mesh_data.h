@@ -90,10 +90,10 @@ static std::vector<GLuint> AXIS_INDICES =
 // Quad vertex data: vec4(position.xy, texCoord.xy)
 static std::vector<glm::vec4> QUAD_VERTICES =
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},  // Bottom-left  (pos: 0,0, tex: 0,0)
-    {1.0f, 0.0f, 1.0f, 0.0f},  // Bottom-right (pos: 1,0, tex: 1,0)
-    {1.0f, 1.0f, 1.0f, 1.0f},  // Top-right    (pos: 1,1, tex: 1,1)
-    {0.0f, 1.0f, 0.0f, 1.0f}   // Top-left     (pos: 0,1, tex: 0,1)
+    {0.0f, 0.0f, 0.0f, 1.0f},  // Bottom-left  (pos: 0,0, tex: 0,0)
+    {1.0f, 0.0f, 1.0f, 1.0f},  // Bottom-right (pos: 1,0, tex: 1,0)
+    {1.0f, 1.0f, 1.0f, 0.0f},  // Top-right    (pos: 1,1, tex: 1,1)
+    {0.0f, 1.0f, 0.0f, 0.0f}   // Top-left     (pos: 0,1, tex: 0,1)
 };
 
 // Quad element indices (EBO)
