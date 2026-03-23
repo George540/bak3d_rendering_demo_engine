@@ -27,6 +27,7 @@ struct particle
 	glm::vec4 color;
 	float lifetime;
     float scale;
+    float max_lifetime;
 
     particle() : 
         position(0.0f),
@@ -34,7 +35,8 @@ struct particle
         velocity(0.0f),
         color(1.0f),
         lifetime(0.0f),
-        scale(1.0f)
+        scale(1.0f),
+        max_lifetime(1.0f)
     {}
 };
 
@@ -114,18 +116,18 @@ public:
     void set_camera(Camera& camera) override;
     void set_visible(bool visible) { m_is_visible = visible; }
     bool is_visible() const { return m_is_visible; }
-    
+
+    void set_particle_info_from_payload(const particle_info& info);
     void sort_particles() const;
     static float random_float(float min, float max);
     GLuint get_particle_amount() const { return m_particle_amount; }
     void update(float dt, GLuint new_particles);
-
-    particle_info particles_payload_info;
 private:
     mutable std::vector<particle> m_particles;
     std::vector<particle_instance_data> m_particle_instance_data;
     bool m_is_visible;
-    
+
+    particle_info particles_payload_info;
     GLint m_particle_amount;
     float m_particle_rotation;
     glm::vec3 m_particle_velocity;
@@ -134,13 +136,18 @@ private:
     float m_particle_range;
     float m_particle_scale;
 
+    GLint m_last_used_particle = 0;
+    float m_spawn_accumulator = 0.0f;
+    float m_emission_rate = 2.0f; // particles per second
+
     mutable Texture2D* m_current_particle_sprite;
     BoundingBox* m_bounding_box;
     
     void initialize(); // initializes particle data
     void set_up_particle_buffers(); // initializes particle buffers
-    GLuint first_unused_particle() const; // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
+    GLuint first_unused_particle(); // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
     void respawn_particle(particle& particle); // respawns particle
+    particle make_particle();
     void reset_particle_generator();
 };
 

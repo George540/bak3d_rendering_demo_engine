@@ -82,6 +82,7 @@ void EventManager::initialize()
 	glfwWindowHint(GLFW_GREEN_BITS, m_vid_mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, m_vid_mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, m_vid_mode->refreshRate);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "          Bak3D Engine v1.2", nullptr, nullptr);
 

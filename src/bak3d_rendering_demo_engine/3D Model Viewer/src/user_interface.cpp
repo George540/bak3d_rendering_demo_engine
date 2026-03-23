@@ -469,7 +469,7 @@ void UserInterface::render_object_window()
 		
 		if (current_particle_system)
 		{
-			current_particle_system->particles_payload_info = particle_payload_info;
+			current_particle_system->set_particle_info_from_payload(particle_payload_info);
 		}
 	}
 	else if (object_current == 3)

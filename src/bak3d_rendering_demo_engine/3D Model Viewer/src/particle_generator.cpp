@@ -8,11 +8,10 @@
 
 using namespace std;
 
-static constexpr int MAX_PARTICLES = 10000;
+static constexpr int MAX_PARTICLES = 30000;
 GLsizei vec4_size = sizeof(glm::vec4);
 GLsizei pid_size = sizeof(particle_instance_data);
 GLsizei ui_size = sizeof(GLuint);
-GLint last_used_particle = 0;
 
 ParticleSystem::ParticleSystem(Material* particle_material, Material* box_material, const particle_info& info) : InstancedObject(particle_material)
 {
@@ -50,13 +49,7 @@ void ParticleSystem::initialize()
 
     for (GLuint i = 0; i < m_particle_amount; ++i)
     {
-        auto p = particle();
-        p.lifetime = particles_payload_info.randomize_lifetime ? m_particle_lifetime + random_float(-particles_payload_info.lifetime_random_offset, particles_payload_info.lifetime_random_offset) : m_particle_lifetime;
-        p.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f) : m_particle_color;
-        p.position = m_position + glm::vec3(random_float(-m_particle_range, m_particle_range), 0.0f, random_float(-m_particle_range, m_particle_range));
-        p.rotation = m_particle_rotation;
-        p.velocity = m_particle_velocity;
-        p.scale = particles_payload_info.randomize_scale ? m_particle_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_particle_scale;
+        auto p = make_particle();
         m_particles.push_back(p);
     }
 }
@@ -109,13 +102,16 @@ void ParticleSystem::update(float dt)
 {
     if (!m_is_visible) return;
 
-    // add new particles 
-    for (GLuint i = 0; i < 2; ++i)
+    m_spawn_accumulator += m_emission_rate * dt;
+    GLuint particles_to_spawn = static_cast<GLuint>(m_spawn_accumulator);
+    m_spawn_accumulator -= particles_to_spawn;
+
+    for (GLuint i = 0; i < particles_to_spawn; ++i)
     {
-        auto unused_particle = first_unused_particle();
-        if (m_particles[unused_particle].lifetime <= 0.0f || m_particles[unused_particle].color.a <= 0.0f)
+        GLuint unused = first_unused_particle();
+        if (m_particles[unused].lifetime <= 0.0f || m_particles[unused].color.a <= 0.0f)
         {
-            respawn_particle(m_particles[unused_particle]);
+            respawn_particle(m_particles[unused]);
         }
     }
 
@@ -161,7 +157,7 @@ void ParticleSystem::update(float dt)
             p.position += p.velocity * dt; // particle is alive, thus update
             if (particles_payload_info.is_color_faded)
             {
-                p.color.a -= (dt / p.lifetime);
+                p.color.a = p.lifetime / p.max_lifetime;
             }
             else
             {
@@ -186,6 +182,16 @@ void ParticleSystem::update(float dt)
 
     Object::update(dt);
     m_bounding_box->update(dt);
+
+    int dead_count = 0;
+    int alive_count = 0;
+    for (particle& p : m_particles)
+    {
+        if (p.lifetime <= 0.0f || p.color.a <= 0.0f)
+            dead_count++;
+        else
+            alive_count++;
+    }
 }
 
 void ParticleSystem::draw() const
@@ -230,29 +236,66 @@ void ParticleSystem::set_camera(Camera& camera)
     m_bounding_box->set_camera(camera);
 }
 
-GLuint ParticleSystem::first_unused_particle() const
+GLuint ParticleSystem::first_unused_particle()
 {
     // first search from last used particle, this will usually return almost instantly
-    for (GLint i = last_used_particle; i < m_particle_amount; ++i)
+    for (GLint i = m_last_used_particle; i < m_particle_amount; ++i)
     {
         if (m_particles[i].lifetime <= 0.0f || m_particles[i].color.a <= 0.0f)
         {
-            last_used_particle = i;
+            m_last_used_particle = i;
             return i;
         }
     }
     // otherwise, do a linear search
-    for (GLint i = 0; i < last_used_particle; ++i)
+    for (GLint i = 0; i < m_last_used_particle; ++i)
     {
         if (m_particles[i].lifetime <= 0.0f || m_particles[i].color.a <= 0.0f)
         {
-            last_used_particle = i;
+            m_last_used_particle = i;
             return i;
         }
     }
     // all particles are taken, override the first one (note that if it repeatedly hits this case, more particles should be reserved)
-    last_used_particle = 0;
-    return last_used_particle;
+    m_last_used_particle = 0;
+    return m_last_used_particle;
+}
+
+void ParticleSystem::set_particle_info_from_payload(const particle_info& info)
+{
+    particles_payload_info = info;
+    m_particle_lifetime = particles_payload_info.lifetime;
+    m_position = glm::vec3(0.0f);
+    m_particle_rotation = particles_payload_info.rotation;
+    m_particle_velocity = particles_payload_info.velocity;
+    m_particle_color = particles_payload_info.color;
+    m_particle_range = particles_payload_info.range;
+    m_particle_scale = particles_payload_info.scale;
+
+    if (m_particle_amount != particles_payload_info.amount)
+    {
+        m_particle_amount = particles_payload_info.amount;
+        m_ibo->set_size(m_particle_amount * pid_size);
+
+        if (m_particle_amount > m_particles.size())
+        {
+            // Add only the new particles needed
+            GLuint particles_to_add = m_particle_amount - m_particles.size();
+            for (GLuint i = 0; i < particles_to_add; ++i)
+            {
+                auto p = make_particle();
+                m_particles.push_back(p);
+            }
+        }
+        else
+        {
+            // Trim the excess particles from the end
+            m_particles.resize(m_particle_amount);
+        }
+
+        m_particle_instance_data.resize(m_particle_amount);
+        m_last_used_particle = 0;
+    }
 }
 
 void ParticleSystem::respawn_particle(particle& particle)
@@ -264,9 +307,9 @@ void ParticleSystem::respawn_particle(particle& particle)
 
     particle.rotation = particles_payload_info.randomize_rotation ? random_float(0.0f, 360.0f) : m_particle_rotation;
 
-    particle.color = particles_payload_info.randomize_color ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), particles_payload_info.color.a) : particles_payload_info.color;
-
-    particle.lifetime = particles_payload_info.randomize_lifetime ? m_particle_lifetime + random_float(-particles_payload_info.lifetime_random_offset, 0.0f) : m_particle_lifetime;
+    particle.color = particles_payload_info.randomize_color
+        ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), particles_payload_info.color.a)
+        : particles_payload_info.color;
 
     particle.velocity = particles_payload_info.randomize_velocity ?
         glm::vec3(random_float(-particles_payload_info.velocity_random_offset.x, particles_payload_info.velocity_random_offset.x),
@@ -274,7 +317,35 @@ void ParticleSystem::respawn_particle(particle& particle)
                   random_float(-particles_payload_info.velocity_random_offset.z, particles_payload_info.velocity_random_offset.z))
         : particles_payload_info.velocity;
 
-    particle.scale = particles_payload_info.randomize_scale ? m_particle_scale - random_float(0.0f, particles_payload_info.scale_random_offset) : m_particle_scale;
+    particle.scale = particles_payload_info.randomize_scale
+        ? m_particle_scale - random_float(0.0f, particles_payload_info.scale_random_offset)
+        : m_particle_scale;
+
+    // Set lifetime last, once, then save it to max_lifetime
+    particle.lifetime = particles_payload_info.randomize_lifetime
+        ? m_particle_lifetime + random_float(-particles_payload_info.lifetime_random_offset, 0.0f)
+        : m_particle_lifetime;
+    particle.max_lifetime = particle.lifetime;
+}
+
+particle ParticleSystem::make_particle()
+{
+    auto p = particle();
+
+    // Stagger initial lifetime so particles expire at different times
+    p.lifetime = random_float(0.0f, m_particle_lifetime);
+    p.max_lifetime = m_particle_lifetime; // max is always the full lifetime
+
+    p.color = particles_payload_info.randomize_color
+        ? glm::vec4(random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), random_float(0.0f, 1.0f), 1.0f)
+        : m_particle_color;
+    p.position = m_position + glm::vec3(random_float(-m_particle_range, m_particle_range), 0.0f, random_float(-m_particle_range, m_particle_range));
+    p.rotation = m_particle_rotation;
+    p.velocity = m_particle_velocity;
+    p.scale = particles_payload_info.randomize_scale
+        ? m_particle_scale - random_float(0.0f, particles_payload_info.scale_random_offset)
+        : m_particle_scale;
+    return p;
 }
 
 void ParticleSystem::reset_particle_generator()

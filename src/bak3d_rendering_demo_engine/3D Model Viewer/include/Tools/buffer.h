@@ -74,6 +74,8 @@ class InstanceBuffer : public Buffer
 public:
     InstanceBuffer(GLsizeiptr size, const void* data, GLenum usage = GL_STATIC_DRAW)
         : Buffer(GL_ARRAY_BUFFER, size, data, usage) {}
+
+    void set_size(int size) { m_size = size; }
 };
 
 #endif
