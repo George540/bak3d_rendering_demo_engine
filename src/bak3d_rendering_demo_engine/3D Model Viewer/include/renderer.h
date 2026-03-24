@@ -10,6 +10,8 @@
 
 #include <glad/glad.h>
 
+#include "buffer.h"
+
 struct GLFWwindow;
 
 /**
@@ -19,9 +21,7 @@ class Renderer
 {
 private:
 	static GLFWwindow* r_window;
-	static GLuint frame_buffer;
-	static GLuint texture_color_buffer;
-	static GLuint render_buffer;
+	static FrameBuffer* frame_buffer;
 public:
 	static void initialize();
 	static void shutdown();
@@ -29,8 +29,9 @@ public:
 	static void begin_frame();
 	static void end_frame();
 
-	static void render_demo_window();
 	static GLFWwindow* get_window() { return r_window; }
+
+	static void framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
 };
 
 #endif

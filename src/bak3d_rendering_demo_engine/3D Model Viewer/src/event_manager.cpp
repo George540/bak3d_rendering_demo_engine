@@ -238,19 +238,3 @@ void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yo
 	cam_zoom_distance -= cam_zoom_factor;
 	cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
 }
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-/**
- * \brief Whenever the window size changed (by OS or user resize) this callback function executes
- * \param window The OpenGL main window
- * \param width The OpenGL main window width
- * \param height The OpenGL main window height
- */
-void EventManager::framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	// make sure the viewport matches the new window dimensions; note that width and 
-	// height will be significantly larger than specified on retina displays.
-	// Note: position is set to 0 for both x and y coordinates
-	glViewport(0, 0, width, height);
-}

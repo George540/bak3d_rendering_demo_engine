@@ -19,7 +19,7 @@
 
 #include "globject.h"
 
-class Buffer: GLObject
+class Buffer: public GLObject
 {
 public:
     Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
@@ -76,6 +76,30 @@ public:
         : Buffer(GL_ARRAY_BUFFER, size, data, usage) {}
 
     void set_size(int size) { m_size = size; }
+};
+
+class FrameBuffer : public Buffer
+{
+public:
+    FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, const GLuint height, GLenum usage = GL_STATIC_DRAW);
+    ~FrameBuffer() override;
+    void bind_object() const override;
+    void unbind_object() const override;
+    void resize(GLuint newWidth, GLuint newHeight);
+
+    GLuint get_width() const { return m_width; }
+    GLuint get_height() const { return m_height; }
+    GLuint get_render_buffer() const { return m_texture_buffer; }
+    GLuint get_depth_buffer() const { return m_rbo; }
+
+private:
+    void create_framebuffer();
+    void destroy_framebuffer();
+
+    GLuint m_width;
+    GLuint m_height;
+    GLuint m_texture_buffer;
+    GLuint m_rbo;
 };
 
 #endif

@@ -15,9 +15,7 @@ using namespace std;
 
 // Renderer
 GLFWwindow* Renderer::r_window = nullptr;
-GLuint Renderer::frame_buffer = NULL;
-GLuint Renderer::texture_color_buffer = NULL;
-GLuint Renderer::render_buffer = NULL;
+FrameBuffer* Renderer::frame_buffer = nullptr;
 
 void Renderer::initialize()
 {
@@ -32,7 +30,7 @@ void Renderer::initialize()
 	}
 	cout << "Initializing GLAD..." << endl;
 
-	glfwSetFramebufferSizeCallback(r_window, EventManager::framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(r_window, framebuffer_size_callback);
 
 	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
 	stbi_set_flip_vertically_on_load(true);
@@ -45,13 +43,15 @@ void Renderer::initialize()
 	glDepthFunc(GL_LESS);
 	cout << "Enabling depth test..." << endl;
 
+	frame_buffer = new FrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height(), GL_NONE);
+
 	cout << "Ending Renderer Initialization..." << endl;
 }
 
 void Renderer::begin_frame()
 {
 	// Clear the screen
-	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+	frame_buffer->bind_object();
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -63,6 +63,7 @@ void Renderer::end_frame()
 {
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
+	frame_buffer->unbind_object();
 	glfwSwapBuffers(r_window);
 	glfwPollEvents();
 }
@@ -70,4 +71,21 @@ void Renderer::end_frame()
 void Renderer::shutdown()
 {
 	r_window = nullptr;
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+/**
+ * \brief Whenever the window size changed (by OS or user resize) this callback function executes
+ * \param window The OpenGL main window
+ * \param newWidth The OpenGL main window width
+ * \param newHeight The OpenGL main window height
+ */
+void Renderer::framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	// Note: position is set to 0 for both x and y coordinates
+	frame_buffer->resize(newWidth, newHeight);
+	glViewport(0, 0, newWidth, newHeight);
 }
