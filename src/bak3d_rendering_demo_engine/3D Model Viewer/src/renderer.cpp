@@ -30,7 +30,7 @@ void Renderer::initialize()
 	}
 	cout << "Initializing GLAD..." << endl;
 
-	glfwSetFramebufferSizeCallback(r_window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(r_window, on_framebuffer_size_callback);
 
 	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
 	stbi_set_flip_vertically_on_load(true);
@@ -52,11 +52,9 @@ void Renderer::begin_frame()
 {
 	// Clear the screen
 	frame_buffer->bind_object();
+	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);\
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// Background Color
-	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);
 }
 
 void Renderer::end_frame()
@@ -81,11 +79,10 @@ void Renderer::shutdown()
  * \param newWidth The OpenGL main window width
  * \param newHeight The OpenGL main window height
  */
-void Renderer::framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight)
+void Renderer::on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight)
 {
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	// Note: position is set to 0 for both x and y coordinates
 	frame_buffer->resize(newWidth, newHeight);
-	glViewport(0, 0, newWidth, newHeight);
 }

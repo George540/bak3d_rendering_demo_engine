@@ -50,7 +50,8 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::bind_object() const
 {
-    glBindFramebuffer(m_target, m_ID);
+    glBindFramebuffer(m_target, 0);
+    glViewport(0, 0, m_width, m_height);
 }
 
 void FrameBuffer::unbind_object() const

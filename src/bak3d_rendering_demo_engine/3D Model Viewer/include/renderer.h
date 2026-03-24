@@ -31,7 +31,7 @@ public:
 
 	static GLFWwindow* get_window() { return r_window; }
 
-	static void framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
+	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
 };
 
 #endif

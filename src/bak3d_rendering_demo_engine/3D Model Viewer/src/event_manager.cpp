@@ -142,7 +142,7 @@ void EventManager::update()
 	last_mouse_position_y = mouse_pos_y;
 
 	// Update mouse zoom via scroll wheel
-	glfwSetScrollCallback(m_window, scroll_callback);
+	glfwSetScrollCallback(m_window, on_scroll_callback);
 
 	// Update frame time
 	const double current_time = glfwGetTime();
@@ -225,7 +225,7 @@ float EventManager::get_random_float(float min, float max)
  * \param xoffset The scrollwheel x-offset (not used)
  * \param yoffset The scrollwheel y-offset
  */
-void EventManager::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void EventManager::on_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	if (yoffset > 0)
 	{

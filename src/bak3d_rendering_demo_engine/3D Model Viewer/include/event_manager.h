@@ -79,7 +79,7 @@ public:
 	static void disable_mouse_cursor();
 	static float get_random_float(float min, float max);
 
-	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	static void on_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	static bool is_using_diffuse_texture;
 	static bool is_using_specular_texture;
 	static bool is_using_normals_texture;
