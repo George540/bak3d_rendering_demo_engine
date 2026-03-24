@@ -50,6 +50,11 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::bind_object() const
 {
+    bind_object_numbered(0);
+}
+
+void FrameBuffer::bind_object_numbered(GLuint fbo_id) const
+{
     glBindFramebuffer(m_target, 0);
     glViewport(0, 0, m_width, m_height);
 }

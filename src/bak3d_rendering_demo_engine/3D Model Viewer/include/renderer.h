@@ -30,6 +30,7 @@ public:
 	static void end_frame();
 
 	static GLFWwindow* get_window() { return r_window; }
+	static FrameBuffer* get_frame_buffer() { return frame_buffer; }
 
 	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
 };

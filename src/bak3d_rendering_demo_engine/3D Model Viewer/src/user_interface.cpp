@@ -102,6 +102,32 @@ void UserInterface::initialize_imgui()
     cout << "Initializing IMGUI window..." << endl;
 }
 
+void UserInterface::draw_viewport_window()
+{
+	ImGui::Begin("Viewport window");
+
+	auto panelPosition = ImGui::GetCursorScreenPos();
+	ImVec2 contentRegion = ImGui::GetContentRegionAvail();
+	auto panelSize = contentRegion;
+	auto frame_buffer_main = Renderer::get_frame_buffer();
+
+	if (panelSize.x > 0 && panelSize.y > 0)
+	{
+		frame_buffer_main->resize((unsigned int)panelSize.x, (unsigned int)panelSize.y);
+	}
+
+	ImGui::Image(
+		(void*)(intptr_t)frame_buffer_main->get_render_buffer(),
+		panelSize,
+		ImVec2(0, 1),
+		ImVec2(1, 0)
+	);
+
+	bool isHovered = ImGui::IsItemHovered();
+
+	ImGui::End();
+}
+
 void UserInterface::begin_frame()
 {
     // Start the Dear ImGui frame
@@ -112,6 +138,7 @@ void UserInterface::begin_frame()
 
 void UserInterface::render_demo_window()
 {
+	//draw_viewport_window();
     render_metrics_window();
     render_environment_window();
     render_object_window();

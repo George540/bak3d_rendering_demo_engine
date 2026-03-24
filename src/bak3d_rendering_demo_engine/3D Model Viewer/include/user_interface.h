@@ -29,6 +29,7 @@ class UserInterface
 {
 private:
     static void initialize_imgui();
+    static void draw_viewport_window();
     static void render_metrics_window();
     static void render_object_window();
     static void render_environment_window();
