@@ -84,7 +84,7 @@ public:
     FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, const GLuint height, GLenum usage = GL_STATIC_DRAW);
     ~FrameBuffer() override;
     void bind_object() const override;
-    void bind_object_numbered(GLuint fbo_id) const;
+    void bind_id_fbo() const;
     void unbind_object() const override;
     void resize(GLuint newWidth, GLuint newHeight);
 

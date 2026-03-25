@@ -52,16 +52,23 @@ void Renderer::begin_frame()
 {
 	// Clear the screen
 	frame_buffer->bind_object();
-	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);\
+	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::end_frame()
 {
+	
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	frame_buffer->unbind_object();
+	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::post_end_frame()
+{
 	glfwSwapBuffers(r_window);
 	glfwPollEvents();
 }
@@ -85,4 +92,5 @@ void Renderer::on_framebuffer_size_callback(GLFWwindow* window, int newWidth, in
 	// height will be significantly larger than specified on retina displays.
 	// Note: position is set to 0 for both x and y coordinates
 	frame_buffer->resize(newWidth, newHeight);
+	glViewport(0, 0, newWidth, newHeight);
 }

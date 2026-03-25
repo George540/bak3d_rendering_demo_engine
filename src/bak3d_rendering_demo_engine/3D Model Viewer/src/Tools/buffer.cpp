@@ -50,27 +50,26 @@ FrameBuffer::~FrameBuffer()
 
 void FrameBuffer::bind_object() const
 {
-    bind_object_numbered(0);
+    glBindFramebuffer(m_target, m_ID);
+    glViewport(0, 0, m_width, m_height);
 }
 
-void FrameBuffer::bind_object_numbered(GLuint fbo_id) const
+void FrameBuffer::unbind_object() const // when unbinding a frame buffer, it binds back to default
 {
     glBindFramebuffer(m_target, 0);
     glViewport(0, 0, m_width, m_height);
 }
 
-void FrameBuffer::unbind_object() const
-{
-    glBindFramebuffer(m_target, 0);
-}
-
 void FrameBuffer::resize(GLuint newWidth, GLuint newHeight)
 {
-    m_width = newWidth;
-    m_height = newHeight;
+    if (m_width != newWidth || m_height != newHeight)
+    {
+        m_width = newWidth;
+        m_height = newHeight;
 
-    destroy_framebuffer();
-    create_framebuffer();
+        destroy_framebuffer();
+        create_framebuffer();
+    }
 }
 
 void FrameBuffer::create_framebuffer()

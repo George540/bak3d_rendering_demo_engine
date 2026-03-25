@@ -73,9 +73,6 @@ void Scene::update(float dt) const
 void Scene::draw() const
 {
 	Renderer::begin_frame();
-	UserInterface::begin_frame();
-
-	UserInterface::render_demo_window();
 
 	if (UserInterface::is_grid_rendering)
 	{
@@ -101,6 +98,11 @@ void Scene::draw() const
 		m_particle_system->draw();
 	}
 
-	UserInterface::end_frame();
 	Renderer::end_frame();
+
+	UserInterface::begin_frame();
+	UserInterface::render_demo_window();
+	UserInterface::end_frame();
+
+	Renderer::post_end_frame();
 }

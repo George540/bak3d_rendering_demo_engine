@@ -28,6 +28,7 @@ public:
 
 	static void begin_frame();
 	static void end_frame();
+	static void post_end_frame();
 
 	static GLFWwindow* get_window() { return r_window; }
 	static FrameBuffer* get_frame_buffer() { return frame_buffer; }

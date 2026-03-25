@@ -113,7 +113,7 @@ void UserInterface::draw_viewport_window()
 
 	if (panelSize.x > 0 && panelSize.y > 0)
 	{
-		frame_buffer_main->resize((unsigned int)panelSize.x, (unsigned int)panelSize.y);
+		frame_buffer_main->resize(static_cast<unsigned int>(panelSize.x), static_cast<unsigned int>(panelSize.y));
 	}
 
 	ImGui::Image(
@@ -138,7 +138,7 @@ void UserInterface::begin_frame()
 
 void UserInterface::render_demo_window()
 {
-	//draw_viewport_window();
+	draw_viewport_window();
     render_metrics_window();
     render_environment_window();
     render_object_window();
