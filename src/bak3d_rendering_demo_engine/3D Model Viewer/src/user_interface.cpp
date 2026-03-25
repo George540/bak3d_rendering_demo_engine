@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_internal.h"
 #include "resource_manager.h"
 #include "stb_image.h"
 
@@ -48,6 +49,8 @@ float UserInterface::light_vertical_rotation = 0.0f;
 float UserInterface::light_origin_distance = 0.0f;
 glm::vec3 UserInterface::light_diffuse_color = glm::vec3(1.0f);
 float UserInterface::light_intensity = 1.0f;
+
+static ImVec2 previous_viewport_size = ImVec2(0, 0);
 
 void UserInterface::initialize()
 {
@@ -104,24 +107,47 @@ void UserInterface::initialize_imgui()
 
 void UserInterface::draw_viewport_window()
 {
-	ImGui::Begin("Viewport window");
+	ImGui::Begin("Viewport window", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 
-	auto panelPosition = ImGui::GetCursorScreenPos();
-	ImVec2 contentRegion = ImGui::GetContentRegionAvail();
-	auto panelSize = contentRegion;
+	ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+	
 	auto frame_buffer_main = Renderer::get_frame_buffer();
+	float fb_aspect = frame_buffer_main->get_aspect_ratio();
+	float view_aspect = viewport_panel_size.x / viewport_panel_size.y;
 
-	if (panelSize.x > 0 && panelSize.y > 0)
+	// Start with Y flipped: top is 1.0f, bottom is 0.0f
+	ImVec2 uv0(0.0f, 1.0f);
+	ImVec2 uv1(1.0f, 0.0f);
+
+	if (view_aspect > fb_aspect)
 	{
-		frame_buffer_main->resize(static_cast<unsigned int>(panelSize.x), static_cast<unsigned int>(panelSize.y));
+		// Viewport is wider than the image: Crop the top and bottom
+		float scale = fb_aspect / view_aspect;
+		float delta = (1.0f - scale) * 0.5f;
+
+		// Offset from the flipped baseline
+		uv0.y = 1.0f - delta; // Start slightly below the top (1.0)
+		uv1.y = delta;        // End slightly above the bottom (0.0)
+	}
+	else
+	{
+		// Viewport is taller than the image: Crop the sides instead
+		float scale = view_aspect / fb_aspect;
+		float delta = (1.0f - scale) * 0.5f;
+
+		uv0.x = delta;
+		uv1.x = 1.0f - delta;
 	}
 
-	ImGui::Image(
-		(void*)(intptr_t)frame_buffer_main->get_render_buffer(),
-		panelSize,
-		ImVec2(0, 1),
-		ImVec2(1, 0)
-	);
+	bool is_window_resizing = ImGui::IsMouseDragging(ImGuiMouseButton_Left)
+								&& ImGui::GetActiveID() == ImGui::GetCurrentWindow()->MoveId
+								&& (glm::abs(previous_viewport_size.x - viewport_panel_size.x) > 0.001f || glm::abs(previous_viewport_size.y - viewport_panel_size.y) > 0.001f);
+	EventManager::is_viewport_active = ImGui::IsWindowFocused() || ImGui::IsWindowHovered() || !is_window_resizing;
+
+	ImTextureID viewport_texture = reinterpret_cast<void*>(static_cast<intptr_t>(frame_buffer_main->get_render_buffer()));
+	ImGui::Image(viewport_texture, viewport_panel_size, uv0, uv1);
+
+	previous_viewport_size = viewport_panel_size;
 
 	bool isHovered = ImGui::IsItemHovered();
 

@@ -37,6 +37,7 @@ GLFWmonitor* EventManager::m_monitor = nullptr;
 const GLFWvidmode* EventManager::m_vid_mode = nullptr;
 int EventManager::m_window_width = 1920; // defaulting to 1920 / 1080 just in case
 int EventManager::m_window_height = 1080;
+bool EventManager::is_viewport_active = false;
 
 /**
  * \brief Initializes the proper GLFW window settings and inputs
@@ -123,15 +124,15 @@ void EventManager::update()
 
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
+
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE
 		&& glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
-		&& !ImGui::IsAnyItemHovered()
-		&& !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+		&& is_viewport_active
 		&& !ImGui::IsAnyItemFocused())
 	{
-		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);  // NOLINT(clang-diagnostic-double-promotion)
-		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);  // NOLINT(clang-diagnostic-double-promotion)
+		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
+		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);
 	}
 	else
 	{
@@ -227,14 +228,19 @@ float EventManager::get_random_float(float min, float max)
  */
 void EventManager::on_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	if (yoffset > 0)
+	ImGuiIO& io = ImGui::GetIO();
+
+	if (io.WantCaptureMouse)
 	{
-		cam_zoom_factor = (cam_zoom_distance * 0.2) * 1;
+		if (yoffset > 0)
+		{
+			cam_zoom_factor = (cam_zoom_distance * 0.2) * 1;
+		}
+		else if (yoffset < 0)
+		{
+			cam_zoom_factor = (cam_zoom_distance * 0.2) * -1;
+		}
+		cam_zoom_distance -= cam_zoom_factor;
+		cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
 	}
-	else if (yoffset < 0)
-	{
-		cam_zoom_factor = (cam_zoom_distance * 0.2) * -1;
-	}
-	cam_zoom_distance -= cam_zoom_factor;
-	cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
 }

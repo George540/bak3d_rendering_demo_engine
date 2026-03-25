@@ -90,6 +90,7 @@ public:
 
     GLuint get_width() const { return m_width; }
     GLuint get_height() const { return m_height; }
+    float get_aspect_ratio() const { return m_width / m_height; }
     GLuint get_render_buffer() const { return m_texture_buffer; }
     GLuint get_depth_buffer() const { return m_rbo; }
 
