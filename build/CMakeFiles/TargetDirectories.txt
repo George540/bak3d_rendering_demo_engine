@@ -1,0 +1,12 @@
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/glad.dir
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/imgui.dir
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/bak3d.dir
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/INSTALL.dir
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/ALL_BUILD.dir
+D:/GitRepositories/Bak3DEngine/build/CMakeFiles/ZERO_CHECK.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/CMakeFiles/uninstall.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/CMakeFiles/INSTALL.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/CMakeFiles/ALL_BUILD.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/src/CMakeFiles/glfw.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/src/CMakeFiles/update_mappings.dir
+D:/GitRepositories/Bak3DEngine/build/third_party/glfw/src/CMakeFiles/INSTALL.dir

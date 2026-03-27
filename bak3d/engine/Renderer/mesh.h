@@ -1,0 +1,34 @@
+// =====================================================================================
+// This mesh class is referenced from https://learnopengl.com by Joey de Vries
+// Only changes made were attribute naming format and more modern C++ syntax
+// Joe de Vries on twitter: https://twitter.com/JoeyDeVriez
+// =====================================================================================
+
+#pragma once
+
+#ifndef MESH_H
+#define MESH_H
+
+#include <glad/glad.h>
+#include <vector>
+
+#include "mesh_data.h"
+#include "Scene/Objects/object.h"
+
+class Mesh : public Object
+{
+public:
+    // mesh Data
+    std::vector<Vertex> m_vertices;
+    std::vector<GLuint> m_indices;
+
+    // constructor
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
+    ~Mesh();
+    void draw() const override;
+
+    /*Shader* get_current_shader() const { return m_material; }
+    void set_current_shader(Shader* shader) { m_material = shader; }*/
+};
+
+#endif
