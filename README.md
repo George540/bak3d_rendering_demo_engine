@@ -4,25 +4,29 @@ Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
 <img width="1200" height="657" alt="image" src="https://github.com/user-attachments/assets/1d002028-8b45-4fee-86a2-e6abab5f9133" />
 
 
-<p align="center">
-  <a href="https://discordapp.com/users/242055319037935616">Add me on Discord</a> •
-  <a href="github.com/users/George540/projects/9">Project Board</a> •
-  <a href="https://github.com/George540/Bak3DEngine/issues">Issues</a>
-</p>
-
 # What is Bak3D
 
 Bak3D (baked) is a real-time 3D rendering engine that can be used as a playground, focusing on simplicity, continous learning, and understanding various rendering concepts. The engine contains simplified features that can be tuned in real time using the engine's editor. It is intended for early learners to use as a reference for their own projects, school assignments or just experimenting. So if you are a student or just starting to understand computer graphics and engine, this one is for you!
 
 # Motivation
 
-Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It became a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with. The purpose of keeping the project in OpenGL because this is usually the first graphics API learners and students are exposed to, thus why it is based on an old school assignment and guide.
+Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It became a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with.
 
 
 <img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
 
 *Bak3D v1.2 introduces more features and tunings, like Particle Systems*
 
+# This engine is for you if you are...
+
+- :ballot_box_with_check: ...a rendering enthusiast and are interested how video games look like behind the hood.
+- :ballot_box_with_check: ...an aspiring beginner who just got introduced to the concept of computer graphics.
+- :ballot_box_with_check: ...a student currently taking a course in Computer Graphics in school, university or on even online.
+- :ballot_box_with_check: ...completely lost about this topic, whether your instructor is not helping at all or just finding it hard to put the pieces together.
+- :ballot_box_with_check: ...an experienced individual in making video games and/or engines and are willing to help newcomers explore the craft.
+- :ballot_box_with_check: ...looking to get a starting point or reference for making your first engine.
+
+This is (or planning to be) the perfect starting point for computer graphics and graphics programming. The purpose of this engine is to assist students and beginners on understanding the behind-the-scenes for different rendering phenomena. It is also a great starting point for creating their own project (under licensing conditions). It is made in OpenGL since it is usually the go-to library for most of introduction courses and to simplify most of the rendering processes. This helps with putting a focus on the actual learning material rather than the API itself.
 
 ---
 
