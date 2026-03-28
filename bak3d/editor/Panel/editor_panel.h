@@ -36,9 +36,9 @@ public:
     EditorPanel(const char* title);
     ~EditorPanel() = default;
 
-    void begin_frame();
-    void update();
-    void end_frame();
+    virtual void begin_frame();
+    virtual void update();
+    virtual void end_frame();
 protected:
     bool m_visible;
     int m_flags;

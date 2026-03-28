@@ -157,8 +157,7 @@ void EventManager::update()
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE
 		&& glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
-		&& is_viewport_active
-		&& !ImGui::IsAnyItemFocused())
+		&& is_viewport_active)
 	{
 		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
 		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);

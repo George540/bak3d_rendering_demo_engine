@@ -22,41 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
+#pragma once
+
 #include "editor_panel.h"
 
-EditorPanel::EditorPanel() : EditorPanel("Panel") {}
-
-EditorPanel::EditorPanel(const char* title)
+/*
+ * Panel for viewing the OpenGL frame buffer output texture in a resizable and croppable format
+ */
+class Viewport : public EditorPanel
 {
-    m_title = title;
-    m_visible = true;
-    m_flags = ImGuiWindowFlags_NoCollapse;
-    m_size = ImVec2(0.0f, -1.0f);
-}
+public:
+    Viewport();
 
-void EditorPanel::begin_frame()
-{
-    if (!m_visible)
-    {
-        return;
-    }
-    ImGui::Begin(m_title, nullptr, m_flags);
-    ImGui::SetNextWindowSize(m_size);
-}
-
-void EditorPanel::update()
-{
-    if (!m_visible)
-    {
-        return;
-    }
-}
-
-void EditorPanel::end_frame()
-{
-    if (!m_visible)
-    {
-        return;
-    }
-    ImGui::End();
-}
+    void begin_frame() override;
+    void update() override;
+    void end_frame() override;
+};

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <iostream>
 
 #include "Panel/editor_panel.h"
+#include "Panel/viewport.h"
 #include "Renderer/renderer.h"
 
 using namespace std;
@@ -73,7 +74,7 @@ void Bak3DEditor::initialize()
     const auto glsl_version = "#version 330";
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    m_panels.emplace_back(make_shared<EditorPanel>("Viewport"));
+    m_panels.emplace_back(make_shared<Viewport>());
     m_panels.emplace_back(make_shared<EditorPanel>("Details"));
     m_panels.emplace_back(make_shared<EditorPanel>("Scene"));
     m_panels.emplace_back(make_shared<EditorPanel>("Assets"));
@@ -139,12 +140,6 @@ void Bak3DEditor::update_window()
     // 3. Update dock space panels
     update_panels(viewport);
 
-    // 4. Update all panels if visible
-    for (const shared_ptr<EditorPanel>& panel : m_panels)
-    {
-        panel->update();
-    }
-
     // 5. End main window and frame
     ImGui::End();
 }
@@ -162,26 +157,26 @@ void Bak3DEditor::update_panels(const ImGuiViewport* viewport)
 
             ImGuiID dock_main_id = window_id;
 
-            // 1. Isolate Details on the far right (Full height)
+            // 1. Isolate Details on the far right for Details (Full height)
             ImGuiID dock_id_left_container;
             const ImGuiID dock_id_details = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_id_left_container);
 
-            // 2. Split the left container horizontally. This creates a bottom row that spans under everything except Details
+            // 2. Split the left container horizontally for Viewport (Right or Middle) and Details (Right). This creates a bottom row that spans under everything except Details
             ImGuiID dock_id_bottom_row;
             const ImGuiID dock_id_top_row = ImGui::DockBuilderSplitNode(dock_id_left_container, ImGuiDir_Up, 0.75f, nullptr, &dock_id_bottom_row);
 
             // 3. Split the top row vertically for Scene (Left) and Viewport (Right)
             ImGuiID dock_id_viewport;
-            const ImGuiID dock_id_scene = ImGui::DockBuilderSplitNode(dock_id_top_row, ImGuiDir_Left, 0.25f, nullptr, &dock_id_viewport);
+            const ImGuiID dock_id_scene = ImGui::DockBuilderSplitNode(dock_id_top_row, ImGuiDir_Left, 0.15f, nullptr, &dock_id_viewport);
 
             // 4. Split the bottom row vertically for Logger (Left) and Assets (Right)
             ImGuiID dock_id_assets;
             const ImGuiID dock_id_logger = ImGui::DockBuilderSplitNode(dock_id_bottom_row, ImGuiDir_Left, 0.5f, nullptr, &dock_id_assets);
 
             // 5. Assign Windows and finish
+            ImGui::DockBuilderDockWindow("Viewport", dock_id_viewport);
             ImGui::DockBuilderDockWindow("Details", dock_id_details);
             ImGui::DockBuilderDockWindow("Scene", dock_id_scene);
-            ImGui::DockBuilderDockWindow("Viewport", dock_id_viewport);
             ImGui::DockBuilderDockWindow("Logger", dock_id_logger);
             ImGui::DockBuilderDockWindow("Assets", dock_id_assets);
 
@@ -194,5 +189,13 @@ void Bak3DEditor::update_panels(const ImGuiViewport* viewport)
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f); // Thin border for the splitter look
         ImGui::DockSpace(window_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::PopStyleVar(2);
+    }
+
+    // 7. Update all panels if visible
+    for (const shared_ptr<EditorPanel>& panel : m_panels)
+    {
+        panel->begin_frame();
+        panel->update();
+        panel->end_frame();
     }
 }
