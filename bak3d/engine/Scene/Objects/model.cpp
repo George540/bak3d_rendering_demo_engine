@@ -10,6 +10,7 @@
 #include "user_interface.h"
 #include "Input/event_manager.h"
 #include "Loader/resource_manager.h"
+#include "Renderer/texture.h"
 
 using namespace std;
 

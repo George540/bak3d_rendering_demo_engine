@@ -1,18 +1,38 @@
-// =====================================================================================
-// A collection of mesh data structs and classes made by George Mavroeidis for setting up
-// drawing meshes. Contains building blocks
-// =====================================================================================
+/* ===========================================================================
+The MIT License (MIT)
+
+Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+=========================================================================== */
 
 #pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "texture.h"
-
 constexpr auto MAX_BONE_INFLUENCE = 4;
 
-// TODO: Turn into proper separate classes with all necessary methods
+/*
+ * Definitions for different rendering structures and constant primitive data.
+ */
+
 struct Vertex
 {
     // position
@@ -59,15 +79,120 @@ struct Edge
     }
 };
 
-/*struct Material
+// Unique cube vertices (8 total)
+static const std::vector<glm::vec3> CUBE_VERTICES_SOLID =
 {
-    Texture2D* diffuse = nullptr;
-    Texture2D* specular = nullptr;
-    Texture2D* normal = nullptr;
-    Texture2D* height = nullptr;
-    float ambient = 0.0f;
-    float shininess = 0.0f;
-    bool use_diffuse_texture = true;
-    bool use_specular_texture = true;
-    bool use_normal_texture = true;
-};*/
+    {-0.5f, -0.5f, -0.5f}, // 0
+    { 0.5f, -0.5f, -0.5f}, // 1
+    { 0.5f,  0.5f, -0.5f}, // 2
+    {-0.5f,  0.5f, -0.5f}, // 3
+    {-0.5f, -0.5f,  0.5f}, // 4
+    { 0.5f, -0.5f,  0.5f}, // 5
+    { 0.5f,  0.5f,  0.5f}, // 6
+    {-0.5f,  0.5f,  0.5f}  // 7
+};
+
+// Indices for the Element Buffer Object (EBO) - 12 triangles (36 indices)
+static const std::vector<GLuint> CUBE_INDICES_SOLID =
+{
+    0, 1, 2, 2, 3, 0,  // Front face
+    1, 5, 6, 6, 2, 1,  // Right face
+    5, 4, 7, 7, 6, 5,  // Back face
+    4, 0, 3, 3, 7, 4,  // Left face
+    3, 2, 6, 6, 7, 3,  // Top face
+    4, 5, 1, 1, 0, 4   // Bottom face
+};
+
+// Vector of glm::vec3 for cube vertices
+static const std::vector<glm::vec3> CUBE_VERTICES_EDGED =
+{
+    {-0.5f, -0.5f, -0.5f},  // 0
+    { 0.5f, -0.5f, -0.5f},  // 1
+    { 0.5f,  0.5f, -0.5f},  // 2
+    {-0.5f,  0.5f, -0.5f},  // 3
+    {-0.5f, -0.5f,  0.5f},  // 4
+    { 0.5f, -0.5f,  0.5f},  // 5
+    { 0.5f,  0.5f,  0.5f},  // 6
+    {-0.5f,  0.5f,  0.5f}   // 7
+};
+
+// Vector of GLuint for cube indices (edges)
+static const std::vector<GLuint> CUBE_INDICES_EDGED =
+{
+    0, 1,  1, 2,  2, 3,  3, 0,  // Bottom face edges
+    4, 5,  5, 6,  6, 7,  7, 4,  // Top face edges
+    0, 4,  1, 5,  2, 6,  3, 7   // Vertical edges
+};
+
+static const std::vector<glm::vec3> CUBE_VERTICES_WIREFRAME =
+{
+    {-0.5f, -0.5f, -0.5f},  // 0 bottom-left-back
+    { 0.5f, -0.5f, -0.5f},  // 1 bottom-right-back
+    { 0.5f,  0.5f, -0.5f},  // 2 top-right-back
+    {-0.5f,  0.5f, -0.5f},  // 3 top-left-back
+    {-0.5f, -0.5f,  0.5f},  // 4 bottom-left-front
+    { 0.5f, -0.5f,  0.5f},  // 5 bottom-right-front
+    { 0.5f,  0.5f,  0.5f},  // 6 top-right-front
+    {-0.5f,  0.5f,  0.5f},  // 7 top-left-front
+};
+
+static const std::vector<GLuint> CUBE_INDICES_WIREFRAME =
+{
+    0, 1,  1, 2,  2, 3,  3, 0,  // back face
+    4, 5,  5, 6,  6, 7,  7, 4,  // front face
+    0, 4,  1, 5,  2, 6,  3, 7   // connecting edges
+};
+
+// Unique vertices for the line (only position)
+static const std::vector<glm::vec3> LINE_VERTICES =
+{
+    {-1.0f, 0.0f, 0.0f}, // 0: Start point
+    {1.0f, 0.0f, 0.0f}   // 1: End point
+};
+
+// Indices for the Element Buffer Object (EBO)
+static const std::vector<GLuint> LINE_INDICES =
+{
+    0, 1  // Single line connecting two points
+};
+
+struct AxisVertex
+{
+    glm::vec3 position;
+    glm::vec3 color;
+};
+
+static const std::vector<AxisVertex> AXIS_VERTICES =
+{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // X red line
+    {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+
+    {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}, // Y green line
+    {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+
+    {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}, // Z blue line
+    {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}
+};
+
+static const std::vector<GLuint> AXIS_INDICES =
+{
+    0, 1,  // X-axis (Red)
+    2, 3,  // Y-axis (Green)
+    4, 5   // Z-axis (Blue)
+};
+
+// Quad vertex data: vec4(position.xy, texCoord.xy)
+static const std::vector<glm::vec4> QUAD_VERTICES =
+{
+    {0.0f, 0.0f, 0.0f, 1.0f},  // Bottom-left  (pos: 0,0, tex: 0,0)
+    {1.0f, 0.0f, 1.0f, 1.0f},  // Bottom-right (pos: 1,0, tex: 1,0)
+    {1.0f, 1.0f, 1.0f, 0.0f},  // Top-right    (pos: 1,1, tex: 1,1)
+    {0.0f, 1.0f, 0.0f, 0.0f}   // Top-left     (pos: 0,1, tex: 0,1)
+};
+
+// Quad element indices (EBO)
+static const std::vector<GLuint> QUAD_INDICES =
+{
+    0, 1, 2,  // First triangle (bottom-left, bottom-right, top-right)
+    2, 3, 0   // Second triangle (top-right, top-left, bottom-left)
+};

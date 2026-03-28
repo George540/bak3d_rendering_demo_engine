@@ -1,7 +1,26 @@
-// =====================================================================================
-// Scene class was made by George Mavroeidis which is referenced from the COMP 371 lab 10.
-// Mostly the structure of update and draw functions is inspired by the lab.
-// =====================================================================================
+/* ===========================================================================
+The MIT License (MIT)
+
+Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+=========================================================================== */
 
 #pragma once
 
@@ -13,6 +32,10 @@
 #include "Objects/light.h"
 #include "Objects/particle_generator.h"
 
+/*
+ * This is the class that contains all the scene's data, such as references to cameras, lights, models, grids, etc.
+ * Runs in the main loop of the project and is only one instance.
+ */
 class Scene
 {
 public:

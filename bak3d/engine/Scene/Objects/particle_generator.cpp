@@ -5,7 +5,7 @@
 #include "Loader/resource_manager.h"
 #include "Loader/file_loader.h"
 #include "Renderer/buffer.h"
-#include "Renderer/primitive_mesh_data.h"
+#include "Renderer/mesh_data.h"
 #include "Renderer/texture.h"
 
 using namespace std;
