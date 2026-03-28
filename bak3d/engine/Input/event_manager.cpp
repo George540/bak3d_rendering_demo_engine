@@ -66,7 +66,8 @@ GLFWmonitor* EventManager::m_monitor = nullptr;
 const GLFWvidmode* EventManager::m_vid_mode = nullptr;
 int EventManager::m_window_width = 1920; // defaulting to 1920 / 1080 just in case
 int EventManager::m_window_height = 1080;
-bool EventManager::is_viewport_active = false;
+bool EventManager::is_dragging_enabled = false;
+bool EventManager::is_scrolling_enabled = false;
 
 /**
  * \brief Initializes the proper GLFW window settings and inputs
@@ -157,7 +158,7 @@ void EventManager::update()
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE
 		&& glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
-		&& is_viewport_active)
+		&& is_dragging_enabled)
 	{
 		delta_x = static_cast<float>(mouse_pos_x - last_mouse_position_x);
 		delta_y = -static_cast<float>(mouse_pos_y - last_mouse_position_y);
@@ -258,7 +259,7 @@ void EventManager::on_scroll_callback(GLFWwindow* window, double xoffset, double
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	if (io.WantCaptureMouse)
+	if (io.WantCaptureMouse && is_scrolling_enabled)
 	{
 		if (yoffset > 0)
 		{

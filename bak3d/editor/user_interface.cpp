@@ -164,7 +164,7 @@ void UserInterface::draw_viewport_window()
 	bool is_window_resizing = ImGui::IsMouseDragging(ImGuiMouseButton_Left)
 								&& ImGui::GetActiveID() == ImGui::GetCurrentWindow()->MoveId
 								&& (glm::abs(previous_viewport_size.x - viewport_panel_size.x) > 0.001f || glm::abs(previous_viewport_size.y - viewport_panel_size.y) > 0.001f);
-	EventManager::is_viewport_active = ImGui::IsWindowFocused() || ImGui::IsWindowHovered() || !is_window_resizing;
+	EventManager::is_dragging_enabled = ImGui::IsWindowFocused() || ImGui::IsWindowHovered() || !is_window_resizing;
 
 	void* viewport_texture = reinterpret_cast<void*>(static_cast<intptr_t>(frame_buffer_main->get_render_buffer()));
 	ImGui::Image(viewport_texture, viewport_panel_size, uv0, uv1);

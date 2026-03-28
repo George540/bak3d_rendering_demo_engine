@@ -62,10 +62,8 @@ void Viewport::update()
                               && (glm::abs(previous_viewport_size.x - viewport_panel_size.x) > 0.001f 
                                || glm::abs(previous_viewport_size.y - viewport_panel_size.y) > 0.001f);
 
-    bool is_hovered_over_viewport = ImGui::GetCurrentWindow()->Name == m_title;
-
     // Latch: only set true when the click begins in the viewport
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && is_hovered_over_viewport)
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
     {
         drag_started_in_viewport = true;
     }
@@ -76,7 +74,8 @@ void Viewport::update()
         drag_started_in_viewport = false;
     }
 
-    EventManager::is_viewport_active = drag_started_in_viewport && !is_window_resizing;
+    EventManager::is_dragging_enabled = drag_started_in_viewport && !is_window_resizing;
+    EventManager::is_scrolling_enabled = ImGui::IsWindowHovered();
 
     void* viewport_texture = reinterpret_cast<void*>(static_cast<intptr_t>(frame_buffer_main->get_render_buffer()));
     ImGui::Image(viewport_texture, viewport_panel_size, uv0, uv1);
