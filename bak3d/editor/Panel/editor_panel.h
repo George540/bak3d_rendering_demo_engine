@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,24 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#pragma once
 
-#include "Core/engine.h"
+#include <imgui.h>
 
 /*
- * This is the 'main' function. Program execution begins and ends there.
- *
- * Date created on 09/08/2022.
- *
- * All dependencies and libraries used listed on README.md and root CMakeLists.txt
+ * Base class for creating sub-windows or panels with different ImGui widgets.
  */
-int main()
+class EditorPanel
 {
-    Bak3DEngine::Initialize();
+public:
+    EditorPanel();
+    EditorPanel(const char* title);
+    ~EditorPanel() = default;
 
-    Bak3DEngine::Update();
-
-    Bak3DEngine::Shutdown();
-
-    return 0;
-}
+    void begin_frame();
+    void update();
+    void end_frame();
+protected:
+    bool m_visible;
+    int m_flags;
+    const char* m_title = "Title";
+    ImVec2 m_size = ImVec2(0.0f, -1.0f);
+};

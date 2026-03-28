@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,24 +22,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#include "editor_panel.h"
 
-#include "Core/engine.h"
+EditorPanel::EditorPanel() : EditorPanel("Panel") {}
 
-/*
- * This is the 'main' function. Program execution begins and ends there.
- *
- * Date created on 09/08/2022.
- *
- * All dependencies and libraries used listed on README.md and root CMakeLists.txt
- */
-int main()
+EditorPanel::EditorPanel(const char* title)
 {
-    Bak3DEngine::Initialize();
+    m_title = title;
+    m_visible = true;
+    m_flags = ImGuiWindowFlags_NoCollapse;
+    m_size = ImVec2(0.0f, -1.0f);
+}
 
-    Bak3DEngine::Update();
+void EditorPanel::begin_frame()
+{
+    ImGui::Begin(m_title, nullptr, m_flags);
+    ImGui::SetNextWindowSize(m_size);
+}
 
-    Bak3DEngine::Shutdown();
+void EditorPanel::update()
+{
+    if (!m_visible)
+    {
+        return;
+    }
+    begin_frame();
+    end_frame();
+}
 
-    return 0;
+void EditorPanel::end_frame()
+{
+    ImGui::End();
 }

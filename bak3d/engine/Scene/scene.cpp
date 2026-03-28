@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include "scene.h"
 
+#include "editor.h"
 #include "Objects/model.h"
 #include "../Loader/file_loader.h"
 #include "../Loader/resource_manager.h"
@@ -99,24 +100,29 @@ void Scene::draw() const
 {
 	Renderer::begin_frame();
 
-	if (UserInterface::is_grid_rendering)
+	// Set depth test for axis to render in front of grid
+	glDepthFunc(GL_ALWAYS);
+	m_grid->draw();
+	m_axis->draw();
+	glDepthFunc(GL_LESS);
+	/*if (UserInterface::is_grid_rendering)
 	{
 		// Set depth test for axis to render in front of grid
 		glDepthFunc(GL_ALWAYS);
 		m_grid->draw();
 		m_axis->draw();
 		glDepthFunc(GL_LESS);
-	}
+	}*/
 
-	if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
+	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
-	}
+	}*/
 
-	if (auto current_model = ResourceManager::get_model(UserInterface::model_combo_items[UserInterface::model_current_index]))
+	/*if (auto current_model = ResourceManager::get_model(UserInterface::model_combo_items[UserInterface::model_current_index]))
 	{
 		current_model->draw();
-	}
+	}*/
 
 	if (m_particle_system && m_particle_system->is_visible())
 	{
@@ -125,9 +131,10 @@ void Scene::draw() const
 
 	Renderer::end_frame();
 
-	UserInterface::begin_frame();
-	UserInterface::render_demo_window();
-	UserInterface::end_frame();
+	Bak3DEditor::update();
+	//UserInterface::begin_frame();
+	//UserInterface::render_demo_window();
+	//UserInterface::end_frame();
 
 	Renderer::post_end_frame();
 }

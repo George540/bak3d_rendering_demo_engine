@@ -29,7 +29,7 @@ THE SOFTWARE.
 /*
  * Static engine class that controls the entire runtime level of the application.
  */
-class Engine
+class Bak3DEngine
 {
 public:
     static void Initialize();

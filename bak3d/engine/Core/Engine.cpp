@@ -22,10 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "Engine.h"
+#include "engine.h"
 
 #include <iostream>
 
+#include "editor.h"
 #include "user_interface.h"
 #include "Input/event_manager.h"
 #include "Loader/resource_manager.h"
@@ -36,21 +37,21 @@ THE SOFTWARE.
  */
 static Scene* scene = nullptr;
 
-void Engine::Initialize()
+void Bak3DEngine::Initialize()
 {
     std::cout << "Greetings user, welcome to Bak3D Engine!\n";
 
     EventManager::initialize();
     Renderer::initialize();
     ResourceManager::initialize();
-    UserInterface::initialize();
+    Bak3DEditor::initialize();
 
     scene = new Scene();
 
     std::cout << "Engine initialized\n";
 }
 
-void Engine::Update()
+void Bak3DEngine::Update()
 {
     do
     {
@@ -65,9 +66,9 @@ void Engine::Update()
     } while (EventManager::is_exit_requested() == false);
 }
 
-void Engine::Shutdown()
+void Bak3DEngine::Shutdown()
 {
-    UserInterface::shutdown();
+    Bak3DEditor::shutdown();
     Renderer::shutdown();
     EventManager::shutdown();
     ResourceManager::shutdown();

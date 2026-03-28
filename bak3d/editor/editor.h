@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,24 +22,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#pragma once
 
-#include "Core/engine.h"
+#include <imgui.h>
 
 /*
- * This is the 'main' function. Program execution begins and ends there.
- *
- * Date created on 09/08/2022.
- *
- * All dependencies and libraries used listed on README.md and root CMakeLists.txt
+ * Static class for processing the ImGui Editor side of the engine.
  */
-int main()
+class Bak3DEditor
 {
-    Bak3DEngine::Initialize();
+public:
+    static void initialize();
+    static void update();
+    static void shutdown();
 
-    Bak3DEngine::Update();
+private:
+    static void begin_frame();
+    static void end_frame();
 
-    Bak3DEngine::Shutdown();
-
-    return 0;
-}
+    static void update_window();
+    static void update_panels(const ImGuiViewport* viewport);
+};
