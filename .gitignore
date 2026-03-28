@@ -512,6 +512,9 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/rider
 
+# Ignore sub-directories
+/build/
+
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 

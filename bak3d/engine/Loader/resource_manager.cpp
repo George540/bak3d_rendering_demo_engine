@@ -22,12 +22,18 @@ void ResourceManager::initialize()
     initialize_shaders();
     initialize_predefined_textures();
     initialize_models();
+
+    auto test1 = Shaders;
+    auto test2 = Textures;
+    auto test3 = Materials;
+    auto test4 = Models;
+    auto test5 = false;
 }
 
 void ResourceManager::initialize_shaders()
 {
     // Get directory and files
-    auto directory = filesystem::absolute("shaders");
+    auto directory = BAK3D_SHADERS_DIR;
     auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert);
     auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag);
 
@@ -73,13 +79,13 @@ void ResourceManager::initialize_shaders()
 
 void ResourceManager::initialize_predefined_textures()
 {
-    auto image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/particles-textures"), png);
+    auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/particles-textures", png);
     for (auto [file_name, file_path] : image_files)
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
 
-    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets/none"), jpg);
+    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute(string(BAK3D_ASSETS_DIR) + "/none"), jpg);
     for (auto [file_name, file_path] : image_files)
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Model);

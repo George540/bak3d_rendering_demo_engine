@@ -183,11 +183,14 @@ endif()
 # Assets and Resources Configuration
 # ============================================================================
 
-# Define asset paths as preprocessor definitions so source code can access them
-# Convert Windows paths to forward slashes for consistency
-string(REPLACE "\\" "/" ASSETS_PATH_NORMALIZED "${BAK3D_ASSETS_DIR}")
-string(REPLACE "\\" "/" SHADERS_PATH_NORMALIZED "${BAK3D_SHADERS_DIR}")
+# Use build root as the base for runtime resources
+set(BAK3D_RUNTIME_DIR ${CMAKE_BINARY_DIR})
 
+# Define normalized paths (forward slashes)
+string(REPLACE "\\" "/" ASSETS_PATH_NORMALIZED "${BAK3D_RUNTIME_DIR}/assets")
+string(REPLACE "\\" "/" SHADERS_PATH_NORMALIZED "${BAK3D_RUNTIME_DIR}/shaders")
+
+# Expose as compile-time macros
 target_compile_definitions(bak3d PRIVATE
     BAK3D_ASSETS_DIR="${ASSETS_PATH_NORMALIZED}"
     BAK3D_SHADERS_DIR="${SHADERS_PATH_NORMALIZED}"
@@ -235,8 +238,8 @@ if(EXISTS "${BAK3D_SHADERS_DIR}")
     add_custom_command(TARGET bak3d POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${BAK3D_SHADERS_DIR}"
-        "$<TARGET_FILE_DIR:bak3d>/shaders"
-        COMMENT "Copying shaders to output directory"
+        "${CMAKE_BINARY_DIR}/shaders"
+        COMMENT "Copying shaders to build root"
     )
 endif()
 
@@ -249,8 +252,8 @@ if(EXISTS "${BAK3D_ASSETS_DIR}")
     add_custom_command(TARGET bak3d POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${BAK3D_ASSETS_DIR}"
-        "$<TARGET_FILE_DIR:bak3d>/assets"
-        COMMENT "Copying assets to output directory"
+        "${CMAKE_BINARY_DIR}/assets"
+        COMMENT "Copying assets to build root"
     )
 endif()
 

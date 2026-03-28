@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/GitRepositories/Bak3DEngine/build/cmake_install.cmake",
-		"D:/GitRepositories/Bak3DEngine/build/third_party/glfw/cmake_install.cmake",
-		"D:/GitRepositories/Bak3DEngine/build/third_party/glfw/src/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

@@ -96,7 +96,7 @@ void Scene::draw() const
 
 	if (m_particle_system && m_particle_system->is_visible())
 	{
-		m_particle_system->draw();
+		//m_particle_system->draw();
 	}
 
 	Renderer::end_frame();
