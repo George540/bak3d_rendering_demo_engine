@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,24 +22,55 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
+#include "Engine.h"
+
 #include <iostream>
 
-#include "Core/Engine.h"
+#include "user_interface.h"
+#include "Input/event_manager.h"
+#include "Loader/resource_manager.h"
+#include "Renderer/renderer.h"
 
-/*
- * This is the 'main' function. Program execution begins and ends there.
- *
- * Date created on 09/08/2022.
- *
- * All dependencies and libraries used listed on README.md and root CMakeLists.txt
+/**
+ * Main scene object that has full scope of the application.
  */
-int main()
+static Scene* scene = nullptr;
+
+void Engine::Initialize()
 {
-    Engine::Initialize();
+    std::cout << "Greetings user, welcome to Bak3D Engine!\n";
 
-    Engine::Update();
+    EventManager::initialize();
+    Renderer::initialize();
+    ResourceManager::initialize();
+    UserInterface::initialize();
 
-    Engine::Shutdown();
+    scene = new Scene();
 
-    return 0;
+    std::cout << "Engine initialized\n";
+}
+
+void Engine::Update()
+{
+    do
+    {
+        // Update Event Manager - Frame time / input / events processing 
+        EventManager::update();
+
+        // Update Scene
+        const float dt = EventManager::get_frame_time();
+        scene->update(dt);
+
+        scene->draw();
+    } while (EventManager::is_exit_requested() == false);
+}
+
+void Engine::Shutdown()
+{
+    UserInterface::shutdown();
+    Renderer::shutdown();
+    EventManager::shutdown();
+    ResourceManager::shutdown();
+
+    std::cout << "Engine has shut down. Exiting application safely.\n";
 }

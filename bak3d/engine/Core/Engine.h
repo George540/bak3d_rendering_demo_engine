@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,24 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#pragma once
 
-#include "Core/Engine.h"
+#include "Scene/scene.h"
 
 /*
- * This is the 'main' function. Program execution begins and ends there.
- *
- * Date created on 09/08/2022.
- *
- * All dependencies and libraries used listed on README.md and root CMakeLists.txt
+ * Static engine class that controls the entire runtime level of the application.
  */
-int main()
+class Engine
 {
-    Engine::Initialize();
-
-    Engine::Update();
-
-    Engine::Shutdown();
-
-    return 0;
-}
+public:
+    static void Initialize();
+    static void Update();
+    static void Shutdown();
+};
