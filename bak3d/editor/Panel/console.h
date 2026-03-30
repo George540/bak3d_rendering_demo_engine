@@ -22,42 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "logger.h"
+#pragma once
 
-using namespace std;
+#include "editor_panel.h"
 
-chrono::steady_clock::time_point Logger::start_time = chrono::steady_clock::now();
-vector<std::string> Logger::log_entries_formatted;
-
-void Logger::initialize()
+class Console : public EditorPanel
 {
-    start_time = chrono::steady_clock::now();
-    log_entries_formatted.clear();
-}
+public:
+    Console();
 
-void Logger::shutdown()
-{
-    log_entries_formatted.clear();
-    B3D_LOG_INFO("Shutting down engine. Time passed: %s", get_elapsed_time_formatted().c_str());
-}
-
-string Logger::get_elapsed_time_formatted()
-{
-    const auto now = chrono::steady_clock::now();
-    const auto difference = now - start_time;
-
-    const auto total_ms = chrono::duration_cast<chrono::milliseconds>(difference).count();
-
-    const long ms = total_ms % 1000;
-    const long total_secs = total_ms / 1000;
-    const long s = total_secs % 60;
-    const long total_mins = total_secs / 60;
-    const long m = total_mins % 60;
-    const long h = total_mins / 60;
-
-    char time_buffer[32];
-    // Format: HH:MM:SS:mmm (0-padded to 2 digits for time, 3 for ms)
-    snprintf(time_buffer, sizeof(time_buffer), "%02ld:%02ld:%02ld:%03ld", h, m, s, ms);
-
-    return time_buffer;
-}
+    void begin_frame() override;
+    void update() override;
+    void end_frame() override;
+};

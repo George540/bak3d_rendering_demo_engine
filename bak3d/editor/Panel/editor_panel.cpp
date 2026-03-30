@@ -40,8 +40,8 @@ void EditorPanel::begin_frame()
     {
         return;
     }
-    ImGui::Begin(m_title, nullptr, m_flags);
     ImGui::SetNextWindowSize(m_size);
+    ImGui::Begin(m_title, nullptr, m_flags);
 }
 
 void EditorPanel::update()

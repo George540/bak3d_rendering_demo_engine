@@ -22,42 +22,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "logger.h"
+#include "console.h"
 
-using namespace std;
+#include "Core/logger.h"
 
-chrono::steady_clock::time_point Logger::start_time = chrono::steady_clock::now();
-vector<std::string> Logger::log_entries_formatted;
-
-void Logger::initialize()
+Console::Console() : EditorPanel("Logger")
 {
-    start_time = chrono::steady_clock::now();
-    log_entries_formatted.clear();
+    m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
 }
 
-void Logger::shutdown()
+void Console::begin_frame()
 {
-    log_entries_formatted.clear();
-    B3D_LOG_INFO("Shutting down engine. Time passed: %s", get_elapsed_time_formatted().c_str());
+    EditorPanel::begin_frame();
 }
 
-string Logger::get_elapsed_time_formatted()
+void Console::update()
 {
-    const auto now = chrono::steady_clock::now();
-    const auto difference = now - start_time;
+    EditorPanel::update();
 
-    const auto total_ms = chrono::duration_cast<chrono::milliseconds>(difference).count();
+    ImGui::Button("Clear", ImVec2(50, 20));
+    ImGui::SameLine();
+    static char search_buffer[64] = "";
+    ImGui::InputTextWithHint("##log_filter", "Filter logs by search...", search_buffer, IM_ARRAYSIZE(search_buffer));
 
-    const long ms = total_ms % 1000;
-    const long total_secs = total_ms / 1000;
-    const long s = total_secs % 60;
-    const long total_mins = total_secs / 60;
-    const long m = total_mins % 60;
-    const long h = total_mins / 60;
+    ImGui::Spacing();
 
-    char time_buffer[32];
-    // Format: HH:MM:SS:mmm (0-padded to 2 digits for time, 3 for ms)
-    snprintf(time_buffer, sizeof(time_buffer), "%02ld:%02ld:%02ld:%03ld", h, m, s, ms);
+    ImGui::BeginTable("##console_text", 1, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_ScrollY);
+    {
+        for (const auto& log_entry : Logger::get_log_entries())
+        {
+            ImGui::TableNextRow(ImGuiTableRowFlags_None, 25.0f);
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("%s", log_entry.c_str());
+        }
 
-    return time_buffer;
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        {
+            ImGui::SetScrollHereY(1.0f);
+        }
+    }
+    ImGui::EndTable();
+}
+
+void Console::end_frame()
+{
+    EditorPanel::end_frame();
 }

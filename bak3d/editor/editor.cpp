@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include <imgui_internal.h>
 #include <iostream>
 
+#include "Core/logger.h"
+#include "Panel/console.h"
 #include "Panel/editor_panel.h"
 #include "Panel/viewport.h"
 #include "Renderer/renderer.h"
@@ -78,9 +80,10 @@ void Bak3DEditor::initialize()
     m_panels.emplace_back(make_shared<EditorPanel>("Details"));
     m_panels.emplace_back(make_shared<EditorPanel>("Scene"));
     m_panels.emplace_back(make_shared<EditorPanel>("Assets"));
-    m_panels.emplace_back(make_shared<EditorPanel>("Logger"));
+    m_panels.emplace_back(make_shared<Console>());
 
     cout << "Initializing ImGui context and panels..." << '\n';
+    B3D_LOG_INFO("ImGui and editor initialized.");
 }
 
 void Bak3DEditor::update()
