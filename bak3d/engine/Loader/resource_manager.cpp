@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <ranges>
 
 #include "file_loader.h"
+#include "Core/logger.h"
 #include "Renderer/shader.h"
 #include "Renderer/texture.h"
 #include "Scene/Objects/model.h"
@@ -63,7 +64,7 @@ void ResourceManager::initialize_shaders()
 
     if (vertex_shader_files.size() != fragment_shader_files.size())
     {
-        throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: Vertex-fragment binding miss-match!");
+        B3D_LOG_ERROR("Vertex-fragment shader binding miss-match!");
     }
 
     // Get absolute paths for both vert and frag files
@@ -93,7 +94,7 @@ void ResourceManager::initialize_shaders()
         }
     }
 
-    cout << "Number of shaders compiled: " << Shaders.size() << endl;
+    B3D_LOG_INFO("Successfully compiled shaders. Number of shaders compiled: %d", Shaders.size());
 
     if (Shaders.empty())
     {
@@ -118,7 +119,7 @@ void ResourceManager::initialize_predefined_textures()
 
 void ResourceManager::initialize_models()
 {
-    auto model_files = FileLoader::get_files_by_type_with_path(filesystem::absolute("assets"), obj);
+    auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), obj);
     int index = 1;
     for (const auto& model_pair : model_files)
     {

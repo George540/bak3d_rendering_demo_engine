@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include <glm/ext/matrix_transform.hpp>
 
 #include "camera.h"
+
+#include "Core/logger.h"
 #include "Input/event_manager.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom) :
@@ -40,7 +42,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, 
 	m_vertical_angle(ver_angle),
 	m_zoom(zoom)
 {
-	std::cout << "Camera has been set up." << std::endl;
+	B3D_LOG_INFO("Camera has been set up.");
 };
 
 void Camera::update(float dt)

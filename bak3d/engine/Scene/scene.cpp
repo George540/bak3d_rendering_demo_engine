@@ -39,8 +39,6 @@ using namespace std;
 
 Scene* Scene::instance;
 
-const auto model_path = std::filesystem::absolute("assets/backpack/backpack.obj").generic_string();
-
 Scene::Scene()
 {
 	instance = this;

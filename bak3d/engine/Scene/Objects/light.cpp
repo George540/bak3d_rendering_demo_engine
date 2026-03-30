@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 #include <GLFW/glfw3.h>
 
+#include "Core/logger.h"
+
 Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	Object(material)
 {
@@ -57,7 +59,7 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	UserInterface::light_vertical_rotation = 135.0f;
 	UserInterface::light_origin_distance = m_distance_offset;
 
-	std::cout << "Light created..." << std::endl;
+	B3D_LOG_INFO("Point light created.");
 }
 
 void Light::update(float dt)

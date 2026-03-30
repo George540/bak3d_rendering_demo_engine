@@ -8,6 +8,7 @@
 
 #include "model.h"
 #include "user_interface.h"
+#include "Core/logger.h"
 #include "Input/event_manager.h"
 #include "Loader/resource_manager.h"
 #include "Renderer/texture.h"
@@ -36,7 +37,7 @@ Model::~Model()
 {
 	// Free texture data
 	textures_cache.clear();
-	cout << "Texture data of model " << m_file_name << " have been cleared" << '\n';
+	B3D_LOG_INFO("Texture data of model %s has been cleared", m_file_name.c_str());
 	
 	// Safely dereference camera and light addresses from pointers
 	m_camera = nullptr;
@@ -44,7 +45,7 @@ Model::~Model()
 	m_current_material = nullptr;
 	
 	meshes.clear();
-	cout << "Model " << m_file_name <<" mesh data have been safely deleted" << '\n';
+	B3D_LOG_INFO("Model %s mesh data have been safely deleted", m_file_name.c_str());
 }
 
 void Model::set_camera_and_light(Camera& camera, Light& light)
@@ -163,12 +164,12 @@ void Model::load_model(string const& path)
 	// check for errors
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) //if it's not zero
 	{
-		cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+		B3D_LOG_ERROR("Assimp error: %s", importer.GetErrorString());
 		return;
 	}
 
 	// retrieve the directory path of the filepath
-	std::cout << "Loading model with name: " << m_file_name << std::endl;
+	B3D_LOG_INFO("Loading model with name %s", m_file_name.c_str());
 
 	// process ASSIMP's root node recursively
 	process_node(scene->mRootNode, scene);

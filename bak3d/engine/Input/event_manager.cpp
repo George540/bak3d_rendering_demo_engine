@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "event_manager.h"
 #include "imgui.h"
+#include "Core/logger.h"
 
 #include "GLFW/glfw3.h"
 
@@ -69,20 +70,15 @@ int EventManager::m_window_height = 1080;
 bool EventManager::is_dragging_enabled = false;
 bool EventManager::is_scrolling_enabled = false;
 
-/**
- * \brief Initializes the proper GLFW window settings and inputs
- * The OS specific settings were used from the COMP 371 lab
+/*
+ * Initializes the proper GLFW window settings and handles all inputs.
  */
 void EventManager::initialize()
 {
 	// Initialize GLFW
 	if (!glfwInit())
 	{
-		std::cerr << "Failed to initialize GLFW.\n";
-	}
-	else
-	{
-		std::cout << "Initializing GLFW..." << endl;
+		B3D_LOG_ERROR("Failed to initialize GLFW.");
 	}
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
@@ -119,13 +115,13 @@ void EventManager::initialize()
 
 	if (m_window == nullptr)
 	{
-		cerr << "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3+ compatible. Try the 2.1 version.\n";
+		B3D_LOG_ERROR("Failed to open GLFW window. If you have an Intel GPU, they are not 3.3+ compatible. Try the 2.1 version.");
 		glfwTerminate();
 		exit(-1);  // NOLINT(concurrency-mt-unsafe)
 	}
 
 	glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
-	std::cout << "Opening Window..." << endl;
+	B3D_LOG_INFO("Window created with size %d x %d", m_window_width, m_window_height);
 
 	cam_zoom_factor = 1;
 
@@ -135,7 +131,7 @@ void EventManager::initialize()
 	// Initial time
 	last_frame_time = glfwGetTime();
 	srand(static_cast<unsigned int>(time(nullptr)));  // NOLINT(cert-msc51-cpp)
-	std::cout << "Ending Event Manager Initialization..." << endl;
+	B3D_LOG_INFO("Event Manager Initialization Complete.");
 }
 
 void EventManager::shutdown()
@@ -144,7 +140,7 @@ void EventManager::shutdown()
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 	m_window = nullptr;
-	std::cout << "Terminating EventManager..." << endl;
+	B3D_LOG_INFO("Event Manager Termination Complete.");
 }
 
 void EventManager::update()

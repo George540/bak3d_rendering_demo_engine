@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "axis.h"
 
+#include "Core/logger.h"
 #include "Renderer/mesh_data.h"
 
 Axis::Axis(Material* material) :
@@ -41,7 +42,7 @@ Axis::Axis(Material* material) :
 	m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(AxisVertex), reinterpret_cast<void*>(offsetof(AxisVertex, color)));
 	m_vao->unbind_object();
 
-	std::cout << "Setting up 3D axis gizmo..." << std::endl;
+	B3D_LOG_INFO("Setting up 3D axis gizmo...");
 }
 
 void Axis::draw() const

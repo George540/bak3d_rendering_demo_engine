@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "grid.h"
 
+#include "Core/logger.h"
+
 Grid::Grid(Material* material) : Object(material), m_number_of_slices(40), m_grid_size(20.0f)
 {
 	// GRID LINE SETUP
@@ -69,7 +71,7 @@ Grid::Grid(Material* material) : Object(material), m_number_of_slices(40), m_gri
 
 	m_number_of_elements = static_cast<GLuint>(indices.size()) * 4;
 
-	std::cout << "Setting up grid..." << std::endl;
+	B3D_LOG_INFO("Setting up grid...");
 }
 
 void Grid::draw() const

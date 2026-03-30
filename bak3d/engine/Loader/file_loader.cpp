@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 #include "file_loader.h"
 
+#include "Core/logger.h"
+
 using namespace std;
 
 vector<string> FileLoader::get_directories(const filesystem::path& path)
@@ -47,7 +49,7 @@ vector<string> FileLoader::get_directories(const filesystem::path& path)
 	}
 	catch (const filesystem::filesystem_error& e)
 	{
-		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+		B3D_LOG_ERROR("File not successfully read: %s", e.what());
 	}
 
 	return directories;
@@ -73,7 +75,7 @@ std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::pa
 	}
 	catch (const filesystem::filesystem_error& e)
 	{
-		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+		B3D_LOG_ERROR("File not successfully read: %s", e.what());
 	}
 
 	return files;
@@ -100,7 +102,7 @@ list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesys
 	}
 	catch (const filesystem::filesystem_error& e)
 	{
-		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+		B3D_LOG_ERROR("File not successfully read: %s", e.what());
 	}
 
 	return files_list;
@@ -134,7 +136,7 @@ list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesy
 	}
 	catch (const filesystem::filesystem_error& e)
 	{
-		cerr << "ERROR::FILELOADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+		B3D_LOG_ERROR("File not successfully read: %s", e.what());
 	}
 
 	return files_list;
@@ -154,7 +156,7 @@ string FileLoader::get_name_from_filename(const string filename)
 {
 	if (filename.empty())
 	{
-		cout << "Could not get name from file. No filename was given" << endl;
+		B3D_LOG_WARNING("Could not get name from file. No filename was given");
 		return filename;
 	}
 	string name = filename.substr(0, filename.find_last_of('.'));

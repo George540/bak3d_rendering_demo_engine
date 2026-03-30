@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include <sstream>
 #include <glm/glm.hpp>
 
+#include "Core/logger.h"
+
 using namespace std;
 
 Shader::Shader() :
@@ -40,12 +42,6 @@ Shader::Shader() :
     
 }
 
-/**
- * \brief Constructor for Shader class
- * \param vertex_shader_source path for vertex shader
- * \param fragment_shader_source path for fragment shader
- * \param shader_name name of shader based on file name
- */
 Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(vertex_shader_source, shader_name, 0)
 {
     m_index = 0;
@@ -80,7 +76,7 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     }
     catch (std::ifstream::failure& e)
     {
-        cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << endl;
+        B3D_LOG_ERROR("Shader file not successfully read: %s", e.what());
     }
 
     const char* vShaderCode = vertexCode.c_str();
@@ -112,7 +108,7 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
-    cout << "Shader " << m_asset_name << " with ID " << m_id << " has compiled..." << endl;
+    B3D_LOG_INFO("Shader %s with ID %d has compiled.", m_asset_name.c_str(), m_id);
 }
 
 Shader::Shader(const Shader& otherShader) : Shader(otherShader.get_vert_path(), otherShader.get_frag_path(), otherShader.get_asset_name())
@@ -125,9 +121,6 @@ Shader::~Shader()
     cout << "Shader " << m_asset_name << " with ID " << m_id << " has been deleted..." << endl;
 }
 
-/**
- * \brief Use the specified shader program
- */
 void Shader::use() const
 {
     glUseProgram(m_id);
@@ -203,11 +196,6 @@ void Shader::set_mat4(const std::string& name, const glm::mat4& mat) const
     glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-/**
- * \brief 
- * \param shader id for the specified shader
- * \param type the error to check
- */
 void Shader::check_compile_errors(unsigned int shader, const string& type)
 {
     GLint success;
@@ -218,7 +206,7 @@ void Shader::check_compile_errors(unsigned int shader, const string& type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            B3D_LOG_ERROR("Shader compilation error of type: %s\n %s\n -- --------------------------------------------------- -- ", type.c_str(), infoLog);
         }
     }
     else
@@ -227,7 +215,7 @@ void Shader::check_compile_errors(unsigned int shader, const string& type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            B3D_LOG_ERROR("Shader linking error of type: %s\n %s\n -- --------------------------------------------------- -- ", type.c_str(), infoLog);
         }
     }
 }

@@ -45,7 +45,7 @@ public:
 
     // constructor
     Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
-    ~Mesh();
+    ~Mesh() override = default;
     void draw() const override;
 
     /*Shader* get_current_shader() const { return m_material; }

@@ -52,11 +52,6 @@ Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices) :
     m_vao->unbind_object();
 }
 
-Mesh::~Mesh()
-{
-    //m_textures.clear();
-}
-
 void Mesh::draw() const
 {
     Object::draw();

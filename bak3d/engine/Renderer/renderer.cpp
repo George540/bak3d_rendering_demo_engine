@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 #include <GLFW/glfw3.h>
 
+#include "Core/logger.h"
+
 using namespace std;
 
 // Renderer
@@ -45,14 +47,14 @@ void Renderer::initialize()
 {
 	r_window = EventManager::get_window();
 	glfwMakeContextCurrent(r_window);
-	cout << "Capturing window at Renderer..." << endl;
+	B3D_LOG_INFO("Capturing window at Renderer...");
 
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
-		cerr << "Failed to initialize GLAD" << endl;
+		B3D_LOG_ERROR("Failed to initialize GLAD");
 		exit(-1);
 	}
-	cout << "Initializing GLAD..." << endl;
+	B3D_LOG_INFO("Initializing GLAD context...");
 
 	glfwSetFramebufferSizeCallback(r_window, on_framebuffer_size_callback);
 
@@ -65,11 +67,11 @@ void Renderer::initialize()
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	cout << "Enabling depth test..." << endl;
+	B3D_LOG_INFO("Enabling depth test...");
 
 	frame_buffer = new FrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height(), GL_NONE);
 
-	cout << "Ending Renderer Initialization..." << endl;
+	B3D_LOG_INFO("Ending Renderer Initialization....");
 }
 
 void Renderer::begin_frame()
@@ -102,14 +104,6 @@ void Renderer::shutdown()
 	r_window = nullptr;
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-/**
- * \brief Whenever the window size changed (by OS or user resize) this callback function executes
- * \param window The OpenGL main window
- * \param newWidth The OpenGL main window width
- * \param newHeight The OpenGL main window height
- */
 void Renderer::on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight)
 {
 	// make sure the viewport matches the new window dimensions; note that width and 

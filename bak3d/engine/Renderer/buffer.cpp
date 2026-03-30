@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 #include <iostream>
 
+#include "Core/logger.h"
+
 using namespace std;
 
 Buffer::Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage) :
@@ -63,7 +65,7 @@ FrameBuffer::FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, 
     m_width(width),
     m_height(height)
 {
-    cout << "Enabling Frame Buffer Object..." << endl;
+    B3D_LOG_INFO("Enabling Frame Buffer Object...");
     create_framebuffer();
 }
 
@@ -100,7 +102,7 @@ void FrameBuffer::create_framebuffer()
 {
     if (m_target != GL_FRAMEBUFFER)
     {
-        cout << "ERROR: Framebuffer target is not correct. Must be GL_FRAMEBUFFER" << endl;
+        B3D_LOG_ERROR("Framebuffer target is not correct. Must be GL_FRAMEBUFFER.");
     }
 
     glGenFramebuffers(1, &m_ID);
@@ -121,7 +123,7 @@ void FrameBuffer::create_framebuffer()
     // Verify framebuffer is complete
     if (GLenum status = glCheckFramebufferStatus(m_target); status != GL_FRAMEBUFFER_COMPLETE)
     {
-        cout << "ERROR: Framebuffer is not complete! Status: 0x%x\n" <<  status << endl;
+        B3D_LOG_ERROR("Framebuffer is not complete! Status: 0x%x", status);
     }
 
     glBindFramebuffer(m_target, 0);

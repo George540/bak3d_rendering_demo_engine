@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "stb_image.h"
 #include "texture.h"
 
+#include "Core/logger.h"
+
 using namespace std;
 
 Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType type, TextureUseType textureUse, bool verbose)
@@ -69,7 +71,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
     }
     else
     {
-        cout << "ERROR::PARTICLEGENERATOR::FILE_NOT_SUCCESSFULLY_READ: Texture failed to load at path: " << path << '\n';
+        B3D_LOG_ERROR("Texture failed to load at path: %s", path.c_str());
         stbi_image_free(data);
     }
 }

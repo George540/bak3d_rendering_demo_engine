@@ -22,55 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "engine.h"
-
-#include <iostream>
-
-#include "editor.h"
 #include "logger.h"
-#include "user_interface.h"
-#include "Input/event_manager.h"
-#include "Loader/resource_manager.h"
-#include "Renderer/renderer.h"
 
-/*
- * Main scene object that has full scope of the application.
- */
-static Scene* scene = nullptr;
+using namespace std;
 
-void Bak3DEngine::Initialize()
+chrono::steady_clock::time_point Logger::start_time = chrono::steady_clock::now();
+
+void Logger::initialize()
 {
-    Logger::initialize();
-    EventManager::initialize();
-    Renderer::initialize();
-    ResourceManager::initialize();
-    Bak3DEditor::initialize();
-
-    scene = new Scene();
-
-    B3D_LOG_INFO("Engine initialized.");
+    start_time = chrono::steady_clock::now();
 }
 
-void Bak3DEngine::Update()
+void Logger::shutdown()
 {
-    do
-    {
-        // Update Event Manager - Frame time / input / events processing 
-        EventManager::update();
-
-        // Update Scene
-        const float dt = EventManager::get_frame_time();
-        scene->update(dt);
-
-        scene->draw();
-    } while (EventManager::is_exit_requested() == false);
+    B3D_LOG_INFO("Shutting down engine. Time passed: %s", get_elapsed_time_formatted().c_str());
 }
 
-void Bak3DEngine::Shutdown()
+string Logger::get_elapsed_time_formatted()
 {
-    Bak3DEditor::shutdown();
-    Renderer::shutdown();
-    EventManager::shutdown();
-    ResourceManager::shutdown();
-    Logger::shutdown();
+    const auto now = chrono::steady_clock::now();
+    const auto difference = now - start_time;
+
+    const auto total_ms = chrono::duration_cast<chrono::milliseconds>(difference).count();
+
+    const long ms = total_ms % 1000;
+    const long total_secs = total_ms / 1000;
+    const long s = total_secs % 60;
+    const long total_mins = total_secs / 60;
+    const long m = total_mins % 60;
+    const long h = total_mins / 60;
+
+    char time_buffer[32];
+    // Format: HH:MM:SS:mmm (0-padded to 2 digits for time, 3 for ms)
+    snprintf(time_buffer, sizeof(time_buffer), "%02ld:%02ld:%02ld:%03ld", h, m, s, ms);
+
+    return time_buffer;
 }

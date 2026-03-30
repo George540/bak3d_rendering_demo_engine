@@ -1,7 +1,33 @@
+/* ===========================================================================
+The MIT License (MIT)
+
+Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+=========================================================================== */
+
 #include <iostream>
 #include <random>
 
 #include "particle_generator.h"
+
+#include "Core/logger.h"
 #include "Loader/resource_manager.h"
 #include "Loader/file_loader.h"
 #include "Renderer/buffer.h"
@@ -34,7 +60,7 @@ ParticleSystem::ParticleSystem(Material* particle_material, Material* box_materi
 
     static_assert(sizeof(particle_instance_data) == 36, "ERROR::PARTICLESYSTEM::WRONG_STRUCT_SIZE");
 
-    cout << "Particle System has been activated with " << m_particle_amount << " particles." << '\n';
+    B3D_LOG_INFO("Particle System has been activated with %d particles.");
 }
 
 ParticleSystem::~ParticleSystem()
@@ -58,7 +84,7 @@ void ParticleSystem::initialize()
 
 void ParticleSystem::set_up_particle_buffers()
 {
-    cout << "Setting up particle buffer data..." << '\n';
+    B3D_LOG_INFO("Setting up particle buffer data...");
 
     m_vbo = new VertexBuffer(static_cast<GLsizei>(QUAD_VERTICES.size()) * vec4_size, QUAD_VERTICES.data());
     m_ebo = new ElementBuffer(static_cast<GLsizei>(QUAD_INDICES.size()) * ui_size, QUAD_INDICES.data());
