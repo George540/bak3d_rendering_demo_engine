@@ -26,11 +26,12 @@ THE SOFTWARE.
 
 #include <glm/vec3.hpp>
 
+#include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
 
 Environment::Environment() : EditorPanel("Environment")
 {
-    
+    m_flags |= ImGuiStyleVar_WindowPadding;
 }
 
 void Environment::begin_frame()
@@ -42,20 +43,15 @@ void Environment::update()
 {
     EditorPanel::update();
 
-    ImGui::BeginTable("##Environment_Table", ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
-    {
-        
-    }
-
-    // Toggle Grid Rendering
     bool grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
-    ImGui::Checkbox("Render Grid", &grid_rendering);
+    ImGuiB3D::PropertyToggle("Render Grid", &grid_rendering, "Render scene grid in viewport");
     GlobalSettings::set_global_setting<bool>(GlobalSettingOption::GridRendering, grid_rendering);
 
     // Toggle light color
     glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
     float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
-    ImGui::ColorEdit4("Background Color", bg_col);
+    //ImGui::ColorEdit4("Background Color", bg_col);
+    ImGuiB3D::PropertyColorPicker("Background Color", bg_col, "Change background color using glClearColor(...)");
     bg_color_vec4.r = bg_col[0];
     bg_color_vec4.g = bg_col[1];
     bg_color_vec4.b = bg_col[2];

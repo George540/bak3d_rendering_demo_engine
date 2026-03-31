@@ -88,7 +88,8 @@ void Renderer::end_frame()
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	frame_buffer->unbind_object();
-	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);
+	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
+	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
