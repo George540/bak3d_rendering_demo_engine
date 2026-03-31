@@ -40,7 +40,11 @@ void Console::update()
 {
     EditorPanel::update();
 
-    ImGui::Button("Clear", ImVec2(50, 20));
+    if (ImGui::Button("Clear", ImVec2(50, 20)))
+    {
+        Logger::clear_log_entries();
+    }
+
     ImGui::SameLine();
     static char search_buffer[64] = "";
     ImGui::InputTextWithHint("##log_filter", "Filter logs by search...", search_buffer, IM_ARRAYSIZE(search_buffer));

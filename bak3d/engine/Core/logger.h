@@ -91,6 +91,7 @@ public:
     }
 
     static std::vector<std::string>& get_log_entries() { return log_entries_formatted; }
+    static void clear_log_entries() { log_entries_formatted.clear(); }
 private:
     static std::string get_elapsed_time_formatted();
 
