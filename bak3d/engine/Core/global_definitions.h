@@ -48,6 +48,7 @@ using GlobalSettingValueType = std::variant<
 enum class GlobalSettingOption : uint32_t
 {
     GridRendering,
+    AxisRendering,
     BackgroundColor,
     Max
 };

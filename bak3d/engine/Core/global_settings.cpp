@@ -41,6 +41,7 @@ void GlobalSettings::initialize()
 {
     global_settings.clear();
     global_settings[GlobalSettingOption::GridRendering] = true;
+    global_settings[GlobalSettingOption::AxisRendering] = true;
     global_settings[GlobalSettingOption::BackgroundColor] = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
 }
 

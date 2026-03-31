@@ -51,24 +51,39 @@ void Environment::update()
 {
     EditorPanel::update();
 
-    bool grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
-    ImGuiB3D::PropertyToggle("Render Grid", &grid_rendering, "Render scene grid in viewport");
-    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::GridRendering, grid_rendering);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("General"))
+    {
+        // Grid Rendering
+        bool grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
+        ImGuiB3D::PropertyToggle("Render Grid", &grid_rendering, "Render scene grid in viewport");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::GridRendering, grid_rendering);
 
-    // Toggle light color
-    glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
-    float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
-    //ImGui::ColorEdit4("Background Color", bg_col);
-    ImGuiB3D::PropertyColorPicker("Background Color", bg_col, "Change background color using glClearColor(...)");
-    bg_color_vec4.r = bg_col[0];
-    bg_color_vec4.g = bg_col[1];
-    bg_color_vec4.b = bg_col[2];
-    bg_color_vec4.a = bg_col[3];
-    GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
+        // Axis Rendering
+        bool axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
+        ImGuiB3D::PropertyToggle("Render Axis", &axis_rendering, "Render scene axis in viewport");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::AxisRendering, axis_rendering);
 
-    // Object Selection
-    ImGuiB3D::PropertyDropdown("Object Selection", object_items, &object_selection_index, "Select an object type to render in the scene");
-    ImGui::Text("%s", object_items[object_selection_index]);
+        // Toggle background color
+        glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
+        float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
+        //ImGui::ColorEdit4("Background Color", bg_col);
+        ImGuiB3D::PropertyColorPicker("Background Color", bg_col, "Change background color using glClearColor(...)");
+        bg_color_vec4.r = bg_col[0];
+        bg_color_vec4.g = bg_col[1];
+        bg_color_vec4.b = bg_col[2];
+        bg_color_vec4.a = bg_col[3];
+        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
+
+        // Object Selection
+        if (ImGuiB3D::PropertyDropdown("Object Selection", object_items, &object_selection_index, "Select an object type to render in the scene"))
+        {
+            B3D_LOG_INFO("Selected object: %s", object_items[object_selection_index]);
+        }
+        ImGui::Text("%s", object_items[object_selection_index]);
+
+        ImGui::TreePop();
+    }
 }
 
 void Environment::end_frame()

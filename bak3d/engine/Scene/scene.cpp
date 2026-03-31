@@ -100,21 +100,21 @@ void Scene::draw() const
 	Renderer::begin_frame();
 
 	// Set depth test for axis to render in front of grid
-	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering))
+	const bool is_grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
+	const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
+	if (is_grid_rendering || is_axis_rendering)
 	{
 		glDepthFunc(GL_ALWAYS);
-		m_grid->draw();
-		m_axis->draw();
+		if (is_grid_rendering)
+		{
+			m_grid->draw();
+		}
+		if (is_axis_rendering)
+		{
+			m_axis->draw();
+		}
 		glDepthFunc(GL_LESS);
 	}
-	/*if (UserInterface::is_grid_rendering)
-	{
-		// Set depth test for axis to render in front of grid
-		glDepthFunc(GL_ALWAYS);
-		m_grid->draw();
-		m_axis->draw();
-		glDepthFunc(GL_LESS);
-	}*/
 
 	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
 	{
