@@ -6,11 +6,11 @@ Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
 
 # What is Bak3D
 
-Bak3D (baked) is a real-time 3D rendering engine that can be used as a playground, focusing on simplicity, continous learning, and understanding various rendering concepts. The engine contains simplified features that can be tuned in real time using the engine's editor. It is intended for early learners to use as a reference for their own projects, school assignments or just experimenting. So if you are a student or just starting to understand computer graphics and engine, this one is for you!
+Bak3D (baked) is a real-time beginner-friendly 3D rendering engine that can be used as a playground, focusing on simplicity, continous learning, and understanding various rendering concepts. The engine contains simplified features that can be tuned in real time using the engine's editor. It is intended for early learners to use as a reference for their own projects, school assignments or just experimenting. It is also good for seasoned professionals who love simple things from simple times. So if you are a student or just starting to understand computer graphics and engine, this one is especially for you!
 
 # Motivation
 
-Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It became a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with.
+Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a Junior 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It formed a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with.
 
 
 <img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
@@ -115,7 +115,7 @@ See [project board](github.com/users/George540/projects/9) and [issue tracking](
 
 In general, this project is aimed to be very simple with no commercial goal in mind. It is mostly a learning project and a demonstration of my knowledge. If anyone is using it for an academic assignment, project or even personal use, do not hesitate to credit this repository (see license).
 
-I am currently working as a graphics developer at flight simulators and this was a good project to get me on track with my onboarding at work. I hope you enjoy using my little beginner engine and I hope you learn many more things with me as well.
+I hope you enjoy using my little beginner engine and I hope you learn many more things with me as well.
 
 ## Acknowledgments
 
