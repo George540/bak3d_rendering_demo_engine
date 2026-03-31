@@ -29,9 +29,17 @@ THE SOFTWARE.
 #include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
 
+using namespace std;
+
+namespace
+{
+    int object_selection_index = 0;
+    vector<const char*> object_items = { "None", "Model", "Particle System", "GPU Particles" };
+}
+
 Environment::Environment() : EditorPanel("Environment")
 {
-    m_flags |= ImGuiStyleVar_WindowPadding;
+
 }
 
 void Environment::begin_frame()
@@ -57,6 +65,10 @@ void Environment::update()
     bg_color_vec4.b = bg_col[2];
     bg_color_vec4.a = bg_col[3];
     GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
+
+    // Object Selection
+    ImGuiB3D::PropertyDropdown("Object Selection", object_items, &object_selection_index, "Select an object type to render in the scene");
+    ImGui::Text("%s", object_items[object_selection_index]);
 }
 
 void Environment::end_frame()

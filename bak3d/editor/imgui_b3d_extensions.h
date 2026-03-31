@@ -24,11 +24,14 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <vector>
+
 class ImGuiB3D
 {
 public:
     static bool PropertyToggle(const char* label, bool* value, const char* tooltip_desc = nullptr);
     static bool PropertyColorPicker(const char* label, float* color, const char* tooltip_desc = nullptr);
+    static bool PropertyDropdown(const char* label, const std::vector<const char*>& data, int* selected_index, const char* tooltip_desc = nullptr);
 private:
     static bool ToolTipExtended(const char* tooltip_desc, float text_wrap_size);
     static bool MultiSpacing(int num_spaces);
