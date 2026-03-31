@@ -27,11 +27,11 @@ THE SOFTWARE.
 
 #include "particle_generator.h"
 
+#include "Core/global_definitions.h"
 #include "Core/logger.h"
 #include "Loader/resource_manager.h"
 #include "Loader/file_loader.h"
 #include "Renderer/buffer.h"
-#include "Renderer/mesh_data.h"
 #include "Renderer/texture.h"
 
 using namespace std;

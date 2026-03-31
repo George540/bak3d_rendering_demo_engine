@@ -22,58 +22,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "engine.h"
+#include "environment.h"
 
-#include <iostream>
+#include <glm/vec3.hpp>
 
-#include "editor.h"
-#include "global_settings.h"
-#include "logger.h"
-#include "user_interface.h"
-#include "Input/event_manager.h"
-#include "Loader/resource_manager.h"
-#include "Renderer/renderer.h"
+#include "Core/global_settings.h"
 
-/*
- * Main scene object that has full scope of the application.
- */
-static Scene* scene = nullptr;
-
-void Bak3DEngine::Initialize()
+Environment::Environment() : EditorPanel("Environment")
 {
-    Logger::initialize();
-    GlobalSettings::initialize();
-    EventManager::initialize();
-    Renderer::initialize();
-    ResourceManager::initialize();
-    Bak3DEditor::initialize();
-
-    scene = new Scene();
-
-    B3D_LOG_INFO("Engine initialized.");
+    
 }
 
-void Bak3DEngine::Update()
+void Environment::begin_frame()
 {
-    do
+    EditorPanel::begin_frame();
+}
+
+void Environment::update()
+{
+    EditorPanel::update();
+
+    ImGui::BeginTable("##Environment_Table", ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY);
     {
-        // Update Event Manager - Frame time / input / events processing 
-        EventManager::update();
+        
+    }
 
-        // Update Scene
-        const float dt = EventManager::get_frame_time();
-        scene->update(dt);
+    // Toggle Grid Rendering
+    bool grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
+    ImGui::Checkbox("Render Grid", &grid_rendering);
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::GridRendering, grid_rendering);
 
-        scene->draw();
-    } while (EventManager::is_exit_requested() == false);
+    // Toggle light color
+    glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
+    float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
+    ImGui::ColorEdit4("Background Color", bg_col);
+    bg_color_vec4.r = bg_col[0];
+    bg_color_vec4.g = bg_col[1];
+    bg_color_vec4.b = bg_col[2];
+    bg_color_vec4.a = bg_col[3];
+    GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
 }
 
-void Bak3DEngine::Shutdown()
+void Environment::end_frame()
 {
-    Bak3DEditor::shutdown();
-    Renderer::shutdown();
-    EventManager::shutdown();
-    ResourceManager::shutdown();
-    GlobalSettings::shutdown();
-    Logger::shutdown();
+    EditorPanel::end_frame();
 }

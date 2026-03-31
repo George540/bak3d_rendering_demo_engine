@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "bounding_box.h"
 
 #include "user_interface.h"
-#include "Renderer/mesh_data.h"
+#include "Core/global_definitions.h"
 
 BoundingBox::BoundingBox(Material* material) : Object(material)
 {

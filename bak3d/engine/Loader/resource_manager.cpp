@@ -25,7 +25,6 @@ THE SOFTWARE.
 #include "resource_manager.h"
 
 #include <filesystem>
-#include <iostream>
 #include <ranges>
 
 #include "file_loader.h"
@@ -47,12 +46,6 @@ void ResourceManager::initialize()
     initialize_shaders();
     initialize_predefined_textures();
     initialize_models();
-
-    auto test1 = Shaders;
-    auto test2 = Textures;
-    auto test3 = Materials;
-    auto test4 = Models;
-    auto test5 = false;
 }
 
 void ResourceManager::initialize_shaders()

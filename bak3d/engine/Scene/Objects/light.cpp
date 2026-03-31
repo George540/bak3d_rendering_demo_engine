@@ -26,9 +26,9 @@ THE SOFTWARE.
 
 #include "light.h"
 
+#include "Core/global_definitions.h"
 #include "user_interface.h"
 #include "Input/event_manager.h"
-#include "Renderer/mesh_data.h"
 
 #include <GLFW/glfw3.h>
 

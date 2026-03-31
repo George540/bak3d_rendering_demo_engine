@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "../Renderer/material.h"
 #include "../Renderer/renderer.h"
 #include "../../Editor/user_interface.h"
+#include "Core/global_settings.h"
 
 using namespace std;
 
@@ -99,10 +100,13 @@ void Scene::draw() const
 	Renderer::begin_frame();
 
 	// Set depth test for axis to render in front of grid
-	glDepthFunc(GL_ALWAYS);
-	m_grid->draw();
-	m_axis->draw();
-	glDepthFunc(GL_LESS);
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering))
+	{
+		glDepthFunc(GL_ALWAYS);
+		m_grid->draw();
+		m_axis->draw();
+		glDepthFunc(GL_LESS);
+	}
 	/*if (UserInterface::is_grid_rendering)
 	{
 		// Set depth test for axis to render in front of grid

@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,14 +24,40 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <vector>
+#include <variant>
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-constexpr auto MAX_BONE_INFLUENCE = 4;
+/*
+ * ============================ ENGINE DEFINITIONS ==========================
+ * Engine declarations and definitions for different types, settings, constants and more.
+ * ==========================================================================
+ */
+
+using GlobalSettingValueType = std::variant<
+    bool,
+    int,
+    float,
+    uint32_t,
+    glm::vec3,
+    glm::vec4
+>;
+
+enum class GlobalSettingOption : uint32_t
+{
+    GridRendering,
+    BackgroundColor,
+    Max
+};
 
 /*
+ * ============================ MESH DEFINITIONS ============================
  * Definitions for different rendering structures and constant primitive data.
+ * ==========================================================================
  */
+constexpr auto MAX_BONE_INFLUENCE = 4;
 
 struct Vertex
 {

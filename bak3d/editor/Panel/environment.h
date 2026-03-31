@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,32 +24,14 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef MESH_H
-#define MESH_H
+#include "editor_panel.h"
 
-#include <glad/glad.h>
-#include <vector>
-
-#include "Core/global_definitions.h"
-#include "Scene/Objects/object.h"
-
-/*
- * Surface-based render object tused to construct a model.
- */
-class Mesh : public Object
+class Environment : public EditorPanel
 {
 public:
-    // mesh Data
-    std::vector<Vertex> m_vertices;
-    std::vector<GLuint> m_indices;
+    Environment();
 
-    // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
-    ~Mesh() override = default;
-    void draw() const override;
-
-    /*Shader* get_current_shader() const { return m_material; }
-    void set_current_shader(Shader* shader) { m_material = shader; }*/
+    void begin_frame() override;
+    void update() override;
+    void end_frame() override;
 };
-
-#endif

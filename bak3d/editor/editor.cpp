@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Core/logger.h"
 #include "Panel/console.h"
 #include "Panel/editor_panel.h"
+#include "Panel/environment.h"
 #include "Panel/viewport.h"
 #include "Renderer/renderer.h"
 
@@ -77,6 +78,7 @@ void Bak3DEditor::initialize()
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     m_panels.emplace_back(make_shared<Viewport>());
+    m_panels.emplace_back(make_shared<Environment>());
     m_panels.emplace_back(make_shared<EditorPanel>("Details"));
     m_panels.emplace_back(make_shared<EditorPanel>("Scene"));
     m_panels.emplace_back(make_shared<EditorPanel>("Assets"));
@@ -143,6 +145,9 @@ void Bak3DEditor::update_window()
     // 3. Update dock space panels
     update_panels(viewport);
 
+    // Show demo window when required
+    //ImGui::ShowDemoWindow();
+
     // 5. End main window and frame
     ImGui::End();
 }
@@ -162,7 +167,7 @@ void Bak3DEditor::update_panels(const ImGuiViewport* viewport)
 
             // 1. Isolate Details on the far right for Details (Full height)
             ImGuiID dock_id_left_container;
-            const ImGuiID dock_id_details = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_id_left_container);
+            const ImGuiID dock_id_environment = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_id_left_container);
 
             // 2. Split the left container horizontally for Viewport (Right or Middle) and Details (Right). This creates a bottom row that spans under everything except Details
             ImGuiID dock_id_bottom_row;
@@ -178,13 +183,47 @@ void Bak3DEditor::update_panels(const ImGuiViewport* viewport)
 
             // 5. Assign Windows and finish
             ImGui::DockBuilderDockWindow("Viewport", dock_id_viewport);
-            ImGui::DockBuilderDockWindow("Details", dock_id_details);
+            ImGui::DockBuilderDockWindow("Environment", dock_id_environment);
+            ImGui::DockBuilderDockWindow("Details", dock_id_environment);
             ImGui::DockBuilderDockWindow("Scene", dock_id_scene);
             ImGui::DockBuilderDockWindow("Logger", dock_id_logger);
             ImGui::DockBuilderDockWindow("Assets", dock_id_assets);
 
             // Note: to reset the panels before runtime, simply delete the editor_config.ini file found inside the build directory.
             ImGui::DockBuilderFinish(window_id);
+
+            if (ImGuiDockNode* environment_node = ImGui::DockBuilderGetNode(dock_id_environment))
+            {
+                environment_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* viewport_node = ImGui::DockBuilderGetNode(dock_id_viewport))
+            {
+                viewport_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* scene_node = ImGui::DockBuilderGetNode(dock_id_scene))
+            {
+                scene_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* logger_node = ImGui::DockBuilderGetNode(dock_id_logger))
+            {
+                logger_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* assets_node = ImGui::DockBuilderGetNode(dock_id_assets))
+            {
+                assets_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* top_row_node = ImGui::DockBuilderGetNode(dock_id_top_row))
+            {
+                top_row_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* bottom_row_node = ImGui::DockBuilderGetNode(dock_id_bottom_row))
+            {
+                bottom_row_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
+            if (ImGuiDockNode* left_container_node = ImGui::DockBuilderGetNode(dock_id_left_container))
+            {
+                left_container_node->LocalFlags |= ImGuiDockNodeFlags_NoSplit;
+            }
         }
 
         // 6. Finish styling

@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include "renderer.h"
 
+#include "Core/global_settings.h"
 #include "Input/event_manager.h"
 #include "user_interface.h"
 
@@ -34,8 +35,6 @@ THE SOFTWARE.
 #include "stb_image.h"
 
 #include <GLFW/glfw3.h>
-
-#include "Core/logger.h"
 
 using namespace std;
 
@@ -78,14 +77,14 @@ void Renderer::begin_frame()
 {
 	// Clear the screen
 	frame_buffer->bind_object();
-	glClearColor(UserInterface::background_color.r, UserInterface::background_color.g, UserInterface::background_color.b, 0.0f);
+	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
+	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::end_frame()
 {
-	
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	frame_buffer->unbind_object();

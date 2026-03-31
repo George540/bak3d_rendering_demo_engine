@@ -26,8 +26,8 @@ THE SOFTWARE.
 
 #include "axis.h"
 
+#include "Core/global_definitions.h"
 #include "Core/logger.h"
-#include "Renderer/mesh_data.h"
 
 Axis::Axis(Material* material) :
 	Object(material)

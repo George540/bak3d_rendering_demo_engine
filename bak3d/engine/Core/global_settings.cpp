@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,34 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#pragma once
+#include "global_settings.h"
 
-#ifndef MESH_H
-#define MESH_H
+std::map<GlobalSettingOption, GlobalSettingValueType> GlobalSettings::global_settings = {};
 
-#include <glad/glad.h>
-#include <vector>
-
-#include "Core/global_definitions.h"
-#include "Scene/Objects/object.h"
-
-/*
- * Surface-based render object tused to construct a model.
- */
-class Mesh : public Object
+const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
 {
-public:
-    // mesh Data
-    std::vector<Vertex> m_vertices;
-    std::vector<GLuint> m_indices;
+    switch (enum_setting)
+    {
+        case GlobalSettingOption::GridRendering: return "Grid Rendering";
+        case GlobalSettingOption::BackgroundColor: return "Background Color";
+        case GlobalSettingOption::Max: return "Max";
+        default: return "unknown";
+    }
+}
 
-    // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
-    ~Mesh() override = default;
-    void draw() const override;
+void GlobalSettings::initialize()
+{
+    global_settings.clear();
+    global_settings[GlobalSettingOption::GridRendering] = true;
+    global_settings[GlobalSettingOption::BackgroundColor] = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
+}
 
-    /*Shader* get_current_shader() const { return m_material; }
-    void set_current_shader(Shader* shader) { m_material = shader; }*/
-};
+void GlobalSettings::shutdown()
+{
+    global_settings.clear();
+}
 
-#endif
+void GlobalSettings::reset_to_defaults()
+{
+    initialize();
+}
