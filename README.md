@@ -80,8 +80,8 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
 |:ballot_box_with_check:| **FrameBuffers** | Surprisingly I never had framebuffers set up, so if I want better control of the final output image, I need that. |
 |:ballot_box_with_check:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
-|☐| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
-|☐| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
+|:gear:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
+|:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
 |☐| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
 |☐| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
 |☐| **Profiling Metrics** | Add a dedicated panel for profiling different features and other important metrics. |
@@ -98,11 +98,8 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |☐| **Polish GPU Particles** | Particle System is barely hanging by. A new and more capable approach is needed. |
 |☐| **Multiple Objects in scene** | Support multiple objects in scene, even from the same type. |
 |☐| **Terrain** | Simple terrain concept for loading a height map into a plane mesh, used for lighting purposes. |
-|☐| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
-|☐| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer. |
 |☐| **Scene Graph** | Add a scene graph for proper handling of multiple objects using spacial culling. |
 |☐| **GPU Culling** | As the scene grows, we need to handle it at scale with culling unecessary or unseen objects. |
-|☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. |
 |☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |☐| **Bonus: Rigidbody demo setup** | If time and motivation, add a simple rigidbody structure for fun physics. |
 |☐| **Bonus: FPV movement** | make camera move around the scene without just being restricted in orbit. |
