@@ -41,7 +41,7 @@ bool ImGuiB3D::PropertyToggle(const char* label, bool* value, const char* toolti
     ImGui::TextUnformatted(label);
     if (tooltip_desc && ImGui::IsItemHovered())
     {
-        ToolTipExtended(tooltip_desc, TOOL_TIP_WIDTH);
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
@@ -54,7 +54,7 @@ bool ImGuiB3D::PropertyColorPicker(const char* label, float* color, const char* 
     ImGui::TextUnformatted(label);
     if (tooltip_desc && ImGui::IsItemHovered())
     {
-        ToolTipExtended(tooltip_desc, TOOL_TIP_WIDTH);
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
@@ -67,7 +67,7 @@ bool ImGuiB3D::PropertyDropdown(const char* label, const std::vector<const char*
     ImGui::TextUnformatted(label);
     if (tooltip_desc && ImGui::IsItemHovered())
     {
-        ToolTipExtended(tooltip_desc, TOOL_TIP_WIDTH);
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
@@ -75,7 +75,7 @@ bool ImGuiB3D::PropertyDropdown(const char* label, const std::vector<const char*
     return ImGui::Combo(label_str.c_str(), selected_index, data.data(), static_cast<int>(data.size()));;
 }
 
-bool ImGuiB3D::ToolTipExtended(const char* tooltip_desc, float text_wrap_size)
+bool ImGuiB3D::ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size)
 {
     ImGui::BeginTooltip();
     ImGui::PushTextWrapPos(text_wrap_size);

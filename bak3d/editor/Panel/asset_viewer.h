@@ -25,7 +25,11 @@ THE SOFTWARE.
 #pragma once
 
 #include "editor_panel.h"
+#include "Renderer/texture.h"
 
+/*
+ * Panel view for all loaded assets stored in the Resource Manager
+ */
 class AssetPanel : public EditorPanel
 {
 public:
@@ -37,4 +41,5 @@ public:
 private:
     void draw_asset_toolbar();
     void draw_asset_grid();
+    void draw_asset_tile(const std::string& name, const Texture2D* texture);
 };

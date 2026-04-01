@@ -37,6 +37,7 @@ public:
 
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);
 private:
-    static bool ToolTipExtended(const char* tooltip_desc, float text_wrap_size);
+    static bool ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size);
+    static bool ToolTipExtendedAsset(const char* tooltip_desc, float text_wrap_size);
     static bool MultiSpacing(int num_spaces);
 };
