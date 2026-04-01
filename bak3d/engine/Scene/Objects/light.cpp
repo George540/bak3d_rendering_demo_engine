@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include <GLFW/glfw3.h>
 
+#include "Core/global_settings.h"
 #include "Core/logger.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
@@ -64,6 +65,11 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 
 void Light::update(float dt)
 {
+	m_horizontal_angle = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_HorizontalRotation);
+	m_vertical_angle = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_VerticalRotation);
+	m_distance_offset = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
+	m_properties.intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
+	
 	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_A) == GLFW_PRESS)
 	{
 		m_horizontal_angle += dt * 30.0f;
@@ -89,6 +95,9 @@ void Light::update(float dt)
 	m_properties.position = m_position;
 
 	set_model_matrix(m_position, get_scaling(), get_rotation(), 0.0f);
+
+	const glm::vec4 diffuse = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
+	m_properties.diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
 }
 
 

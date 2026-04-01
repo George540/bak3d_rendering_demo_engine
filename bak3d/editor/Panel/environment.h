@@ -34,4 +34,7 @@ public:
     void begin_frame() override;
     void update() override;
     void end_frame() override;
+private:
+    void draw_general_settings();
+    void draw_light_settings();
 };

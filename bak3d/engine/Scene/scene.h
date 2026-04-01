@@ -27,6 +27,9 @@ THE SOFTWARE.
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <map>
+
+#include "Core/global_definitions.h"
 #include "Objects/axis.h"
 #include "Objects/grid.h"
 #include "Objects/light.h"
@@ -50,11 +53,14 @@ public:
 
 	void update(float dt) const;
 	void draw() const;
+
+	Camera* get_camera() const { return m_camera; }
 private:
 	static Scene* instance;
 	
 	void process_particle_activation();
-	
+
+	std::map<SceneObjectType, Object*> m_scene_objects;
 	ParticleSystem* m_particle_system;
 	Camera* m_camera;
 	Light* m_light;

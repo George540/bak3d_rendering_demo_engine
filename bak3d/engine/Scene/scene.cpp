@@ -63,18 +63,22 @@ Scene::Scene()
 	// Grid Setup
 	m_grid = new Grid(ResourceManager::get_material("grid"));
 	m_grid->set_camera(*m_camera);
+	m_scene_objects[SceneObjectType::Grid] = m_grid;
 	
 	m_axis = new Axis(ResourceManager::get_material("line"));
 	m_axis->set_camera(*m_camera);
+	m_scene_objects[SceneObjectType::Axis] = m_axis;
 	
 	m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("bounding-box"));
 	m_particle_system->set_camera(*m_camera);
 	UserInterface::current_particle_system = m_particle_system;
+	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_material("light"));
 	m_light->set_camera(*m_camera);
 	UserInterface::environment_point_light = m_light;
+	m_scene_objects[SceneObjectType::Light] = m_light;
 
 	ResourceManager::set_camera(*m_camera, *m_light);
 }
@@ -86,12 +90,16 @@ Scene::~Scene()
 	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
+	m_scene_objects.clear();
 }
 
 void Scene::update(float dt) const
 {
 	m_camera->update(dt);
-	m_light->update(dt);
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
+	{
+		m_light->update(dt);
+	}
 	m_particle_system->update(dt);
 }
 
@@ -116,6 +124,10 @@ void Scene::draw() const
 		glDepthFunc(GL_LESS);
 	}
 
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
+	{
+		m_light->draw();
+	}
 	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
@@ -134,9 +146,6 @@ void Scene::draw() const
 	Renderer::end_frame();
 
 	Bak3DEditor::update();
-	//UserInterface::begin_frame();
-	//UserInterface::render_demo_window();
-	//UserInterface::end_frame();
 
 	Renderer::post_end_frame();
 }

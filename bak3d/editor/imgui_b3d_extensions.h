@@ -33,6 +33,7 @@ public:
     static bool PropertyToggle(const char* label, bool* value, const char* tooltip_desc = nullptr);
     static bool PropertyColorPicker(const char* label, float* color, const char* tooltip_desc = nullptr);
     static bool PropertyDropdown(const char* label, const std::vector<const char*>& data, int* selected_index, const char* tooltip_desc = nullptr);
+    static bool PropertySliderFloat(const char* label, float* value, float v_min, float v_max, const char* format, const char* tooltip_desc = nullptr);
     static bool SeparatorWithSpacing(int num_spaces);
 
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);

@@ -51,6 +51,17 @@ void Environment::update()
 {
     EditorPanel::update();
 
+    draw_general_settings();
+    draw_light_settings();
+}
+
+void Environment::end_frame()
+{
+    EditorPanel::end_frame();
+}
+
+void Environment::draw_general_settings()
+{
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("General"))
     {
@@ -85,7 +96,49 @@ void Environment::update()
     }
 }
 
-void Environment::end_frame()
+void Environment::draw_light_settings()
 {
-    EditorPanel::end_frame();
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Point Light"))
+    {
+        bool light_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled);
+        ImGuiB3D::PropertyToggle("Enabled", &light_enabled, "Enable light in viewport");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_Enabled, light_enabled);
+
+        ImGui::BeginDisabled(!light_enabled);
+        {
+            // Horizontal Rotation
+            float light_horizontal_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_HorizontalRotation);
+            ImGuiB3D::PropertySliderFloat("Horizontal Rotation", &light_horizontal_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object horizontally.");
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_HorizontalRotation, light_horizontal_rotation);
+
+            // Vertical Rotation
+            float light_vertical_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_VerticalRotation);
+            ImGuiB3D::PropertySliderFloat("Vertical Rotation", &light_vertical_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object vertically.");
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_VerticalRotation, light_vertical_rotation);
+
+            // Distance Offset
+            float light_origin_distance = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
+            ImGuiB3D::PropertySliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f, "%.3f", "Light distance from origin (center of axis).");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_OriginDistance, light_origin_distance);
+
+            // Intensity
+            float light_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
+            ImGuiB3D::PropertySliderFloat("Intensity", &light_intensity, 0.0f, 10.0f, "%.3f", "Intensity of the light");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Intensity, light_intensity);
+
+            // Color
+            glm::vec4 light_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
+            float bg_col[4] = {  light_color.r,  light_color.g,  light_color.b, light_color.a };
+            ImGuiB3D::PropertyColorPicker("Color", bg_col, "Change light's color");
+            light_color.r = bg_col[0];
+            light_color.g = bg_col[1];
+            light_color.b = bg_col[2];
+            light_color.a = bg_col[3];
+            GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
+        }
+        ImGui::EndDisabled();
+
+        ImGui::TreePop();
+    }
 }

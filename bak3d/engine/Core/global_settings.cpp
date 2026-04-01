@@ -31,9 +31,16 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
     switch (enum_setting)
     {
         case GlobalSettingOption::GridRendering: return "Grid Rendering";
+        case GlobalSettingOption::AxisRendering: return "Axis Rendering";
         case GlobalSettingOption::BackgroundColor: return "Background Color";
+        case GlobalSettingOption::Light_Enabled: return "Enabled";
+        case GlobalSettingOption::Light_HorizontalRotation: return "Horizontal Rotation";
+        case GlobalSettingOption::Light_VerticalRotation: return "Vertical Rotation";
+        case GlobalSettingOption::Light_OriginDistance: return "Origin Distance";
+        case GlobalSettingOption::Light_Color: return "Color";
+        case GlobalSettingOption::Light_Intensity: return "Intensity";
         case GlobalSettingOption::Max: return "Max";
-        default: return "unknown";
+        default: return "Unknown";
     }
 }
 
@@ -43,6 +50,12 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::GridRendering] = true;
     global_settings[GlobalSettingOption::AxisRendering] = true;
     global_settings[GlobalSettingOption::BackgroundColor] = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
+    global_settings[GlobalSettingOption::Light_Enabled] = true;
+    global_settings[GlobalSettingOption::Light_HorizontalRotation] = 45.0f;
+    global_settings[GlobalSettingOption::Light_VerticalRotation] = 135.0f;
+    global_settings[GlobalSettingOption::Light_OriginDistance] = 5.0f;
+    global_settings[GlobalSettingOption::Light_Color] = glm::vec4(1.0f);
+    global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;
 }
 
 void GlobalSettings::shutdown()

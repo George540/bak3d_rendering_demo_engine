@@ -50,6 +50,22 @@ enum class GlobalSettingOption : uint32_t
     GridRendering,
     AxisRendering,
     BackgroundColor,
+    Light_Enabled,
+    Light_HorizontalRotation,
+    Light_VerticalRotation,
+    Light_OriginDistance,
+    Light_Color,
+    Light_Intensity,
+    Max
+};
+
+enum class SceneObjectType : uint32_t
+{
+    Grid,
+    Axis,
+    Light,
+    Model,
+    ParticleSystem,
     Max
 };
 
