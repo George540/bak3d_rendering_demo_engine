@@ -69,6 +69,12 @@ public:
 	void set_visible(bool visible) { m_is_visible = visible; }
 	bool is_visible() const { return m_is_visible; }
 
+	// Model stats
+	int get_num_vertices() const { return m_num_vertices; }
+	std::set<Edge> get_unique_edges() const { return m_unique_edges; }
+	int get_num_faces() const { return m_num_faces; }
+	int get_num_triangles() const { return m_num_triangles; }
+
 	bool has_texture_of_type(const aiTextureType& texture_type) const { return textures_cache.contains(texture_type); }
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

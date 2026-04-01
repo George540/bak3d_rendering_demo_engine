@@ -29,6 +29,8 @@ THE SOFTWARE.
 
 #include "imgui_b3d_extensions.h"
 #include "Loader/resource_manager.h"
+#include "Renderer/texture.h"
+#include "Scene/Objects/model.h"
 
 using namespace std;
 
@@ -112,6 +114,16 @@ void AssetPanel::draw_asset_grid()
 
     if (ImGui::BeginTable("##asset_table", m_columns, 0))
     {
+        for (auto& [name, model] : ResourceManager::Models)
+        {
+            if (!m_search_name_string.empty() && !ImGuiB3D::StringContainsIgnoreCase(name, m_search_name_string))
+            {
+                continue;
+            }
+
+            ImGui::TableNextColumn();
+            draw_asset_tile(name, model);
+        }
         for (auto& [name, texture] : ResourceManager::Textures)
         {
             if (!m_search_name_string.empty() && !ImGuiB3D::StringContainsIgnoreCase(name, m_search_name_string))
@@ -129,9 +141,9 @@ void AssetPanel::draw_asset_grid()
     ImGui::EndChild();
 }
 
-void AssetPanel::draw_asset_tile(const string& name, const Texture2D* texture)
+void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
 {
-    if (!texture)
+    if (!asset)
     {
         return;
     }
@@ -143,7 +155,7 @@ void AssetPanel::draw_asset_tile(const string& name, const Texture2D* texture)
                         : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Use the GL texture id directly — ImGui treats it as an ImTextureID
-    const ImTextureID text_id = static_cast<int>(texture->get_asset_id());
+    const ImTextureID text_id = static_cast<int>(asset->get_asset_id());
 
     ImGui::PushID(name.c_str());
 
@@ -198,11 +210,21 @@ void AssetPanel::draw_asset_tile(const string& name, const Texture2D* texture)
         ImGui::BeginTooltip();
         ImGui::Image(text_id, { 128.0f, 128.0f }, { 1, 1}, { 0, 0 });
         ImGui::Separator();
-        ImGui::Text("File:       %s", texture->get_file_name().c_str());
-        ImGui::Text("Directory:  %s", texture->get_directory().c_str());
-        ImGui::Text("Resolution: %d x %d", texture->get_width(), texture->get_height());
-        ImGui::Text("Channels:   %d", texture->get_nb_color_channels());
-        ImGui::Text("GL ID:      %u", texture->get_asset_id());
+        ImGui::Text("File:       %s", asset->get_file_name().c_str());
+        ImGui::Text("Directory:  %s", asset->get_directory().c_str());
+        if (const Texture2D* texture = dynamic_cast<Texture2D*>(asset))
+        {
+            ImGui::Text("Resolution: %d x %d", texture->get_width(), texture->get_height());
+            ImGui::Text("Channels:   %d", texture->get_nb_color_channels());
+        }
+        else if (const Model* model = dynamic_cast<Model*>(asset))
+        {
+            ImGui::Text("Vertices:   %d", model->get_num_vertices());
+            ImGui::Text("Edges:      %d", model->get_unique_edges().size());
+            ImGui::Text("Triangles:  %d", model->get_num_triangles());
+            ImGui::Text("Faces:      %d", model->get_num_faces());
+        }
+        ImGui::Text("GL ID:      %u", asset->get_asset_id());
         ImGui::EndTooltip();
     }
 
