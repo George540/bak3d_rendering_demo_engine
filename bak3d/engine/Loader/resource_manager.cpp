@@ -97,7 +97,7 @@ void ResourceManager::initialize_shaders()
 
 void ResourceManager::initialize_predefined_textures()
 {
-    auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/particles-textures", png);
+    auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", png);
     for (auto [file_name, file_path] : image_files)
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
@@ -108,11 +108,13 @@ void ResourceManager::initialize_predefined_textures()
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Model);
     }
+
+    B3D_LOG_INFO("Successfully loaded %d textures.", Textures.size());
 }
 
 void ResourceManager::initialize_models()
 {
-    auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), obj);
+    auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/models", obj);
     int index = 1;
     for (const auto& model_pair : model_files)
     {

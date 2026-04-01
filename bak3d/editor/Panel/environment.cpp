@@ -67,7 +67,6 @@ void Environment::update()
         // Toggle background color
         glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
         float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
-        //ImGui::ColorEdit4("Background Color", bg_col);
         ImGuiB3D::PropertyColorPicker("Background Color", bg_col, "Change background color using glClearColor(...)");
         bg_color_vec4.r = bg_col[0];
         bg_color_vec4.g = bg_col[1];

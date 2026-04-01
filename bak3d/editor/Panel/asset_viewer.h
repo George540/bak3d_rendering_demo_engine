@@ -24,19 +24,17 @@ THE SOFTWARE.
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "editor_panel.h"
 
-class ImGuiB3D
+class AssetPanel : public EditorPanel
 {
 public:
-    static bool PropertyToggle(const char* label, bool* value, const char* tooltip_desc = nullptr);
-    static bool PropertyColorPicker(const char* label, float* color, const char* tooltip_desc = nullptr);
-    static bool PropertyDropdown(const char* label, const std::vector<const char*>& data, int* selected_index, const char* tooltip_desc = nullptr);
-    static bool SeparatorWithSpacing(int num_spaces);
+    AssetPanel();
 
-    static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);
+    void begin_frame() override;
+    void update() override;
+    void end_frame() override;
 private:
-    static bool ToolTipExtended(const char* tooltip_desc, float text_wrap_size);
-    static bool MultiSpacing(int num_spaces);
+    void draw_asset_toolbar();
+    void draw_asset_grid();
 };

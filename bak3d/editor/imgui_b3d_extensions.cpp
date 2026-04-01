@@ -24,7 +24,9 @@ THE SOFTWARE.
 
 #include "imgui_b3d_extensions.h"
 
+#include <algorithm>
 #include <imgui.h>
+#include <iterator>
 #include <string>
 
 using namespace std;
@@ -90,4 +92,24 @@ bool ImGuiB3D::MultiSpacing(int num_spaces)
         ImGui::Spacing();
     }
     return true;
+}
+
+bool ImGuiB3D::SeparatorWithSpacing(const int num_spaces = 1)
+{
+    MultiSpacing(num_spaces);
+    ImGui::Separator();
+    MultiSpacing(num_spaces);
+    return true;
+}
+
+bool ImGuiB3D::StringContainsIgnoreCase(string str, const string& sub_str)
+{
+    ranges::transform(str, str.begin(), 
+                          [](const unsigned char c){ return std::tolower(c); });
+
+    string sub_lower;
+    ranges::transform(sub_str, std::back_inserter(sub_lower),
+                      [](const unsigned char c){ return std::tolower(c); });
+
+    return str.find(sub_lower) != std::string::npos;
 }

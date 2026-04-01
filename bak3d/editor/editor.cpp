@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <iostream>
 
 #include "Core/logger.h"
+#include "Panel/asset_viewer.h"
 #include "Panel/console.h"
 #include "Panel/editor_panel.h"
 #include "Panel/environment.h"
@@ -81,7 +82,7 @@ void Bak3DEditor::initialize()
     m_panels.emplace_back(make_shared<Environment>());
     m_panels.emplace_back(make_shared<EditorPanel>("Details"));
     m_panels.emplace_back(make_shared<EditorPanel>("Scene"));
-    m_panels.emplace_back(make_shared<EditorPanel>("Assets"));
+    m_panels.emplace_back(make_shared<AssetPanel>());
     m_panels.emplace_back(make_shared<Console>());
 
     cout << "Initializing ImGui context and panels..." << '\n';

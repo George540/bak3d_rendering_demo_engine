@@ -22,62 +22,64 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "console.h"
+#include "asset_viewer.h"
 
 #include "imgui_b3d_extensions.h"
-#include "Core/logger.h"
+#include "Loader/resource_manager.h"
 
 using namespace std;
 
-Console::Console() : EditorPanel("Logger")
+namespace
 {
-    m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
+    auto m_image_textures = ResourceManager::Textures;
+    string m_search_name_string;
+    
 }
 
-void Console::begin_frame()
+AssetPanel::AssetPanel() : EditorPanel("Assets")
+{
+    
+}
+
+void AssetPanel::begin_frame()
 {
     EditorPanel::begin_frame();
 }
 
-void Console::update()
+void AssetPanel::update()
 {
     EditorPanel::update();
 
-    if (ImGui::Button("Clear", ImVec2(50, 20)))
-    {
-        Logger::clear_log_entries();
-    }
-
-    ImGui::SameLine();
-    static char search_buffer[64] = "";
-    ImGui::SetNextItemWidth(-1.0f);
-    ImGui::InputTextWithHint("##log_filter", "Filter logs by search...", search_buffer, IM_ARRAYSIZE(search_buffer));
+    draw_asset_toolbar();
 
     ImGuiB3D::SeparatorWithSpacing(1);
 
-    ImGui::BeginTable("##console_text", 1, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_ScrollY);
-    {
-        for (const auto& log_entry : Logger::get_log_entries())
-        {
-            if (search_buffer[0] != '\0' && !ImGuiB3D::StringContainsIgnoreCase(log_entry, string(search_buffer)))
-            {
-                continue;
-            }
-            ImGui::TableNextRow(ImGuiTableRowFlags_None, 25.0f);
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("%s", log_entry.c_str());
-        }
-
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-        {
-            ImGui::SetScrollHereY(1.0f);
-        }
-    }
-    ImGui::EndTable();
+    draw_asset_grid();
 }
 
-void Console::end_frame()
+void AssetPanel::end_frame()
 {
     EditorPanel::end_frame();
+}
+
+void AssetPanel::draw_asset_toolbar()
+{
+    if (ImGui::Button("Clear", ImVec2(50, 20)))
+    {
+        
+    }
+
+    ImGui::SameLine();
+    
+    static char search_buffer[64] = "";
+    ImGui::SetNextItemWidth(-1.0f);
+    if (ImGui::InputTextWithHint("##asset_filter", "Filter assets by name...", search_buffer, IM_ARRAYSIZE(search_buffer)))
+    {
+        m_search_name_string = string(search_buffer);
+    }
+}
+
+void AssetPanel::draw_asset_grid()
+{
+    
 }
