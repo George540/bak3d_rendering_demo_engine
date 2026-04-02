@@ -66,6 +66,7 @@ public:
 	void draw() const; // draws the model, and thus all its meshes
 	void set_camera_and_light(Camera& camera, Light& light);
 	void set_current_material(const std::string& material_name);
+	Material* get_current_material() const { return m_current_material; }
 	void set_visible(bool visible) { m_is_visible = visible; }
 	bool is_visible() const { return m_is_visible; }
 

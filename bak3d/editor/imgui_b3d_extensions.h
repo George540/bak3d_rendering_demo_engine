@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <imgui.h>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,7 @@ public:
     static bool PropertyColorPicker(const char* label, float* color, const char* tooltip_desc = nullptr);
     static bool PropertyDropdown(const char* label, const std::vector<const char*>& data, int* selected_index, const char* tooltip_desc = nullptr);
     static bool PropertySliderFloat(const char* label, float* value, float v_min, float v_max, const char* format, const char* tooltip_desc = nullptr);
+    static bool PropertyImageButton(const char* label, const char* tooltip_desc, int* texture_id, ImVec2 size, ImVec2 uv0 = ImVec2( 1.0f, 1.0f), ImVec2 uv1 = ImVec2( 0.0f, 0.0f), ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     static bool SeparatorWithSpacing(int num_spaces);
 
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);

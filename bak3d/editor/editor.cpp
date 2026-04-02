@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Core/logger.h"
 #include "Panel/asset_viewer.h"
 #include "Panel/console.h"
+#include "Panel/details.h"
 #include "Panel/editor_panel.h"
 #include "Panel/environment.h"
 #include "Panel/viewport.h"
@@ -80,7 +81,7 @@ void Bak3DEditor::initialize()
 
     m_panels.emplace_back(make_shared<Viewport>());
     m_panels.emplace_back(make_shared<Environment>());
-    m_panels.emplace_back(make_shared<EditorPanel>("Details"));
+    m_panels.emplace_back(make_shared<Details>());
     m_panels.emplace_back(make_shared<EditorPanel>("Scene"));
     m_panels.emplace_back(make_shared<AssetPanel>());
     m_panels.emplace_back(make_shared<Console>());

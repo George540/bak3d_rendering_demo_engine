@@ -103,7 +103,7 @@ void ResourceManager::initialize_predefined_textures()
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Particle);
     }
 
-    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute(string(BAK3D_ASSETS_DIR) + "/none"), jpg);
+    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute(string(BAK3D_ASSETS_DIR) + "/default"), jpg);
     for (auto [file_name, file_path] : image_files)
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE, TextureUseType::Model);

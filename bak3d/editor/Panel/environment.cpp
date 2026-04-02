@@ -29,14 +29,6 @@ THE SOFTWARE.
 #include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
 
-using namespace std;
-
-namespace
-{
-    int object_selection_index = 0;
-    vector<const char*> object_items = { "None", "Model", "Particle System", "GPU Particles" };
-}
-
 Environment::Environment() : EditorPanel("Environment")
 {
 
@@ -84,13 +76,6 @@ void Environment::draw_general_settings()
         bg_color_vec4.b = bg_col[2];
         bg_color_vec4.a = bg_col[3];
         GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
-
-        // Object Selection
-        if (ImGuiB3D::PropertyDropdown("Object Selection", object_items, &object_selection_index, "Select an object type to render in the scene"))
-        {
-            B3D_LOG_INFO("Selected object: %s", object_items[object_selection_index]);
-        }
-        ImGui::Text("%s", object_items[object_selection_index]);
 
         ImGui::TreePop();
     }

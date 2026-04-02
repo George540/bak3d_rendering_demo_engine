@@ -80,6 +80,9 @@ Scene::Scene()
 	UserInterface::environment_point_light = m_light;
 	m_scene_objects[SceneObjectType::Light] = m_light;
 
+	// Model setup (empty for now)
+	m_model = nullptr;
+
 	ResourceManager::set_camera(*m_camera, *m_light);
 }
 
@@ -137,6 +140,16 @@ void Scene::draw() const
 	{
 		current_model->draw();
 	}*/
+
+	// @TODO: remove temporary code
+	auto model = m_model;
+	auto material = m_model ? m_model->get_current_material() : nullptr;
+	auto materials = ResourceManager::Materials;
+	auto textures = ResourceManager::Textures;
+	if (m_model)
+	{
+		m_model->draw();
+	}
 
 	if (m_particle_system && m_particle_system->is_visible())
 	{

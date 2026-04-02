@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,56 +24,21 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef SCENE_H
-#define SCENE_H
-
-#include <map>
-
-#include "Core/global_definitions.h"
-#include "Objects/axis.h"
-#include "Objects/grid.h"
-#include "Objects/light.h"
-#include "Objects/model.h"
-#include "Objects/particle_generator.h"
+#include "editor_panel.h"
 
 /*
- * This is the class that contains all the scene's data, such as references to cameras, lights, models, grids, etc.
- * Runs in the main loop of the project and is only one instance.
+ *  Panel view for object properties.
  */
-class Scene
+class Details : public EditorPanel
 {
 public:
-	Scene();
-	~Scene();
+    Details();
 
-	static Scene* get_instance()
-	{
-		static Scene* instance;
-		return instance;
-	}
-
-	void update(float dt) const;
-	void draw() const;
-
-	Camera* get_camera() const { return m_camera; }
-
-	Object* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); };
-
-	Model* get_model() const { return m_model; }
-	void set_model(Model* model) { m_model = model; }
-
-	static Scene* instance;
+    virtual void begin_frame();
+    virtual void update();
+    virtual void end_frame();
 private:
-	
-	void process_particle_activation();
-
-	std::unordered_map<SceneObjectType, Object*> m_scene_objects;
-	ParticleSystem* m_particle_system;
-	Camera* m_camera;
-	Model* m_model; // Asset, not an Object
-	Light* m_light;
-	Grid* m_grid;
-	Axis* m_axis;
+    void draw_object_section();
+    void draw_model_section();
+    void draw_particle_system_section();
 };
-
-#endif
