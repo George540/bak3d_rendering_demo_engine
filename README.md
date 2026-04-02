@@ -82,7 +82,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:gear:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
 |:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
 |:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
-|☐| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
+|:gear:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
 |☐| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
 |☐| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
 |☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. |
