@@ -22,23 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#pragma once
+#include "metrics.h"
 
-#include "editor_panel.h"
+#include "Input/event_manager.h"
 
-/*
- *  Panel view for object properties.
- */
-class Details : public EditorPanel
+Metrics::Metrics() : EditorPanel("Metrics")
 {
-public:
-    Details();
+    
+}
 
-    void begin_frame() override;
-    void update() override;
-    void end_frame() override;
-private:
-    void draw_object_section();
-    void draw_model_section();
-    void draw_particle_system_section();
-};
+void Metrics::begin_frame()
+{
+    EditorPanel::begin_frame();
+}
+
+void Metrics::update()
+{
+    EditorPanel::update();
+
+    ImGui::Text("FPS: %d", EventManager::get_frames_per_second());
+    ImGui::Text("Frame Time: %.3f ms", 1000.0f * EventManager::get_frame_time());
+    ImGui::Text("ImGuiIO: %.0f FPS", ImGui::GetIO().Framerate);
+}
+
+void Metrics::end_frame()
+{
+    EditorPanel::end_frame();
+}

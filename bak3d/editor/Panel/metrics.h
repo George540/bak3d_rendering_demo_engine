@@ -27,18 +27,14 @@ THE SOFTWARE.
 #include "editor_panel.h"
 
 /*
- *  Panel view for object properties.
+ * Profiler Metrics Panel for diagnosing different application stats and insights.
  */
-class Details : public EditorPanel
+class Metrics : public EditorPanel
 {
 public:
-    Details();
+    Metrics();
 
     void begin_frame() override;
     void update() override;
     void end_frame() override;
-private:
-    void draw_object_section();
-    void draw_model_section();
-    void draw_particle_system_section();
 };
