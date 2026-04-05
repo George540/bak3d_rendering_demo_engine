@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "bounding_box.h"
+/*#include "bounding_box.h"
 
-#include "user_interface.h"
 #include "Core/global_definitions.h"
 
-BoundingBox::BoundingBox(Material* material) : Object(material)
+BoundingBox::BoundingBox(Material* material) : RenderableObject(material)
 {
     m_vao->bind_object();
     m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_WIREFRAME.size(), CUBE_VERTICES_WIREFRAME.data());
@@ -44,7 +43,7 @@ void BoundingBox::update(float dt)
     {
         auto velocity_offset = particles_info.velocity_random_offset;
         m_scaling = (glm::vec3(velocity_offset) * particles_info.lifetime) + (particles_info.range * 2.0f);
-        Object::update(dt);
+        RenderableObject::update(dt);
     }
     else
     {
@@ -53,7 +52,7 @@ void BoundingBox::update(float dt)
         m_scaling = (glm::vec3(particles_info.velocity) * particles_info.lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale);
     }
 
-    Object::update(dt);
+    RenderableObject::update(dt);
 }
 
 void BoundingBox::draw() const
@@ -62,12 +61,12 @@ void BoundingBox::draw() const
 
     m_material->set_vec3("color", glm::vec3(1.0f));
     
-    Object::draw();
+    RenderableObject::draw();
 
     m_vao->bind_object();
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, nullptr);
     m_vao->unbind_object();
 
     glDepthFunc(GL_LESS);
-}
+}*/
 

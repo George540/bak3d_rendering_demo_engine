@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "Input/event_manager.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom) :
-	m_position(position),
+	SceneObject(position),
 	m_lookat(lookat),
 	m_cam_up(up),
 	m_cam_speed(speed),

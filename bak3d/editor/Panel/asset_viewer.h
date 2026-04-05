@@ -25,7 +25,7 @@ THE SOFTWARE.
 #pragma once
 
 #include "editor_panel.h"
-#include "Loader/asset.h"
+#include "Asset/asset.h"
 
 /*
  * Panel view for all loaded assets stored in the Resource Manager

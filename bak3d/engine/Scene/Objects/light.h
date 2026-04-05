@@ -24,10 +24,7 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef LIGHT_H
-#define LIGHT_H
-
-#include "object.h"
+#include "renderable_object.h"
 
 // Payload struct for light properties
 struct light
@@ -40,9 +37,9 @@ struct light
 };
 
 /*
- * Basic Light class that draws a cube light source.
+ * Basic Light class that draws a cube light source (will use sprite instead of cube in the future).
  */
-class Light : public Object
+class Light : public RenderableObject
 {
 	// ORIENTATION
 	float m_horizontal_angle;
@@ -73,5 +70,3 @@ public:
 	void set_diffuse_color(const glm::vec3 col) { m_properties.diffuse = col; }
 	void set_light_intensity(const float intensity) { m_properties.intensity = intensity; }
 };
-
-#endif

@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include <utility>
 
 #include "imgui_b3d_extensions.h"
-#include "Loader/resource_manager.h"
-#include "Renderer/texture.h"
+#include "Asset/resource_manager.h"
 #include "Scene/Objects/model.h"
 
 using namespace std;
@@ -155,7 +154,7 @@ void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
                         : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Use the GL texture id directly — ImGui treats it as an ImTextureID
-    const ImTextureID text_id = static_cast<int>(asset->get_asset_id());
+    const ImTextureID text_id = static_cast<int>(asset->get_object_id());
 
     ImGui::PushID(name.c_str());
 
@@ -224,7 +223,7 @@ void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
             ImGui::Text("Triangles:  %d", model->get_num_triangles());
             ImGui::Text("Faces:      %d", model->get_num_faces());
         }
-        ImGui::Text("GL ID:      %u", asset->get_asset_id());
+        ImGui::Text("GL ID:      %u", asset->get_object_id());
         ImGui::EndTooltip();
     }
 

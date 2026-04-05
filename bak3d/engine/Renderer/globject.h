@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef GLOBJECT_H
-#define GLOBJECT_H
-
 #include <glad/glad.h>
 
 /*
@@ -43,5 +40,3 @@ public:
 protected:
     GLuint m_ID = 0;
 };
-
-#endif

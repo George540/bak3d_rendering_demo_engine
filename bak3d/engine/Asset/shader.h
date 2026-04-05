@@ -24,14 +24,11 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef SHADER_H
-#define SHADER_H
-
 #include <glad/glad.h> 
 #include <glm/fwd.hpp>
 #include <string>
 
-#include "Loader/asset.h"
+#include "asset.h"
 
 /*
  * Shader class used to load shader files and building them to be used in the engine.
@@ -76,5 +73,3 @@ public:
 	void set_mat3(const std::string& name, const glm::mat3& mat) const;
 	void set_mat4(const std::string& name, const glm::mat4& mat) const;
 };
-
-#endif

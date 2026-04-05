@@ -30,12 +30,9 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
-
 #include <assimp/material.h>
 
-#include "Loader/asset.h"
+#include "asset.h"
 
 enum class TextureUseType
 {
@@ -58,9 +55,6 @@ public:
     
     static void unbind();
     
-    int get_texture_model_index() const { return m_texture_model_index; }
-    void set_texture_model_index(int texture_index) { m_texture_model_index = texture_index; }
-    
     aiTextureType get_texture_type() const { return m_texture_type; }
     TextureUseType get_texture_use_type() const { return m_texture_use_type; }
     int get_width() const { return m_width; }
@@ -70,11 +64,8 @@ public:
     bool operator==(const Texture2D& other) const;
     bool operator!=(const Texture2D& other) const;
 private:
-    int m_texture_model_index;
     aiTextureType m_texture_type;
     TextureUseType m_texture_use_type;
     int m_width, m_height; // texture image dimensions: width and height of loaded image in pixels
     int m_nb_color_channels; // the number of color components in the loaded image
 };
-
-#endif

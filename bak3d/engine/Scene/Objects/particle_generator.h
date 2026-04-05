@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#pragma once
+/*#pragma once
 
 #ifndef PARTICLEGENERATOR_H
 #define PARTICLEGENERATOR_H
@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <vector>
 
 #include "bounding_box.h"
-#include "object.h"
+#include "renderable_object.h"
 #include "Renderer/material.h"
 
 struct particle
@@ -120,7 +120,7 @@ struct particle_info
  * @todo TO BE DEPRECATED AND REMADE:
  * Particle System class that is based on instanced object properties to generate billboard particles
  * and manage them in 3D space with dynamic lifetime and other properties that change over time.
- */
+ #1#
 class ParticleSystem : public InstancedObject
 {
 public:
@@ -128,10 +128,9 @@ public:
     ParticleSystem(Material* particle_material, Material* box_material, const particle_info& info = particle_info());
     ~ParticleSystem();
 
-    void update(float dt);
+    void update(float dt) override;
     void draw() const override;
 
-    void set_camera(Camera& camera) override;
     void set_visible(bool visible) { m_is_visible = visible; }
     bool is_visible() const { return m_is_visible; }
 
@@ -169,4 +168,4 @@ private:
     void reset_particle_generator();
 };
 
-#endif
+#endif*/

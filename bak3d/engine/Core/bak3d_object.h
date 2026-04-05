@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <chrono>
 #include <string>
 
 #include "glfw/src/internal.h"
@@ -35,7 +36,11 @@ THE SOFTWARE.
 class Bak3DObject
 {
 public:
-    Bak3DObject();
+    Bak3DObject()
+    {
+        m_object_id = generate_unique_id();
+    }
+    Bak3DObject(const std::string& name) : Bak3DObject() { m_object_name = name; }
     virtual ~Bak3DObject() = default;
 
     const std::string& get_object_name() const { return m_object_name; }
@@ -49,4 +54,19 @@ protected:
     std::string m_object_name;
     GLuint m_object_id = 0;
     GLuint m_object_size = 0;
+private:
+    static uint32_t generate_unique_id()
+    {
+        static std::atomic<uint32_t> s_counter{ 1 };
+        uint32_t count = s_counter.fetch_add(1, std::memory_order_relaxed);
+
+        // FNV-1a base mixed with counter via Knuth multiplicative hash.
+        // Keeps IDs non-sequential and spread across the uint32 space.
+        uint32_t hash = 2166136261u;
+        hash ^= count;
+        hash *= 16777619u;
+        hash ^= (count >> 16);
+        hash *= 2654435761u;
+        return hash == 0 ? 1 : hash; // 0 reserved as null/invalid
+    }
 };

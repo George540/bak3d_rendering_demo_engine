@@ -45,12 +45,25 @@ namespace log_helper
 
 #define LOG_FILENAME (log_helper::extract_filename(__FILE__))
 
-enum class LogLevel
+enum class LogLevel : uint8_t
 {
-    LOG,
-    WARNING,
-    ERROR
+    Log_Info,
+    Log_Warning,
+    Log_Error,
+    Log_Max
 };
+
+inline const char* to_string(LogLevel e)
+{
+    switch (e)
+    {
+    case LogLevel::Log_Info: return "LOG";
+    case LogLevel::Log_Warning: return "WARNING";
+    case LogLevel::Log_Error: return "ERROR";
+    case LogLevel::Log_Max: return "MAX";
+    default: return "unknown";
+    }
+}
 
 constexpr static int MAX_LOG_ENTRIES = 32;
 
@@ -65,20 +78,20 @@ public:
     template<typename... Args>
     static void print_log(const char* file, int line, LogLevel level, const char* fmt, Args... args)
     {
-        const char* colour = "\033[0m";
         const char* tag = "LOG";
         switch (level)
         {
-            case LogLevel::LOG: colour = "\033[37m"; tag = "LOG";  break;
-            case LogLevel::WARNING: colour = "\033[33m"; tag = "WARN"; break;
-            case LogLevel::ERROR: colour = "\033[1;31m"; tag = "ERR";  break;
+            case LogLevel::Log_Info: tag = "LOG";  break;
+            case LogLevel::Log_Warning: tag = "WARN"; break;
+            case LogLevel::Log_Error: tag = "ERR";  break;
+            case LogLevel::Log_Max: break;
         }
 
-        char header_buffer[512];
+        char header_buffer[128];
         std::string elapsed_time_formatted = get_elapsed_time_formatted();
         int length = std::snprintf(header_buffer, sizeof(header_buffer), "[%s][%s] %s:%d - ", elapsed_time_formatted.c_str(), tag, file, line);
 
-        char log_buffer[1024];
+        char log_buffer[256];
         length = std::snprintf(log_buffer, sizeof(log_buffer), fmt, args...);
         std::string full_log = std::string(header_buffer) + log_buffer + "\n";
 
@@ -100,10 +113,10 @@ private:
 };
 
 #define B3D_LOG_INFO(fmt, ...) \
-    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::LOG, fmt, ##__VA_ARGS__)
+    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::Log_Info, fmt, ##__VA_ARGS__)
  
 #define B3D_LOG_WARNING(fmt, ...) \
-    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::WARNING, fmt, ##__VA_ARGS__)
+    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::Log_Warning, fmt, ##__VA_ARGS__)
  
 #define B3D_LOG_ERROR(fmt, ...) \
-    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::ERROR, fmt, ##__VA_ARGS__)
+    Logger::print_log(LOG_FILENAME, __LINE__, LogLevel::Log_Error, fmt, ##__VA_ARGS__)

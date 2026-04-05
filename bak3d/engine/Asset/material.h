@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef MATERIAL_H
-#define MATERIAL_H
-
 #include <unordered_map>
 #include <string>
 
@@ -38,7 +35,7 @@ class Shader;
 class Texture2D;
 
 /*
- * Material class that sets parameters to be sent to a specific shader used by a mesh.
+ * Material class that sets parameters to be sent to a specific shader used by a renderable component.
  */
 class Material
 {
@@ -78,8 +75,4 @@ public:
     void set_mat2(const std::string& key_name, const glm::mat2& value) { m_mat2_uniforms[key_name] = value; }
     void set_mat3(const std::string& key_name, const glm::mat3& value) { m_mat3_uniforms[key_name] = value; }
     void set_mat4(const std::string& key_name, const glm::mat4& value) { m_mat4_uniforms[key_name] = value; }
-
-    void set_texture_id(const std::string& key_name, const unsigned int value) { m_uint_uniforms[key_name] = value; }
 };
-
-#endif

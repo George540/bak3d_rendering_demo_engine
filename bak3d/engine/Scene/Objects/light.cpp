@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include "light.h"
 
 #include "Core/global_definitions.h"
-#include "user_interface.h"
 #include "Input/event_manager.h"
 
 #include <GLFW/glfw3.h>
@@ -36,7 +35,7 @@ THE SOFTWARE.
 #include "Core/logger.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
-	Object(material)
+	RenderableObject(material)
 {
 	m_position = position;
 	m_scaling = scaling;
@@ -55,10 +54,6 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	m_horizontal_angle = m_position.x;
 	m_vertical_angle = m_position.y;
 	m_distance_offset = glm::distance(m_position, glm::vec3(0.0f));
-
-	UserInterface::light_horizontal_rotation = 45.0f;
-	UserInterface::light_vertical_rotation = 135.0f;
-	UserInterface::light_origin_distance = m_distance_offset;
 
 	B3D_LOG_INFO("Point light created.");
 }
@@ -103,7 +98,7 @@ void Light::update(float dt)
 
 void Light::draw() const
 {
-	Object::draw();
+	RenderableObject::draw();
 
 	m_material->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
 

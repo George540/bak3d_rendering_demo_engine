@@ -24,15 +24,12 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef AXIS_H
-#define AXIS_H
-
-#include "object.h"
+#include "renderable_object.h"
 
 /*
  * Basic axis object class that draws the XYZ 3D axis lines.
  */
-class Axis : public Object
+class Axis : public RenderableObject
 {
 public:
 	Axis(Material* material);
@@ -40,4 +37,3 @@ public:
 
 	void draw() const override;
 };
-#endif

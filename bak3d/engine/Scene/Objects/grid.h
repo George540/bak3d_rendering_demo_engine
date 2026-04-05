@@ -24,16 +24,12 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef GRID_H
-#define GRID_H
-
-#include "object.h"
-
+#include "renderable_object.h"
 
 /*
  * Basic grid class that draws the XZ plane grid with a certain size and slices.
  */
-class Grid : public Object
+class Grid : public RenderableObject
 {
 public:
 	Grid(Material* material);
@@ -45,5 +41,3 @@ private:
 	int m_number_of_slices;
 	float m_grid_size;
 };
-
-#endif

@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "Core/global_settings.h"
 #include "Input/event_manager.h"
-#include "user_interface.h"
 
 #include "imgui.h"
 #include "stb_image.h"

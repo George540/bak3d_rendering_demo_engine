@@ -24,13 +24,9 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef FILELOADER_H
-#define FILELOADER_H
-
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <map>
 #include <list>
 #include <filesystem>
 
@@ -67,5 +63,3 @@ public:
 	static std::vector<char*> get_vector_items_to_array(const std::list<std::pair<std::string, std::string>>, bool is_returning_path = true);
 	static std::string find_first_containing_string(const std::vector<std::string>& string_vector, const std::string& substring);
 };
-
-#endif

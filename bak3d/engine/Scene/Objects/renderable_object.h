@@ -24,32 +24,44 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef MESH_H
-#define MESH_H
-
-#include <glad/glad.h>
-#include <vector>
-
-#include "Core/global_definitions.h"
-#include "Scene/Objects/object.h"
+#include "Asset/material.h"
+#include "Core/renderable.h"
+#include "Renderer/buffer.h"
+#include "Renderer/vertex_array.h"
+#include "Scene/scene_object.h"
 
 /*
- * Surface-based render object tused to construct a model.
+ * Base primitive object class for drawable engine scene objects.
+ * Contains data for initializing, binding, drawing and cleaning up.
  */
-class Mesh : public Object
+class RenderableObject : public SceneObject, public IRenderable
 {
+protected:
+    VertexArray* m_vao;
+    VertexBuffer* m_vbo;
+    ElementBuffer* m_ebo;
+
+    Material* m_material;
 public:
-    // mesh Data
-    std::vector<Vertex> m_vertices;
-    std::vector<GLuint> m_indices;
+    RenderableObject(Material* material);
+    ~RenderableObject() override;
 
-    // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
-    ~Mesh() override = default;
+    void set_material(Material* material) { m_material = material; }
+    void update(float dt) override;
     void draw() const override;
-
-    /*Shader* get_current_shader() const { return m_material; }
-    void set_current_shader(Shader* shader) { m_material = shader; }*/
 };
 
-#endif
+/*
+ * Instanced version of the object class, containing an instanced buffer.
+ * Used for drawing multiple instances of the same object in the same draw call.
+ */
+class InstancedObject : public RenderableObject
+{
+protected:
+    InstanceBuffer* m_ibo;
+public:
+    InstancedObject(Material* material);
+    ~InstancedObject() override;
+
+    void draw() const override;
+};

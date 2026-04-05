@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+/*#include <iostream>
 #include <random>
 
 #include "particle_generator.h"
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Loader/file_loader.h"
 #include "Renderer/buffer.h"
 #include "Renderer/texture.h"
+#include "Scene/scene.h"
 
 using namespace std;
 
@@ -109,7 +110,7 @@ void ParticleSystem::set_up_particle_buffers()
 
 void ParticleSystem::sort_particles() const
 {
-    auto cameraPos = m_camera->get_camera_position();
+    auto cameraPos = Scene::instance->get_camera()->get_camera_position();
     ranges::sort(m_particles,
                  [cameraPos](const particle& a, const particle& b) {
                      float distA = length(glm::vec3(a.position) - cameraPos);
@@ -208,7 +209,7 @@ void ParticleSystem::update(float dt)
     m_ibo->set_buffer_sub_data(0, m_particle_instance_data);
     m_ibo->unbind_object();
 
-    Object::update(dt);
+    RenderableObject::update(dt);
     m_bounding_box->update(dt);
 
     int dead_count = 0;
@@ -256,12 +257,6 @@ void ParticleSystem::draw() const
     }
 
     Texture2D::unbind();
-}
-
-void ParticleSystem::set_camera(Camera& camera)
-{
-    Object::set_camera(camera);
-    m_bounding_box->set_camera(camera);
 }
 
 GLuint ParticleSystem::first_unused_particle()
@@ -379,4 +374,4 @@ particle ParticleSystem::make_particle()
 void ParticleSystem::reset_particle_generator()
 {
     particles_payload_info = particle_info();
-}
+}*/

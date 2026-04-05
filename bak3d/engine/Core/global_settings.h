@@ -30,13 +30,15 @@ THE SOFTWARE.
 #include "global_definitions.h"
 #include "logger.h"
 
+/*
+ * 
+ */
 class GlobalSettings
 {
     static std::map<GlobalSettingOption, GlobalSettingValueType> global_settings;
     static const char* to_string(GlobalSettingOption enum_setting);
 public:
     static void initialize();
-    static void update() {};
     static void shutdown();
 
     template<typename T>

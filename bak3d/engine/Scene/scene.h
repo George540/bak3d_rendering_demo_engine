@@ -24,13 +24,9 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef SCENE_H
-#define SCENE_H
-
-#include <map>
-
 #include "Core/global_definitions.h"
 #include "Objects/axis.h"
+#include "Objects/camera.h"
 #include "Objects/grid.h"
 #include "Objects/light.h"
 #include "Objects/model.h"
@@ -56,8 +52,9 @@ public:
 	void draw() const;
 
 	Camera* get_camera() const { return m_camera; }
+	Light* get_active_light() const { return m_light; }
 
-	Object* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); };
+	RenderableObject* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); };
 
 	Model* get_model() const { return m_model; }
 	void set_model(Model* model) { m_model = model; }
@@ -67,13 +64,11 @@ private:
 	
 	void process_particle_activation();
 
-	std::unordered_map<SceneObjectType, Object*> m_scene_objects;
-	ParticleSystem* m_particle_system;
+	std::unordered_map<SceneObjectType, RenderableObject*> m_scene_objects;
+	//ParticleSystem* m_particle_system;
 	Camera* m_camera;
 	Model* m_model; // Asset, not an Object
 	Light* m_light;
 	Grid* m_grid;
 	Axis* m_axis;
 };
-
-#endif

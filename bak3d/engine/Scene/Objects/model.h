@@ -24,20 +24,16 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef MODEL_H
-#define MODEL_H
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-
-#include "camera.h"
-#include "light.h"
-#include "Loader/asset.h"
-#include "Renderer/mesh.h"
 
 #include <string>
 #include <vector>
 #include <set>
+
+#include "Asset/asset.h"
+#include "Asset/mesh.h"
+#include "Asset/texture.h"
 
 /*
  * An asset class that stores information about a model loaded from a file using assimp.
@@ -64,7 +60,6 @@ public:
 	~Model() override;
 
 	void draw() const; // draws the model, and thus all its meshes
-	void set_camera_and_light(Camera& camera, Light& light);
 	void set_current_material(const std::string& material_name);
 	Material* get_current_material() const { return m_current_material; }
 	void set_visible(bool visible) { m_is_visible = visible; }
@@ -88,12 +83,8 @@ private:
 	void update_light_properties() const;
 	void update_material_properties() const;
 	void update_breakdown_shader() const;
-	
-	Camera* m_camera;
-	Light* m_light;
+
 	Material* m_current_material;
 
 	bool m_is_visible;
 };
-
-#endif

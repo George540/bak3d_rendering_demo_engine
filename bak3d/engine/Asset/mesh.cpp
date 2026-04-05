@@ -27,13 +27,12 @@ THE SOFTWARE.
 #include <iostream>
 #include <utility>
 
-#include "buffer.h"
 #include "texture.h"
 
 using namespace std;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices) :
-    Object(nullptr), // no initial material at first
+    RenderableObject(nullptr), // no initial material at first
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices))
 {
@@ -54,7 +53,7 @@ Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices) :
 
 void Mesh::draw() const
 {
-    Object::draw();
+    RenderableObject::draw();
 
     // draw mesh
     m_vao->bind_object();

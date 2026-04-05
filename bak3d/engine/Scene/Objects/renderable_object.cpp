@@ -24,11 +24,13 @@ THE SOFTWARE.
 
 #include <filesystem>
 
-#include "object.h"
+#include "renderable_object.h"
+
+#include "Scene/scene.h"
 
 using namespace std;
 
-Object::Object(Material* material)
+RenderableObject::RenderableObject(Material* material)
 {
 	m_material = material;
 
@@ -40,32 +42,32 @@ Object::Object(Material* material)
 	m_ebo = nullptr;
 }
 
-Object::~Object()
+RenderableObject::~RenderableObject()
 {
 	delete m_vao;
 	delete m_vbo;
 	delete m_ebo;
 	delete m_material;
-	delete m_camera;
 }
 
-void Object::update(float dt)
+void RenderableObject::update(float dt)
 {
 	set_model_matrix(m_position, m_scaling, m_euler_rotation, 0.0f);
 }
 
-void Object::draw() const
+void RenderableObject::draw() const
 {
-	if (!m_material || !m_camera) return;
+	Camera* scene_camera = Scene::instance->get_camera();
+	if (!m_material || !scene_camera) return;
 	
-	m_material->set_mat4("projection", m_camera->get_projection_matrix());
-	m_material->set_mat4("view", m_camera->get_view_matrix());
+	m_material->set_mat4("projection", scene_camera->get_projection_matrix());
+	m_material->set_mat4("view", scene_camera->get_view_matrix());
 	m_material->set_mat4("model", m_model_matrix);
 
 	m_material->apply();
 }
 
-InstancedObject::InstancedObject(Material* material) : Object(material), m_ibo(nullptr) {}
+InstancedObject::InstancedObject(Material* material) : RenderableObject(material), m_ibo(nullptr) {}
 
 InstancedObject::~InstancedObject()
 {
@@ -74,10 +76,11 @@ InstancedObject::~InstancedObject()
 
 void InstancedObject::draw() const
 {
-	if (!m_material || !m_camera) return;
+	Camera* scene_camera = Scene::instance->get_camera();
+	if (!m_material || !scene_camera) return;
 	
-	m_material->set_mat4("projection", m_camera->get_projection_matrix());
-	m_material->set_mat4("view", m_camera->get_view_matrix());
+	m_material->set_mat4("projection", scene_camera->get_projection_matrix());
+	m_material->set_mat4("view", scene_camera->get_view_matrix());
 
 	m_material->apply();
 }

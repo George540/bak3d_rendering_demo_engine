@@ -27,10 +27,8 @@ THE SOFTWARE.
 #include <ranges>
 
 #include "imgui_b3d_extensions.h"
-#include "user_interface.h"
+#include "Asset/resource_manager.h"
 #include "Core/logger.h"
-#include "Loader/resource_manager.h"
-#include "Renderer/texture.h"
 #include "Scene/scene.h"
 
 using namespace std;
@@ -108,7 +106,7 @@ void Details::draw_model_section()
         Model* selected_model = ResourceManager::Models[selected_model_name];
         m_current_model = Scene::instance->get_model();
 
-        bool is_model_different = selected_model && m_current_model ? selected_model->get_asset_name() != m_current_model->get_asset_name() : selected_model != m_current_model;
+        bool is_model_different = selected_model && m_current_model ? selected_model->get_object_name() != m_current_model->get_object_name() : selected_model != m_current_model;
         if (is_model_different)
         {
             m_current_model = selected_model;
@@ -132,15 +130,15 @@ void Details::draw_model_section()
         if (m_current_model)
         {
             // Albedo
-            auto albedo = static_cast<int>(m_current_model->textures_cache[aiTextureType_DIFFUSE] ? m_current_model->textures_cache[aiTextureType_DIFFUSE]->get_asset_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_asset_id());
+            auto albedo = static_cast<int>(m_current_model->textures_cache[aiTextureType_DIFFUSE] ? m_current_model->textures_cache[aiTextureType_DIFFUSE]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
             ImGuiB3D::PropertyImageButton("Albedo", nullptr, &albedo, ImVec2(40.0f, 40.0f));
 
             // Specular
-            auto specular = static_cast<int>(m_current_model->textures_cache[aiTextureType_SPECULAR] ? m_current_model->textures_cache[aiTextureType_SPECULAR]->get_asset_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_asset_id());
+            auto specular = static_cast<int>(m_current_model->textures_cache[aiTextureType_SPECULAR] ? m_current_model->textures_cache[aiTextureType_SPECULAR]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
             ImGuiB3D::PropertyImageButton("Specular", nullptr, &specular, ImVec2(40.0f, 40.0f));
 
             // Normal
-            auto normal = static_cast<int>(m_current_model->textures_cache[aiTextureType_HEIGHT] ? m_current_model->textures_cache[aiTextureType_HEIGHT]->get_asset_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_asset_id());
+            auto normal = static_cast<int>(m_current_model->textures_cache[aiTextureType_HEIGHT] ? m_current_model->textures_cache[aiTextureType_HEIGHT]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
             ImGuiB3D::PropertyImageButton("Normal", nullptr, &normal, ImVec2(40.0f, 40.0f));
 
             // Gamma Correction

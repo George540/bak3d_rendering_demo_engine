@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "Core/logger.h"
 
 Axis::Axis(Material* material) :
-	Object(material)
+	RenderableObject(material)
 {
 	m_scaling = glm::vec3(3.0f);
 	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);
@@ -47,7 +47,7 @@ Axis::Axis(Material* material) :
 
 void Axis::draw() const
 {
-	Object::draw();
+	RenderableObject::draw();
 
 	m_vao->bind_object();
 	glDrawElements(GL_LINES, static_cast<GLsizei>(AXIS_INDICES.size()), GL_UNSIGNED_INT, nullptr);

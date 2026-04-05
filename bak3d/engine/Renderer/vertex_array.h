@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef VERTEXARRAY_H
-#define VERTEXARRAY_H
-
 #include <glad/glad.h>
 
 #include "globject.h"
@@ -45,5 +42,3 @@ public:
 
     void set_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer, GLuint divisor = 0);
 };
-
-#endif

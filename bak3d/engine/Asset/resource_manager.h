@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef RESOURCEMANAGER_H
-#define RESOURCEMANAGER_H
-
 #include <string>
 #include <unordered_map>
 
@@ -51,7 +48,6 @@ public:
     static std::unordered_map<std::string, Model*> Models;
 
     static void initialize();
-    static void set_camera(Camera& camera, Light& light);
     
     static Shader* get_shader(const std::string& shader_name) { return Shaders[shader_name]; }
     
@@ -71,5 +67,3 @@ private:
     
     ResourceManager() = default;
 };
-
-#endif

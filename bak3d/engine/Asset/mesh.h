@@ -24,51 +24,37 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef OBJECT_H
-#define OBJECT_H
+#include <glad/glad.h>
+#include <vector>
 
-#include "camera.h"
-#include "Renderer/buffer.h"
-#include "Renderer/material.h"
-#include "Renderer/vertex_array.h"
-#include "transform.h"
+#include "Core/global_definitions.h"
+#include "Scene/Objects/renderable_object.h"
 
 /*
- * Base primitive object class for drawable engine scene objects.
- * Contains data for initializing, binding, drawing and cleaning up.
+ * Renderable object made out of vertices and edges to form a shape out of surfaces.
  */
-class Object : public Transform
+class Mesh : public RenderableObject
 {
-protected:
-    VertexArray* m_vao;
-    VertexBuffer* m_vbo;
-    ElementBuffer* m_ebo;
-
-    Material* m_material;
-    Camera* m_camera;
 public:
-    Object(Material* material);
-    ~Object() override;
+    // mesh Data
+    std::vector<Vertex> m_vertices;
+    std::vector<GLuint> m_indices;
 
-    virtual void set_camera(Camera& camera) { m_camera = &camera; }
-    void set_material(Material* material) { m_material = material; }
-    void update(float dt) override;
-    virtual void draw() const;
-};
-
-/*
- * Instanced version of the object class, containing an instanced buffer.
- * Used for drawing multiple instances of the same object in the same draw call.
- */
-class InstancedObject : public Object
-{
-protected:
-    InstanceBuffer* m_ibo;
-public:
-    InstancedObject(Material* material);
-    ~InstancedObject() override;
-
+    // constructor
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
+    ~Mesh() override = default;
     void draw() const override;
 };
 
-#endif
+class InstancedMesh : public Mesh
+{
+protected:
+    InstanceBuffer* m_ibo;
+    int m_num_instances;
+public:
+    InstancedMesh(Material* material);
+    ~InstancedMesh() override;
+
+    void draw() const override;
+    int get_num_instances() const { return m_num_instances; }
+};

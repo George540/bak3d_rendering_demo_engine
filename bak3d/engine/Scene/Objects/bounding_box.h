@@ -22,17 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#pragma once
+/*#pragma once
 
-#ifndef BOUNDINGBOX_H
-#define BOUNDINGBOX_H
-
-#include "object.h"
+#include "renderable_object.h"
 
 /*
  * Basic bounding box class that draws a wireframe cube.
- */
-class BoundingBox : public Object
+ #1#
+class BoundingBox : public RenderableObject
 {
 public:
     BoundingBox(Material* material);
@@ -40,6 +37,4 @@ public:
 
     void update(float dt) override;
     void draw() const override;
-};
-
-#endif
+};*/

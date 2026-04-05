@@ -31,17 +31,13 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
-
-#include <glm/vec3.hpp>
 #include <glm/fwd.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 /*
  * Abstract class for declaring objects using position, orientation and scaling in 3D space.
  */
-class Transform
+class SceneObject
 {
 protected:
     glm::vec3 m_position = glm::vec3(0.0f);
@@ -51,8 +47,9 @@ protected:
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
 public:
-    Transform() = default;
-    virtual ~Transform() = default;
+    SceneObject() = default;
+    SceneObject(const glm::vec3 position) : m_position(position) {};
+    virtual ~SceneObject() = default;
 
     glm::vec3 get_position() const { return m_position; }
     glm::vec3 get_rotation() const { return m_euler_rotation; }
@@ -69,10 +66,9 @@ public:
         m_model_matrix =
             translate(m_model_matrix, m_position) *
             rotate(m_model_matrix, glm::radians(rotation_angle_degrees), rotation_axis) *
-            scale(m_model_matrix, m_scaling);
+            scale(m_model_matrix,m_scaling);
     }
 
     virtual void update(float dt) = 0;
 };
 
-#endif

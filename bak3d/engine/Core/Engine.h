@@ -24,8 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#include "Scene/scene.h"
-
 /*
  * Static engine class that controls the entire runtime level of the application.
  */

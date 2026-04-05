@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef RENDERER_H
-#define RENDERER_H
-
 #include "buffer.h"
 
 struct GLFWwindow;
@@ -52,5 +49,3 @@ public:
 
 	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
 };
-
-#endif

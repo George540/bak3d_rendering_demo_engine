@@ -28,9 +28,8 @@ THE SOFTWARE.
 #include <ranges>
 
 #include "file_loader.h"
+#include "shader.h"
 #include "Core/logger.h"
-#include "Renderer/shader.h"
-#include "Renderer/texture.h"
 #include "Scene/Objects/model.h"
 
 using namespace std;
@@ -123,19 +122,11 @@ void ResourceManager::initialize_models()
     }
 }
 
-void ResourceManager::set_camera(Camera& camera, Light& light)
-{
-    for (auto model : Models)
-    {
-        model.second->set_camera_and_light(camera, light);
-    }
-}
-
 void ResourceManager::shutdown()
 {
     for (const auto& val : Shaders | views::values)
     {
-        glDeleteProgram(val->get_asset_id());
+        glDeleteProgram(val->get_object_id());
     }
 
     Shaders.clear();

@@ -24,17 +24,16 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef CAMERA_H
-#define CAMERA_H
-
 #include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
+
+#include "Scene/scene_object.h"
 
 /*
  * Camera class that contains every information for moving the viewport in world space.
  * Contains other camera parameters.
  */
-class Camera
+class Camera : public SceneObject
 {
 public:
 	Camera(glm::vec3 position,
@@ -44,16 +43,15 @@ public:
 		float hor_angle, 
 		float ver_angle, 
 		float zoom);
-	~Camera() = default;
+	~Camera() override = default;
 
-	void update(float dt);
+	void update(float dt) override;
 
 	[[nodiscard]] glm::mat4 get_view_matrix() const;
 	[[nodiscard]] glm::mat4 get_projection_matrix() const;
 	[[nodiscard]] glm::mat4 get_view_projection_matrix() const;
 	[[nodiscard]] glm::vec3 get_camera_position() const { return m_position; }
 private:
-	glm::vec3 m_position; // camera position
 	glm::vec3 m_lookat; // look towards this point
 	glm::vec3 m_cam_up; // up vector
 
@@ -62,5 +60,3 @@ private:
 	double m_vertical_angle;   // vertical angle
 	float m_zoom; // camera zoom
 };
-
-#endif

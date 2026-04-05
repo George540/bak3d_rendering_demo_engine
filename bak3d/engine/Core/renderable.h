@@ -31,5 +31,5 @@ class IRenderable
 {
 public:
     virtual ~IRenderable() = default;
-    virtual void draw() = 0;
+    virtual void draw() const = 0;
 };

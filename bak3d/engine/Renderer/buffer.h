@@ -24,9 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifndef BUFFER_H
-#define BUFFER_H
-
 #include <glad/glad.h>
 #include <stdexcept>
 #include <vector>
@@ -132,5 +129,3 @@ private:
     GLuint m_texture_buffer;
     GLuint m_rbo;
 };
-
-#endif

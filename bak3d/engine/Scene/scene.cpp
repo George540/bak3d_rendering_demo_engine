@@ -29,12 +29,10 @@ THE SOFTWARE.
 
 #include "editor.h"
 #include "Objects/model.h"
-#include "../Loader/file_loader.h"
-#include "../Loader/resource_manager.h"
-#include "../Renderer/material.h"
 #include "../Renderer/renderer.h"
-#include "../../Editor/user_interface.h"
+#include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
+#include "Objects/camera.h"
 
 using namespace std;
 
@@ -62,35 +60,27 @@ Scene::Scene()
 	
 	// Grid Setup
 	m_grid = new Grid(ResourceManager::get_material("grid"));
-	m_grid->set_camera(*m_camera);
 	m_scene_objects[SceneObjectType::Grid] = m_grid;
 	
 	m_axis = new Axis(ResourceManager::get_material("line"));
-	m_axis->set_camera(*m_camera);
 	m_scene_objects[SceneObjectType::Axis] = m_axis;
 	
-	m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("bounding-box"));
-	m_particle_system->set_camera(*m_camera);
-	UserInterface::current_particle_system = m_particle_system;
-	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;
+	/*m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("bounding-box"));
+	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;*/
 
 	// Light Setup
 	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_material("light"));
-	m_light->set_camera(*m_camera);
-	UserInterface::environment_point_light = m_light;
 	m_scene_objects[SceneObjectType::Light] = m_light;
 
 	// Model setup (empty for now)
 	m_model = nullptr;
-
-	ResourceManager::set_camera(*m_camera, *m_light);
 }
 
 Scene::~Scene()
 {
 	delete m_grid;
 	delete m_camera;
-	delete m_particle_system;
+	//delete m_particle_system;
 	delete m_light;
 	delete m_axis;
 	m_scene_objects.clear();
@@ -103,7 +93,7 @@ void Scene::update(float dt) const
 	{
 		m_light->update(dt);
 	}
-	m_particle_system->update(dt);
+	//m_particle_system->update(dt);
 }
 
 void Scene::draw() const
@@ -151,10 +141,10 @@ void Scene::draw() const
 		m_model->draw();
 	}
 
-	if (m_particle_system && m_particle_system->is_visible())
+	/*if (m_particle_system && m_particle_system->is_visible())
 	{
-		//m_particle_system->draw();
-	}
+		m_particle_system->draw();
+	}*/
 
 	Renderer::end_frame();
 

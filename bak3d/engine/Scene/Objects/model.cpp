@@ -1,36 +1,57 @@
+/* ===========================================================================
+The MIT License (MIT)
+
+Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+=========================================================================== */
+
 #include <assimp/postprocess.h>
 #define STB_IMAGE_IMPLEMENTATION    
 #include "stb_image.h"
 
 #include <iostream>
-#include <ostream>
 #include <filesystem>
 
 #include "model.h"
-#include "user_interface.h"
+
+#include "Asset/resource_manager.h"
 #include "Core/logger.h"
 #include "Input/event_manager.h"
-#include "Loader/resource_manager.h"
-#include "Renderer/texture.h"
+#include "Scene/scene.h"
 
 using namespace std;
 
 Model::Model(const string& path, const std::string& file_name, int index) :
-	m_combo_index(index),
-	m_camera(nullptr),
-	m_light(nullptr)
+	m_combo_index(index)
 {
 	m_path = path;
 	m_directory = m_path.substr(0, m_path.find_last_of('/'));
 	m_file_name = file_name;
-	m_asset_name = m_file_name.substr(0, m_file_name.find('.'));
+	m_object_name = m_file_name.substr(0, m_file_name.find('.'));
 	
 	load_model(path);
 
-	ResourceManager::add_material(m_asset_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
-	ResourceManager::add_material(m_asset_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
+	ResourceManager::add_material(m_object_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
+	ResourceManager::add_material(m_object_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
 
-	set_current_material(m_asset_name + ".model");
+	set_current_material(m_object_name + ".model");
 }
 
 Model::~Model()
@@ -38,34 +59,22 @@ Model::~Model()
 	// Free texture data
 	textures_cache.clear();
 	B3D_LOG_INFO("Texture data of model %s has been cleared", m_file_name.c_str());
-	
-	// Safely dereference camera and light addresses from pointers
-	m_camera = nullptr;
-	m_light = nullptr;
+
 	m_current_material = nullptr;
 	
 	meshes.clear();
 	B3D_LOG_INFO("Model %s mesh data have been safely deleted", m_file_name.c_str());
 }
 
-void Model::set_camera_and_light(Camera& camera, Light& light)
-{
-	m_camera = &camera;
-	m_light = &light;
-	for (auto mesh : meshes)
-	{
-		mesh->set_camera(camera);
-	}
-}
-
 void Model::draw() const
 {
-	if (!m_is_visible || !m_camera || !m_light || !m_current_material) return;
+	if (!m_is_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material) return;
 
-	if (UserInterface::is_full_render_selected
+	/*UserInterface::is_full_render_selected
 			&& !UserInterface::is_diffuse_render_selected
 			&& !UserInterface::is_specular_selected
-			&& !UserInterface::is_normal_map_selected)
+			&& !UserInterface::is_normal_map_selected*/
+	if (true)
 	{
 		// UPDATE MODEL MATERIAL
 		update_light_properties();
@@ -74,7 +83,7 @@ void Model::draw() const
 	else
 	{
 		// UPDATE DISSECT MATERIAL
-		update_breakdown_shader();
+		//update_breakdown_shader();
 	}
 	
 	for (auto& mesh : meshes)
@@ -85,12 +94,10 @@ void Model::draw() const
 
 void Model::update_light_properties() const
 {
-	if (!m_light || !m_camera) return;
-	
-	const auto light = m_light->get_light_properties();
+	const auto light = Scene::instance->get_active_light()->get_light_properties();
 
 	// VERTEX
-	m_current_material->set_vec3("viewPos", m_camera->get_camera_position());
+	m_current_material->set_vec3("viewPos", Scene::instance->get_camera()->get_camera_position());
 	m_current_material->set_vec3("lightPos", light.position);
 
 	// FRAGMENT
@@ -127,16 +134,16 @@ void Model::update_material_properties() const
 	}
 	
 	m_current_material->set_float("material.ambient", 0.5f);
-	m_current_material->set_float("material.shininess", UserInterface::shininess);
+	//m_current_material->set_float("material.shininess", m;
 	m_current_material->set_bool("materialSettings.useDiffuseTexture", EventManager::get_using_diffuse_texture());
 	m_current_material->set_bool("materialSettings.useSpecularTexture", EventManager::get_using_specular_texture());
 	m_current_material->set_bool("materialSettings.useNormalsTexture", EventManager::get_using_normal_maps());
-	m_current_material->set_bool("material.gamma", UserInterface::is_gamma_enabled);
+	m_current_material->set_bool("material.gamma", gamma_correction);
 }
 
 void Model::update_breakdown_shader() const
 {
-	aiTextureType texture_type = aiTextureType_DIFFUSE;
+	/*aiTextureType texture_type = aiTextureType_DIFFUSE;
 	if (UserInterface::is_diffuse_render_selected)
 	{
 		texture_type = aiTextureType_DIFFUSE;
@@ -152,7 +159,7 @@ void Model::update_breakdown_shader() const
 
 	m_current_material->set_int("textureSampler", 0);
 	Texture2D* texture = textures_cache.contains(texture_type) ? textures_cache.at(texture_type) : ResourceManager::get_texture("None.jpg");
-	texture->bind(0);
+	texture->bind(0);*/
 }
 
 void Model::load_model(string const& path)
@@ -328,7 +335,7 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 			string texture_file_name = string(filename.C_Str());
 			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
-			auto texture_key = format("{}.{}",m_asset_name, texture_name);
+			auto texture_key = format("{}.{}",m_object_name, texture_name);
 			ResourceManager::add_texture(texture_key, texture);
 			textures_cache[type] = texture;
 		}

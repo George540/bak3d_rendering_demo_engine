@@ -29,10 +29,11 @@ THE SOFTWARE.
 #include "editor.h"
 #include "global_settings.h"
 #include "logger.h"
-#include "user_interface.h"
+
+#include "Asset/resource_manager.h"
 #include "Input/event_manager.h"
-#include "Loader/resource_manager.h"
 #include "Renderer/renderer.h"
+#include "Scene/scene.h"
 
 /*
  * Main scene object that has full scope of the application.
