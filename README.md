@@ -82,12 +82,12 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:gear:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
 |:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
 |:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
-|:gear:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
+|:ballot_box_with_check:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
 |☐| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
-|☐| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
+|:gear:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
 |☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. |
-|☐| **Bug fixing** | Fix minor bugs in some features I have left behind. |
-|☐| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
+|:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
+|:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
 
 
 ### v1.4 - The Rendering Universe Expands
