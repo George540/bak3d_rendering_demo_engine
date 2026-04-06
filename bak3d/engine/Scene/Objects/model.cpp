@@ -39,6 +39,7 @@ THE SOFTWARE.
 using namespace std;
 
 Model::Model(const string& path, const std::string& file_name, int index) :
+	Asset(path, file_name),
 	m_combo_index(index)
 {
 	m_path = path;
@@ -333,7 +334,7 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 		{
 			string path = m_directory + '/' + filename.C_Str();
 			string texture_file_name = string(filename.C_Str());
-			Texture2D* texture = new Texture2D(path, texture_file_name, type, TextureUseType::Model);
+			Texture2D* texture = new Texture2D(path, texture_file_name, type);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
 			auto texture_key = format("{}.{}",m_object_name, texture_name);
 			ResourceManager::add_texture(texture_key, texture);

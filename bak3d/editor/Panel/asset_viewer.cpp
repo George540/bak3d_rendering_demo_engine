@@ -153,8 +153,8 @@ void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
                         ? ImVec4(0.6f, 0.85f, 1.0f, 1.0f)  // highlight tint
                         : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-    // Use the GL texture id directly — ImGui treats it as an ImTextureID
-    const ImTextureID text_id = static_cast<int>(asset->get_object_id());
+    const auto texture_asset = dynamic_cast<Texture2D*>(asset);
+    const ImTextureID text_id = texture_asset ? texture_asset->get_texture_id() : asset->get_object_id();
 
     ImGui::PushID(name.c_str());
 

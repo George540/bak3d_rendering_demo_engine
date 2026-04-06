@@ -34,12 +34,6 @@ THE SOFTWARE.
 
 #include "asset.h"
 
-enum class TextureUseType
-{
-    Model,
-    Particle
-};
-
 /*
  * Class that stores texture data in memory loaded from an image asset on disk.
  * Used to bind textures in the GPU when called, integrates with assimp structure as well.
@@ -49,23 +43,25 @@ class Texture2D : public Asset
 {
 public:
     Texture2D() = default;
-    Texture2D(const std::string& path, const std::string& file_name, aiTextureType type, TextureUseType textureUse, bool verbose = true);
-    ~Texture2D() override = default;
+    Texture2D(const std::string& path, const std::string& file_name, aiTextureType type);
+    Texture2D(const Texture2D&) = delete;
+    ~Texture2D() override;
+
     void bind(int unit_slot) const; // binds the texture as the current active GL_TEXTURE_2D texture object
-    
     static void unbind();
     
     aiTextureType get_texture_type() const { return m_texture_type; }
-    TextureUseType get_texture_use_type() const { return m_texture_use_type; }
+    GLuint get_texture_id() const { return m_texture_id; }
     int get_width() const { return m_width; }
     int get_height() const { return m_height; }
     int get_nb_color_channels() const { return m_nb_color_channels; }
 
+    Texture2D& operator=(const Texture2D&) = delete;
     bool operator==(const Texture2D& other) const;
     bool operator!=(const Texture2D& other) const;
 private:
+    GLuint m_texture_id;
     aiTextureType m_texture_type;
-    TextureUseType m_texture_use_type;
     int m_width, m_height; // texture image dimensions: width and height of loaded image in pixels
     int m_nb_color_channels; // the number of color components in the loaded image
 };

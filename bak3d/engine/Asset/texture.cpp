@@ -34,24 +34,33 @@ THE SOFTWARE.
 #include "stb_image.h"
 #include "texture.h"
 
+#include <cassert>
+#include <unordered_map>
+
 #include "Core/logger.h"
 
 using namespace std;
 
-Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType type, TextureUseType textureUse, bool verbose)
+Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType type)
     :
     Asset(path, file_name),
-    m_texture_type(type),
-    m_texture_use_type(textureUse)
+    m_texture_type(type)
 {
     // Bypass gen texture ID with unique ID
-    glGenTextures(1, &m_object_id);
+    glGenTextures(1, &m_texture_id);
 
     if (const auto data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_nb_color_channels, 0))
     {
-        GLenum format = m_nb_color_channels == 3 ? GL_RGB : GL_RGBA;
+        GLenum format;
+        switch (m_nb_color_channels)
+        {
+            case 1: format = GL_RED;  break;
+            case 3: format = GL_RGB;  break;
+            case 4: format = GL_RGBA; break;
+            default: B3D_LOG_ERROR("Invalid texture format for texture %s with ID %d", file_name, m_texture_id); break;
+        }
 
-        glBindTexture(GL_TEXTURE_2D, m_object_id);
+        glBindTexture(GL_TEXTURE_2D, m_texture_id);
         glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);  // NOLINT(bugprone-narrowing-conversions)
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -60,12 +69,12 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_object_id, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture_id, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         stbi_image_free(data);
 
-        B3D_LOG_INFO("Texture %s loaded with asset ID: %d", m_object_name, m_object_id);
+        B3D_LOG_INFO("Texture %s loaded with texture ID: %d", m_object_name, m_texture_id);
     }
     else
     {
@@ -74,10 +83,16 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
     }
 }
 
+Texture2D::~Texture2D()
+{
+    glDeleteTextures(1, &m_texture_id);
+}
+
 void Texture2D::bind(int unit_slot) const
 {
+    assert(m_texture_id && "Binding an invalid texture");
     glActiveTexture(GL_TEXTURE0 + unit_slot);
-    glBindTexture(GL_TEXTURE_2D, m_object_id);
+    glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
 void Texture2D::unbind()
@@ -89,14 +104,12 @@ bool Texture2D::operator==(const Texture2D& other) const
 {
     return m_object_id == other.m_object_id
         && m_file_name == other.m_file_name
-        && m_texture_type == other.m_texture_type
-        && m_texture_use_type == other.m_texture_use_type;
+        && m_texture_type == other.m_texture_type;
 }
 
 bool Texture2D::operator!=(const Texture2D& other) const
 {
     return m_object_id != other.m_object_id
         || m_file_name != other.m_file_name
-        || m_texture_type != other.m_texture_type
-        || m_texture_use_type != other.m_texture_use_type;
+        || m_texture_type != other.m_texture_type;
 }
