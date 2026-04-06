@@ -103,7 +103,7 @@ void Details::draw_model_section()
     {
         ImGuiB3D::PropertyDropdown("Model", m_model_name_items, &model_selection_index, "Select one of the loaded asset models to render in the scene.");
         string selected_model_name = m_model_name_items[model_selection_index];
-        Model* selected_model = ResourceManager::Models[selected_model_name];
+        Model* selected_model = model_selection_index > 0 ? ResourceManager::Models[selected_model_name] : nullptr;
         m_current_model = Scene::instance->get_model();
 
         bool is_model_different = selected_model && m_current_model ? selected_model->get_object_name() != m_current_model->get_object_name() : selected_model != m_current_model;
