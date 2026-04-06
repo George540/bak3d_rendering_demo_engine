@@ -30,9 +30,11 @@ THE SOFTWARE.
 
 using namespace std;
 
-RenderableObject::RenderableObject(Material* material)
+RenderableObject::RenderableObject(Material* material, const glm::vec3 position, const std::string& name)
+	: SceneObject(position, name)
 {
 	m_material = material;
+	m_visible = true;
 
 	m_vao = new VertexArray();
 	m_vao->bind_object();
@@ -67,7 +69,7 @@ void RenderableObject::draw() const
 	m_material->apply();
 }
 
-InstancedObject::InstancedObject(Material* material) : RenderableObject(material), m_ibo(nullptr) {}
+InstancedObject::InstancedObject(Material* material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
 
 InstancedObject::~InstancedObject()
 {

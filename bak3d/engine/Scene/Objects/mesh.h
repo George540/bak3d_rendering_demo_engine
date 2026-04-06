@@ -41,7 +41,7 @@ public:
     std::vector<GLuint> m_indices;
 
     // constructor
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, const std::string& name);
     ~Mesh() override = default;
     void draw() const override;
 };

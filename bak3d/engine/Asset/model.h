@@ -62,10 +62,11 @@ public:
 	void draw() const; // draws the model, and thus all its meshes
 	void set_current_material(const std::string& material_name);
 	Material* get_current_material() const { return m_current_material; }
-	void set_visible(bool visible) { m_is_visible = visible; }
-	bool is_visible() const { return m_is_visible; }
+	void set_visible(bool visible) { m_visible = visible; }
+	bool is_visible() const { return m_visible; }
 
 	// Model stats
+	std::vector<Mesh*> get_all_meshes() const { return meshes; }
 	int get_num_vertices() const { return m_num_vertices; }
 	std::set<Edge> get_unique_edges() const { return m_unique_edges; }
 	int get_num_faces() const { return m_num_faces; }
@@ -86,5 +87,5 @@ private:
 
 	Material* m_current_material;
 
-	bool m_is_visible;
+	bool m_visible;
 };

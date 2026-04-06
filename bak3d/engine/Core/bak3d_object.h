@@ -41,7 +41,7 @@ public:
         m_object_id = generate_unique_id();
     }
     Bak3DObject(const std::string& name) : Bak3DObject() { m_object_name = name; }
-    virtual ~Bak3DObject() = default;
+    virtual ~Bak3DObject() = 0;
 
     const std::string& get_object_name() const { return m_object_name; }
     void set_object_name(const std::string& name) { m_object_name = name; }
@@ -70,3 +70,5 @@ private:
         return hash == 0 ? 1 : hash; // 0 reserved as null/invalid
     }
 };
+
+inline Bak3DObject::~Bak3DObject() {}

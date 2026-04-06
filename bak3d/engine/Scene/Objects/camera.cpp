@@ -33,8 +33,10 @@ THE SOFTWARE.
 #include "Core/logger.h"
 #include "Input/event_manager.h"
 
+using namespace std;
+
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, float hor_angle, float ver_angle, float zoom) :
-	SceneObject(position),
+	SceneObject(position, "Camera"),
 	m_lookat(lookat),
 	m_cam_up(up),
 	m_cam_speed(speed),
@@ -55,7 +57,7 @@ void Camera::update(float dt)
 	m_vertical_angle -= EventManager::get_mouse_motion_y() * m_cam_speed * static_cast<double>(dt);
 
 	// Clamp vertical angle to [-85, 85] degrees
-	m_vertical_angle = std::max(-85.0f, std::min(85.0f, static_cast<float>(m_vertical_angle)));
+	m_vertical_angle = max(-85.0f, min(85.0f, static_cast<float>(m_vertical_angle)));
 	if (m_horizontal_angle > 360)
 	{
 		m_horizontal_angle -= 360;

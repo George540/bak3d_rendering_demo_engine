@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "Core/logger.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
-	RenderableObject(material)
+	RenderableObject(material, position, "Light")
 {
 	m_position = position;
 	m_scaling = scaling;

@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,34 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#pragma once
 
-#include "axis.h"
+#include "editor_panel.h"
 
-#include "Core/global_definitions.h"
-#include "Core/logger.h"
-
-Axis::Axis(Material* material) :
-	RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), "Axis")
+/*
+ * Display the scene object hierarchy.
+ * Right now, this isn't a real scene graph since most scene objects are unique and single instanced.
+ * It is planned in the future to add proper entity hierarchy and scene graph traversal.
+ */
+class SceneGraph : public EditorPanel
 {
-	m_scaling = glm::vec3(3.0f);
-	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);
+public:
+    SceneGraph();
 
-	m_vbo = new VertexBuffer(sizeof(AxisVertex) * AXIS_VERTICES.size(), &AXIS_VERTICES[0]);
-	m_ebo = new ElementBuffer(sizeof(GLuint) * AXIS_INDICES.size(), &AXIS_INDICES[0]);
-
-	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AxisVertex), reinterpret_cast<void*>(offsetof(AxisVertex, position)));
-	m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(AxisVertex), reinterpret_cast<void*>(offsetof(AxisVertex, color)));
-	m_vao->unbind_object();
-
-	B3D_LOG_INFO("Setting up 3D axis gizmo...");
-}
-
-void Axis::draw() const
-{
-	RenderableObject::draw();
-
-	m_vao->bind_object();
-	glDrawElements(GL_LINES, static_cast<GLsizei>(AXIS_INDICES.size()), GL_UNSIGNED_INT, nullptr);
-	m_vao->unbind_object();
-}
+    void begin_frame() override;
+    void update() override;
+    void end_frame() override;
+};

@@ -69,7 +69,7 @@ Model::~Model()
 
 void Model::draw() const
 {
-	if (!m_is_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material) return;
+	if (!m_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material) return;
 
 	/*UserInterface::is_full_render_selected
 			&& !UserInterface::is_diffuse_render_selected
@@ -318,7 +318,9 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 	load_material_textures(material, aiTextureType_HEIGHT);
 
 	// return a mesh object created from the extracted mesh data
-	return new Mesh(vertices, indices);
+	const int mesh_index = meshes.size();
+	string mesh_name = "ChildMesh_" + to_string(mesh_index);
+	return new Mesh(vertices, indices, mesh_name);
 }
 
 void Model::load_material_textures(aiMaterial* mat, aiTextureType type)

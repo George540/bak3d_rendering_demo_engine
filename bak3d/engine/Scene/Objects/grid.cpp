@@ -32,7 +32,10 @@ THE SOFTWARE.
 
 #include "Core/logger.h"
 
-Grid::Grid(Material* material) : RenderableObject(material), m_number_of_slices(40), m_grid_size(20.0f)
+Grid::Grid(Material* material)
+	: RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), "Grid")
+	, m_number_of_slices(40)
+	, m_grid_size(20.0f)
 {
 	// GRID LINE SETUP
 	// Grid setup used indices and EBOs for proper identification of each line

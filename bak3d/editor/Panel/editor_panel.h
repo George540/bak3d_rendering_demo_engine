@@ -34,7 +34,7 @@ class EditorPanel
 public:
     EditorPanel();
     EditorPanel(const char* title);
-    ~EditorPanel() = default;
+    virtual ~EditorPanel() = default;
 
     virtual void begin_frame();
     virtual void update();

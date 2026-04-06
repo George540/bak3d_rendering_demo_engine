@@ -34,10 +34,12 @@ THE SOFTWARE.
 #include <glm/fwd.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Core/bak3d_object.h"
+
 /*
  * Abstract class for declaring objects using position, orientation and scaling in 3D space.
  */
-class SceneObject
+class SceneObject : public Bak3DObject
 {
 protected:
     glm::vec3 m_position = glm::vec3(0.0f);
@@ -47,9 +49,9 @@ protected:
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
 public:
-    SceneObject() = default;
-    SceneObject(const glm::vec3 position) : m_position(position) {};
-    virtual ~SceneObject() = default;
+    SceneObject() : SceneObject(glm::vec3(0.0f, 0.0f, 0.0f), "Object") {}
+    SceneObject(const glm::vec3 position, const std::string& name) : Bak3DObject(name), m_position(position) {}
+    virtual ~SceneObject() override = 0;
 
     glm::vec3 get_position() const { return m_position; }
     glm::vec3 get_rotation() const { return m_euler_rotation; }
@@ -72,3 +74,4 @@ public:
     virtual void update(float dt) = 0;
 };
 
+inline SceneObject::~SceneObject() = default;
