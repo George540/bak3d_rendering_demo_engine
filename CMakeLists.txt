@@ -137,8 +137,18 @@ list(APPEND BAK3D_SOURCES ${ENGINE_SOURCES})
 file(GLOB_RECURSE EDITOR_SOURCES "${BAK3D_SOURCE_DIR}/editor/*.cpp" "${BAK3D_SOURCE_DIR}/editor/*.h" "${BAK3D_SOURCE_DIR}/editor/*.hpp")
 list(APPEND BAK3D_SOURCES ${EDITOR_SOURCES})
 
+# Glob shader files
+file(GLOB_RECURSE SHADER_FILES 
+    "${BAK3D_SHADERS_DIR}/*.vert"
+    "${BAK3D_SHADERS_DIR}/*.frag"
+    "${BAK3D_SHADERS_DIR}/*.geom"
+    "${BAK3D_SHADERS_DIR}/*.comp"
+    "${BAK3D_SHADERS_DIR}/*.tesc"
+    "${BAK3D_SHADERS_DIR}/*.tese"
+)
+
 # Create the main executable
-add_executable(bak3d ${BAK3D_SOURCES})
+add_executable(bak3d ${BAK3D_SOURCES} ${SHADER_FILES})
 
 # Set target include directories
 target_include_directories(bak3d PRIVATE ${BAK3D_INCLUDE_DIRS})
@@ -272,6 +282,7 @@ if(MSVC)
     source_group("Source Files" FILES ${BAK3D_SOURCE_DIR}/main.cpp)
     source_group("Engine" FILES ${ENGINE_SOURCES})
     source_group("Editor" FILES ${EDITOR_SOURCES})
+	source_group("Shaders" FILES ${SHADER_FILES})
     
     # Set compiler flags for MSVC
     target_compile_options(bak3d PRIVATE /W4)
