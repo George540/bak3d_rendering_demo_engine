@@ -115,10 +115,10 @@ void Details::draw_model_section()
 
         if (m_current_model)
         {
-            ImGui::Text("Vertices:   %d", m_current_model->get_num_vertices());
-            ImGui::Text("Edges:      %d", m_current_model->get_unique_edges().size());
-            ImGui::Text("Triangles:  %d", m_current_model->get_num_triangles());
-            ImGui::Text("Faces:      %d", m_current_model->get_num_faces());
+            ImGui::Text("Vertices:  %d", m_current_model->get_num_vertices());
+            ImGui::Text("Edges:     %zu",m_current_model->get_unique_edges().size());
+            ImGui::Text("Triangles: %d", m_current_model->get_num_triangles());
+            ImGui::Text("Faces:     %d", m_current_model->get_num_faces());
         }
 
         ImGui::TreePop();
