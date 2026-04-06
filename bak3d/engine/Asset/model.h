@@ -32,8 +32,8 @@ THE SOFTWARE.
 #include <set>
 
 #include "Asset/asset.h"
-#include "Asset/mesh.h"
 #include "Asset/texture.h"
+#include "Scene/Objects/mesh.h"
 
 /*
  * An asset class that stores information about a model loaded from a file using assimp.

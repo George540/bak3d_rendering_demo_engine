@@ -28,8 +28,9 @@ THE SOFTWARE.
 #include <utility>
 
 #include "imgui_b3d_extensions.h"
+#include "Asset/model.h"
 #include "Asset/resource_manager.h"
-#include "Scene/Objects/model.h"
+#include "Asset/texture.h"
 
 using namespace std;
 
@@ -48,7 +49,7 @@ namespace
     {
         const float char_width = ImGui::CalcTextSize("A").x;
         int max_chars = static_cast<int>(tile_width / char_width);
-        max_chars = std::max(max_chars, 1);
+        max_chars = max(max_chars, 1);
 
         if (cmp_less_equal(label.size(), max_chars))
         {
