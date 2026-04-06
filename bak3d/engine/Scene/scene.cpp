@@ -97,8 +97,6 @@ void Scene::update(float dt) const
 
 void Scene::draw() const
 {
-	Renderer::begin_frame();
-
 	// Set depth test for axis to render in front of grid
 	const bool is_grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
 	const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
@@ -144,10 +142,4 @@ void Scene::draw() const
 	{
 		m_particle_system->draw();
 	}*/
-
-	Renderer::end_frame();
-
-	Bak3DEditor::update();
-
-	Renderer::post_end_frame();
 }
