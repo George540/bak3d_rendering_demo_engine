@@ -28,9 +28,10 @@ THE SOFTWARE.
 #include <ranges>
 
 #include "file_loader.h"
+#include "model.h"
 #include "shader.h"
+#include "texture.h"
 #include "Core/logger.h"
-#include "Scene/Objects/model.h"
 
 using namespace std;
 

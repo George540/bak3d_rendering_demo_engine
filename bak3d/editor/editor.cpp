@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
+#include <implot.h>
 #include <iostream>
 
 #include "Core/logger.h"
@@ -45,6 +46,7 @@ namespace
 {
     std::vector<std::shared_ptr<EditorPanel>> m_panels;
     const char* editor_space_name = "##editor_window";
+    float editor_time_elapsed = 0;
 }
 
 constexpr auto window_flags =
@@ -62,6 +64,7 @@ void Bak3DEditor::initialize()
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
 
     // Configure ImGui
     ImGuiIO& io = ImGui::GetIO();
@@ -106,7 +109,13 @@ void Bak3DEditor::shutdown()
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
+}
+
+float Bak3DEditor::get_editor_lifetime()
+{
+    return editor_time_elapsed;
 }
 
 void Bak3DEditor::begin_frame()
@@ -132,6 +141,7 @@ void Bak3DEditor::end_frame()
 
 void Bak3DEditor::update_window()
 {
+    editor_time_elapsed += ImGui::GetIO().DeltaTime;
     // 1. Set Main Viewport properties and style
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);

@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "scene.h"
 
 #include "editor.h"
-#include "Objects/model.h"
 #include "../Renderer/renderer.h"
 #include "Asset/resource_manager.h"
 #include "Core/global_settings.h"

@@ -24,12 +24,12 @@ THE SOFTWARE.
 
 #pragma once
 
+#include "Asset/model.h"
 #include "Core/global_definitions.h"
 #include "Objects/axis.h"
 #include "Objects/camera.h"
 #include "Objects/grid.h"
 #include "Objects/light.h"
-#include "Objects/model.h"
 #include "Objects/particle_generator.h"
 
 /*
@@ -54,16 +54,13 @@ public:
 	Camera* get_camera() const { return m_camera; }
 	Light* get_active_light() const { return m_light; }
 
-	RenderableObject* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); };
+	RenderableObject* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); }
 
 	Model* get_model() const { return m_model; }
 	void set_model(Model* model) { m_model = model; }
 
 	static Scene* instance;
 private:
-	
-	void process_particle_activation();
-
 	std::unordered_map<SceneObjectType, RenderableObject*> m_scene_objects;
 	//ParticleSystem* m_particle_system;
 	Camera* m_camera;

@@ -36,6 +36,7 @@ public:
     static void update();
     static void shutdown();
 
+    static float get_editor_lifetime();
 private:
     static void begin_frame();
     static void end_frame();

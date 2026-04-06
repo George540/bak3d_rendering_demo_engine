@@ -90,6 +90,9 @@ if(EXISTS "${BAK3D_THIRD_PARTY_DIR}/imgui")
         ${BAK3D_THIRD_PARTY_DIR}/imgui/src/imgui_widgets.cpp
         ${BAK3D_THIRD_PARTY_DIR}/imgui/src/imgui_impl_glfw.cpp
         ${BAK3D_THIRD_PARTY_DIR}/imgui/src/imgui_impl_opengl3.cpp
+		${BAK3D_THIRD_PARTY_DIR}/imgui/src/implot.cpp
+		${BAK3D_THIRD_PARTY_DIR}/imgui/src/implot_demo.cpp
+		${BAK3D_THIRD_PARTY_DIR}/imgui/src/implot_items.cpp
     )
     target_include_directories(imgui PUBLIC
         ${BAK3D_THIRD_PARTY_DIR}/imgui/include
