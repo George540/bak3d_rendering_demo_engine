@@ -1,13 +1,31 @@
 #version 450 core
 
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
 uniform mat4 model;
 uniform mat4 view = mat4(1.0);
 uniform mat4 projection = mat4(1.0);
 
+out vec2 TexCoords;
+
+#include "Common.glsl"
+
 void main()
 {
-	mat4 modelViewProjection = projection * view * model;
-	gl_Position = modelViewProjection * vec4(aPos, 1.0);
+    // Extract world position from the model matrix's translation column
+    vec3 worldPos = vec3(model[3]);
+
+    // Extract uniform scale from the model matrix (X column magnitude)
+    float scale = length(vec3(model[0]));
+
+    vec3 worldPosition = apply_billboarding(
+        worldPos,
+        vertex.xy,
+        0.0, // no rotation for a light marker
+        scale,
+        view
+    );
+
+    TexCoords = vertex.zw;
+    gl_Position = projection * view * vec4(worldPosition, 1.0);
 }

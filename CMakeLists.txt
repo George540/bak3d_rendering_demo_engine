@@ -141,6 +141,7 @@ list(APPEND BAK3D_SOURCES ${EDITOR_SOURCES})
 file(GLOB_RECURSE SHADER_FILES 
     "${BAK3D_SHADERS_DIR}/*.vert"
     "${BAK3D_SHADERS_DIR}/*.frag"
+	"${BAK3D_SHADERS_DIR}/*.glsl"
     "${BAK3D_SHADERS_DIR}/*.geom"
     "${BAK3D_SHADERS_DIR}/*.comp"
     "${BAK3D_SHADERS_DIR}/*.tesc"

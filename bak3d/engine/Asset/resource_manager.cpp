@@ -77,7 +77,12 @@ void ResourceManager::initialize_shaders()
     {
         auto vert_path_string = string(shader_file_pair.first);
         auto shader_name = vert_path_string.substr(vert_path_string.find_last_of('/') + 1);
-        shader_name = shader_name.substr(0, shader_name.find('.'));
+
+        const auto dot_position = shader_name.find_last_of('.');
+        string shader_type_str = shader_name.substr(dot_position + 1);
+        
+        shader_name = shader_name.substr(0, dot_position);
+
         if (!Shaders.contains(shader_name))
         {
             Shaders[shader_name] = new Shader(
@@ -103,13 +108,13 @@ void ResourceManager::initialize_predefined_textures()
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE);
     }
 
-    image_files = FileLoader::get_files_by_type_with_path(filesystem::absolute(string(BAK3D_ASSETS_DIR) + "/default"), jpg);
+    image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", jpg);
     for (auto [file_name, file_path] : image_files)
     {
         Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE);
     }
 
-    B3D_LOG_INFO("Successfully loaded %d textures.", Textures.size());
+    B3D_LOG_INFO("Successfully loaded %d default sprite textures.", Textures.size());
 }
 
 void ResourceManager::initialize_models()

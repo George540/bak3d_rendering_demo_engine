@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <string>
 
 #include "asset.h"
+#include "Core/global_definitions.h"
 
 /*
  * Shader class used to load shader files and building them to be used in the engine.
@@ -39,13 +40,12 @@ class Shader : public Asset
 private:
 	const char* m_vert_path;
 	const char* m_frag_path;
-	
+
 	GLuint m_index;
-	static void check_compile_errors(unsigned int shader, const std::string& type);
 public:
 	// Constructor
 	Shader();
-	Shader(const char* vertex_shader_source, const char* fragment_shader_source, std::string shader_name);
+	Shader(const char* vertex_shader_source, const char* fragment_shader_source, const std::string& shader_name);
 	Shader(const Shader& otherShader);
 	~Shader() override;
 

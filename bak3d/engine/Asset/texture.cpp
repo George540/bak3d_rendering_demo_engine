@@ -74,7 +74,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
 
         stbi_image_free(data);
 
-        B3D_LOG_INFO("Texture %s loaded with texture ID: %d", m_object_name, m_texture_id);
+        B3D_LOG_INFO("Texture %s loaded with texture ID: %d", m_object_name.c_str(), m_texture_id);
     }
     else
     {

@@ -68,7 +68,10 @@ Scene::Scene()
 	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;*/
 
 	// Light Setup
-	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f), glm::vec3(0.1f, 0.1f, 0.1f), ResourceManager::get_material("light"));
+	auto initial_light_scaling_value = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
+	m_light = new Light(glm::vec3(-3.0f, 3.0f, 3.0f),
+		glm::vec3(initial_light_scaling_value, initial_light_scaling_value, initial_light_scaling_value),
+		ResourceManager::get_material("light"));
 	m_scene_objects[SceneObjectType::Light] = m_light;
 
 	// Model setup (empty for now)

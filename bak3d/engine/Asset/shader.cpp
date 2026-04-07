@@ -27,12 +27,83 @@ THE SOFTWARE.
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <glm/glm.hpp>
 
+#include "Core/global_definitions.h"
 #include "Core/logger.h"
 
 using namespace std;
+
+namespace
+{
+    void check_compile_errors(unsigned int shader_id, const string& shader_type, const string& shader_name)
+    {
+        GLint success;
+        GLchar infoLog[1024];
+        if (shader_type != "PROGRAM")
+        {
+            glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
+            if (!success)
+            {
+                glGetShaderInfoLog(shader_id, 1024, nullptr, infoLog);
+                B3D_LOG_ERROR("Shader compilation error of type: %s%s\n %s\n -- --------------------------------------------------- -- ", shader_name.c_str(), shader_type.c_str(), infoLog);
+            }
+        }
+        else
+        {
+            glGetProgramiv(shader_id, GL_LINK_STATUS, &success);
+            if (!success)
+            {
+                glGetProgramInfoLog(shader_id, 1024, nullptr, infoLog);
+                B3D_LOG_ERROR("Shader linking error of type: %s%s\n %s\n -- --------------------------------------------------- -- ", shader_name.c_str(), shader_type.c_str(), infoLog);
+            }
+        }
+    }
+
+    string resolve_includes(const string& source, const string& shader_dir)
+    {
+        string result;
+        istringstream stream(source);
+        string line;
+
+        static const regex include_pattern(R"re(^\s*#include\s+"([^"]+)"\s*$)re");
+
+        while (getline(stream, line))
+        {
+            // Strip carriage return for Windows line endings
+            if (!line.empty() && line.back() == '\r')
+            {
+                line.pop_back();
+            }
+
+            smatch match;
+            if (regex_match(line, match, include_pattern))
+            {
+                string include_path = shader_dir + "/" + match[1].str();
+                ifstream include_file(include_path);
+
+                if (!include_file.is_open())
+                {
+                    B3D_LOG_ERROR("Could not open included shader file: %s", include_path.c_str());
+                    result += line + "\n"; // leave line in place so the GLSL error is traceable
+                    continue;
+                }
+
+                stringstream include_stream;
+                include_stream << include_file.rdbuf();
+                result += include_stream.str() + "\n";
+            }
+            else
+            {
+                result += line + "\n";
+            }
+        }
+
+        return result;
+    }
+}
 
 Shader::Shader() :
     Shader(filesystem::absolute("shaders/LineShader.vert").string().c_str(),
@@ -42,7 +113,8 @@ Shader::Shader() :
     
 }
 
-Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, string shader_name) : Asset(vertex_shader_source, shader_name)
+Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, const string& shader_name)
+    : Asset(vertex_shader_source, shader_name)
 {
     m_index = 0;
     m_vert_path = vertex_shader_source;
@@ -64,17 +136,22 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
         vShaderFile.open(vertex_shader_source);
         fShaderFile.open(fragment_shader_source);
         stringstream vShaderStream, fShaderStream;
+
         // read file's buffer contents into streams
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();
+
         // close file handlers
         vShaderFile.close();
         fShaderFile.close();
+
+        string shader_dir = filesystem::path(vertex_shader_source).parent_path().string();
+
         // convert stream into string
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
+        vertexCode = resolve_includes(vShaderStream.str(), shader_dir);
+        fragmentCode = resolve_includes(fShaderStream.str(), shader_dir);
     }
-    catch (std::ifstream::failure& e)
+    catch (ifstream::failure& e)
     {
         B3D_LOG_ERROR("Shader file not successfully read: %s", e.what());
     }
@@ -89,20 +166,20 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
-    check_compile_errors(vertex, "VERTEX");
+    check_compile_errors(vertex, ".vert", m_object_name);
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
-    check_compile_errors(fragment, "FRAGMENT");
+    check_compile_errors(fragment, ".frag", m_object_name);
 
     // shader Program
     m_object_id = glCreateProgram();
     glAttachShader(m_object_id, vertex);
     glAttachShader(m_object_id, fragment);
     glLinkProgram(m_object_id);
-    check_compile_errors(m_object_id, "PROGRAM");
+    check_compile_errors(m_object_id, "PROGRAM", m_object_name);
 
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
@@ -118,7 +195,7 @@ Shader::Shader(const Shader& otherShader) : Shader(otherShader.get_vert_path(), 
 
 Shader::~Shader()
 {
-    cout << "Shader " << m_object_name << " with ID " << m_object_id << " has been deleted..." << endl;
+    B3D_LOG_INFO("Shader %s has been deleted.", m_object_name.c_str());
 }
 
 void Shader::use() const
@@ -146,76 +223,52 @@ void Shader::set_int(const string& name, int value) const
     glUniform1i(glGetUniformLocation(m_object_id, name.c_str()), value);
 }
 
-void Shader::set_float(const std::string& name, GLfloat value) const
+void Shader::set_float(const string& name, GLfloat value) const
 {
 	glUniform1f(glGetUniformLocation(m_object_id, name.c_str()), value);
 }
 
-void Shader::set_vec2(const std::string& name, const glm::vec2& value) const
+void Shader::set_vec2(const string& name, const glm::vec2& value) const
 {
     glUniform2fv(glGetUniformLocation(m_object_id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::set_vec2(const std::string& name, float x, float y) const
+void Shader::set_vec2(const string& name, float x, float y) const
 {
     glUniform2f(glGetUniformLocation(m_object_id, name.c_str()), x, y);
 }
 
-void Shader::set_vec3(const std::string& name, const glm::vec3& value) const
+void Shader::set_vec3(const string& name, const glm::vec3& value) const
 {
     glUniform3fv(glGetUniformLocation(m_object_id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::set_vec3(const std::string& name, float x, float y, float z) const
+void Shader::set_vec3(const string& name, float x, float y, float z) const
 {
     glUniform3f(glGetUniformLocation(m_object_id, name.c_str()), x, y, z);
 }
 
-void Shader::set_vec4(const std::string& name, const glm::vec4& value) const
+void Shader::set_vec4(const string& name, const glm::vec4& value) const
 {
     glUniform4fv(glGetUniformLocation(m_object_id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::set_vec4(const std::string& name, float x, float y, float z, float w) const
+void Shader::set_vec4(const string& name, float x, float y, float z, float w) const
 {
     glUniform4f(glGetUniformLocation(m_object_id, name.c_str()), x, y, z, w);
 }
 
-void Shader::set_mat2(const std::string& name, const glm::mat2& mat) const
+void Shader::set_mat2(const string& name, const glm::mat2& mat) const
 {
     glUniformMatrix2fv(glGetUniformLocation(m_object_id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::set_mat3(const std::string& name, const glm::mat3& mat) const
+void Shader::set_mat3(const string& name, const glm::mat3& mat) const
 {
     glUniformMatrix3fv(glGetUniformLocation(m_object_id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::set_mat4(const std::string& name, const glm::mat4& mat) const
+void Shader::set_mat4(const string& name, const glm::mat4& mat) const
 {
     glUniformMatrix4fv(glGetUniformLocation(m_object_id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-}
-
-void Shader::check_compile_errors(unsigned int shader, const string& type)
-{
-    GLint success;
-    GLchar infoLog[1024];
-    if (type != "PROGRAM")
-    {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            B3D_LOG_ERROR("Shader compilation error of type: %s\n %s\n -- --------------------------------------------------- -- ", type.c_str(), infoLog);
-        }
-    }
-    else
-    {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            B3D_LOG_ERROR("Shader linking error of type: %s\n %s\n -- --------------------------------------------------- -- ", type.c_str(), infoLog);
-        }
-    }
 }

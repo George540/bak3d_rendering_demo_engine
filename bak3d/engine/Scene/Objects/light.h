@@ -48,7 +48,7 @@ class Light : public RenderableObject
 
 	// PROPERTIES
 	light m_properties{};
-
+	Texture2D* m_sprite_texture;
 public:
 	Light(glm::vec3 position, glm::vec3 scaling, Material* material);
 	~Light() override = default;

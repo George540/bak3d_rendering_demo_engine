@@ -36,6 +36,7 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::Light_Enabled: return "Enabled";
         case GlobalSettingOption::Light_HorizontalRotation: return "Horizontal Rotation";
         case GlobalSettingOption::Light_VerticalRotation: return "Vertical Rotation";
+        case GlobalSettingOption::Light_Scaling: return "Scaling";
         case GlobalSettingOption::Light_OriginDistance: return "Origin Distance";
         case GlobalSettingOption::Light_Color: return "Color";
         case GlobalSettingOption::Light_Intensity: return "Intensity";
@@ -53,6 +54,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_Enabled] = true;
     global_settings[GlobalSettingOption::Light_HorizontalRotation] = 45.0f;
     global_settings[GlobalSettingOption::Light_VerticalRotation] = 135.0f;
+    global_settings[GlobalSettingOption::Light_Scaling] = 0.5f;
     global_settings[GlobalSettingOption::Light_OriginDistance] = 5.0f;
     global_settings[GlobalSettingOption::Light_Color] = glm::vec4(1.0f);
     global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;

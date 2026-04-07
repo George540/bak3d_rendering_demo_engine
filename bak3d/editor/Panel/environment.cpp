@@ -102,6 +102,11 @@ void Environment::draw_light_settings()
             ImGuiB3D::PropertySliderFloat("Vertical Rotation", &light_vertical_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object vertically.");
             GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_VerticalRotation, light_vertical_rotation);
 
+            // Sprite Scaling
+            float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
+            ImGuiB3D::PropertySliderFloat("Sprite Scaling", &sprite_scaling, 0.1f, 3.0f, "%.3f", "Change the light's icon size.");
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_Scaling, sprite_scaling);
+
             // Distance Offset
             float light_origin_distance = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
             ImGuiB3D::PropertySliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f, "%.3f", "Light distance from origin (center of axis).");

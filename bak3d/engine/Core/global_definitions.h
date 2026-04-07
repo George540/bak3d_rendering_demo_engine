@@ -53,6 +53,7 @@ enum class GlobalSettingOption : uint32_t
     Light_Enabled,
     Light_HorizontalRotation,
     Light_VerticalRotation,
+    Light_Scaling,
     Light_OriginDistance,
     Light_Color,
     Light_Intensity,
@@ -75,6 +76,9 @@ enum class SceneObjectType : uint32_t
  * ==========================================================================
  */
 constexpr auto MAX_BONE_INFLUENCE = 4;
+
+static constexpr GLsizei VEC4_SIZE = sizeof(glm::vec4);
+static constexpr GLsizei UINT_SIZE = sizeof(GLuint);
 
 struct Vertex
 {
