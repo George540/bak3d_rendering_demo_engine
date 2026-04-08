@@ -48,8 +48,6 @@ UniformBuffer* Renderer::matrix_uniform_buffer = nullptr;
 void Renderer::initialize()
 {
 	r_window = EventManager::get_window();
-	glfwMakeContextCurrent(r_window);
-	B3D_LOG_INFO("Capturing window at Renderer...");
 
 	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{

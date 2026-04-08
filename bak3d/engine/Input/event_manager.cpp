@@ -79,47 +79,70 @@ void EventManager::initialize()
 	if (!glfwInit())
 	{
 		B3D_LOG_ERROR("Failed to initialize GLFW.");
+		return;
 	}
 
+	// Request MSAA (will be configured later)
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-#if defined(PLATFORM_OSX)
-	// OS X would use legacy opengl by default, and wouldn't be able to load shaders
-	// This is the proper way to setup GLFW to use modern OpenGL
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
-
-#else
-	// Allow older laptops to run the framework, even though, our framework
-	// is compatible with OpenGL 3.3 (which removed many deprecated features)
+	// Prefer modern OpenGL
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	// MacOS requires this for core profile
+#ifdef PLATFORM_OSX
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-	// Open a window and create its OpenGL context
-	glfwWindowHint(GLFW_RESIZABLE, 1);
+	// Sensible defaults (more widely supported than 32-bit)
+	glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
+	// Open a window and create its OpenGL context Window behavior
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
+	// Get primary monitor & video mode
 	m_monitor = glfwGetPrimaryMonitor();
 	m_vid_mode = glfwGetVideoMode(m_monitor);
 
+	// Match monitor format
 	glfwWindowHint(GLFW_RED_BITS, m_vid_mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, m_vid_mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, m_vid_mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, m_vid_mode->refreshRate);
-	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "          Bak3D Engine v1.2", nullptr, nullptr);
+	m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "Bak3D Engine", nullptr, nullptr);
 
-	if (m_window == nullptr)
+	// Fallback by loosening rules
+	if (!m_window)
 	{
-		B3D_LOG_ERROR("Failed to open GLFW window. If you have an Intel GPU, they are not 3.3+ compatible. Try the 2.1 version.");
-		glfwTerminate();
-		exit(-1);  // NOLINT(concurrency-mt-unsafe)
+		B3D_LOG_WARNING("Modern OpenGL context failed. Attempting fallback...");
+
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+
+		glfwWindowHint(GLFW_SAMPLES, 0);
+		glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
+		m_window = glfwCreateWindow(m_vid_mode->width, m_vid_mode->height, "Bak3D Engine", nullptr, nullptr);
 	}
 
+	// Final failure
+	if (!m_window)
+	{
+		B3D_LOG_ERROR("Failed to create GLFW window with OpenGL context.");
+		glfwTerminate();
+		return;
+	}
+
+	// Make context current
+	glfwMakeContextCurrent(m_window);
+
+	// Get actual window size
 	glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
 	B3D_LOG_INFO("Window created with size %d x %d", m_window_width, m_window_height);
 
