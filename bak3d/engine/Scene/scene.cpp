@@ -117,10 +117,6 @@ void Scene::draw() const
 		glDepthFunc(GL_LESS);
 	}
 
-	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
-	{
-		m_light->draw();
-	}
 	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
 	{
 		m_light->draw();
@@ -145,4 +141,8 @@ void Scene::draw() const
 	{
 		m_particle_system->draw();
 	}*/
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
+	{
+		m_light->draw();
+	}
 }
