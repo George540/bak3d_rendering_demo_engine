@@ -7,8 +7,8 @@ out vec3 FragPos;
 out vec2 TexCoord;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+
+#include "Common.glsl"
 
 void main()
 {

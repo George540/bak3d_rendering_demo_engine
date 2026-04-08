@@ -79,6 +79,7 @@ constexpr auto MAX_BONE_INFLUENCE = 4;
 
 static constexpr GLsizei VEC4_SIZE = sizeof(glm::vec4);
 static constexpr GLsizei UINT_SIZE = sizeof(GLuint);
+static constexpr GLsizei MAT4_SIZE = sizeof(glm::mat4);
 
 struct Vertex
 {

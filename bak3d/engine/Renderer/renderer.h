@@ -36,6 +36,7 @@ class Renderer
 private:
 	static GLFWwindow* r_window;
 	static FrameBuffer* frame_buffer;
+	static UniformBuffer* matrix_uniform_buffer;
 public:
 	static void initialize();
 	static void shutdown();
@@ -46,6 +47,7 @@ public:
 
 	static GLFWwindow* get_window() { return r_window; }
 	static FrameBuffer* get_frame_buffer() { return frame_buffer; }
+	static UniformBuffer* get_uniform_buffer() { return matrix_uniform_buffer; }
 
 	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
 };

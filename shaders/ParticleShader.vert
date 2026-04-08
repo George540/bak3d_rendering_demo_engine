@@ -12,9 +12,6 @@ layout (location = 4) in float instanceScale;
 out vec2 TexCoords;
 out vec4 ParticleColor;
 
-uniform mat4 projection;
-uniform mat4 view;
-
 #include "Common.glsl"
 
 void main()

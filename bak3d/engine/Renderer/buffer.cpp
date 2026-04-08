@@ -25,14 +25,16 @@ THE SOFTWARE.
 #include "buffer.h"
 
 #include <iostream>
+#include <utility>
 
+#include "Core/global_definitions.h"
 #include "Core/logger.h"
 
 using namespace std;
 
 Buffer::Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage) :
     m_target(target),
-    m_size(size),
+    m_buffer_size(size),
     m_data(data),
     m_usage(usage)
 {
@@ -41,7 +43,7 @@ Buffer::Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage) :
     {
         glGenBuffers(1, &m_ID);
         glBindBuffer(m_target, m_ID);
-        glBufferData(m_target, m_size, m_data, m_usage);
+        set_buffer_data(m_data, m_buffer_size);
     }
 }
 
@@ -60,12 +62,31 @@ void Buffer::unbind_object() const
     glBindBuffer(m_target, 0);
 }
 
+void Buffer::set_buffer_data(const void* buffer_data, const size_t buffer_data_size)
+{
+    if (m_data != buffer_data && cmp_not_equal(m_buffer_size, buffer_data_size))
+    {
+        m_data = buffer_data;
+        m_buffer_size = buffer_data_size;
+    }
+    glBufferData(m_target, m_buffer_size, m_data, m_usage);
+}
+
+void Buffer::set_buffer_sub_data(const void* sub_data, const size_t sub_data_size, const size_t sub_data_offset)
+{
+    if (sub_data_offset + sub_data_size > m_buffer_size)
+    {
+        // Prevent out-of-bounds GPU memory write
+        throw runtime_error("Buffer overflow: set_buffer_sub_data(...) exceeds allocated size");
+    }
+    glBufferSubData(m_target, sub_data_offset, sub_data_size, sub_data);
+}
+
 FrameBuffer::FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, const GLuint height, GLenum usage)
     : Buffer(GL_FRAMEBUFFER, size, data, usage),
     m_width(width),
     m_height(height)
 {
-    B3D_LOG_INFO("Enabling Frame Buffer Object...");
     create_framebuffer();
 }
 
@@ -128,6 +149,8 @@ void FrameBuffer::create_framebuffer()
 
     glBindFramebuffer(m_target, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    B3D_LOG_INFO("Frame Buffer Object enabled...");
 }
 
 void FrameBuffer::destroy_framebuffer()
@@ -147,4 +170,12 @@ void FrameBuffer::destroy_framebuffer()
         glDeleteRenderbuffers(1, &m_rbo);
         m_rbo = 0;
     }
+}
+
+UniformBuffer::UniformBuffer(GLsizeiptr size, const void* data, const GLuint binding_index, GLenum usage)
+    : Buffer(GL_UNIFORM_BUFFER, size, data, usage)
+{
+    Buffer::unbind_object();
+    glBindBufferRange(GL_UNIFORM_BUFFER, binding_index, m_ID, 0, m_buffer_size);
+    B3D_LOG_INFO("Uniform Buffer Object enabled...");
 }

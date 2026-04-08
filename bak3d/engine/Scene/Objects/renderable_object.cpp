@@ -61,9 +61,7 @@ void RenderableObject::draw() const
 {
 	Camera* scene_camera = Scene::instance->get_camera();
 	if (!m_material || !scene_camera) return;
-	
-	m_material->set_mat4("projection", scene_camera->get_projection_matrix());
-	m_material->set_mat4("view", scene_camera->get_view_matrix());
+
 	m_material->set_mat4("model", m_model_matrix);
 
 	m_material->apply();
@@ -80,9 +78,6 @@ void InstancedObject::draw() const
 {
 	Camera* scene_camera = Scene::instance->get_camera();
 	if (!m_material || !scene_camera) return;
-	
-	m_material->set_mat4("projection", scene_camera->get_projection_matrix());
-	m_material->set_mat4("view", scene_camera->get_view_matrix());
 
 	m_material->apply();
 }

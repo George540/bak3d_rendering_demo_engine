@@ -26,7 +26,6 @@ THE SOFTWARE.
 
 #include <glad/glad.h>
 #include <stdexcept>
-#include <vector>
 
 #include "globject.h"
 
@@ -42,31 +41,12 @@ public:
     void unbind_object() const override;
 protected:
     GLenum m_target;
-    GLsizeiptr m_size;
+    GLsizeiptr m_buffer_size;
     const void* m_data;
     GLenum m_usage;
 public:
-    template <typename T>
-    void set_buffer_data(const std::vector<T>& data)
-    {
-        m_data = data.data();
-        m_size = data.size() * sizeof(T);
-        glBufferData(m_target, m_size, m_data, m_usage);
-    }
-
-    template <typename T>
-    void set_buffer_sub_data(size_t offset, const std::vector<T>& data)
-    {
-        if (offset + data.size() * sizeof(T) > m_size)
-        {
-            // Prevent out-of-bounds GPU memory write
-            throw std::runtime_error("Buffer overflow: set_buffer_sub_data(...) exceeds allocated size");
-        }
-
-        m_data = data.data();
-        m_size = data.size() * sizeof(T);
-        glBufferSubData(m_target, offset, m_size, m_data);
-    }
+    void set_buffer_data(const void* buffer_data, size_t buffer_data_size);
+    void set_buffer_sub_data(const void* sub_data, size_t sub_data_size, size_t sub_data_offset);
 };
 
 /*
@@ -98,7 +78,7 @@ public:
     InstanceBuffer(GLsizeiptr size, const void* data, GLenum usage = GL_STATIC_DRAW)
         : Buffer(GL_ARRAY_BUFFER, size, data, usage) {}
 
-    void set_size(int size) { m_size = size; }
+    void set_size(int size) { m_buffer_size = size; }
 };
 
 /*
@@ -128,4 +108,10 @@ private:
     GLuint m_height;
     GLuint m_texture_buffer;
     GLuint m_rbo;
+};
+
+class UniformBuffer : public Buffer
+{
+public:
+    UniformBuffer(GLsizeiptr size, const void* data, GLuint binding_index, GLenum usage = GL_STATIC_DRAW);
 };

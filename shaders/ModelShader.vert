@@ -7,8 +7,6 @@ layout (location = 3) in vec3 aTangent;
 layout (location = 4) in vec3 aBitangent;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 uniform vec3 viewPos;
 uniform vec3 lightPos;
 
@@ -21,6 +19,8 @@ out VS_OUT
     vec3 TangentViewPos;
     vec3 TangentFragPos;
 } vs_out;
+
+#include "Common.glsl"
 
 void main()
 {

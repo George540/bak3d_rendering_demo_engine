@@ -4,8 +4,8 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aCol;
 
 uniform mat4 model;
-uniform mat4 view = mat4(1.0);
-uniform mat4 projection = mat4(1.0);
+
+#include "Common.glsl"
 
 out vec3 vertexColor;
 

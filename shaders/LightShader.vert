@@ -3,8 +3,6 @@
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
 uniform mat4 model;
-uniform mat4 view = mat4(1.0);
-uniform mat4 projection = mat4(1.0);
 
 out vec2 TexCoords;
 
