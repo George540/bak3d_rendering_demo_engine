@@ -47,9 +47,13 @@ Axis::Axis(Material* material) :
 
 void Axis::draw() const
 {
+	glDepthFunc(GL_ALWAYS);
+
 	RenderableObject::draw();
 
 	m_vao->bind_object();
 	glDrawElements(GL_LINES, static_cast<GLsizei>(AXIS_INDICES.size()), GL_UNSIGNED_INT, nullptr);
 	m_vao->unbind_object();
+
+	glDepthFunc(GL_LESS);
 }

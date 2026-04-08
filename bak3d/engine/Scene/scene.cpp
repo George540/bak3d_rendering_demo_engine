@@ -105,7 +105,6 @@ void Scene::draw() const
 	const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
 	if (is_grid_rendering || is_axis_rendering)
 	{
-		glDepthFunc(GL_ALWAYS);
 		if (is_grid_rendering)
 		{
 			m_grid->draw();
@@ -114,7 +113,6 @@ void Scene::draw() const
 		{
 			m_axis->draw();
 		}
-		glDepthFunc(GL_LESS);
 	}
 
 	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
