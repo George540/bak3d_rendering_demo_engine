@@ -68,6 +68,7 @@ public:
 	static void initialize();
 	static void shutdown();
 
+	static void begin_update();
 	static void update();
 	static void end_update();
 

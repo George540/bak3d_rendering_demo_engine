@@ -166,14 +166,17 @@ void EventManager::shutdown()
 	B3D_LOG_INFO("Event Manager Termination Complete.");
 }
 
-void EventManager::update()
+void EventManager::begin_update()
 {
 	// Update inputs / events
 	glfwPollEvents();
 
 	// Update mouse positions
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
+}
 
+void EventManager::update()
+{
 	// Camera tilt and Pan
 	if (last_mouse_right_state == GLFW_RELEASE
 		&& glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
