@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -22,32 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#pragma once
+#include "renderer_passes.h"
 
-#include "buffer.h"
+#include "Core/global_settings.h"
+#include "Scene/scene.h"
 
-struct GLFWwindow;
-
-/*
- * Static class for managing everything rendering related, whether triggered by code or by the user.
- */
-class Renderer
+void RendererPasses::render_pass_debug_geometry()
 {
-private:
-	static GLFWwindow* r_window;
-	static FrameBuffer* frame_buffer;
-	static UniformBuffer* matrix_uniform_buffer;
-public:
-	static void initialize();
-	static void shutdown();
+    const bool is_grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
+    const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
+    if (is_grid_rendering)
+    {
+        Scene::instance->get_object_in_scene(SceneObjectType::Grid)->draw();
+    }
+    if (is_axis_rendering)
+    {
+        Scene::instance->get_object_in_scene(SceneObjectType::Axis)->draw();
+    }
+}
 
-	static void begin_frame();
-	static void render_frame();
-	static void end_frame();
+void RendererPasses::render_pass_base_geometry()
+{
+    if (const Model* model = Scene::instance->get_model())
+    {
+        model->draw();
+    }
+}
 
-	static GLFWwindow* get_window() { return r_window; }
-	static FrameBuffer* get_frame_buffer() { return frame_buffer; }
-	static UniformBuffer* get_uniform_buffer() { return matrix_uniform_buffer; }
-
-	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
-};
+void RendererPasses::render_pass_lighting()
+{
+    Scene::instance->get_active_light()->draw();
+}

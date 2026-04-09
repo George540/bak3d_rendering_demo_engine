@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "scene.h"
 
 #include "editor.h"
-#include "../Renderer/renderer.h"
 #include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
 #include "Objects/camera.h"
@@ -96,51 +95,4 @@ void Scene::update(float dt) const
 		m_light->update(dt);
 	}
 	//m_particle_system->update(dt);
-}
-
-void Scene::draw() const
-{
-	// Set depth test for axis to render in front of grid
-	const bool is_grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
-	const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
-	if (is_grid_rendering || is_axis_rendering)
-	{
-		if (is_grid_rendering)
-		{
-			m_grid->draw();
-		}
-		if (is_axis_rendering)
-		{
-			m_axis->draw();
-		}
-	}
-
-	/*if (!m_particle_system->is_visible() && UserInterface::is_full_render_selected)
-	{
-		m_light->draw();
-	}*/
-
-	/*if (auto current_model = ResourceManager::get_model(UserInterface::model_combo_items[UserInterface::model_current_index]))
-	{
-		current_model->draw();
-	}*/
-
-	// @TODO: remove temporary code
-	auto model = m_model;
-	auto material = m_model ? m_model->get_current_material() : nullptr;
-	auto materials = ResourceManager::Materials;
-	auto textures = ResourceManager::Textures;
-	if (m_model)
-	{
-		m_model->draw();
-	}
-
-	/*if (m_particle_system && m_particle_system->is_visible())
-	{
-		m_particle_system->draw();
-	}*/
-	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
-	{
-		m_light->draw();
-	}
 }

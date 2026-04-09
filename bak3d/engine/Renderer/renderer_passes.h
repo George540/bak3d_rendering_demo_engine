@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,30 +24,10 @@ THE SOFTWARE.
 
 #pragma once
 
-#include "buffer.h"
-
-struct GLFWwindow;
-
-/*
- * Static class for managing everything rendering related, whether triggered by code or by the user.
- */
-class Renderer
+class RendererPasses
 {
-private:
-	static GLFWwindow* r_window;
-	static FrameBuffer* frame_buffer;
-	static UniformBuffer* matrix_uniform_buffer;
 public:
-	static void initialize();
-	static void shutdown();
-
-	static void begin_frame();
-	static void render_frame();
-	static void end_frame();
-
-	static GLFWwindow* get_window() { return r_window; }
-	static FrameBuffer* get_frame_buffer() { return frame_buffer; }
-	static UniformBuffer* get_uniform_buffer() { return matrix_uniform_buffer; }
-
-	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
+    static void render_pass_debug_geometry(); // fake debug pass, still geometry
+    static void render_pass_base_geometry();
+    static void render_pass_lighting(); // fake lighting pass, still geometry
 };

@@ -61,19 +61,17 @@ void Bak3DEngine::Update()
         // Update Event Manager - Frame time / input / events processing 
         EventManager::update();
 
-        Renderer::begin_frame();
-
         // Update Scene
         const float dt = EventManager::get_frame_time();
         scene->update(dt);
 
-        scene->draw();
-
+        Renderer::begin_frame();
+        Renderer::render_frame();
         Renderer::end_frame();
 
         Bak3DEditor::update();
 
-        Renderer::post_end_frame();
+        EventManager::end_update();
     } while (EventManager::is_exit_requested() == false);
 }
 

@@ -206,6 +206,12 @@ void EventManager::update()
 	last_frame_time = current_time;
 }
 
+void EventManager::end_update()
+{
+	glfwSwapBuffers(m_window);
+	glfwPollEvents();
+}
+
 float EventManager::get_frame_time()
 {
 	return frame_time;

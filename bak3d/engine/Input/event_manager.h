@@ -69,6 +69,7 @@ public:
 	static void shutdown();
 
 	static void update();
+	static void end_update();
 
 	static float get_frame_time();
 	static float get_frame_time_max();

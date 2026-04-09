@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "renderer_passes.h"
 #include "Scene/scene.h"
 
 using namespace std;
@@ -58,7 +59,7 @@ void Renderer::initialize()
 
 	glfwSetFramebufferSizeCallback(r_window, on_framebuffer_size_callback);
 
-	// tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+	// Tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
 	stbi_set_flip_vertically_on_load(true);
 
 	// Somehow, glewInit triggers a glInvalidEnum... Let's ignore it
@@ -96,6 +97,13 @@ void Renderer::begin_frame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Renderer::render_frame()
+{
+	RendererPasses::render_pass_debug_geometry();
+	RendererPasses::render_pass_base_geometry();
+	RendererPasses::render_pass_lighting();
+}
+
 void Renderer::end_frame()
 {
 	// Swap buffers
@@ -105,12 +113,6 @@ void Renderer::end_frame()
 	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
 	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Renderer::post_end_frame()
-{
-	glfwSwapBuffers(r_window);
-	glfwPollEvents();
 }
 
 void Renderer::shutdown()
