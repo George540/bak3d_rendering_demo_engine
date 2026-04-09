@@ -22,37 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "renderer_passes.h"
+#pragma once
 
-#include "Core/global_settings.h"
-#include "Scene/scene.h"
-
-void RendererPasses::render_pass_debug_geometry()
+/*
+ * Simple static Scene Manager that handles Scene instance behaviour in the main loop.
+ */
+class SceneManager
 {
-    const bool is_grid_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::GridRendering);
-    const bool is_axis_rendering = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AxisRendering);
-    if (is_grid_rendering)
-    {
-        Scene::instance->get_object_in_scene(SceneObjectType::Grid)->draw();
-    }
-    if (is_axis_rendering)
-    {
-        Scene::instance->get_object_in_scene(SceneObjectType::Axis)->draw();
-    }
-}
-
-void RendererPasses::render_pass_base_geometry()
-{
-    if (const Model* model = Scene::instance->get_model())
-    {
-        model->draw();
-    }
-}
-
-void RendererPasses::render_pass_lighting()
-{
-    if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled))
-    {
-        Scene::instance->get_active_light()->draw();
-    }
-}
+public:
+    static void initialize();
+    static void update();
+    static void shutdown();
+};

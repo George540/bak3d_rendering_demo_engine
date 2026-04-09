@@ -22,60 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "engine.h"
+#include "scene_manager.h"
 
-#include <iostream>
-
-#include "editor.h"
-#include "global_settings.h"
-#include "logger.h"
-
-#include "Asset/resource_manager.h"
+#include "scene.h"
+#include "Core/logger.h"
 #include "Input/event_manager.h"
-#include "Renderer/renderer.h"
-#include "Scene/scene_manager.h"
 
-void Bak3DEngine::Initialize()
+namespace
 {
-    Logger::initialize();
-    GlobalSettings::initialize();
-    EventManager::initialize();
-    Renderer::initialize();
-    ResourceManager::initialize();
-    Bak3DEditor::initialize();
-    SceneManager::initialize();
-
-    B3D_LOG_INFO("Engine initialized.");
+    // One instance for now. Could potentially make multiple viewport scenes or render capture scenes.
+    Scene* scene = nullptr;
 }
 
-void Bak3DEngine::Update()
+void SceneManager::initialize()
 {
-    do
-    {
-        // Update Event Manager - Frame time / input / events processing 
-        EventManager::update();
+    scene = new Scene();
 
-        // Update Scene Manager
-        SceneManager::update();
-
-        // Update Renderer - Drawing / Passes / Buffer Objects
-        Renderer::begin_frame();
-        Renderer::render_frame();
-        Renderer::end_frame();
-
-        Bak3DEditor::update();
-
-        EventManager::end_update();
-    } while (EventManager::is_exit_requested() == false);
+    B3D_LOG_INFO("Scene Manager initialized with one Scene instance...");
 }
 
-void Bak3DEngine::Shutdown()
+void SceneManager::update()
 {
-    SceneManager::shutdown();
-    Bak3DEditor::shutdown();
-    Renderer::shutdown();
-    EventManager::shutdown();
-    ResourceManager::shutdown();
-    GlobalSettings::shutdown();
-    Logger::shutdown();
+    const float frame_time_dt = EventManager::get_frame_time();
+    scene->update(frame_time_dt);
+}
+
+void SceneManager::shutdown()
+{
+    scene = nullptr;
 }

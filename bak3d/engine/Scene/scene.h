@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 /*
  * This is the class that contains all the scene's data, such as references to cameras, lights, models, grids, etc.
- * Runs in the main loop of the project and is only one instance.
+ * Runs in the main loop of the project and is only one singleton instance (at the moment).
  */
 class Scene
 {
@@ -49,7 +49,6 @@ public:
 	}
 
 	void update(float dt) const;
-	void draw() const;
 
 	Camera* get_camera() const { return m_camera; }
 	Light* get_active_light() const { return m_light; }
