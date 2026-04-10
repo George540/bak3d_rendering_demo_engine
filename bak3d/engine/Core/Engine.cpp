@@ -58,7 +58,7 @@ void Bak3DEngine::Update()
         SceneManager::update();
 
         Renderer::begin_frame();
-        Renderer::render_frame(); // Update Renderer - Drawing / Passes / Buffer Objects
+        Renderer::draw_frame(); // Update Renderer - Drawing / Passes / Buffer Objects
         Renderer::end_frame();
 
         Bak3DEditor::update(); // Update Editor - Panels / Widgets / ImGui context

@@ -107,16 +107,31 @@ void FrameBuffer::unbind_object() const // when unbinding a frame buffer, it bin
     glViewport(0, 0, m_width, m_height);
 }
 
-void FrameBuffer::resize(GLuint newWidth, GLuint newHeight)
+void FrameBuffer::resize(GLuint new_width, GLuint new_height)
 {
-    if (m_width != newWidth || m_height != newHeight)
+    if (m_width != new_width || m_height != new_height)
     {
-        m_width = newWidth;
-        m_height = newHeight;
+        m_width = new_width;
+        m_height = new_height;
 
         destroy_framebuffer();
         create_framebuffer();
     }
+}
+
+void FrameBuffer::create_attachments()
+{
+    glGenTextures(1, &m_texture_buffer);
+    glBindTexture(GL_TEXTURE_2D, m_texture_buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(m_target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture_buffer, 0);
+
+    glGenRenderbuffers(1, &m_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_width, m_height);
+    glFramebufferRenderbuffer(m_target, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 }
 
 void FrameBuffer::create_framebuffer()
@@ -129,17 +144,7 @@ void FrameBuffer::create_framebuffer()
     glGenFramebuffers(1, &m_ID);
     glBindFramebuffer(m_target, m_ID);
 
-    glGenTextures(1, &m_texture_buffer);
-    glBindTexture(GL_TEXTURE_2D, m_texture_buffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(m_target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture_buffer, 0);
-
-    glGenRenderbuffers(1, &m_rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_width, m_height);
-    glFramebufferRenderbuffer(m_target, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+    create_attachments();
 
     // Verify framebuffer is complete
     if (GLenum status = glCheckFramebufferStatus(m_target); status != GL_FRAMEBUFFER_COMPLETE)
@@ -170,6 +175,74 @@ void FrameBuffer::destroy_framebuffer()
         glDeleteRenderbuffers(1, &m_rbo);
         m_rbo = 0;
     }
+}
+
+MultisampleFrameBuffer::MultisampleFrameBuffer(GLsizeiptr size, const void* data, GLuint width, GLuint height, GLsizei samples, GLenum usage)
+    : FrameBuffer(size, data, width, height, usage),
+    m_samples(samples),
+    m_max_samples(0)
+{
+    glGetIntegerv(GL_MAX_SAMPLES, &m_max_samples);
+
+    // Validate the requested samples against the hardware limit.
+    // Fallback to a safe default if invalid.
+    if (samples < 1 || samples > m_max_samples || (samples & (samples - 1)) != 0)
+    {
+        B3D_LOG_ERROR("Invalid MSAA sample count: %d. Must be power of two or greater than the hardware limit: %d.", samples, m_max_samples);
+        m_samples = 4;
+    }
+    // FrameBuffer constructor already called create_framebuffer(). Redo it for this one.
+    destroy_framebuffer();
+    create_framebuffer();
+
+    B3D_LOG_INFO("MSAA Frame Buffer Object enabled...");
+}
+
+void MultisampleFrameBuffer::resize(const GLuint new_width, const GLuint new_height, const GLsizei new_samples)
+{
+    if (new_samples < 1 || new_samples > 8 || (new_samples & (new_samples - 1)) != 0)
+    {
+        B3D_LOG_ERROR("Invalid sample count: %d. Must be a power of two between 1 and 8.", new_samples);
+        return;
+    }
+    if (m_width != new_width || m_height != new_height || m_samples != new_samples)
+    {
+        m_width = new_width;
+        m_height = new_height;
+        m_samples = new_samples;
+        destroy_framebuffer();
+        create_framebuffer();
+    }
+}
+
+void MultisampleFrameBuffer::resolve_to(const FrameBuffer& fbo_target) const
+{
+    // Ensure both intermediate FBO and MSAA FBO are the same size.
+    assert(m_width == fbo_target.get_width() && m_height == fbo_target.get_height());
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_ID);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_target.get_id());
+    glBlitFramebuffer(
+        0, 0, m_width, m_height,
+        0, 0, fbo_target.get_width(), fbo_target.get_height(),
+        GL_COLOR_BUFFER_BIT,
+        GL_NEAREST
+    );
+}
+
+void MultisampleFrameBuffer::create_attachments()
+{
+    glGenTextures(1, &m_texture_buffer);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_texture_buffer);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_samples, GL_RGB, m_width, m_height, GL_TRUE);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+    glFramebufferTexture2D(m_target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_texture_buffer, 0);
+
+    glGenRenderbuffers(1, &m_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GL_DEPTH24_STENCIL8, m_width, m_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(m_target, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 }
 
 UniformBuffer::UniformBuffer(GLsizeiptr size, const void* data, const GLuint binding_index, GLenum usage)

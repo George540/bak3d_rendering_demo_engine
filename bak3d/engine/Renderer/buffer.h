@@ -37,16 +37,17 @@ class Buffer: public GLObject
 public:
     Buffer(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
     ~Buffer() override;
+
     void bind_object() const override;
     void unbind_object() const override;
+
+    void set_buffer_data(const void* buffer_data, size_t buffer_data_size);
+    void set_buffer_sub_data(const void* sub_data, size_t sub_data_size, size_t sub_data_offset);
 protected:
     GLenum m_target;
     GLsizeiptr m_buffer_size;
     const void* m_data;
     GLenum m_usage;
-public:
-    void set_buffer_data(const void* buffer_data, size_t buffer_data_size);
-    void set_buffer_sub_data(const void* sub_data, size_t sub_data_size, size_t sub_data_offset);
 };
 
 /*
@@ -88,11 +89,11 @@ public:
 class FrameBuffer : public Buffer
 {
 public:
-    FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, const GLuint height, GLenum usage = GL_STATIC_DRAW);
+    FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, const GLuint height, GLenum usage = GL_NONE);
     ~FrameBuffer() override;
     void bind_object() const override;
     void unbind_object() const override;
-    void resize(GLuint newWidth, GLuint newHeight);
+    void resize(GLuint new_width, GLuint new_height);
 
     GLuint get_width() const { return m_width; }
     GLuint get_height() const { return m_height; }
@@ -100,7 +101,8 @@ public:
     GLuint get_render_buffer() const { return m_texture_buffer; }
     GLuint get_depth_buffer() const { return m_rbo; }
 
-private:
+protected:
+    virtual void create_attachments();
     void create_framebuffer();
     void destroy_framebuffer();
 
@@ -108,6 +110,27 @@ private:
     GLuint m_height;
     GLuint m_texture_buffer;
     GLuint m_rbo;
+};
+
+/*
+ * A FrameBuffer variant that stores sample sizes for Multisampled Anti-Aliasing
+ */
+class MultisampleFrameBuffer : public FrameBuffer
+{
+public:
+    MultisampleFrameBuffer(GLsizeiptr size, const void* data, GLuint width, GLuint height, GLsizei samples = 4, GLenum usage = GL_NONE);
+
+    GLsizei get_samples() const { return m_samples; }
+    GLsizei get_max_samples () const { return m_max_samples; }
+
+    void resize(GLuint new_width, GLuint new_height, GLsizei new_samples);
+    void resolve_to(const FrameBuffer& fbo_target) const;
+protected:
+    void create_attachments() override;
+
+private:
+    GLsizei m_samples;
+    GLsizei m_max_samples;
 };
 
 class UniformBuffer : public Buffer

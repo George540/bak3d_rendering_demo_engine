@@ -32,7 +32,7 @@ THE SOFTWARE.
 class GLObject
 {
 public:
-    virtual ~GLObject() {}
+    virtual ~GLObject() = default;
     virtual void bind_object() const = 0;
     virtual void unbind_object() const = 0;
     GLuint get_id() const { return m_ID; }

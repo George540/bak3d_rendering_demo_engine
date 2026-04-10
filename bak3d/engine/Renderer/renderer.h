@@ -35,19 +35,25 @@ class Renderer
 {
 private:
 	static GLFWwindow* r_window;
-	static FrameBuffer* frame_buffer;
-	static UniformBuffer* matrix_uniform_buffer;
+
+	static MultisampleFrameBuffer* r_msaa_fbo;
+	static FrameBuffer* r_fbo;
+	
+	static UniformBuffer* r_ubo;
 public:
 	static void initialize();
 	static void shutdown();
 
 	static void begin_frame();
-	static void render_frame();
+	static void draw_frame();
 	static void end_frame();
 
 	static GLFWwindow* get_window() { return r_window; }
-	static FrameBuffer* get_frame_buffer() { return frame_buffer; }
-	static UniformBuffer* get_uniform_buffer() { return matrix_uniform_buffer; }
+	static MultisampleFrameBuffer* get_msaa_frame_buffer() { return r_msaa_fbo; }
+	static FrameBuffer* get_frame_buffer() { return r_fbo; }
+	static UniformBuffer* get_uniform_buffer() { return r_ubo; }
 
-	static void on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight);
+	static void on_framebuffer_size_callback(GLFWwindow* window, int new_width, int new_height);
+private:
+	static void initialize_buffers();
 };

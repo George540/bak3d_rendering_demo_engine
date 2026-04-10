@@ -40,6 +40,8 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::Light_OriginDistance: return "Origin Distance";
         case GlobalSettingOption::Light_Color: return "Color";
         case GlobalSettingOption::Light_Intensity: return "Intensity";
+        case GlobalSettingOption::MSAA_Enabled: return "MSAA Enabled";
+        case GlobalSettingOption::MSAA_Samples: return "MSAA Samples";
         case GlobalSettingOption::Max: return "Max";
         default: return "Unknown";
     }
@@ -58,6 +60,8 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_OriginDistance] = 5.0f;
     global_settings[GlobalSettingOption::Light_Color] = glm::vec4(1.0f);
     global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;
+    global_settings[GlobalSettingOption::MSAA_Enabled] = true;
+    global_settings[GlobalSettingOption::MSAA_Samples] = 4; // turns to 4x4 when passed to GLFW
 }
 
 void GlobalSettings::shutdown()

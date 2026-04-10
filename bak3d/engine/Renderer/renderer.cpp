@@ -43,8 +43,9 @@ using namespace std;
 
 // Renderer
 GLFWwindow* Renderer::r_window = nullptr;
-FrameBuffer* Renderer::frame_buffer = nullptr;
-UniformBuffer* Renderer::matrix_uniform_buffer = nullptr;
+MultisampleFrameBuffer* Renderer::r_msaa_fbo = nullptr;
+FrameBuffer* Renderer::r_fbo = nullptr;
+UniformBuffer* Renderer::r_ubo = nullptr;
 
 void Renderer::initialize()
 {
@@ -70,8 +71,7 @@ void Renderer::initialize()
 	glDepthFunc(GL_LESS);
 	B3D_LOG_INFO("Enabling depth test...");
 
-	frame_buffer = new FrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height(), GL_NONE);
-	matrix_uniform_buffer = new UniformBuffer(MAT4_SIZE * 2, nullptr, 0, GL_DYNAMIC_DRAW);
+	initialize_buffers();
 
 	B3D_LOG_INFO("Ending Renderer Initialization....");
 }
@@ -81,13 +81,19 @@ void Renderer::begin_frame()
 	glm::mat4 projection_matrix = Scene::instance->get_camera()->get_projection_matrix();
 	glm::mat4 view_matrix = Scene::instance->get_camera()->get_view_matrix();
 
-	matrix_uniform_buffer->bind_object();
-	matrix_uniform_buffer->set_buffer_sub_data(glm::value_ptr(projection_matrix), MAT4_SIZE, 0);
-	matrix_uniform_buffer->set_buffer_sub_data(glm::value_ptr(view_matrix), MAT4_SIZE, MAT4_SIZE);
-	matrix_uniform_buffer->unbind_object();
-	
-	// Clear the screen
-	frame_buffer->bind_object();
+	r_ubo->bind_object();
+	r_ubo->set_buffer_sub_data(glm::value_ptr(projection_matrix), MAT4_SIZE, 0);
+	r_ubo->set_buffer_sub_data(glm::value_ptr(view_matrix), MAT4_SIZE, MAT4_SIZE);
+	r_ubo->unbind_object();
+
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled))
+	{
+		r_msaa_fbo->bind_object();
+	}
+	else
+	{
+		r_fbo->bind_object();
+	}
 
 	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
 	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
@@ -97,7 +103,7 @@ void Renderer::begin_frame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::render_frame()
+void Renderer::draw_frame()
 {
 	RendererPasses::render_pass_debug_geometry();
 	RendererPasses::render_pass_base_geometry();
@@ -109,7 +115,18 @@ void Renderer::end_frame()
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	frame_buffer->unbind_object();
+
+	// Back to default framebuffer
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled))
+	{
+		r_msaa_fbo->resolve_to(*r_fbo);
+		r_msaa_fbo->unbind_object();
+	}
+	else
+	{
+		r_fbo->unbind_object();
+	}
+
 	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
 	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,13 +135,24 @@ void Renderer::end_frame()
 void Renderer::shutdown()
 {
 	r_window = nullptr;
+	r_ubo = nullptr;
+	r_fbo = nullptr;
+	r_msaa_fbo = nullptr;
 }
 
-void Renderer::on_framebuffer_size_callback(GLFWwindow* window, int newWidth, int newHeight)
+void Renderer::on_framebuffer_size_callback(GLFWwindow* window, const int new_width, const int new_height)
 {
-	// make sure the viewport matches the new window dimensions; note that width and 
-	// height will be significantly larger than specified on retina displays.
-	// Note: position is set to 0 for both x and y coordinates
-	frame_buffer->resize(newWidth, newHeight);
-	glViewport(0, 0, newWidth, newHeight);
+	if (new_width == 0 || new_height == 0)
+	{
+		return;
+	}
+	r_msaa_fbo->resize(new_width, new_height, r_msaa_fbo->get_samples());
+	r_fbo->resize(new_width, new_height);
+}
+
+void Renderer::initialize_buffers()
+{
+	r_msaa_fbo = new MultisampleFrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
+	r_fbo = new FrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
+	r_ubo = new UniformBuffer(MAT4_SIZE * 2, nullptr, 0, GL_DYNAMIC_DRAW);
 }

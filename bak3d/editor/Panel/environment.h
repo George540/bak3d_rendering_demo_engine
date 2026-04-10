@@ -35,6 +35,7 @@ public:
     void update() override;
     void end_frame() override;
 private:
-    void draw_general_settings();
-    void draw_light_settings();
+    static void draw_general_settings();
+    static void draw_light_settings();
+    static void draw_post_processing_settings();
 };

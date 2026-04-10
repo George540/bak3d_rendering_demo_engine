@@ -82,9 +82,6 @@ void EventManager::initialize()
 		return;
 	}
 
-	// Request MSAA (will be configured later)
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
 	// Prefer modern OpenGL
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

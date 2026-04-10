@@ -57,6 +57,8 @@ enum class GlobalSettingOption : uint32_t
     Light_OriginDistance,
     Light_Color,
     Light_Intensity,
+    MSAA_Enabled,
+    MSAA_Samples,
     Max
 };
 

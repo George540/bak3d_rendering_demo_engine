@@ -24,14 +24,28 @@ THE SOFTWARE.
 
 #include "environment.h"
 
+#include <algorithm>
 #include <glm/vec3.hpp>
 
 #include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
+#include "Renderer/renderer.h"
+
+using namespace std;
+
+namespace
+{
+    vector<const char*> m_msaa_samples = { };
+}
 
 Environment::Environment() : EditorPanel("Environment")
 {
-
+    /*const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
+    m_msaa_samples.reserve(msaa_max_samples);
+    for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id * 2)
+    {
+        m_msaa_samples[sample_id] = string("%sx%s")
+    }*/
 }
 
 void Environment::begin_frame()
@@ -45,6 +59,7 @@ void Environment::update()
 
     draw_general_settings();
     draw_light_settings();
+    draw_post_processing_settings();
 }
 
 void Environment::end_frame()
@@ -126,6 +141,25 @@ void Environment::draw_light_settings()
             light_color.b = bg_col[2];
             light_color.a = bg_col[3];
             GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
+        }
+        ImGui::EndDisabled();
+
+        ImGui::TreePop();
+    }
+}
+
+void Environment::draw_post_processing_settings()
+{
+     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Post Processing"))
+    {
+        bool msaa_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled);
+        ImGuiB3D::PropertyToggle("MSAA", &msaa_enabled, "Toggle Multisample Anti-Aliasing");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::MSAA_Enabled, msaa_enabled);
+
+        ImGui::BeginDisabled(!msaa_enabled);
+        {
+            
         }
         ImGui::EndDisabled();
 
