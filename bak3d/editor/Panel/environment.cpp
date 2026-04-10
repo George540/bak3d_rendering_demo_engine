@@ -41,6 +41,7 @@ Environment::Environment() : EditorPanel("Environment")
 {
     // Dynamically create MSAA sampling options for dropdown selection based on hardware's max samples.
     const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
+    
     m_msaa_samples.reserve(msaa_max_samples);
     for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id *= 2)
     {
@@ -161,18 +162,21 @@ void Environment::draw_post_processing_settings()
         ImGui::BeginDisabled(!msaa_enabled);
         {
             int msaa_sample = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::MSAA_Samples);
-            if (ImGui::BeginCombo("MSAA Samples", (to_string(msaa_sample) + "x" + to_string(msaa_sample)).c_str())) 
+            const string preview = to_string(msaa_sample) + "x" + to_string(msaa_sample);
+            if (ImGuiB3D::PropertyBeginDropdown("MSAA Samples", preview.c_str(), "Controls MSAA quality."))
             {
-                for (int n = 0; n < m_msaa_samples.size(); n++) 
+                for (int n = 0; n < m_msaa_samples.size(); n++)
                 {
+                    ImGui::PushID(n);
+
                     // Bitwise shift to power of two:
                     // Index 0 -> 2 (2^1)
                     // Index 1 -> 4 (2^2)
                     // Index 2 -> 8 (2^3)...
                     const int sample_value = 1 << (n + 1);
-
                     const bool is_selected = (msaa_sample == sample_value);
-                    if (ImGui::Selectable(m_msaa_samples[n].c_str(), is_selected)) 
+
+                    if (ImGui::Selectable(m_msaa_samples[n].c_str(), is_selected))
                     {
                         msaa_sample = sample_value;
                         GlobalSettings::set_global_setting<int>(GlobalSettingOption::MSAA_Samples, msaa_sample);
@@ -182,7 +186,10 @@ void Environment::draw_post_processing_settings()
                     {
                         ImGui::SetItemDefaultFocus();
                     }
+
+                    ImGui::PopID();
                 }
+
                 ImGui::EndCombo();
             }
         }

@@ -36,6 +36,8 @@ THE SOFTWARE.
  * ==========================================================================
  */
 
+constexpr static int MAX_LOG_ENTRIES = 64;
+
 using GlobalSettingValueType = std::variant<
     bool,
     int,

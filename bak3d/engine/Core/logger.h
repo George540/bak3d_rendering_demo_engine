@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include <chrono>
 #include <cstdio>
 
+#include "global_definitions.h"
+
 namespace log_helper
 {
     constexpr const char* extract_filename(const char* path)
@@ -64,8 +66,6 @@ inline const char* to_string(LogLevel e)
     default: return "unknown";
     }
 }
-
-constexpr static int MAX_LOG_ENTRIES = 32;
 
 /*
  * Simple Logger class for logging different levels of logging severity (Log, Warning, Error).

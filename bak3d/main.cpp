@@ -27,7 +27,7 @@ THE SOFTWARE.
 /*
  * This is the 'main' function. Program execution begins and ends there.
  *
- * Date created on 09/08/2022.
+ * Date created: 09/08/2022.
  *
  * All dependencies and libraries used listed on README.md and root CMakeLists.txt
  */

@@ -72,7 +72,21 @@ bool ImGuiB3D::PropertyDropdown(const char* label, const std::vector<const char*
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
     const auto label_str = "##" + string(label);
-    return ImGui::Combo(label_str.c_str(), selected_index, data.data(), static_cast<int>(data.size()));;
+    return ImGui::Combo(label_str.c_str(), selected_index, data.data(), static_cast<int>(data.size()));
+}
+
+bool ImGuiB3D::PropertyBeginDropdown(const char* label, const char* preview_value, const char* tooltip_desc)
+{
+    ImGui::TextUnformatted(label);
+    if (tooltip_desc && ImGui::IsItemHovered())
+    {
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
+    }
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    const auto label_str = "##" + string(label);
+    return ImGui::BeginCombo(label_str.c_str(), preview_value);
+    // NOTE: Make sure you use ImGui::EndCombo() to properly close the widget.
 }
 
 bool ImGuiB3D::PropertySliderFloat(const char* label, float* value, float v_min, float v_max, const char* format,
