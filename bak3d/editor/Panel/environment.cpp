@@ -24,7 +24,6 @@ THE SOFTWARE.
 
 #include "environment.h"
 
-#include <algorithm>
 #include <glm/vec3.hpp>
 
 #include "imgui_b3d_extensions.h"
@@ -35,17 +34,19 @@ using namespace std;
 
 namespace
 {
-    vector<const char*> m_msaa_samples = { };
+    vector<string> m_msaa_samples = { };
 }
 
 Environment::Environment() : EditorPanel("Environment")
 {
-    /*const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
+    // Dynamically create MSAA sampling options for dropdown selection based on hardware's max samples.
+    const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
     m_msaa_samples.reserve(msaa_max_samples);
-    for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id * 2)
+    for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id *= 2)
     {
-        m_msaa_samples[sample_id] = string("%sx%s")
-    }*/
+        string label = to_string(sample_id) + "x" + to_string(sample_id);
+        m_msaa_samples.push_back(label);
+    }
 }
 
 void Environment::begin_frame()
@@ -150,7 +151,7 @@ void Environment::draw_light_settings()
 
 void Environment::draw_post_processing_settings()
 {
-     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Post Processing"))
     {
         bool msaa_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled);
@@ -159,7 +160,31 @@ void Environment::draw_post_processing_settings()
 
         ImGui::BeginDisabled(!msaa_enabled);
         {
-            
+            int msaa_sample = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::MSAA_Samples);
+            if (ImGui::BeginCombo("MSAA Samples", (to_string(msaa_sample) + "x" + to_string(msaa_sample)).c_str())) 
+            {
+                for (int n = 0; n < m_msaa_samples.size(); n++) 
+                {
+                    // Bitwise shift to power of two:
+                    // Index 0 -> 2 (2^1)
+                    // Index 1 -> 4 (2^2)
+                    // Index 2 -> 8 (2^3)...
+                    const int sample_value = 1 << (n + 1);
+
+                    const bool is_selected = (msaa_sample == sample_value);
+                    if (ImGui::Selectable(m_msaa_samples[n].c_str(), is_selected)) 
+                    {
+                        msaa_sample = sample_value;
+                        GlobalSettings::set_global_setting<int>(GlobalSettingOption::MSAA_Samples, msaa_sample);
+                    }
+
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
         }
         ImGui::EndDisabled();
 

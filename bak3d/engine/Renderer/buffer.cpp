@@ -88,6 +88,8 @@ FrameBuffer::FrameBuffer(GLsizeiptr size, const void* data, const GLuint width, 
     m_height(height)
 {
     create_framebuffer();
+    
+    B3D_LOG_INFO("Frame Buffer Object enabled...");
 }
 
 FrameBuffer::~FrameBuffer()
@@ -154,8 +156,6 @@ void FrameBuffer::create_framebuffer()
 
     glBindFramebuffer(m_target, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    B3D_LOG_INFO("Frame Buffer Object enabled...");
 }
 
 void FrameBuffer::destroy_framebuffer()
@@ -198,20 +198,20 @@ MultisampleFrameBuffer::MultisampleFrameBuffer(GLsizeiptr size, const void* data
     B3D_LOG_INFO("MSAA Frame Buffer Object enabled...");
 }
 
-void MultisampleFrameBuffer::resize(const GLuint new_width, const GLuint new_height, const GLsizei new_samples)
+void MultisampleFrameBuffer::set_samples(const GLsizei new_samples)
 {
-    if (new_samples < 1 || new_samples > 8 || (new_samples & (new_samples - 1)) != 0)
+    if (new_samples < 1 || new_samples > m_max_samples || (new_samples & (new_samples - 1)) != 0)
     {
         B3D_LOG_ERROR("Invalid sample count: %d. Must be a power of two between 1 and 8.", new_samples);
         return;
     }
-    if (m_width != new_width || m_height != new_height || m_samples != new_samples)
+    if (m_samples != new_samples)
     {
-        m_width = new_width;
-        m_height = new_height;
         m_samples = new_samples;
         destroy_framebuffer();
         create_framebuffer();
+        
+        B3D_LOG_INFO("Resampling MSAA Frame Buffer Object to %dx%d samples...", m_samples, m_samples);
     }
 }
 

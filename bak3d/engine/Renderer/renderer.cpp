@@ -85,9 +85,14 @@ void Renderer::begin_frame()
 	r_ubo->set_buffer_sub_data(glm::value_ptr(projection_matrix), MAT4_SIZE, 0);
 	r_ubo->set_buffer_sub_data(glm::value_ptr(view_matrix), MAT4_SIZE, MAT4_SIZE);
 	r_ubo->unbind_object();
-
+	
 	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled))
 	{
+		if (const int samples_setting = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::MSAA_Samples);
+			r_msaa_fbo->get_samples() != samples_setting)
+		{
+			r_msaa_fbo->set_samples(samples_setting);
+		}
 		r_msaa_fbo->bind_object();
 	}
 	else
@@ -146,7 +151,7 @@ void Renderer::on_framebuffer_size_callback(GLFWwindow* window, const int new_wi
 	{
 		return;
 	}
-	r_msaa_fbo->resize(new_width, new_height, r_msaa_fbo->get_samples());
+	r_msaa_fbo->resize(new_width, new_height);
 	r_fbo->resize(new_width, new_height);
 }
 

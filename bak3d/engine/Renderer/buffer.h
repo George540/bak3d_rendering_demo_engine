@@ -120,10 +120,10 @@ class MultisampleFrameBuffer : public FrameBuffer
 public:
     MultisampleFrameBuffer(GLsizeiptr size, const void* data, GLuint width, GLuint height, GLsizei samples = 4, GLenum usage = GL_NONE);
 
+    void set_samples(const GLsizei new_samples);
     GLsizei get_samples() const { return m_samples; }
     GLsizei get_max_samples () const { return m_max_samples; }
 
-    void resize(GLuint new_width, GLuint new_height, GLsizei new_samples);
     void resolve_to(const FrameBuffer& fbo_target) const;
 protected:
     void create_attachments() override;
