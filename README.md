@@ -83,9 +83,10 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
 |:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
 |:ballot_box_with_check:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
-|☐| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
-|:gear:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
-|☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. |
+|:gear:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
+|:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
+|☐| **Light Types** | More light types to add such as spotlights, area lights and directional lights. For now, just make the single light in the scene to change type. |
+|☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
 |:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
 
@@ -93,14 +94,14 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 ### v1.4 - The Rendering Universe Expands
 | Status | Feature | Description |
 | :---: | :--- | :--- |
+|☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. PBR Materials as well as HDR and IBL. |
+|☐| **Deferred Rendering** | Apply the possibility to integrate rendering features at scale and keep it industry standard. Opens up the possibility for multiple lights in scene. |
 |☐| **Compute Pipeline** | Add compute pipeline and shaders in the Renderer for opening the possibility for more rendering features. Also implement for GPU Particles. |
-|☐| **Light Types** | More light types to add such as spotlights, area lights and directional lights. Support multiple lights in scene and shaders as well. |
-|☐| **Polish GPU Particles** | Particle System is barely hanging by. A new and more capable approach is needed. |
+|☐| **Polish GPU Particles** | Particle System is barely keeping up. A new and more capable approach is needed. |
 |☐| **Multiple Objects in scene** | Support multiple objects in scene, even from the same type. |
 |☐| **Terrain** | Simple terrain concept for loading a height map into a plane mesh, used for lighting purposes. |
 |☐| **Scene Graph** | Add a scene graph for proper handling of multiple objects using spacial culling. |
 |☐| **GPU Culling** | As the scene grows, we need to handle it at scale with culling unecessary or unseen objects. |
-|☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |☐| **Bonus: Rigidbody demo setup** | If time and motivation, add a simple rigidbody structure for fun physics. |
 |☐| **Bonus: FPV movement** | make camera move around the scene without just being restricted in orbit. |
 
