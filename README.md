@@ -89,6 +89,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
 |:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
+|☐| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
 
 ### v1.4 - The Rendering Universe Expands
