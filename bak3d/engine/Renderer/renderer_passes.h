@@ -30,4 +30,5 @@ public:
     static void render_pass_debug_geometry(); // fake debug pass, still geometry
     static void render_pass_base_geometry();
     static void render_pass_lighting(); // fake lighting pass, still geometry
+    static void render_post_processing();
 };

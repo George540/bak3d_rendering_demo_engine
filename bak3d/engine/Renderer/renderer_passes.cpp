@@ -24,6 +24,8 @@ THE SOFTWARE.
 
 #include "renderer_passes.h"
 
+#include "post_processor.h"
+#include "renderer.h"
 #include "Core/global_settings.h"
 #include "Scene/scene.h"
 
@@ -55,4 +57,11 @@ void RendererPasses::render_pass_lighting()
     {
         Scene::instance->get_active_light()->draw();
     }
+}
+
+void RendererPasses::render_post_processing()
+{
+    PostProcessor::begin_frame();
+    PostProcessor::process_frame(*Renderer::get_frame_buffer());
+    PostProcessor::end_frame();
 }

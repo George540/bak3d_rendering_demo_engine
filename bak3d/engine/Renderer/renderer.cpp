@@ -114,10 +114,7 @@ void Renderer::draw_frame()
 	RendererPasses::render_pass_debug_geometry();
 	RendererPasses::render_pass_base_geometry();
 	RendererPasses::render_pass_lighting();
-}
 
-void Renderer::end_frame()
-{
 	// Swap buffers
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -133,10 +130,11 @@ void Renderer::end_frame()
 		r_fbo->unbind_object();
 	}
 
-	PostProcessor::begin_frame();
-	PostProcessor::process_frame(*r_fbo);
-	PostProcessor::end_frame();
+	RendererPasses::render_post_processing();
+}
 
+void Renderer::end_frame()
+{
 	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
 	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
