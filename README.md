@@ -72,9 +72,9 @@ Simply clone the repo locally and run the setup.py script located in the root of
 Download and extract the latest .zip folder on the *Releases* section onto your personal computer. Enter the folder and launch the **Bak3D Engine** .exe application. The program will run in windowed version that covers the entire display. To close the program, just open the console window and close it.
 
 
-## Next Features
+## Roadmap
 
-### v1.3 - The Abstraction Update
+### [v1.3 - The Abstraction Update](https://github.com/George540/Bak3DEngine/milestone/2)
 | Status | Feature | Description |
 | :---: | :--- | :--- |
 |:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
