@@ -69,7 +69,6 @@ Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture_id, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         stbi_image_free(data);

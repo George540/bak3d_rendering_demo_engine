@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "Asset/resource_manager.h"
 #include "Input/event_manager.h"
+#include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
 #include "Scene/scene_manager.h"
 
@@ -42,6 +43,7 @@ void Bak3DEngine::Initialize()
     EventManager::initialize();
     Renderer::initialize();
     ResourceManager::initialize();
+    PostProcessor::initialize();
     Bak3DEditor::initialize();
     SceneManager::initialize();
 
@@ -71,9 +73,10 @@ void Bak3DEngine::Shutdown()
 {
     SceneManager::shutdown();
     Bak3DEditor::shutdown();
+    PostProcessor::shutdown();
+    ResourceManager::shutdown();
     Renderer::shutdown();
     EventManager::shutdown();
-    ResourceManager::shutdown();
     GlobalSettings::shutdown();
     Logger::shutdown();
 }

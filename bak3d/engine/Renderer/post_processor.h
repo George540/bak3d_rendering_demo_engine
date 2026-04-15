@@ -1,4 +1,4 @@
-/* ===========================================================================
+﻿/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,17 +24,25 @@ THE SOFTWARE.
 
 #pragma once
 
-/*
- * Abstract class for OpenGL rendering objects that bind data to the GPU.
- */
-class GLObject
+#include "buffer.h"
+#include "Asset/shader.h"
+
+class PostProcessor
 {
 public:
-    virtual ~GLObject() = default;
-    virtual void bind_object() const = 0;
-    virtual void unbind_object() const = 0;
-    GLuint get_id() const { return m_ID; }
+    static void initialize();
+    static void shutdown();
 
-protected:
-    GLuint m_ID = 0;
+    static void begin_frame();
+    static void process_frame(const FrameBuffer& resolved_fbo);
+    static void end_frame();
+
+    static Shader* get_shader();
+    static FrameBuffer* get_frame_buffer();
+    
+    static void resize(GLuint width, GLuint height);
+private:
+    static void create_quad();
+    static void draw_quad();
+    static void destroy_quad();
 };

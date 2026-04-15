@@ -117,7 +117,7 @@ void Light::draw() const
 	m_sprite_texture->bind(0);
 
 	m_vao->bind_object();
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(CUBE_INDICES_SOLID.size()), GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(QUAD_INDICES.size()), GL_UNSIGNED_INT, nullptr);
 	m_vao->unbind_object();
 
 	Texture2D::unbind();

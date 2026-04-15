@@ -4,6 +4,7 @@
 #include <glm/common.hpp>
 
 #include "Input/event_manager.h"
+#include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
 
 namespace
@@ -27,7 +28,7 @@ void Viewport::update()
 
     ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
 	
-    auto frame_buffer_main = Renderer::get_frame_buffer();
+    auto frame_buffer_main = PostProcessor::get_frame_buffer();
     float fb_aspect = frame_buffer_main->get_aspect_ratio();
     float view_aspect = viewport_panel_size.x / viewport_panel_size.y;
 

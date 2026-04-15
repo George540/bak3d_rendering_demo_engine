@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "post_processor.h"
 #include "renderer_passes.h"
 #include "Scene/scene.h"
 
@@ -132,6 +133,10 @@ void Renderer::end_frame()
 		r_fbo->unbind_object();
 	}
 
+	PostProcessor::begin_frame();
+	PostProcessor::process_frame(*r_fbo);
+	PostProcessor::end_frame();
+
 	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
 	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -153,6 +158,7 @@ void Renderer::on_framebuffer_size_callback(GLFWwindow* window, const int new_wi
 	}
 	r_msaa_fbo->resize(new_width, new_height);
 	r_fbo->resize(new_width, new_height);
+	PostProcessor::resize(new_width, new_height);
 }
 
 void Renderer::initialize_buffers()
