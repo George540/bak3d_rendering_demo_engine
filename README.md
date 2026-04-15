@@ -86,7 +86,6 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:gear:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
 |:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
 |☐| **Light Types** | More light types to add such as spotlights, area lights and directional lights. For now, just make the single light in the scene to change type. |
-|☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
 |:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
 |☐| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
@@ -95,6 +94,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 ### v1.4 - The Rendering Universe Expands
 | Status | Feature | Description |
 | :---: | :--- | :--- |
+|☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
 |☐| **PBR Lighting** | A fundamental rendering concept I've been looking forward to implement. PBR Materials as well as HDR and IBL. |
 |☐| **Deferred Rendering** | Apply the possibility to integrate rendering features at scale and keep it industry standard. Opens up the possibility for multiple lights in scene. |
 |☐| **Compute Pipeline** | Add compute pipeline and shaders in the Renderer for opening the possibility for more rendering features. Also implement for GPU Particles. |
