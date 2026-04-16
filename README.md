@@ -18,10 +18,6 @@ Bak3D engine started as a fun project back at a time where I just graduated from
 
 <br>
 
-<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
-
-*Bak3D v1.2, 2024: introduction of Particle Systems*
-
 # This engine is for you if you are...
 
 - :ballot_box_with_check: ...a rendering enthusiast and are interested how video games look like behind the hood.
@@ -50,11 +46,11 @@ This is (or planning to be) the perfect starting point for computer graphics and
 | **Particles** | GPU-driven particle system that can render thousands of particles with an extensive property modifications (size, velocity, lifetime, amount, textures, bounding box flow, etc) (restructuring at the moment). |
 | **Metrics** | Simple profiling window for displaying basic GPU metrics, such as FPS, frame time in both numerical and histogram formats. |
 
-<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/3639aed6-ff0f-463a-999b-daf375aa9b83" />
+<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
 
-*Bak3D v1.2, 2022: The first major feature of the engine, assimp model loading*
+*Bak3D v1.2, 2024: introduction of Particle Systems*
 
-
+<br>
 
 ## Third-Party libraries
 
@@ -69,6 +65,11 @@ Found inside the third_party directory, these are the current libraries being su
 | **[KHRPlatform](https://registry.khronos.org/EGL/api/KHR/khrplatform.h)** | Khronos group header file that defines platform-specific types and macros for OpenGL. |
 | **[stb_image](https://github.com/nothings/stb)** | Lightweight header file for loading and creating textures in OpenGL, by stb. |
 
+<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/3639aed6-ff0f-463a-999b-daf375aa9b83" />
+
+*Bak3D v1.1, 2022: The first major feature of the engine, custom assimp model loading*
+
+<br>
 
 ## How to build
 Simply clone the repo locally and run the setup.py script located in the root of the repository. Choose your .sln format and configuration and then open the solution once everything is done.
@@ -96,7 +97,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |☐| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
 
-### v1.4 - The Rendering Universe Expands
+### [v1.4 - The Rendering Universe Expands](https://github.com/George540/Bak3DEngine/milestone/3)
 | Status | Feature | Description |
 | :---: | :--- | :--- |
 |☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
