@@ -286,7 +286,13 @@ if(MSVC)
 	source_group("Shaders" FILES ${SHADER_FILES})
     
     # Set compiler flags for MSVC
-    target_compile_options(bak3d PRIVATE /W4)
+    # More robust compilation setup:
+	target_compile_options(bak3d PRIVATE
+		/W4 # Warning level 4
+		/FS # Synchronous PDB writes
+		/permissive- # Standards conformance
+		/std:c++latest # Latest C++ standard
+	)
 endif()
 
 # ============================================================================
