@@ -12,10 +12,15 @@ Bak3D (baked) is a real-time beginner-friendly 3D rendering engine that can be u
 
 Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a Junior 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It formed a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with.
 
+<img width="2557" height="1004" alt="image" src="https://github.com/user-attachments/assets/e0569608-e1db-4744-92c7-44328c8823fb" />
+
+*Bak3D v1.3, 2026: editor overhaul, restructuring and fundamental rendering system implementations*
+
+<br>
 
 <img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
 
-*Bak3D v1.2 introduces more features and tunings, like Particle Systems*
+*Bak3D v1.2, 2024: introduction of Particle Systems*
 
 # This engine is for you if you are...
 
@@ -47,7 +52,7 @@ This is (or planning to be) the perfect starting point for computer graphics and
 
 <img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/3639aed6-ff0f-463a-999b-daf375aa9b83" />
 
-*Custom Mushroom model imported into the engine with appropriate textures.*
+*Bak3D v1.2, 2022: The first major feature of the engine, assimp model loading*
 
 
 
