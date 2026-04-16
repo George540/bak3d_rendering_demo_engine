@@ -79,6 +79,8 @@ public:
 	static bool is_exit_requested();
 
 	static GLFWwindow* get_window();
+	static GLFWmonitor* get_monitor();
+	const static GLFWvidmode* get_vid_mode();
 	static int get_window_width() { return m_window_width; }
 	static int get_window_height() { return m_window_height; }
 

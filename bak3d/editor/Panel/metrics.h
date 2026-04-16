@@ -37,4 +37,7 @@ public:
     void begin_frame() override;
     void update() override;
     void end_frame() override;
+private:
+    void update_metrics();
+    void update_hardware();
 };

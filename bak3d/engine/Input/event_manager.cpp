@@ -242,6 +242,16 @@ GLFWwindow* EventManager::get_window()
 	return m_window;
 }
 
+GLFWmonitor* EventManager::get_monitor()
+{
+	return m_monitor;
+}
+
+const GLFWvidmode* EventManager::get_vid_mode()
+{
+	return m_vid_mode;
+}
+
 double EventManager::get_mouse_motion_x()
 {
 	return delta_x;
