@@ -57,8 +57,19 @@ void Metrics::update()
 {
     EditorPanel::update();
 
-    update_metrics();
-    update_hardware();
+    if (ImGui::BeginTable("##metrics_table", 2, ImGuiTableFlags_Resizable))
+    {
+        ImGui::TableSetupColumn("Metrics", ImGuiTableColumnFlags_WidthStretch, 0.65f);
+        ImGui::TableSetupColumn("Hardware", ImGuiTableColumnFlags_WidthStretch, 0.35f);
+
+        ImGui::TableNextColumn();
+        update_metrics();
+
+        ImGui::TableNextColumn();
+        update_hardware();
+
+        ImGui::EndTable();
+    }
 }
 
 void Metrics::end_frame()
@@ -68,53 +79,47 @@ void Metrics::end_frame()
 
 void Metrics::update_metrics()
 {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Metrics"))
+    int fps_count = EventManager::get_frames_per_second();
+    float frame_time_ms = 1000.0f * EventManager::get_frame_time();
+    float imgui_frame_time_ms = ImGui::GetIO().Framerate;
+
+    ImGui::Text("FPS: %d", fps_count);
+    ImGui::Text("Frame Time: %.3f ms", frame_time_ms);
+    ImGui::Text("ImGuiIO: %.0f FPS", imgui_frame_time_ms);
+
+    // Stats Plot
     {
-        int fps_count = EventManager::get_frames_per_second();
-        float frame_time_ms = 1000.0f * EventManager::get_frame_time();
-        float imgui_frame_time_ms = ImGui::GetIO().Framerate;
+        static float history = 10.0f;
+        ImGui::SliderFloat("History",&history,10,60,"%.1f s");
 
-        ImGui::Text("FPS: %d", fps_count);
-        ImGui::Text("Frame Time: %.3f ms", frame_time_ms);
-        ImGui::Text("ImGuiIO: %.0f FPS", imgui_frame_time_ms);
-
-        // Stats Plot
+        frame_time_stamps_plotted.push_back(frame_time_ms);
+        if (frame_time_stamps_plotted.size() > MAX_PLOTS_COUNT)
         {
-            static float history = 10.0f;
-            ImGui::SliderFloat("History",&history,10,60,"%.1f s");
-
-            frame_time_stamps_plotted.push_back(frame_time_ms);
-            if (frame_time_stamps_plotted.size() > MAX_PLOTS_COUNT)
-            {
-                frame_time_stamps_plotted.erase(frame_time_stamps_plotted.begin());
-            }
-
-            float time_elapsed = Bak3DEditor::get_editor_lifetime();
-        
-            if (ImPlot::BeginPlot("##UnitGraph", ImVec2(-1,ImGui::GetTextLineHeight() * 11)))
-            {
-                ImPlot::SetupAxes("Stat Time (ms)", "Time (ms)", ImPlotAxisFlags_NoTickLabels, 0);
-                ImPlot::SetupAxisLimits(ImAxis_X1,time_elapsed - history, time_elapsed, ImGuiCond_Always);
-                ImPlot::SetupAxisLimits(ImAxis_Y1,0,33.33); // 33.33 ms = 30 FPS, lowest visible limit
-            
-                ImPlot::PlotLine("Frame Time",
-                    frame_time_stamps_plotted.data(),
-                    static_cast<int>(frame_time_stamps_plotted.size()),
-                    1.0f, 0.0f, plot_specs_ms);
-
-                // 60 FPS warning threshold at 16.66ms
-                ImPlot::PlotInfLines("##60 FPS", &SOFT_MS_THRESHOLD, 1,
-           {
-                    ImPlotProp_LineColor, ImVec4(1.0f, 0.4f, 0.1f, 1.0f),
-                    ImPlotProp_Flags, ImPlotInfLinesFlags_Horizontal
-                });
-
-                ImPlot::EndPlot();
-            }
+            frame_time_stamps_plotted.erase(frame_time_stamps_plotted.begin());
         }
 
-        ImGui::TreePop();
+        float time_elapsed = Bak3DEditor::get_editor_lifetime();
+        
+        if (ImPlot::BeginPlot("##UnitGraph", ImVec2(-1,ImGui::GetTextLineHeight() * 11)))
+        {
+            ImPlot::SetupAxes("Stat Time (ms)", "Time (ms)", ImPlotAxisFlags_NoTickLabels, 0);
+            ImPlot::SetupAxisLimits(ImAxis_X1,time_elapsed - history, time_elapsed, ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1,0,33.33); // 33.33 ms = 30 FPS, lowest visible limit
+            
+            ImPlot::PlotLine("Frame Time",
+                frame_time_stamps_plotted.data(),
+                static_cast<int>(frame_time_stamps_plotted.size()),
+                1.0f, 0.0f, plot_specs_ms);
+
+            // 60 FPS warning threshold at 16.66ms
+            ImPlot::PlotInfLines("##60 FPS", &SOFT_MS_THRESHOLD, 1,
+       {
+                ImPlotProp_LineColor, ImVec4(1.0f, 0.4f, 0.1f, 1.0f),
+                ImPlotProp_Flags, ImPlotInfLinesFlags_Horizontal
+            });
+
+            ImPlot::EndPlot();
+        }
     }
 }
 
