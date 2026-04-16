@@ -195,6 +195,10 @@ void Environment::draw_post_processing_settings()
         }
         ImGui::EndDisabled();
 
+        bool post_process_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
+        ImGuiB3D::PropertyToggle("Enabled", &post_process_enabled, "Toggle Post Processing");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Enabled, post_process_enabled);
+
         ImGui::TreePop();
     }
 }

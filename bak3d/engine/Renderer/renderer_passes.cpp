@@ -61,7 +61,10 @@ void RendererPasses::render_pass_lighting()
 
 void RendererPasses::render_post_processing()
 {
-    PostProcessor::begin_frame();
-    PostProcessor::process_frame(*Renderer::get_frame_buffer());
-    PostProcessor::end_frame();
+    if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled))
+    {
+        PostProcessor::begin_frame();
+        PostProcessor::process_frame(*Renderer::get_frame_buffer());
+        PostProcessor::end_frame();
+    }
 }

@@ -3,6 +3,7 @@
 #include <imgui_internal.h>
 #include <glm/common.hpp>
 
+#include "Core/global_settings.h"
 #include "Input/event_manager.h"
 #include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
@@ -27,8 +28,9 @@ void Viewport::update()
     EditorPanel::update();
 
     ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
-	
-    auto frame_buffer_main = PostProcessor::get_frame_buffer();
+
+    bool post_processing_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
+    auto frame_buffer_main = post_processing_enabled ? PostProcessor::get_frame_buffer() : Renderer::get_frame_buffer();
     float fb_aspect = frame_buffer_main->get_aspect_ratio();
     float view_aspect = viewport_panel_size.x / viewport_panel_size.y;
 

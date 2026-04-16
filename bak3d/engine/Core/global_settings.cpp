@@ -26,12 +26,13 @@ THE SOFTWARE.
 
 std::map<GlobalSettingOption, GlobalSettingValueType> GlobalSettings::global_settings = {};
 
+// TODO: to be used for property labels in ImGui
 const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
 {
     switch (enum_setting)
     {
-        case GlobalSettingOption::GridRendering: return "Grid Rendering";
-        case GlobalSettingOption::AxisRendering: return "Axis Rendering";
+        case GlobalSettingOption::GridRendering: return "Enable Grid";
+        case GlobalSettingOption::AxisRendering: return "Enable Axis";
         case GlobalSettingOption::BackgroundColor: return "Background Color";
         case GlobalSettingOption::Light_Enabled: return "Enabled";
         case GlobalSettingOption::Light_HorizontalRotation: return "Horizontal Rotation";
@@ -42,6 +43,7 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::Light_Intensity: return "Intensity";
         case GlobalSettingOption::MSAA_Enabled: return "MSAA Enabled";
         case GlobalSettingOption::MSAA_Samples: return "MSAA Samples";
+        case GlobalSettingOption::PostProcessing_Enabled: return "Enabled";
         case GlobalSettingOption::Max: return "Max";
         default: return "Unknown";
     }
@@ -62,6 +64,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;
     global_settings[GlobalSettingOption::MSAA_Enabled] = true;
     global_settings[GlobalSettingOption::MSAA_Samples] = 4; // turns to 4x4 when passed to GLFW
+    global_settings[GlobalSettingOption::PostProcessing_Enabled] = false;
 }
 
 void GlobalSettings::shutdown()

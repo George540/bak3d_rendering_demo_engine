@@ -61,6 +61,7 @@ enum class GlobalSettingOption : uint32_t
     Light_Intensity,
     MSAA_Enabled,
     MSAA_Samples,
+    PostProcessing_Enabled,
     Max
 };
 
