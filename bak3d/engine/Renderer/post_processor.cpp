@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "vertex_array.h"
 #include "Asset/resource_manager.h"
+#include "Core/global_settings.h"
 #include "Core/logger.h"
 #include "Input/event_manager.h"
 
@@ -39,6 +40,13 @@ namespace
     VertexArray* m_vao;
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
+
+    PostProcessColoring post_process_coloring_payload = PostProcessColoring();
+
+    float normalize_value(const float raw_value, const float min, const float max, const float new_min = -1.0f, const float new_max = 1.0f)
+    {
+        return (raw_value - min) / (max - min) * (new_max - new_min) + new_min;
+    }
 }
 void PostProcessor::initialize()
 {
@@ -68,6 +76,9 @@ void PostProcessor::process_frame(const FrameBuffer& resolved_fbo)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, static_cast<int>(resolved_fbo.get_render_buffer()));
     m_shader->set_int("screenTexture", 0);
+
+    process_post_process_coloring_payload();
+    
     draw_quad();
 }
 
@@ -118,4 +129,23 @@ void PostProcessor::destroy_quad()
     delete m_ebo;
     delete m_vbo;
     delete m_vao;
+}
+
+void PostProcessor::process_post_process_coloring_payload()
+{
+    post_process_coloring_payload.invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert);
+    post_process_coloring_payload.grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale);
+    post_process_coloring_payload.brightness = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness), -10.0f, 10.0f);
+    post_process_coloring_payload.contrast = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast), -10.0f, 10.0f);
+    post_process_coloring_payload.hue = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue), -10.0f, 10.0f);
+    post_process_coloring_payload.saturation = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation), -10.0f, 10.0f);
+    post_process_coloring_payload.temperature = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature), -10.0f, 10.0f);
+
+    m_shader->set_bool("postProcessColoring.invert", post_process_coloring_payload.invert);
+    m_shader->set_bool("postProcessColoring.grayscale", post_process_coloring_payload.grayscale);
+    m_shader->set_float("postProcessColoring.brightness", post_process_coloring_payload.brightness);
+    m_shader->set_float("postProcessColoring.contrast", post_process_coloring_payload.contrast);
+    m_shader->set_float("postProcessColoring.hue", post_process_coloring_payload.hue);
+    m_shader->set_float("postProcessColoring.saturation", post_process_coloring_payload.saturation);
+    m_shader->set_float("postProcessColoring.temperature", post_process_coloring_payload.temperature);
 }

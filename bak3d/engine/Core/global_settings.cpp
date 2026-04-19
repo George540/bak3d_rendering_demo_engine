@@ -44,6 +44,13 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::MSAA_Enabled: return "MSAA Enabled";
         case GlobalSettingOption::MSAA_Samples: return "MSAA Samples";
         case GlobalSettingOption::PostProcessing_Enabled: return "Enabled";
+        case GlobalSettingOption::PostProcessing_Coloring_Invert: return "Invert";
+        case GlobalSettingOption::PostProcessing_Coloring_Brightness: return "Brightness";
+        case GlobalSettingOption::PostProcessing_Coloring_Contrast: return "Contrast";
+        case GlobalSettingOption::PostProcessing_Coloring_Grayscale: return "Grayscale";
+        case GlobalSettingOption::PostProcessing_Coloring_Hue: return "Hue";
+        case GlobalSettingOption::PostProcessing_Coloring_Saturation: return "Saturation";
+        case GlobalSettingOption::PostProcessing_Coloring_Temperature: return "Temperature";
         case GlobalSettingOption::Max: return "Max";
         default: return "Unknown";
     }
@@ -54,7 +61,7 @@ void GlobalSettings::initialize()
     global_settings.clear();
     global_settings[GlobalSettingOption::GridRendering] = true;
     global_settings[GlobalSettingOption::AxisRendering] = true;
-    global_settings[GlobalSettingOption::BackgroundColor] = glm::vec4(0.3f, 0.3f, 0.3f, 1.0f);
+    global_settings[GlobalSettingOption::BackgroundColor] = glm::vec4(0.133f, 0.168f, 0.2f, 1.0f);
     global_settings[GlobalSettingOption::Light_Enabled] = true;
     global_settings[GlobalSettingOption::Light_HorizontalRotation] = 45.0f;
     global_settings[GlobalSettingOption::Light_VerticalRotation] = 135.0f;
@@ -65,6 +72,13 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::MSAA_Enabled] = true;
     global_settings[GlobalSettingOption::MSAA_Samples] = 4; // turns to 4x4 when passed to GLFW
     global_settings[GlobalSettingOption::PostProcessing_Enabled] = false;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Invert] = false;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Grayscale] = false;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Brightness] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Contrast] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Hue] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Saturation] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_Temperature] = 0.0f;
 }
 
 void GlobalSettings::shutdown()

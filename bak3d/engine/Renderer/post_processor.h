@@ -27,6 +27,23 @@ THE SOFTWARE.
 #include "buffer.h"
 #include "Asset/shader.h"
 
+/*
+ * Struct payload for general coloring post process settings
+ */
+struct PostProcessColoring
+{
+    bool invert;
+    bool grayscale;
+    float brightness;
+    float contrast;
+    float hue;
+    float saturation;
+    float temperature;
+};
+
+/*
+ * 
+ */
 class PostProcessor
 {
 public:
@@ -45,4 +62,6 @@ private:
     static void create_quad();
     static void draw_quad();
     static void destroy_quad();
+
+    static void process_post_process_coloring_payload();
 };

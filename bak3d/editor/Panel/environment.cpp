@@ -196,8 +196,40 @@ void Environment::draw_post_processing_settings()
         ImGui::EndDisabled();
 
         bool post_process_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
-        ImGuiB3D::PropertyToggle("Enabled", &post_process_enabled, "Toggle Post Processing");
+        ImGuiB3D::PropertyToggle("Enabled", &post_process_enabled, "Toggle Post Processing.");
         GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Enabled, post_process_enabled);
+
+        ImGui::BeginDisabled(!post_process_enabled);
+        {
+            bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert);
+            ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert, invert);
+
+            bool grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale);
+            ImGuiB3D::PropertyToggle("Grayscale", &grayscale, "Turn color image into black and white using Perceptive Luminance.");
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale, grayscale);
+
+            float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness);
+            ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -10.0f, 10.0f, "%.1f", "Adjust color image's brightness levels");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness, brightness);
+
+            float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast);
+            ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -10.0f, 10.0f, "%.1f", "Adjust color image's contrast.");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast, contrast);
+
+            float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue);
+            ImGuiB3D::PropertySliderFloat("Hue", &hue, -10.0f, 10.0f, "%.1f", "Adjust color image's hue.");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, hue);
+
+            float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation);
+            ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -10.0f, 10.0f, "%.1f", "Adjust color image's saturation.");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, saturation);
+
+            float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature);
+            ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -10.0f, 10.0f, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, temperature);
+        }
+        ImGui::EndDisabled();
 
         ImGui::TreePop();
     }

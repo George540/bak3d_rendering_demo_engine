@@ -78,8 +78,7 @@ namespace
                 line.pop_back();
             }
 
-            smatch match;
-            if (regex_match(line, match, include_pattern))
+            if (smatch match; regex_match(line, match, include_pattern))
             {
                 string include_path = shader_dir + "/" + match[1].str();
                 ifstream include_file(include_path);

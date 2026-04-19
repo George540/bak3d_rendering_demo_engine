@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include <string>
 
 #include "asset.h"
-#include "Core/global_definitions.h"
 
 /*
  * Shader class used to load shader files and building them to be used in the engine.

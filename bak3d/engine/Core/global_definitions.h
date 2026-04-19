@@ -62,6 +62,13 @@ enum class GlobalSettingOption : uint32_t
     MSAA_Enabled,
     MSAA_Samples,
     PostProcessing_Enabled,
+    PostProcessing_Coloring_Invert,
+    PostProcessing_Coloring_Grayscale,
+    PostProcessing_Coloring_Brightness,
+    PostProcessing_Coloring_Contrast,
+    PostProcessing_Coloring_Hue,
+    PostProcessing_Coloring_Saturation,
+    PostProcessing_Coloring_Temperature,
     Max
 };
 
