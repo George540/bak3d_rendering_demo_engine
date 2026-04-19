@@ -38,4 +38,5 @@ private:
     static void draw_general_settings();
     static void draw_light_settings();
     static void draw_post_processing_settings();
+    static void reset_to_defaults();
 };

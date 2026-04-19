@@ -201,6 +201,11 @@ void Environment::draw_post_processing_settings()
 
         ImGui::BeginDisabled(!post_process_enabled);
         {
+            if (ImGuiB3D::PropertyButton("Reset Defaults", "Reset Post Processing effects to disabled values."))
+            {
+                reset_to_defaults();
+            }
+            
             bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert);
             ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
             GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert, invert);
@@ -210,27 +215,38 @@ void Environment::draw_post_processing_settings()
             GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale, grayscale);
 
             float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness);
-            ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -10.0f, 10.0f, "%.1f", "Adjust color image's brightness levels");
+            ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's brightness levels");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness, brightness);
 
             float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast);
-            ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -10.0f, 10.0f, "%.1f", "Adjust color image's contrast.");
+            ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's contrast.");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast, contrast);
 
             float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue);
-            ImGuiB3D::PropertySliderFloat("Hue", &hue, -10.0f, 10.0f, "%.1f", "Adjust color image's hue.");
+            ImGuiB3D::PropertySliderFloat("Hue", &hue, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's hue.");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, hue);
 
             float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation);
-            ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -10.0f, 10.0f, "%.1f", "Adjust color image's saturation.");
+            ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's saturation.");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, saturation);
 
             float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature);
-            ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -10.0f, 10.0f, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
+            ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, temperature);
         }
         ImGui::EndDisabled();
 
         ImGui::TreePop();
     }
+}
+
+void Environment::reset_to_defaults()
+{
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert, false);
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale, false);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, 0.0f);
 }

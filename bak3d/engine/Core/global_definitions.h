@@ -37,6 +37,7 @@ THE SOFTWARE.
  */
 
 constexpr static int MAX_LOG_ENTRIES = 64;
+constexpr static float POST_PROCESS_COLORING_SLIDER_CLAMP = 10.0f;
 
 using GlobalSettingValueType = std::variant<
     bool,
