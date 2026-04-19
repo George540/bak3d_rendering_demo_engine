@@ -79,6 +79,8 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::PostProcessing_Coloring_Hue] = 0.0f;
     global_settings[GlobalSettingOption::PostProcessing_Coloring_Saturation] = 0.0f;
     global_settings[GlobalSettingOption::PostProcessing_Coloring_Temperature] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcessing_Coloring_VignetteColor] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void GlobalSettings::shutdown()

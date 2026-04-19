@@ -70,6 +70,8 @@ enum class GlobalSettingOption : uint32_t
     PostProcessing_Coloring_Hue,
     PostProcessing_Coloring_Saturation,
     PostProcessing_Coloring_Temperature,
+    PostProcessing_Coloring_VignetteIntensity,
+    PostProcessing_Coloring_VignetteColor,
     Max
 };
 

@@ -140,6 +140,8 @@ void PostProcessor::process_post_process_coloring_payload()
     post_process_coloring_payload.hue = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
     post_process_coloring_payload.saturation = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
     post_process_coloring_payload.temperature = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_coloring_payload.vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity); // No need to normalize value for shader. Keep raw value.
+    post_process_coloring_payload.vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor);
 
     m_shader->set_bool("postProcessColoring.invert", post_process_coloring_payload.invert);
     m_shader->set_bool("postProcessColoring.grayscale", post_process_coloring_payload.grayscale);
@@ -148,4 +150,6 @@ void PostProcessor::process_post_process_coloring_payload()
     m_shader->set_float("postProcessColoring.hue", post_process_coloring_payload.hue);
     m_shader->set_float("postProcessColoring.saturation", post_process_coloring_payload.saturation);
     m_shader->set_float("postProcessColoring.temperature", post_process_coloring_payload.temperature);
+    m_shader->set_float("postProcessColoring.vignette_intensity", post_process_coloring_payload.vignette_intensity);
+    m_shader->set_vec4("postProcessColoring.vignette_color", post_process_coloring_payload.vignette_color);
 }

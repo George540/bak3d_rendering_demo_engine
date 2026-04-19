@@ -233,6 +233,19 @@ void Environment::draw_post_processing_settings()
             float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature);
             ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
             GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, temperature);
+
+            float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity);
+            ImGuiB3D::PropertySliderFloat("Vignette Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity, vignette_intensity);
+
+            glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor);
+            float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
+            ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
+            vignette_color.r = bg_col[0];
+            vignette_color.g = bg_col[1];
+            vignette_color.b = bg_col[2];
+            vignette_color.a = bg_col[3];
+            GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor, vignette_color);
         }
         ImGui::EndDisabled();
 
@@ -249,4 +262,6 @@ void Environment::reset_to_defaults()
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, 0.0f);
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, 0.0f);
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }

@@ -24,6 +24,8 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "buffer.h"
 #include "Asset/shader.h"
 
@@ -39,10 +41,12 @@ struct PostProcessColoring
     float hue;
     float saturation;
     float temperature;
+    float vignette_intensity;
+    glm::vec4 vignette_color;
 };
 
 /*
- * 
+ * Post Processing Manager setup for different screen effects.
  */
 class PostProcessor
 {

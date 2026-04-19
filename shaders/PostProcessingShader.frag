@@ -9,6 +9,8 @@ struct PostProcessColoring
     float hue;
     float saturation;
     float temperature;
+    float vignette_intensity;
+    vec4 vignette_color;
 };
 
 in vec2 TextCoords;
@@ -63,6 +65,18 @@ void main()
     
     new_color.r += postProcessColoring.temperature;
     new_color.b -= postProcessColoring.temperature;
+
+    vec2 uv = TextCoords - 0.5;
+    float dist = length(uv);
+    float vignette = 1.0 - dist * dist;
+
+    vec3 v_color = postProcessColoring.vignette_intensity >= 0.0
+                    ? postProcessColoring.vignette_color.rgb
+                    : 1.0 - postProcessColoring.vignette_color.rgb;
+
+    vignette = pow(vignette, abs(postProcessColoring.vignette_intensity));
+
+    new_color.rgb = mix(v_color, new_color.rgb, vignette);
 
     new_color.rgb = clamp(new_color.rgb, 0.0, 1.0);
     
