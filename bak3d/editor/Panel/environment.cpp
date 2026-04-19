@@ -61,7 +61,7 @@ void Environment::update()
 
     draw_general_settings();
     draw_light_settings();
-    draw_post_processing_settings();
+    draw_post_processor_settings();
 }
 
 void Environment::end_frame()
@@ -150,18 +150,30 @@ void Environment::draw_light_settings()
     }
 }
 
-void Environment::draw_post_processing_settings()
+void Environment::draw_post_processor_settings()
 {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Post Processing"))
+    if (ImGui::TreeNode("Effects"))
     {
-        bool msaa_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled);
+        draw_rasterization_settings();
+        draw_post_processing_settings();
+
+        ImGui::TreePop();
+    }
+}
+
+void Environment::draw_rasterization_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Rasterization"))
+    {
+        bool msaa_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AA_MSAA_Enabled);
         ImGuiB3D::PropertyToggle("MSAA", &msaa_enabled, "Toggle Multisample Anti-Aliasing");
-        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::MSAA_Enabled, msaa_enabled);
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::AA_MSAA_Enabled, msaa_enabled);
 
         ImGui::BeginDisabled(!msaa_enabled);
         {
-            int msaa_sample = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::MSAA_Samples);
+            int msaa_sample = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::AA_MSAA_Samples);
             const string preview = to_string(msaa_sample) + "x" + to_string(msaa_sample);
             if (ImGuiB3D::PropertyBeginDropdown("MSAA Samples", preview.c_str(), "Controls MSAA quality."))
             {
@@ -179,7 +191,7 @@ void Environment::draw_post_processing_settings()
                     if (ImGui::Selectable(m_msaa_samples[n].c_str(), is_selected))
                     {
                         msaa_sample = sample_value;
-                        GlobalSettings::set_global_setting<int>(GlobalSettingOption::MSAA_Samples, msaa_sample);
+                        GlobalSettings::set_global_setting<int>(GlobalSettingOption::AA_MSAA_Samples, msaa_sample);
                     }
 
                     if (is_selected)
@@ -194,74 +206,89 @@ void Environment::draw_post_processing_settings()
             }
         }
         ImGui::EndDisabled();
+            
+        ImGui::TreePop();
+    }
+}
 
+void Environment::draw_post_processing_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Post Processing"))
+    {
         bool post_process_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
         ImGuiB3D::PropertyToggle("Enabled", &post_process_enabled, "Toggle Post Processing.");
         GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Enabled, post_process_enabled);
 
         ImGui::BeginDisabled(!post_process_enabled);
         {
-            if (ImGuiB3D::PropertyButton("Reset Defaults", "Reset Post Processing effects to disabled values."))
-            {
-                reset_to_defaults();
-            }
-            
-            bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert);
-            ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert, invert);
-
-            bool grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale);
-            ImGuiB3D::PropertyToggle("Grayscale", &grayscale, "Turn color image into black and white using Perceptive Luminance.");
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale, grayscale);
-
-            float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness);
-            ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's brightness levels");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness, brightness);
-
-            float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast);
-            ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's contrast.");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast, contrast);
-
-            float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue);
-            ImGuiB3D::PropertySliderFloat("Hue", &hue, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's hue.");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, hue);
-
-            float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation);
-            ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's saturation.");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, saturation);
-
-            float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature);
-            ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, temperature);
-
-            float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity);
-            ImGuiB3D::PropertySliderFloat("Vignette Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity, vignette_intensity);
-
-            glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor);
-            float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
-            ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
-            vignette_color.r = bg_col[0];
-            vignette_color.g = bg_col[1];
-            vignette_color.b = bg_col[2];
-            vignette_color.a = bg_col[3];
-            GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor, vignette_color);
+            draw_color_grading_settings();
         }
         ImGui::EndDisabled();
-
+        
         ImGui::TreePop();
     }
 }
 
-void Environment::reset_to_defaults()
+void Environment::draw_color_grading_settings()
 {
-    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert, false);
-    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale, false);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Hue, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity, 0.0f);
-    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    if (ImGuiB3D::PropertyButton("Reset Defaults", "Reset Color Grading", "Reset Post Processing effects to disabled values."))
+    {
+        reset_color_grading_to_defaults();
+    }
+    
+    bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert);
+    ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert, invert);
+
+    bool grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale);
+    ImGuiB3D::PropertyToggle("Grayscale", &grayscale, "Turn color image into black and white using Perceptive Luminance.");
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale, grayscale);
+
+    float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness);
+    ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's brightness levels");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness, brightness);
+
+    float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast);
+    ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's contrast.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast, contrast);
+
+    float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue);
+    ImGuiB3D::PropertySliderFloat("Hue", &hue, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's hue.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue, hue);
+
+    float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation);
+    ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's saturation.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation, saturation);
+
+    float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature);
+    ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, temperature);
+
+    float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity);
+    ImGuiB3D::PropertySliderFloat("Vignette Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
+
+    glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
+    float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
+    ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
+    vignette_color.r = bg_col[0];
+    vignette_color.g = bg_col[1];
+    vignette_color.b = bg_col[2];
+    vignette_color.a = bg_col[3];
+    GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
+    GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
+}
+
+void Environment::reset_color_grading_to_defaults()
+{
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert, false);
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale, false);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }

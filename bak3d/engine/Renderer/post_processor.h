@@ -32,7 +32,7 @@ THE SOFTWARE.
 /*
  * Struct payload for general coloring post process settings
  */
-struct PostProcessColoring
+struct PostProcess_ColorGrading
 {
     bool invert;
     bool grayscale;

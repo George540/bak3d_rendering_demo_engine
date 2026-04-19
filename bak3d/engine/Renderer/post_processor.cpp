@@ -41,7 +41,7 @@ namespace
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
 
-    PostProcessColoring post_process_coloring_payload = PostProcessColoring();
+    PostProcess_ColorGrading post_process_color_grading = PostProcess_ColorGrading();
 
     float normalize_value(const float raw_value, const float min, const float max, const float new_min = -1.0f, const float new_max = 1.0f)
     {
@@ -133,23 +133,23 @@ void PostProcessor::destroy_quad()
 
 void PostProcessor::process_post_process_coloring_payload()
 {
-    post_process_coloring_payload.invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Invert);
-    post_process_coloring_payload.grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Coloring_Grayscale);
-    post_process_coloring_payload.brightness = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Brightness), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_coloring_payload.contrast = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Contrast), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_coloring_payload.hue = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Hue), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_coloring_payload.saturation = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Saturation), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_coloring_payload.temperature = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_Temperature), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_coloring_payload.vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcessing_Coloring_VignetteIntensity); // No need to normalize value for shader. Keep raw value.
-    post_process_coloring_payload.vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcessing_Coloring_VignetteColor);
+    post_process_color_grading.invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert);
+    post_process_color_grading.grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale);
+    post_process_color_grading.brightness = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_color_grading.contrast = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_color_grading.hue = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_color_grading.saturation = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_color_grading.temperature = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
+    post_process_color_grading.vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity); // No need to normalize value for shader. Keep raw value.
+    post_process_color_grading.vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
 
-    m_shader->set_bool("postProcessColoring.invert", post_process_coloring_payload.invert);
-    m_shader->set_bool("postProcessColoring.grayscale", post_process_coloring_payload.grayscale);
-    m_shader->set_float("postProcessColoring.brightness", post_process_coloring_payload.brightness);
-    m_shader->set_float("postProcessColoring.contrast", post_process_coloring_payload.contrast);
-    m_shader->set_float("postProcessColoring.hue", post_process_coloring_payload.hue);
-    m_shader->set_float("postProcessColoring.saturation", post_process_coloring_payload.saturation);
-    m_shader->set_float("postProcessColoring.temperature", post_process_coloring_payload.temperature);
-    m_shader->set_float("postProcessColoring.vignette_intensity", post_process_coloring_payload.vignette_intensity);
-    m_shader->set_vec4("postProcessColoring.vignette_color", post_process_coloring_payload.vignette_color);
+    m_shader->set_bool("post_process_color_grading.invert", post_process_color_grading.invert);
+    m_shader->set_bool("post_process_color_grading.grayscale", post_process_color_grading.grayscale);
+    m_shader->set_float("post_process_color_grading.brightness", post_process_color_grading.brightness);
+    m_shader->set_float("post_process_color_grading.contrast", post_process_color_grading.contrast);
+    m_shader->set_float("post_process_color_grading.hue", post_process_color_grading.hue);
+    m_shader->set_float("post_process_color_grading.saturation", post_process_color_grading.saturation);
+    m_shader->set_float("post_process_color_grading.temperature", post_process_color_grading.temperature);
+    m_shader->set_float("post_process_color_grading.vignette_intensity", post_process_color_grading.vignette_intensity);
+    m_shader->set_vec4("post_process_color_grading.vignette_color", post_process_color_grading.vignette_color);
 }

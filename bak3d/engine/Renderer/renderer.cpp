@@ -87,9 +87,9 @@ void Renderer::begin_frame()
 	r_ubo->set_buffer_sub_data(glm::value_ptr(view_matrix), MAT4_SIZE, MAT4_SIZE);
 	r_ubo->unbind_object();
 	
-	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled))
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AA_MSAA_Enabled))
 	{
-		if (const int samples_setting = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::MSAA_Samples);
+		if (const int samples_setting = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::AA_MSAA_Samples);
 			r_msaa_fbo->get_samples() != samples_setting)
 		{
 			r_msaa_fbo->set_samples(samples_setting);
@@ -120,7 +120,7 @@ void Renderer::draw_frame()
 	glDisable(GL_CULL_FACE);
 
 	// Back to default framebuffer
-	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::MSAA_Enabled))
+	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AA_MSAA_Enabled))
 	{
 		r_msaa_fbo->resolve_to(*r_fbo);
 		r_msaa_fbo->unbind_object();

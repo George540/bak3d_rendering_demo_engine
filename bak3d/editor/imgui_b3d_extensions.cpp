@@ -103,7 +103,7 @@ bool ImGuiB3D::PropertySliderFloat(const char* label, float* value, float v_min,
     return ImGui::SliderFloat(label_str.c_str(), value, v_min, v_max, format);
 }
 
-bool ImGuiB3D::PropertyButton(const char* label, const char* tooltip_desc, const ImVec2 size)
+bool ImGuiB3D::PropertyButton(const char* label, const char* button_label, const char* tooltip_desc, const ImVec2 size)
 {
     ImGui::TextUnformatted(label);
     if (tooltip_desc && ImGui::IsItemHovered())
@@ -112,7 +112,7 @@ bool ImGuiB3D::PropertyButton(const char* label, const char* tooltip_desc, const
     }
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
-    return ImGui::Button(label, size);
+    return ImGui::Button(button_label ? button_label : label, size);
 }
 
 bool ImGuiB3D::PropertyImageButton(const char* label, const char* tooltip_desc, int* texture_id, const ImVec2 size,
