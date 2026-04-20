@@ -51,52 +51,108 @@ void ResourceManager::initialize()
 void ResourceManager::initialize_shaders()
 {
     // Get directory and files
-    auto directory = BAK3D_SHADERS_DIR;
+    const auto directory = BAK3D_SHADERS_DIR;
     auto vertex_shader_files = FileLoader::get_files_by_type_with_path(directory, vert);
     auto fragment_shader_files = FileLoader::get_files_by_type_with_path(directory, frag);
 
-    if (vertex_shader_files.size() != fragment_shader_files.size())
+    // Map shaders for lookup later
+    unordered_map<string, string> vertex_shaders_map;
+    for (const auto& [file_name, file_path] : vertex_shader_files)
     {
-        B3D_LOG_ERROR("Vertex-fragment shader binding miss-match!");
+        string name = FileLoader::get_name_from_filename(file_name);
+        vertex_shaders_map[name] = file_path;
+    }
+    unordered_map<string, string> fragment_shaders_map;
+    for (const auto& [file_name, file_path] : fragment_shader_files)
+    {
+        string name = FileLoader::get_name_from_filename(file_name);
+        fragment_shaders_map[name] = file_path;
     }
 
-    // Get absolute paths for both vert and frag files
-    auto vertex_paths = FileLoader::get_vector_items_to_array(vertex_shader_files);
-    auto fragment_paths = FileLoader::get_vector_items_to_array(fragment_shader_files);
+    unordered_map<string, string> shaders_to_match;
+    vector<pair<string, string>> vertex_fragment_sources;
 
-    // Combine vert and frag paths in pairs
-    vector<pair<char*, char*>> vert_frag_sources;
-    vert_frag_sources.reserve(vertex_shader_files.size());
-    for (int i = 0; i < vertex_shader_files.size(); ++i)
+    // Iterate through vertex shader files
+    for (const auto& [filename, filepath] : vertex_shader_files)
     {
-        vert_frag_sources.emplace_back(vertex_paths[i], fragment_paths[i]);
+        string vert_file_name = filename;
+        string vert_path = filepath;
+
+        string vert_name = FileLoader::get_name_from_filename(vert_file_name);
+
+        // Combine vert and frag paths in pairs that have the same name
+        if (fragment_shaders_map.contains(vert_name))
+        {
+            vertex_fragment_sources.emplace_back(vert_path, fragment_shaders_map[vert_name]); // <vertex path, fragment path>
+        }
+        else
+        {
+            // If they don't match, add vertex shader into a to-be-matched container
+            shaders_to_match.emplace(vert_name, vert_path);
+        }
     }
+
+    // Find unmatched fragment shaders, if any, and add to the to-be-matched container
+    for (const auto& [filename, filepath] : fragment_shader_files)
+    {
+        string frag_file_name = filename;
+        string frag_path = filepath;
+
+        string frag_name = FileLoader::get_name_from_filename(frag_file_name);
+
+        if (!vertex_shaders_map.contains(frag_name))
+        {
+            shaders_to_match.emplace(frag_name, frag_path);
+        }
+    }
+
+    auto test = shaders_to_match;
 
     // Create and bind shaders.
-    for (const auto shader_file_pair : vert_frag_sources)
+    for (const auto& shader_file_pair : vertex_fragment_sources)
     {
-        auto vert_path_string = string(shader_file_pair.first);
-        auto shader_name = vert_path_string.substr(vert_path_string.find_last_of('/') + 1);
-
-        const auto dot_position = shader_name.find_last_of('.');
-        string shader_type_str = shader_name.substr(dot_position + 1);
-        
-        shader_name = shader_name.substr(0, dot_position);
+        // Use frag name for shader name, since it's possible that vertex shaders are common to others
+        auto shader_path_string = string(shader_file_pair.second);
+        auto shader_name = FileLoader::get_name_from_path(shader_path_string);
 
         if (!Shaders.contains(shader_name))
         {
             Shaders[shader_name] = new Shader(
-            shader_file_pair.first,
-            shader_file_pair.second,
+            shader_file_pair.first.c_str(),
+            shader_file_pair.second.c_str(),
             shader_name);
         }
     }
 
-    B3D_LOG_INFO("Successfully compiled shaders. Number of shaders compiled: %d", Shaders.size());
+    // If shaders that did not automatically match are found, manually match them with caution!
+    // NOTE: This is used so far to match post process fragment shaders with the PostProcessingShader.vert vertex shader.
+    //       See shader files for reference.
+    if (!shaders_to_match.empty())
+    {
+        Shaders["ColorGradingShader"] = new Shader(
+            shaders_to_match["PostProcessingShader"].c_str(),
+            shaders_to_match["ColorGradingShader"].c_str(),
+            "ColorGradingShader");
 
+        Shaders["BlurKernelShader"] = new Shader(
+            shaders_to_match["PostProcessingShader"].c_str(),
+            shaders_to_match["BlurKernelShader"].c_str(),
+            "BlurKernelShader");
+
+        Shaders["EdgeDetectionKernelShader"] = new Shader(
+            shaders_to_match["PostProcessingShader"].c_str(),
+            shaders_to_match["EdgeDetectionKernelShader"].c_str(),
+            "EdgeDetectionKernelShader");
+    }
+
+    auto shaders = Shaders;
     if (Shaders.empty())
     {
-        throw runtime_error("ERROR::SHADER_COMPILATION_ERROR: No shaders loaded!");
+        B3D_LOG_ERROR("No shaders loaded! Program will crash");
+    }
+    else
+    {
+        B3D_LOG_INFO("Successfully compiled shaders. Number of shaders compiled: %d", Shaders.size());
     }
 }
 

@@ -52,7 +52,7 @@ void PostProcessor::initialize()
 {
     m_fbo = make_unique<FrameBuffer>(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
     auto shaders = ResourceManager::Shaders;
-    m_shader = ResourceManager::get_shader("PostProcessingShader");
+    m_shader = ResourceManager::get_shader("ColorGradingShader");
     create_quad();
     B3D_LOG_INFO("Post Processing initialized...");
 }

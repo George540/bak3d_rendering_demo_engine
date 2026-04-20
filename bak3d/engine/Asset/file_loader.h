@@ -54,11 +54,12 @@ public:
 
 	static std::vector<std::string> get_directories(const std::filesystem::path& path);
 	static std::vector<std::string> get_files_by_type(const std::filesystem::path& path, FileType type);
-	static std::list<std::pair<std::string, std::string>> get_files_by_type_with_path(const std::filesystem::path& path, FileType type);
-	static std::list<std::pair<std::string, std::string>> get_files_by_types_with_path(const std::filesystem::path& path, const std::vector<FileType>& types);
+	static std::vector<std::pair<std::string, std::string>> get_files_by_type_with_path(const std::filesystem::path& path, FileType type);
+	static std::vector<std::pair<std::string, std::string>> get_files_by_types_with_path(const std::filesystem::path& path, const std::vector<FileType>& types);
 	static std::string get_filename_from_path(const std::filesystem::path& path);
-	static std::string get_filename_from_path(const std::string path);
-	static std::string get_name_from_filename(const std::string filename);
+	static std::string get_filename_from_path(const std::string& path);
+	static std::string get_name_from_filename(const std::string& filename, bool to_lower_case = false);
+	static std::string get_name_from_path(const std::string& path, const bool to_lower_case = false);
 	static std::string enum_to_string(FileType type);
 	static std::vector<char*> get_vector_items_to_array(const std::list<std::pair<std::string, std::string>>, bool is_returning_path = true);
 	static std::string find_first_containing_string(const std::vector<std::string>& string_vector, const std::string& substring);

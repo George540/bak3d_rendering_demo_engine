@@ -55,7 +55,7 @@ vector<string> FileLoader::get_directories(const filesystem::path& path)
 	return directories;
 }
 
-std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::path& path, FileType type)
+vector<string> FileLoader::get_files_by_type(const filesystem::path& path, FileType type)
 {
 	vector<string> files;
 
@@ -81,20 +81,24 @@ std::vector<std::string> FileLoader::get_files_by_type(const std::filesystem::pa
 	return files;
 }
 
-list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesystem::path& path, FileType type)
+vector<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesystem::path& path, FileType type)
 {
-	list<pair<string, string>> files_list;
+	vector<pair<string, string>> files_list;
+
 	try
 	{
-		if (exists(path) && is_directory(path))
+		if (filesystem::exists(path) && filesystem::is_directory(path))
 		{
 			for (const auto& entry : filesystem::recursive_directory_iterator(path))
 			{
-				if (is_regular_file(entry.path()) && entry.path().extension() == enum_to_string(type))
+				if (filesystem::is_regular_file(entry.path()) &&
+					entry.path().extension() == enum_to_string(type))
 				{
-					auto path = entry.path();
-					auto filepath = path.generic_string();
-					auto filename = path.filename().generic_string();
+					const auto& file_path = entry.path();
+
+					string filepath = file_path.generic_string();
+					string filename = file_path.filename().generic_string();
+
 					files_list.emplace_back(filename, filepath);
 				}
 			}
@@ -108,26 +112,33 @@ list<pair<string, string>> FileLoader::get_files_by_type_with_path(const filesys
 	return files_list;
 }
 
-list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesystem::path& path, const vector<FileType>& types)
+vector<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesystem::path& path, const vector<FileType>& types)
 {
-	list<pair<string, string>> files_list;
+	vector<pair<string, string>> files_list;
+
 	try
 	{
-		if (exists(path) && is_directory(path))
+		if (filesystem::exists(path) && filesystem::is_directory(path))
 		{
 			for (const auto& entry : filesystem::recursive_directory_iterator(path))
 			{
-				if (is_regular_file(entry.path()))
+				if (filesystem::is_regular_file(entry.path()))
 				{
-					auto file_ext = entry.path().extension();
-                    
-					// Check if the file extension matches any in the provided types
-					if (ranges::any_of(types, [&](const FileType& type) { return file_ext == enum_to_string(type); }))
+					const auto& file_path = entry.path();
+					auto file_ext = file_path.extension();
+
+					// Check if extension matches any requested type
+					if (ranges::any_of(types, [&](const FileType& type)
 					{
-						auto path = entry.path();
-						auto filepath = path.generic_string();
-						auto filename = path.filename().generic_string();
-						auto assetname = filename.substr(0, filename.find_last_of('/'));
+						return file_ext == enum_to_string(type);
+					}))
+					{
+						string filepath = file_path.generic_string();
+						string filename = file_path.filename().generic_string();
+
+						// ⚠️ Fix: extract name without extension correctly
+						string assetname = filename.substr(0, filename.find_last_of('.'));
+
 						files_list.emplace_back(assetname, filepath);
 					}
 				}
@@ -142,17 +153,17 @@ list<pair<string, string>> FileLoader::get_files_by_types_with_path(const filesy
 	return files_list;
 }
 
-std::string FileLoader::get_filename_from_path(const std::filesystem::path& path)
+string FileLoader::get_filename_from_path(const filesystem::path& path)
 {
 	return path.filename().generic_string();
 }
 
-std::string FileLoader::get_filename_from_path(const std::string path)
+string FileLoader::get_filename_from_path(const string& path)
 {
 	return filesystem::absolute(path).filename().generic_string();
 }
 
-string FileLoader::get_name_from_filename(const string filename)
+string FileLoader::get_name_from_filename(const string& filename, const bool to_lower_case)
 {
 	if (filename.empty())
 	{
@@ -160,10 +171,19 @@ string FileLoader::get_name_from_filename(const string filename)
 		return filename;
 	}
 	string name = filename.substr(0, filename.find_last_of('.'));
-	transform(name.begin(), name.end(), name.begin(), ::tolower);
-	name[0] = std::toupper(name[0]);
+	if (to_lower_case)
+	{
+		transform(name.begin(), name.end(), name.begin(), ::tolower);
+		name[0] = toupper(name[0]);
+	}
 
 	return name;
+}
+
+string FileLoader::get_name_from_path(const string& path, const bool to_lower_case)
+{
+	const auto file_name = get_filename_from_path(path);
+	return get_name_from_filename(file_name, to_lower_case);
 }
 
 string FileLoader::enum_to_string(FileType type)
