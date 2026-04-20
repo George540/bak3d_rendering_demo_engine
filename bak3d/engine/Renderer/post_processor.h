@@ -24,26 +24,8 @@ THE SOFTWARE.
 
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "buffer.h"
 #include "Asset/shader.h"
-
-/*
- * Struct payload for general coloring post process settings
- */
-struct PostProcess_ColorGrading
-{
-    bool invert;
-    bool grayscale;
-    float brightness;
-    float contrast;
-    float hue;
-    float saturation;
-    float temperature;
-    float vignette_intensity;
-    glm::vec4 vignette_color;
-};
 
 /*
  * Post Processing Manager setup for different screen effects.
@@ -54,18 +36,13 @@ public:
     static void initialize();
     static void shutdown();
 
-    static void begin_frame();
     static void process_frame(const FrameBuffer& resolved_fbo);
-    static void end_frame();
 
-    static Shader* get_shader();
-    static FrameBuffer* get_frame_buffer();
+    static FrameBuffer* get_final_frame_buffer();
     
     static void resize(GLuint width, GLuint height);
 private:
     static void create_quad();
     static void draw_quad();
     static void destroy_quad();
-
-    static void process_post_process_coloring_payload();
 };

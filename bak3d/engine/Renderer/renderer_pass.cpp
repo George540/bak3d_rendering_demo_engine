@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include "renderer_passes.h"
+#include "renderer_pass.h"
 
 #include "post_processor.h"
 #include "renderer.h"
@@ -63,8 +63,6 @@ void RendererPasses::render_post_processing()
 {
     if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled))
     {
-        PostProcessor::begin_frame();
         PostProcessor::process_frame(*Renderer::get_frame_buffer());
-        PostProcessor::end_frame();
     }
 }

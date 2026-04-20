@@ -30,7 +30,7 @@ void Viewport::update()
     ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
 
     bool post_processing_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
-    auto frame_buffer_main = post_processing_enabled ? PostProcessor::get_frame_buffer() : Renderer::get_frame_buffer();
+    auto frame_buffer_main = post_processing_enabled ? PostProcessor::get_final_frame_buffer() : Renderer::get_frame_buffer();
     float fb_aspect = frame_buffer_main->get_aspect_ratio();
     float view_aspect = viewport_panel_size.x / viewport_panel_size.y;
 

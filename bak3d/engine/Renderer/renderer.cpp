@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include <glm/gtc/type_ptr.hpp>
 
 #include "post_processor.h"
-#include "renderer_passes.h"
+#include "renderer_pass.h"
 #include "Scene/scene.h"
 
 using namespace std;

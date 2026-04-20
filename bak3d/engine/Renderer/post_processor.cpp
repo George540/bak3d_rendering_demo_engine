@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include "post_processor.h"
 
+#include "post_process_pass.h"
 #include "vertex_array.h"
 #include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
@@ -34,73 +35,95 @@ using namespace std;
 
 namespace
 {
-    Shader* m_shader;
-    unique_ptr<FrameBuffer> m_fbo;
+    unique_ptr<FrameBuffer> m_fbo_a;
+    unique_ptr<FrameBuffer> m_fbo_b;
+
+    FrameBuffer* m_last_written_fbo;
+
+    vector<unique_ptr<PostProcessPass>> m_passes;
 
     VertexArray* m_vao;
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
-
-    PostProcess_ColorGrading post_process_color_grading = PostProcess_ColorGrading();
-
-    float normalize_value(const float raw_value, const float min, const float max, const float new_min = -1.0f, const float new_max = 1.0f)
-    {
-        return (raw_value - min) / (max - min) * (new_max - new_min) + new_min;
-    }
 }
+
 void PostProcessor::initialize()
 {
-    m_fbo = make_unique<FrameBuffer>(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
-    auto shaders = ResourceManager::Shaders;
-    m_shader = ResourceManager::get_shader("ColorGradingShader");
+    m_fbo_a = make_unique<FrameBuffer>(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
+    m_fbo_b = make_unique<FrameBuffer>(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
+
     create_quad();
+
+    // Register passes in execution order
+    m_passes.push_back(make_unique<PostProcessPass_ColorGrading>());
+    //m_passes.push_back(make_unique<Pass_GaussianBlur>());
+    //m_passes.push_back(make_unique<Pass_Sharpen>());
+    //m_passes.push_back(make_unique<Pass_EdgeDetect>());
+
     B3D_LOG_INFO("Post Processing initialized...");
 }
 
 void PostProcessor::shutdown()
 {
-    destroy_quad();
-    m_shader = nullptr;
-    m_fbo.reset();
-    m_fbo = nullptr;
-}
+    m_passes.clear();
 
-void PostProcessor::begin_frame()
-{
-    m_fbo->bind_object();
-    m_shader->use();
+    m_fbo_a.reset();
+    m_fbo_b.reset();
+    delete m_last_written_fbo;
+
+    destroy_quad();
 }
 
 void PostProcessor::process_frame(const FrameBuffer& resolved_fbo)
 {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, static_cast<int>(resolved_fbo.get_render_buffer()));
-    m_shader->set_int("screenTexture", 0);
+    // Ping: Read from
+    // Pong: Write to
+    FrameBuffer* ping = const_cast<FrameBuffer*>(&resolved_fbo); // first read is the scene
+    FrameBuffer* pong = m_fbo_a.get();
 
-    process_post_process_coloring_payload();
-    
-    draw_quad();
+    bool first_write_to_a = true;
+
+    for (const auto& pass : m_passes)
+    {
+        if (!pass->is_enabled())
+        {
+            continue;
+        }
+
+        Shader* shader = pass->get_shader();
+
+        pong->bind_object();
+        shader->use();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, static_cast<int>(ping->get_render_buffer()));
+        shader->set_int("screenTexture", 0);
+
+        pass->process(); // let the pass upload its own uniforms
+
+        draw_quad();
+
+        shader->unuse();
+        pong->unbind_object();
+
+        // swap: last output becomes next input
+        ping = pong;
+        pong = first_write_to_a ? m_fbo_b.get() : m_fbo_a.get();
+        first_write_to_a = !first_write_to_a;
+    }
+
+    m_last_written_fbo = ping; // the FBO holding the final result
 }
 
-void PostProcessor::end_frame()
+FrameBuffer* PostProcessor::get_final_frame_buffer()
 {
-    m_shader->unuse();
-    m_fbo->unbind_object();
-}
-
-Shader* PostProcessor::get_shader()
-{
-    return m_shader;
-}
-
-FrameBuffer* PostProcessor::get_frame_buffer()
-{
-    return m_fbo.get();
+    return m_last_written_fbo;
 }
 
 void PostProcessor::resize(GLuint width, GLuint height)
 {
-    m_fbo->resize(width, height);
+    m_fbo_a->resize(width, height);
+    m_fbo_b->resize(width, height);
 }
 
 void PostProcessor::create_quad()
@@ -129,27 +152,4 @@ void PostProcessor::destroy_quad()
     delete m_ebo;
     delete m_vbo;
     delete m_vao;
-}
-
-void PostProcessor::process_post_process_coloring_payload()
-{
-    post_process_color_grading.invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert);
-    post_process_color_grading.grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale);
-    post_process_color_grading.brightness = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_color_grading.contrast = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_color_grading.hue = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_color_grading.saturation = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_color_grading.temperature = normalize_value(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature), -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP);
-    post_process_color_grading.vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity); // No need to normalize value for shader. Keep raw value.
-    post_process_color_grading.vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
-
-    m_shader->set_bool("post_process_color_grading.invert", post_process_color_grading.invert);
-    m_shader->set_bool("post_process_color_grading.grayscale", post_process_color_grading.grayscale);
-    m_shader->set_float("post_process_color_grading.brightness", post_process_color_grading.brightness);
-    m_shader->set_float("post_process_color_grading.contrast", post_process_color_grading.contrast);
-    m_shader->set_float("post_process_color_grading.hue", post_process_color_grading.hue);
-    m_shader->set_float("post_process_color_grading.saturation", post_process_color_grading.saturation);
-    m_shader->set_float("post_process_color_grading.temperature", post_process_color_grading.temperature);
-    m_shader->set_float("post_process_color_grading.vignette_intensity", post_process_color_grading.vignette_intensity);
-    m_shader->set_vec4("post_process_color_grading.vignette_color", post_process_color_grading.vignette_color);
 }

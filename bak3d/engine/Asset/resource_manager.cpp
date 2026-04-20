@@ -134,15 +134,10 @@ void ResourceManager::initialize_shaders()
             shaders_to_match["ColorGradingShader"].c_str(),
             "ColorGradingShader");
 
-        Shaders["BlurKernelShader"] = new Shader(
-            shaders_to_match["PostProcessingShader"].c_str(),
-            shaders_to_match["BlurKernelShader"].c_str(),
-            "BlurKernelShader");
-
-        Shaders["EdgeDetectionKernelShader"] = new Shader(
-            shaders_to_match["PostProcessingShader"].c_str(),
-            shaders_to_match["EdgeDetectionKernelShader"].c_str(),
-            "EdgeDetectionKernelShader");
+        Shaders["KernelEffectShader"] = new Shader(
+            shaders_to_match["KernelEffectShader"].c_str(),
+            shaders_to_match["KernelEffectShader"].c_str(),
+            "KernelEffectShader");
     }
 
     auto shaders = Shaders;
