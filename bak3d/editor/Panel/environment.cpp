@@ -60,8 +60,16 @@ void Environment::update()
     EditorPanel::update();
 
     draw_general_settings();
+
+    ImGuiB3D::SeparatorWithSpacing(1);
+
     draw_light_settings();
+
+    ImGuiB3D::SeparatorWithSpacing(1);
+
     draw_post_processor_settings();
+
+    ImGuiB3D::SeparatorWithSpacing(1);
 }
 
 void Environment::end_frame()
@@ -206,7 +214,9 @@ void Environment::draw_rasterization_settings()
             }
         }
         ImGui::EndDisabled();
-            
+
+        ImGuiB3D::SeparatorWithSpacing(1);
+
         ImGui::TreePop();
     }
 }
@@ -226,7 +236,9 @@ void Environment::draw_post_processing_settings()
             draw_kernel_effect_settings();
         }
         ImGui::EndDisabled();
-        
+
+        ImGuiB3D::SeparatorWithSpacing(1);
+
         ImGui::TreePop();
     }
 }
@@ -234,9 +246,9 @@ void Environment::draw_post_processing_settings()
 void Environment::draw_color_grading_settings()
 {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Post Processing"))
+    if (ImGui::TreeNode("Color Grading"))
     {
-        if (ImGuiB3D::PropertyButton("Reset Defaults", "Reset Color Grading", "Reset Post Processing effects to disabled values."))
+        if (ImGuiB3D::PropertyButton("Reset", "Reset Color Grading", "Reset Post Processing effects to disabled values."))
         {
             reset_color_grading_to_defaults();
         }
@@ -269,19 +281,9 @@ void Environment::draw_color_grading_settings()
         ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
         GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, temperature);
 
-        float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity);
-        ImGuiB3D::PropertySliderFloat("Vignette Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
+        ImGuiB3D::SeparatorWithSpacing(1);
 
-        glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
-        float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
-        ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
-        vignette_color.r = bg_col[0];
-        vignette_color.g = bg_col[1];
-        vignette_color.b = bg_col[2];
-        vignette_color.a = bg_col[3];
-        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
-        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
+        draw_vignette_settings();
 
         ImGui::TreePop();
     }
@@ -295,6 +297,30 @@ void Environment::draw_kernel_effect_settings()
         // Sharpen
         // Gaussian Blur
         // Sobel Edge Detection
+
+        ImGui::TreePop();
+    }
+}
+
+void Environment::draw_vignette_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Vignette"))
+    {
+        float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity);
+        ImGuiB3D::PropertySliderFloat("Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
+        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
+
+        glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
+        float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
+        ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
+        vignette_color.r = bg_col[0];
+        vignette_color.g = bg_col[1];
+        vignette_color.b = bg_col[2];
+        vignette_color.a = bg_col[3];
+        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
+
+        ImGuiB3D::SeparatorWithSpacing(1);
 
         ImGui::TreePop();
     }

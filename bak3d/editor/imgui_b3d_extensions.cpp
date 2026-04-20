@@ -32,8 +32,8 @@ THE SOFTWARE.
 using namespace std;
 
 constexpr float TOOL_TIP_WIDTH = 500.0f;
-constexpr float LABEL_HORIZONTAL_WIDTH_RATIO = 0.38f;
-constexpr float VALUE_HORIZONTAL_WIDTH_RATIO = 0.18f;
+constexpr float LABEL_HORIZONTAL_WIDTH_RATIO = 0.5f;
+constexpr float VALUE_HORIZONTAL_WIDTH_RATIO = 0.1f;
 constexpr float VALUE_INNER_PADDING = 5.0f;
 
 bool ImGuiB3D::PropertyToggle(const char* label, bool* value, const char* tooltip_desc)
