@@ -48,4 +48,5 @@ private:
     static void draw_vignette_settings();
     
     static void reset_color_grading_to_defaults();
+    static void reset_kernel_effects_to_defaults();
 };

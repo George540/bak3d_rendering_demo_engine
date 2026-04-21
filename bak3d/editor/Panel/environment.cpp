@@ -294,6 +294,11 @@ void Environment::draw_kernel_effect_settings()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Kernel Effects - Convolution Matrices"))
     {
+        if (ImGuiB3D::PropertyButton("Reset", "Reset Kernel Effects", "Reset kernel effects to disabled values."))
+        {
+            reset_kernel_effects_to_defaults();
+        }
+
         float sharpen_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity);
         ImGuiB3D::PropertySliderFloat("Sharpen", &sharpen_intensity, 0.0f, 1.0f, "%.1f", "Adjust Sharpen intensity. Enhances edges and details by increasing the contrast between adjacent pixels.");
         GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity, sharpen_intensity);
@@ -353,4 +358,13 @@ void Environment::reset_color_grading_to_defaults()
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, 0.0f);
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, 0.0f);
     GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void Environment::reset_kernel_effects_to_defaults()
+{
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity, 0.0f);
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity, 0.0f);
 }
