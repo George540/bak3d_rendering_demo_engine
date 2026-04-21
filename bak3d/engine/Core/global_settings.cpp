@@ -51,6 +51,11 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::PostProcess_ColorGrading_Hue: return "Hue";
         case GlobalSettingOption::PostProcess_ColorGrading_Saturation: return "Saturation";
         case GlobalSettingOption::PostProcess_ColorGrading_Temperature: return "Temperature";
+        case GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity: return "Sharpen";
+        case GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity: return "Sobel";
+        case GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity: return "Emboss";
+        case GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity: return "Box Blur";
+        case GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity: return "Laplacian";
         case GlobalSettingOption::Max: return "Max";
         default: return "Unknown";
     }
@@ -81,6 +86,11 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_Temperature] = 0.0f;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity] = 0.0f;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_VignetteColor] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    global_settings[GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity] = 0.0f;
+    global_settings[GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity] = 0.0f;
 }
 
 void GlobalSettings::shutdown()

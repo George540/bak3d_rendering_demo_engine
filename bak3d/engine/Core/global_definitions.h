@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <array>
 #include <vector>
 #include <variant>
 
@@ -72,6 +73,11 @@ enum class GlobalSettingOption : uint32_t
     PostProcess_ColorGrading_Temperature,
     PostProcess_ColorGrading_VignetteIntensity,
     PostProcess_ColorGrading_VignetteColor,
+    PostProcess_KernelEffect_SharpenIntensity,
+    PostProcess_KernelEffect_SobelIntensity,
+    PostProcess_KernelEffect_EmbossIntensity,
+    PostProcess_KernelEffect_BoxBlurIntensity,
+    PostProcess_KernelEffect_LaplacianIntensity,
     Max
 };
 
@@ -86,7 +92,7 @@ enum class SceneObjectType : uint32_t
 };
 
 /*
- * ============================ MESH DEFINITIONS ============================
+ * ========================= RENDERING DEFINITIONS ==========================
  * Definitions for different rendering structures and constant primitive data.
  * ==========================================================================
  */
@@ -258,4 +264,54 @@ static const std::vector<GLuint> QUAD_INDICES =
 {
     0, 1, 2,  // First triangle (bottom-left, bottom-right, top-right)
     2, 3, 0   // Second triangle (top-right, top-left, bottom-left)
+};
+
+/*
+ * ======================== POST PROCESS DEFINITIONS ========================
+ * Definitions and constant for different post process rendering structures.
+ * ==========================================================================
+ */
+
+enum class KernelEffectType : uint32_t
+{
+    Sharpen,
+    Sobel,
+    Emboss,
+    BoxBlur,
+    Laplacian,
+    Max
+};
+constexpr std::array STANDARD_SHARPEN =
+{
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  9.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f
+};
+
+constexpr std::array SOBEL_EDGE_DETECTION =
+{
+    -1.0f, -1.0f, -1.0f,
+    -1.0f,  8.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f
+};
+
+constexpr std::array EMBOSS =
+{
+    -2.0f, -1.0f,  0.0f,
+    -1.0f,  1.0f,  1.0f,
+     0.0f,  1.0f,  2.0f
+};
+
+constexpr std::array BOX_BLUR =
+{
+    1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f,
+    1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f,
+    1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f
+};
+
+constexpr std::array LAPLACIAN_SHARPEN =
+{
+    0.0f,  1.0f,  0.0f,
+    1.0f, -4.0f,  1.0f,
+    0.0f,  1.0f,  0.0f
 };

@@ -60,3 +60,34 @@ void PostProcessPass_ColorGrading::process()
     m_shader->set_float("post_process_color_grading.vignette_intensity", m_post_process_color_grading.vignette_intensity);
     m_shader->set_vec4("post_process_color_grading.vignette_color", m_post_process_color_grading.vignette_color);
 }
+
+void PostProcessPass_KernelEffect::process()
+{
+    switch (m_kernel_type)
+    {
+        case KernelEffectType::Sharpen:
+            m_shader->set_float_array("kernel_matrix", STANDARD_SHARPEN.data(), 9);
+            m_shader->set_float("kernel_intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity));
+            break;
+        case KernelEffectType::Sobel:
+            m_shader->set_float_array("kernel_matrix", SOBEL_EDGE_DETECTION.data(), 9);
+            m_shader->set_float("kernel_intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity));
+            break;
+        case KernelEffectType::Emboss:
+            m_shader->set_float_array("kernel_matrix", EMBOSS.data(), 9);
+            m_shader->set_float("kernel_intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity));
+            break;
+        case KernelEffectType::BoxBlur:
+            m_shader->set_float_array("kernel_matrix", BOX_BLUR.data(), 9);
+            m_shader->set_float("kernel_intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity));
+            break;
+        case KernelEffectType::Laplacian:
+            m_shader->set_float_array("kernel_matrix", LAPLACIAN_SHARPEN.data(), 9);
+            m_shader->set_float("kernel_intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity));
+            break;
+        case KernelEffectType::Max:
+            break;
+        default:
+            break;
+    }
+}

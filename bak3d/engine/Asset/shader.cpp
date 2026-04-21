@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <regex>
 #include <sstream>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Core/global_definitions.h"
 #include "Core/logger.h"
@@ -270,4 +271,39 @@ void Shader::set_mat3(const string& name, const glm::mat3& mat) const
 void Shader::set_mat4(const string& name, const glm::mat4& mat) const
 {
     glUniformMatrix4fv(glGetUniformLocation(m_object_id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::set_float_array(const string& name, const float* values, const GLsizei count) const
+{
+    glUniform1fv(glGetUniformLocation(m_object_id, name.c_str()), count, values);
+}
+
+void Shader::set_int_array(const string& name, const int* values, const GLsizei count) const
+{
+    glUniform1iv(glGetUniformLocation(m_object_id, name.c_str()), count, values);
+}
+
+void Shader::set_vec2_array(const string& name, const glm::vec2* values, const GLsizei count) const
+{
+    glUniform2fv(glGetUniformLocation(m_object_id, name.c_str()), count, glm::value_ptr(values[0]));
+}
+
+void Shader::set_vec3_array(const string& name, const glm::vec3* values, const GLsizei count) const
+{
+    glUniform3fv(glGetUniformLocation(m_object_id, name.c_str()), count, glm::value_ptr(values[0]));
+}
+
+void Shader::set_vec4_array(const string& name, const glm::vec4* values, const GLsizei count) const
+{
+    glUniform4fv(glGetUniformLocation(m_object_id, name.c_str()), count, glm::value_ptr(values[0]));
+}
+
+void Shader::set_mat3_array(const string& name, const glm::mat3* values, const GLsizei count) const
+{
+    glUniformMatrix3fv(glGetUniformLocation(m_object_id, name.c_str()), count, GL_FALSE, glm::value_ptr(values[0]));
+}
+
+void Shader::set_mat4_array(const string& name, const glm::mat4* values, const GLsizei count) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(m_object_id, name.c_str()), count, GL_FALSE, glm::value_ptr(values[0]));
 }

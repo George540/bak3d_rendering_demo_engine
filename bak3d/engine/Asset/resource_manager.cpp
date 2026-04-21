@@ -135,7 +135,7 @@ void ResourceManager::initialize_shaders()
             "ColorGradingShader");
 
         Shaders["KernelEffectShader"] = new Shader(
-            shaders_to_match["KernelEffectShader"].c_str(),
+            shaders_to_match["PostProcessingShader"].c_str(),
             shaders_to_match["KernelEffectShader"].c_str(),
             "KernelEffectShader");
     }

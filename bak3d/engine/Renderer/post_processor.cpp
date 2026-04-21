@@ -55,10 +55,12 @@ void PostProcessor::initialize()
     create_quad();
 
     // Register passes in execution order
+    m_passes.push_back(make_unique<PostProcessPass_KernelEffect>(KernelEffectType::Sharpen));
+    m_passes.push_back(make_unique<PostProcessPass_KernelEffect>(KernelEffectType::BoxBlur));
+    m_passes.push_back(make_unique<PostProcessPass_KernelEffect>(KernelEffectType::Emboss));
+    m_passes.push_back(make_unique<PostProcessPass_KernelEffect>(KernelEffectType::Sobel));
+    m_passes.push_back(make_unique<PostProcessPass_KernelEffect>(KernelEffectType::Laplacian));
     m_passes.push_back(make_unique<PostProcessPass_ColorGrading>());
-    //m_passes.push_back(make_unique<Pass_GaussianBlur>());
-    //m_passes.push_back(make_unique<Pass_Sharpen>());
-    //m_passes.push_back(make_unique<Pass_EdgeDetect>());
 
     B3D_LOG_INFO("Post Processing initialized...");
 }

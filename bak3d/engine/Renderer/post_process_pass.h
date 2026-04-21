@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "buffer.h"
 #include "Asset/resource_manager.h"
 #include "Asset/shader.h"
+#include "Core/global_definitions.h"
 
 /*
  * Struct payload for general coloring post process settings
@@ -82,4 +83,23 @@ public:
     void process() override;
 private:
     PostProcessUniform_ColorGrading m_post_process_color_grading = PostProcessUniform_ColorGrading();
+};
+
+/*
+ * Color Grading pass: invert, grayscale, brightness, saturation, contrast, etc.
+ */
+class PostProcessPass_KernelEffect : public PostProcessPass
+{
+public:
+    PostProcessPass_KernelEffect()
+        : PostProcessPass("KernelEffect", "KernelEffectShader") { m_is_enabled = true; m_kernel_type = KernelEffectType::Sharpen; }
+
+    PostProcessPass_KernelEffect(const KernelEffectType type)
+        : PostProcessPass("KernelEffect", "KernelEffectShader") { m_is_enabled = true; m_kernel_type = type; }
+
+    KernelEffectType get_kernel_type() const { return m_kernel_type; }
+
+    void process() override;
+private:
+    KernelEffectType m_kernel_type;
 };

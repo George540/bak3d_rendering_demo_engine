@@ -71,4 +71,12 @@ public:
 	void set_mat2(const std::string& name, const glm::mat2& mat) const;
 	void set_mat3(const std::string& name, const glm::mat3& mat) const;
 	void set_mat4(const std::string& name, const glm::mat4& mat) const;
+
+	void set_float_array(const std::string& name, const float* values, GLsizei count) const;
+	void set_int_array(const std::string& name, const int* values, GLsizei count) const;
+	void set_vec2_array(const std::string& name, const glm::vec2* values, GLsizei count) const;
+	void set_vec3_array(const std::string& name, const glm::vec3* values, GLsizei count) const;
+	void set_vec4_array(const std::string& name, const glm::vec4* values, GLsizei count) const;
+	void set_mat3_array(const std::string& name, const glm::mat3* values, GLsizei count) const;
+	void set_mat4_array(const std::string& name, const glm::mat4* values, GLsizei count) const;
 };
