@@ -205,6 +205,7 @@ void Environment::draw_light_settings()
                 ImGui::TreePop();
             }
 
+            // Unique light type properties
             if (light_type == LightType::Point || light_type == LightType::Spot)
             {
                 const string light_type_string = light_type_to_string(light_type);
@@ -218,6 +219,11 @@ void Environment::draw_light_settings()
 
                     if (light_type == LightType::Spot)
                     {
+                        // Cone size
+                        float cone_size = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Size);
+                        ImGuiB3D::PropertySliderFloat("Cone Size", &cone_size, 1.0f, 45.0f, "%.1f", "Alter cone angle of the spotlight. The greater the size, the greater the light casting area.");
+                        GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Spot_ConeAngle_Size, cone_size);
+
                         // Inner Cone Angle
                         float inner = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff);
                         ImGuiB3D::PropertySliderFloat("Inner Cone Angle", &inner, 1.0f, 45.0f, "%.1f", "Alter inner cone angle cutoff of the spotlight. The larger the value, the smoother the cutoff.");

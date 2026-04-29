@@ -57,6 +57,7 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 
 	m_attenuation_radius = 32.0f;
 
+	m_cone_size = 1.0f;
 	m_inner_cut_off = glm::cos(glm::radians(12.5f));
 	m_outer_cut_off = glm::cos(glm::radians(17.5f));
 
@@ -74,28 +75,10 @@ void Light::update(float dt)
 	m_distance_offset = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
 	m_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
 	const float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
-	
-	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_A) == GLFW_PRESS)
-	{
-		m_horizontal_angle += dt * 30.0f;
-	}
-	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_D) == GLFW_PRESS)
-	{
-		m_horizontal_angle -= dt * 30.0f;
-	}
 
 	const auto theta = glm::radians(m_horizontal_angle);
 	const auto phi = glm::radians(m_vertical_angle);
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
-
-	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_W) == GLFW_PRESS)
-	{
-		m_distance_offset += dt * 30.0f;
-	}
-	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_S) == GLFW_PRESS)
-	{
-		m_distance_offset -= dt * 30.0f;
-	}
 
 	m_position *= m_distance_offset;
 	m_scaling = glm::vec3(sprite_scaling, sprite_scaling, sprite_scaling);
@@ -110,9 +93,10 @@ void Light::update(float dt)
 	const LightType type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
 	set_texture_by_type(type);
 
+	m_cone_size = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Size);
 	m_attenuation_radius = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Point_Attenuation_Radius);
-	m_inner_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff)));
-	m_outer_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff)));
+	m_inner_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff) + m_cone_size));
+	m_outer_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff) + m_cone_size));
 
 	update_light_data_ubo();
 }

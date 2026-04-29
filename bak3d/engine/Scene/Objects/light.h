@@ -75,6 +75,7 @@ protected:
 	// SPOT
 	float m_inner_cut_off; // glm::cos(glm::radians(inner_degrees))
 	float m_outer_cut_off; // glm::cos(glm::radians(outer_degrees))
+	float m_cone_size;
 
 	std::unique_ptr<UniformBuffer> m_light_data_ubo;
 
@@ -119,11 +120,13 @@ public:
 	float get_attenuation_radius() const { return m_attenuation_radius; }
 	float get_cone_angle_inner_cutoff() const { return m_inner_cut_off; }
 	float get_cone_angle_outer_cutoff() const { return m_outer_cut_off; }
+	float get_cone_size() const { return m_cone_size; }
 
 	// Attenuation (point + spot)
 	void set_attenuation(const float radius);
 	// Cone angles in degrees — stored internally as cosines (spot only)
 	void set_cone_angles(float inner_degrees, float outer_degrees);
+	void set_cone_size(const float size) { m_cone_size = size; };
 private:
 	void update_light_data_ubo() const;
 	void set_texture_by_type(LightType type);

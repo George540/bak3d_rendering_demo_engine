@@ -63,6 +63,7 @@ enum class GlobalSettingOption : uint32_t
     Light_Color,
     Light_Intensity,
     Light_Point_Attenuation_Radius,
+    Light_Spot_ConeAngle_Size,
     Light_Spot_ConeAngle_Inner_CutOff,
     Light_Spot_ConeAngle_Outer_CutOff,
     AA_MSAA_Enabled,

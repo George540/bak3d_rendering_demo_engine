@@ -43,6 +43,7 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::Light_Color: return "Color";
         case GlobalSettingOption::Light_Intensity: return "Intensity";
         case GlobalSettingOption::Light_Point_Attenuation_Radius: return "Attenuation Radius";
+        case GlobalSettingOption::Light_Spot_ConeAngle_Size: return "Cone Size";
         case GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff: return "Inner Cutoff";
         case GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff: return "Outer Cutoff";
         case GlobalSettingOption::AA_MSAA_Enabled: return "MSAA Enabled";
@@ -80,6 +81,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_Color] = glm::vec4(1.0f);
     global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;
     global_settings[GlobalSettingOption::Light_Point_Attenuation_Radius] = 100.0f;
+    global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Size] = 1.0f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff] = 12.5f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff] = 35.0f;
     global_settings[GlobalSettingOption::AA_MSAA_Enabled] = true;
