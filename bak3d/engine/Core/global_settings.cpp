@@ -83,7 +83,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_Point_Attenuation_Radius] = 100.0f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Size] = 1.0f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff] = 12.5f;
-    global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff] = 35.0f;
+    global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff] = 17.5f;
     global_settings[GlobalSettingOption::AA_MSAA_Enabled] = true;
     global_settings[GlobalSettingOption::AA_MSAA_Samples] = 4; // turns to 4x4 when passed to GLFW
     global_settings[GlobalSettingOption::PostProcessing_Enabled] = false;

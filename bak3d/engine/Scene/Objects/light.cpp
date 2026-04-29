@@ -131,8 +131,8 @@ void Light::set_attenuation(const float radius)
 
 void Light::set_cone_angles(const float inner_degrees, const float outer_degrees)
 {
-	m_inner_cut_off = glm::cos(glm::radians(inner_degrees));
-	m_outer_cut_off = glm::cos(glm::radians(outer_degrees));
+	m_inner_cut_off = glm::cos(glm::radians(inner_degrees + m_cone_size));
+	m_outer_cut_off = glm::cos(glm::radians(outer_degrees + m_cone_size));
 }
 
 void Light::update_light_data_ubo() const
