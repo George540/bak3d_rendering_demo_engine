@@ -144,13 +144,12 @@ vec3 calc_spot_light()
     vec3 diffuse  = calc_diffuse(light_data.diffuse.rgb, lightDir, normal);
     vec3 specular = calc_specular(light_data.specular.rgb, lightDir, normal, viewDir);
 
-    vec3 spotDir = materialSettings.useNormalsTexture
-                    ? normalize(fs_in.TangentLightDir)
-                    : normalize(-light_data.direction.rgb);
+    vec3 worldLightDir = normalize(light_data.position.rgb - fs_in.FragPos);
+    vec3 worldSpotDir  = normalize(light_data.direction.rgb);
 
     // Spotlight cone attenuation (soft edges)
     // cut_off and outer_cut_off are stored as cosines, inner > outer
-    float theta          = dot(lightDir, spotDir);
+    float theta          = dot(worldLightDir, worldSpotDir);
     float cut_off        = light_data.position.a;
     float outer_cut_off  = light_data.direction.a;
     float epsilon        = cut_off - outer_cut_off;

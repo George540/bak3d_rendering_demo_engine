@@ -32,11 +32,18 @@ void main()
     T = normalize(T - dot(T, N) * N); // re-orthogonalize T with respect to N
     vec3 B = cross(N, T); // then retrieve perpendicular vector B with the cross product of T and N
 
-    mat3 TBN = transpose(mat3(T, B, N));    
+    // Correct handedness using mesh bitangent
+    if (dot(cross(N, T), vec3(model * vec4(aBitangent, 0.0))) < 0.0)
+    {
+        B = -B;
+    }
+
+    mat3 TBN = transpose(mat3(T, B, N));
+
     vs_out.TangentLightPos = TBN * light_data.direction.rgb;
     vs_out.TangentViewPos  = TBN * camera_position;
     vs_out.TangentFragPos  = TBN * vs_out.FragPos;
-    vs_out.TangentLightDir = TBN * light_data.direction.rgb;
+    vs_out.TangentLightDir = TBN * normalize(-light_data.direction.rgb);
     
     gl_Position = camera_data.projection * camera_data.view * model * vec4(aPos, 1.0);
 }
