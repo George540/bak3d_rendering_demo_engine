@@ -70,12 +70,10 @@ protected:
 	glm::vec3 m_direction;
 
 	// POINT
-	float m_constant;
-	float m_linear;
-	float m_quadratic;
+	float m_attenuation_radius;
 
 	// SPOT
-	float m_inner_cut_off;       // glm::cos(glm::radians(inner_degrees))
+	float m_inner_cut_off; // glm::cos(glm::radians(inner_degrees))
 	float m_outer_cut_off; // glm::cos(glm::radians(outer_degrees))
 
 	std::unique_ptr<UniformBuffer> m_light_data_ubo;
@@ -118,14 +116,12 @@ public:
 	glm::vec3 get_direction() const { return m_direction; }
 	void set_direction(const glm::vec3 direction) { m_direction = glm::normalize(direction); }
 
-	float get_attenuation_constant() const { return m_constant; }
-	float get_attenuation_linear() const { return m_linear; }
-	float get_attenuation_quadratic() const { return m_quadratic; }
+	float get_attenuation_radius() const { return m_attenuation_radius; }
 	float get_cone_angle_inner_cutoff() const { return m_inner_cut_off; }
 	float get_cone_angle_outer_cutoff() const { return m_outer_cut_off; }
 
 	// Attenuation (point + spot)
-	void set_attenuation(float constant, float linear, float quadratic);
+	void set_attenuation(const float radius);
 	// Cone angles in degrees — stored internally as cosines (spot only)
 	void set_cone_angles(float inner_degrees, float outer_degrees);
 private:

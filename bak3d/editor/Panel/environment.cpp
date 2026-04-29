@@ -120,15 +120,16 @@ void Environment::draw_general_settings()
 void Environment::draw_light_settings()
 {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Point Light"))
+    if (ImGui::TreeNode("Light"))
     {
         bool light_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Light_Enabled);
         ImGuiB3D::PropertyToggle("Enabled", &light_enabled, "Enable light in viewport");
         GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_Enabled, light_enabled);
 
+        const LightType light_type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
+
         ImGui::BeginDisabled(!light_enabled);
         {
-            LightType light_type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
             if (ImGuiB3D::PropertyBeginDropdown("Type", light_type_to_string(light_type), "Select Light Caster type. Choices are:\n"
                                                                                                                   " - Directional\n"
                                                                                                                   " - Point\n"
@@ -201,9 +202,35 @@ void Environment::draw_light_settings()
                 light_color.a = bg_col[3];
                 GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
 
-                
-
                 ImGui::TreePop();
+            }
+
+            if (light_type == LightType::Point || light_type == LightType::Spot)
+            {
+                const string light_type_string = light_type_to_string(light_type);
+                ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+                if (ImGui::TreeNode(light_type_string.c_str()))
+                {
+                    // Attenuation Radius
+                    float attenuation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Point_Attenuation_Radius);
+                    ImGuiB3D::PropertySliderFloat("Attenuation Radius", &attenuation, 0.0f, 300.0f, "%.1f", "Alter attenuation radius of the light. Controls linear and quadratic factors of attenuation calculation.");
+                    GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Point_Attenuation_Radius, attenuation);
+
+                    if (light_type == LightType::Spot)
+                    {
+                        // Inner Cone Angle
+                        float inner = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff);
+                        ImGuiB3D::PropertySliderFloat("Inner Cone Angle", &inner, 1.0f, 45.0f, "%.1f", "Alter inner cone angle cutoff of the spotlight. The larger the value, the smoother the cutoff.");
+                        GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff, inner);
+
+                        float outer_max = glm::min<float>(inner + 30.0f, 60.0f);
+                        float outer = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff);
+                        ImGuiB3D::PropertySliderFloat("Outer Cone Angle", &outer, inner, outer_max, "%.1f", "Alter outer cone angle cutoff of the spotlight. The larger the value, the smoother the cutoff.");
+                        GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff, outer);
+                    }
+
+                    ImGui::TreePop();
+                }
             }
         }
         ImGui::EndDisabled();

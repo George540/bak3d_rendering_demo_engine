@@ -18,6 +18,7 @@ out VS_OUT
     vec3 TangentLightPos;
     vec3 TangentViewPos;
     vec3 TangentFragPos;
+    vec3 TangentLightDir;
 } vs_out;
 
 void main()
@@ -32,9 +33,10 @@ void main()
     vec3 B = cross(N, T); // then retrieve perpendicular vector B with the cross product of T and N
 
     mat3 TBN = transpose(mat3(T, B, N));    
-    vs_out.TangentLightPos = TBN * light_data.position.rgb;
+    vs_out.TangentLightPos = TBN * light_data.direction.rgb;
     vs_out.TangentViewPos  = TBN * camera_position;
     vs_out.TangentFragPos  = TBN * vs_out.FragPos;
+    vs_out.TangentLightDir = TBN * light_data.direction.rgb;
     
     gl_Position = camera_data.projection * camera_data.view * model * vec4(aPos, 1.0);
 }

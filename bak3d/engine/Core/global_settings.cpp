@@ -42,10 +42,7 @@ const char* GlobalSettings::to_string(GlobalSettingOption enum_setting)
         case GlobalSettingOption::Light_OriginDistance: return "Origin Distance";
         case GlobalSettingOption::Light_Color: return "Color";
         case GlobalSettingOption::Light_Intensity: return "Intensity";
-        case GlobalSettingOption::Light_Directional_Direction: return "Direction";
-        case GlobalSettingOption::Light_Point_Attenuation_Constant: return "Constant";
-        case GlobalSettingOption::Light_Point_Attenuation_Linear: return "Linear";
-        case GlobalSettingOption::Light_Point_Attenuation_Quadratic: return "Quadratic";
+        case GlobalSettingOption::Light_Point_Attenuation_Radius: return "Attenuation Radius";
         case GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff: return "Inner Cutoff";
         case GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff: return "Outer Cutoff";
         case GlobalSettingOption::AA_MSAA_Enabled: return "MSAA Enabled";
@@ -82,10 +79,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::Light_OriginDistance] = 5.0f;
     global_settings[GlobalSettingOption::Light_Color] = glm::vec4(1.0f);
     global_settings[GlobalSettingOption::Light_Intensity] = 1.0f;
-    global_settings[GlobalSettingOption::Light_Directional_Direction] = glm::vec3(0.5f, -0.5f, 0.0f);
-    global_settings[GlobalSettingOption::Light_Point_Attenuation_Constant] = 1.0f;
-    global_settings[GlobalSettingOption::Light_Point_Attenuation_Linear] = 0.09f;
-    global_settings[GlobalSettingOption::Light_Point_Attenuation_Quadratic] = 0.032f;
+    global_settings[GlobalSettingOption::Light_Point_Attenuation_Radius] = 100.0f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff] = 12.5f;
     global_settings[GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff] = 35.0f;
     global_settings[GlobalSettingOption::AA_MSAA_Enabled] = true;

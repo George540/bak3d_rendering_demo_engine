@@ -15,11 +15,10 @@ layout (std140, binding = 1) uniform LightData
 {
     vec4 position;  // .rgb = position,  .a = cut_off       (cosine of inner cone angle)
     vec4 direction; // .rgb = direction, .a = outer_cut_off (cosine of outer cone angle)
-    vec4 ambient;   // .rgb = ambient,   .a = constant      (attenuation)
-    vec4 diffuse;   // .rgb = diffuse,   .a = linear        (attenuation)
-    vec4 specular;  // .rgb = specular,  .a = quadratic     (attenuation)
-    vec4 intensity; // .rgb = PADDING,   .a = intensity
-    int type;       // LIGHT_TYPE_DIRECTIONAL / POINT / SPOT
+    vec4 ambient;   // .rgb = ambient,   .a = radius        (attenuation radius)
+    vec4 diffuse;   // .rgb = diffuse,   .a = intensity
+    vec4 specular;  // .rgb = specular,  .a = PADDING
+    int type;
     float padding[3];
 } light_data;
 

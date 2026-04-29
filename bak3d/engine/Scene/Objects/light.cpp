@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "Asset/texture.h"
 #include "Core/global_settings.h"
 #include "Core/logger.h"
+#include "Scene/scene.h"
 
 Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	RenderableObject(material, position, "Light")
@@ -54,9 +55,7 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	m_ambient = glm::vec3(0.3f);
 	m_specular = glm::vec3(0.3f);
 
-	m_constant = 1.0f;
-	m_linear = 0.09f;
-	m_quadratic = 0.032f;
+	m_attenuation_radius = 32.0f;
 
 	m_inner_cut_off = glm::cos(glm::radians(12.5f));
 	m_outer_cut_off = glm::cos(glm::radians(17.5f));
@@ -97,9 +96,11 @@ void Light::update(float dt)
 	{
 		m_distance_offset -= dt * 30.0f;
 	}
-	m_position *= m_distance_offset;
 
+	m_position *= m_distance_offset;
 	m_scaling = glm::vec3(sprite_scaling, sprite_scaling, sprite_scaling);
+
+	m_direction = glm::normalize(m_position);
 
 	set_model_matrix(m_position, m_scaling, m_euler_rotation, 0.0f);
 
@@ -109,7 +110,9 @@ void Light::update(float dt)
 	const LightType type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
 	set_texture_by_type(type);
 
-	m_direction = glm::normalize(m_position - glm::vec3(0.0f));
+	m_attenuation_radius = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Point_Attenuation_Radius);
+	m_inner_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Inner_CutOff)));
+	m_outer_cut_off = glm::cos(glm::radians(GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Spot_ConeAngle_Outer_CutOff)));
 
 	update_light_data_ubo();
 }
@@ -138,11 +141,9 @@ void Light::draw() const
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Light::set_attenuation(const float constant, const float linear, const float quadratic)
+void Light::set_attenuation(const float radius)
 {
-	m_constant = constant;
-	m_linear = linear;
-	m_quadratic = quadratic;
+	m_attenuation_radius = radius;
 }
 
 void Light::set_cone_angles(const float inner_degrees, const float outer_degrees)
@@ -154,32 +155,29 @@ void Light::set_cone_angles(const float inner_degrees, const float outer_degrees
 void Light::update_light_data_ubo() const
 {
 	m_light_data_ubo->bind_object();
+
 	// vec4 position
-	m_light_data_ubo->set_buffer_sub_data(&m_position,        VEC3_SIZE,  0 * VEC4_SIZE + 0);
-	m_light_data_ubo->set_buffer_sub_data(&m_inner_cut_off,         FLOAT_SIZE, 0 * VEC4_SIZE + VEC3_SIZE);
+	m_light_data_ubo->set_buffer_sub_data(&m_position,			 VEC3_SIZE,  0 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_inner_cut_off,      FLOAT_SIZE, 0 * VEC4_SIZE + VEC3_SIZE);
 
 	// vec4 direction
-	m_light_data_ubo->set_buffer_sub_data(&m_direction,       VEC3_SIZE,  1 * VEC4_SIZE + 0);
-	m_light_data_ubo->set_buffer_sub_data(&m_outer_cut_off,   FLOAT_SIZE, 1 * VEC4_SIZE + VEC3_SIZE);
+	m_light_data_ubo->set_buffer_sub_data(&m_direction,			 VEC3_SIZE,  1 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_outer_cut_off,		 FLOAT_SIZE, 1 * VEC4_SIZE + VEC3_SIZE);
 
-	// vec4 ambient
-	m_light_data_ubo->set_buffer_sub_data(&m_ambient,         VEC3_SIZE,  2 * VEC4_SIZE + 0);
-	m_light_data_ubo->set_buffer_sub_data(&m_constant,        FLOAT_SIZE, 2 * VEC4_SIZE + VEC3_SIZE);
+	// vec4 ambient (.a = radius)
+	m_light_data_ubo->set_buffer_sub_data(&m_ambient,			 VEC3_SIZE,  2 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_attenuation_radius, FLOAT_SIZE, 2 * VEC4_SIZE + VEC3_SIZE);
 
-	// vec4 diffuse
-	m_light_data_ubo->set_buffer_sub_data(&m_diffuse,         VEC3_SIZE,  3 * VEC4_SIZE + 0);
-	m_light_data_ubo->set_buffer_sub_data(&m_linear,          FLOAT_SIZE, 3 * VEC4_SIZE + VEC3_SIZE);
+	// vec4 diffuse (.a = intensity)
+	m_light_data_ubo->set_buffer_sub_data(&m_diffuse,			 VEC3_SIZE,  3 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_intensity,			 FLOAT_SIZE, 3 * VEC4_SIZE + VEC3_SIZE);
 
-	// vec4 specular
-	m_light_data_ubo->set_buffer_sub_data(&m_specular,        VEC3_SIZE,  4 * VEC4_SIZE + 0);
-	m_light_data_ubo->set_buffer_sub_data(&m_quadratic,       FLOAT_SIZE, 4 * VEC4_SIZE + VEC3_SIZE);
+	// vec4 specular (.a = unused)
+	m_light_data_ubo->set_buffer_sub_data(&m_specular,			 VEC3_SIZE,  4 * VEC4_SIZE + 0);
 
-	// vec4 intensity (.a only, .rgb is padding)
-	m_light_data_ubo->set_buffer_sub_data(&m_intensity,       FLOAT_SIZE, 5 * VEC4_SIZE + VEC3_SIZE);
-
-	// int type + float padding[3]
+	// int type
 	const int32_t type = static_cast<int32_t>(m_type);
-	m_light_data_ubo->set_buffer_sub_data(&type,              INT_SIZE,   6 * VEC4_SIZE);
+	m_light_data_ubo->set_buffer_sub_data(&type,				 INT_SIZE,   5 * VEC4_SIZE);
 
 	m_light_data_ubo->unbind_object();
 }
