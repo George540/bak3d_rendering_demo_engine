@@ -81,7 +81,10 @@ namespace
 
             if (smatch match; regex_match(line, match, include_pattern))
             {
-                string include_path = shader_dir + "/" + match[1].str();
+                // Go one directory up from shader_dir
+                auto parent_dir = shader_dir.substr(0, shader_dir.find_last_of("/\\"));
+                string include_path = parent_dir + "/" + match[1].str();
+
                 ifstream include_file(include_path);
 
                 if (!include_file.is_open())

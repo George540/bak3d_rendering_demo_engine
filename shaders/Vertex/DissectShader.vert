@@ -6,13 +6,11 @@ layout (location = 2) in vec2 aTexCoords;
 out vec3 FragPos;
 out vec2 TexCoord;
 
-uniform mat4 model;
-
-#include "Common.glsl"
+#include "Common_Global.glsl"
 
 void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
     TexCoord = aTexCoords;
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = camera_data.projection * camera_data.view * model * vec4(aPos, 1.0);
 }

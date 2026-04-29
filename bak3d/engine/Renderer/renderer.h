@@ -38,8 +38,6 @@ private:
 
 	static MultisampleFrameBuffer* r_msaa_fbo;
 	static FrameBuffer* r_fbo;
-	
-	static UniformBuffer* r_ubo;
 public:
 	static void initialize();
 	static void shutdown();
@@ -51,7 +49,6 @@ public:
 	static GLFWwindow* get_window() { return r_window; }
 	static MultisampleFrameBuffer* get_msaa_frame_buffer() { return r_msaa_fbo; }
 	static FrameBuffer* get_frame_buffer() { return r_fbo; }
-	static UniformBuffer* get_uniform_buffer() { return r_ubo; }
 
 	static void on_framebuffer_size_callback(GLFWwindow* window, int new_width, int new_height);
 private:

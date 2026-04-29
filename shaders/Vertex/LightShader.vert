@@ -2,11 +2,9 @@
 
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
-uniform mat4 model;
-
 out vec2 TexCoords;
 
-#include "Common.glsl"
+#include "Common_Global.glsl"
 
 void main()
 {
@@ -21,9 +19,9 @@ void main()
         vertex.xy,
         0.0, // no rotation for a light marker
         scale,
-        view
+        camera_data.view
     );
 
     TexCoords = vertex.zw;
-    gl_Position = projection * view * vec4(worldPosition, 1.0);
+    gl_Position = camera_data.projection * camera_data.view * vec4(worldPosition, 1.0);
 }

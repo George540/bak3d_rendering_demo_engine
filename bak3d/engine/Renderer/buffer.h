@@ -137,4 +137,5 @@ class UniformBuffer : public Buffer
 {
 public:
     UniformBuffer(GLsizeiptr size, const void* data, GLuint binding_index, GLenum usage = GL_STATIC_DRAW);
+    void bind_to_binding_point(GLint binding_point);
 };

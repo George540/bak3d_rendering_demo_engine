@@ -29,24 +29,35 @@ THE SOFTWARE.
 #include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
 #include "Renderer/renderer.h"
+#include "Scene/Objects/light.h"
 
 using namespace std;
 
 namespace
 {
     vector<string> m_msaa_samples = { };
+    vector<string> m_light_type_items = { };
 }
 
 Environment::Environment() : EditorPanel("Environment")
 {
     // Dynamically create MSAA sampling options for dropdown selection based on hardware's max samples.
     const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
-    
     m_msaa_samples.reserve(msaa_max_samples);
     for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id *= 2)
     {
         string label = to_string(sample_id) + "x" + to_string(sample_id);
         m_msaa_samples.push_back(label);
+    }
+
+    // Could be hardcoded since we know the light types already, but let's keep it modular.
+    constexpr int light_types_num = static_cast<int>(LightType::Max);
+    m_light_type_items.reserve(light_types_num);
+    for (int light_type_id = 0; light_type_id < light_types_num; light_type_id++)
+    {
+        const LightType light_type = static_cast<LightType>(light_type_id);
+        string label = light_type_to_string(light_type);
+        m_light_type_items.push_back(label);
     }
 }
 
@@ -117,40 +128,83 @@ void Environment::draw_light_settings()
 
         ImGui::BeginDisabled(!light_enabled);
         {
-            // Horizontal Rotation
-            float light_horizontal_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_HorizontalRotation);
-            ImGuiB3D::PropertySliderFloat("Horizontal Rotation", &light_horizontal_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object horizontally.");
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_HorizontalRotation, light_horizontal_rotation);
+            LightType light_type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
+            if (ImGuiB3D::PropertyBeginDropdown("Type", light_type_to_string(light_type), "Select Light Caster type. Choices are:\n"
+                                                                                                                  " - Directional\n"
+                                                                                                                  " - Point\n"
+                                                                                                                  " - Spot\n"
+                                                                                                                  " - Area"))
+            {
+                for (int light_type_index = 0; light_type_index < m_light_type_items.size(); light_type_index++)
+                {
+                    ImGui::PushID(light_type_index);
 
-            // Vertical Rotation
-            float light_vertical_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_VerticalRotation);
-            ImGuiB3D::PropertySliderFloat("Vertical Rotation", &light_vertical_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object vertically.");
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_VerticalRotation, light_vertical_rotation);
+                    const bool is_selected = (light_type_to_string(light_type) == m_light_type_items[light_type_index].c_str());
 
-            // Sprite Scaling
-            float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
-            ImGuiB3D::PropertySliderFloat("Sprite Scaling", &sprite_scaling, 0.1f, 3.0f, "%.3f", "Change the light's icon size.");
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_Scaling, sprite_scaling);
+                    if (ImGui::Selectable(m_light_type_items[light_type_index].c_str(), is_selected))
+                    {
+                        GlobalSettings::set_global_setting<uint32_t>(GlobalSettingOption::Light_Type, static_cast<uint32_t>(light_type_index));
+                    }
 
-            // Distance Offset
-            float light_origin_distance = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
-            ImGuiB3D::PropertySliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f, "%.3f", "Light distance from origin (center of axis).");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_OriginDistance, light_origin_distance);
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
 
-            // Intensity
-            float light_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
-            ImGuiB3D::PropertySliderFloat("Intensity", &light_intensity, 0.0f, 10.0f, "%.3f", "Intensity of the light");
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Intensity, light_intensity);
+                    ImGui::PopID();
+                }
 
-            // Color
-            glm::vec4 light_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
-            float bg_col[4] = {  light_color.r,  light_color.g,  light_color.b, light_color.a };
-            ImGuiB3D::PropertyColorPicker("Color", bg_col, "Change light's color");
-            light_color.r = bg_col[0];
-            light_color.g = bg_col[1];
-            light_color.b = bg_col[2];
-            light_color.a = bg_col[3];
-            GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
+                ImGui::EndCombo();
+            }
+
+            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+            if (ImGui::TreeNode("Orientation"))
+            {
+                // Horizontal Rotation
+                float light_horizontal_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_HorizontalRotation);
+                ImGuiB3D::PropertySliderFloat("Horizontal Rotation", &light_horizontal_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object horizontally.");
+                GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_HorizontalRotation, light_horizontal_rotation);
+
+                // Vertical Rotation
+                float light_vertical_rotation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_VerticalRotation);
+                ImGuiB3D::PropertySliderFloat("Vertical Rotation", &light_vertical_rotation, 0.0f, 360.0f, "%.3f", "Orbit light around object vertically.");
+                GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_VerticalRotation, light_vertical_rotation);
+
+                // Sprite Scaling
+                float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
+                ImGuiB3D::PropertySliderFloat("Sprite Scaling", &sprite_scaling, 0.1f, 3.0f, "%.3f", "Change the light's icon size.");
+                GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Light_Scaling, sprite_scaling);
+
+                // Distance Offset
+                float light_origin_distance = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
+                ImGuiB3D::PropertySliderFloat("Distance", &light_origin_distance, 2.0f, 10.0f, "%.3f", "Light distance from origin (center of axis).");
+                GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_OriginDistance, light_origin_distance);
+
+                ImGui::TreePop();
+            }
+
+            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+            if (ImGui::TreeNode("Coloration"))
+            {
+                // Intensity
+                float light_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
+                ImGuiB3D::PropertySliderFloat("Intensity", &light_intensity, 0.0f, 10.0f, "%.3f", "Intensity of the light");
+                GlobalSettings::set_global_setting<float>(GlobalSettingOption::Light_Intensity, light_intensity);
+
+                // Color
+                glm::vec4 light_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
+                float bg_col[4] = {  light_color.r,  light_color.g,  light_color.b, light_color.a };
+                ImGuiB3D::PropertyColorPicker("Color", bg_col, "Change light's color");
+                light_color.r = bg_col[0];
+                light_color.g = bg_col[1];
+                light_color.b = bg_col[2];
+                light_color.a = bg_col[3];
+                GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
+
+                
+
+                ImGui::TreePop();
+            }
         }
         ImGui::EndDisabled();
 

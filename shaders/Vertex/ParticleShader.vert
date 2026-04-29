@@ -12,7 +12,7 @@ layout (location = 4) in float instanceScale;
 out vec2 TexCoords;
 out vec4 ParticleColor;
 
-#include "Common.glsl"
+#include "Common_Global.glsl"
 
 void main()
 {
@@ -22,7 +22,7 @@ void main()
         vertex.xy,
         instanceRotation,
         instanceScale,
-        view
+        camera_data.view
     );
 
     // Set texture coordinates and particle color
@@ -30,5 +30,5 @@ void main()
     ParticleColor = instanceColor;
 
     // Apply the projection and view matrices
-    gl_Position = projection * view * vec4(worldPosition, 1.0);
+    gl_Position = camera_data.projection * camera_data.view * vec4(worldPosition, 1.0);
 }

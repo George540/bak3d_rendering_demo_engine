@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
 
+#include "Renderer/buffer.h"
 #include "Scene/scene_object.h"
 
 /*
@@ -51,6 +52,7 @@ public:
 	[[nodiscard]] glm::mat4 get_projection_matrix() const;
 	[[nodiscard]] glm::mat4 get_view_projection_matrix() const;
 	[[nodiscard]] glm::vec3 get_camera_position() const { return m_position; }
+	[[nodiscard]] UniformBuffer* get_camera_data_buffer() const { return m_camera_data_ubo.get(); }
 private:
 	glm::vec3 m_lookat; // look towards this point
 	glm::vec3 m_cam_up; // up vector
@@ -59,4 +61,6 @@ private:
 	double m_horizontal_angle; // horizontal angle
 	double m_vertical_angle;   // vertical angle
 	float m_zoom; // camera zoom
+
+	std::unique_ptr<UniformBuffer> m_camera_data_ubo;
 };

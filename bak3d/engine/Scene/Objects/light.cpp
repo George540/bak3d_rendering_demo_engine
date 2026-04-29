@@ -48,18 +48,24 @@ Light::Light(glm::vec3 position, glm::vec3 scaling, Material* material) :
 	m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
 	m_vao->unbind_object();
 
-	m_properties.position = m_position;
-	m_properties.diffuse = glm::vec3(1.0f);
-	m_properties.ambient = glm::vec3(0.3f);
-	m_properties.specular = glm::vec3(0.3f);
+	m_light_data_ubo = std::make_unique<UniformBuffer>(7 * VEC4_SIZE /*Temporary size*/, nullptr, 1, GL_DYNAMIC_DRAW);
+
+	m_diffuse = glm::vec3(1.0f);
+	m_ambient = glm::vec3(0.3f);
+	m_specular = glm::vec3(0.3f);
+
+	m_constant = 1.0f;
+	m_linear = 0.09f;
+	m_quadratic = 0.032f;
+
+	m_inner_cut_off = glm::cos(glm::radians(12.5f));
+	m_outer_cut_off = glm::cos(glm::radians(17.5f));
 
 	m_horizontal_angle = m_position.x;
 	m_vertical_angle = m_position.y;
 	m_distance_offset = glm::distance(m_position, glm::vec3(0.0f));
 
-	m_sprite_texture = ResourceManager::get_texture("point_light_icon.png");
-
-	B3D_LOG_INFO("Point light created.");
+	B3D_LOG_INFO("Light created.");
 }
 
 void Light::update(float dt)
@@ -67,8 +73,8 @@ void Light::update(float dt)
 	m_horizontal_angle = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_HorizontalRotation);
 	m_vertical_angle = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_VerticalRotation);
 	m_distance_offset = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_OriginDistance);
-	m_properties.intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
-	float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
+	m_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Intensity);
+	const float sprite_scaling = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
 	
 	if (glfwGetKey(EventManager::get_window(), GLFW_KEY_A) == GLFW_PRESS)
 	{
@@ -92,16 +98,21 @@ void Light::update(float dt)
 		m_distance_offset -= dt * 30.0f;
 	}
 	m_position *= m_distance_offset;
-	m_properties.position = m_position;
 
 	m_scaling = glm::vec3(sprite_scaling, sprite_scaling, sprite_scaling);
 
 	set_model_matrix(m_position, m_scaling, m_euler_rotation, 0.0f);
 
 	const glm::vec4 diffuse = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
-	m_properties.diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
-}
+	m_diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
 
+	const LightType type = static_cast<LightType>(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::Light_Type));
+	set_texture_by_type(type);
+
+	m_direction = glm::normalize(m_position - glm::vec3(0.0f));
+
+	update_light_data_ubo();
+}
 
 void Light::draw() const
 {
@@ -111,7 +122,7 @@ void Light::draw() const
 
 	RenderableObject::draw();
 
-	m_material->set_vec4("diffuseColor", glm::vec4(m_properties.diffuse, 1.0f));
+	m_material->set_vec4("diffuseColor", glm::vec4(m_diffuse, 1.0f));
 	m_material->set_int("sprite", 0);
 
 	m_sprite_texture->bind(0);
@@ -125,4 +136,68 @@ void Light::draw() const
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+}
+
+void Light::set_attenuation(const float constant, const float linear, const float quadratic)
+{
+	m_constant = constant;
+	m_linear = linear;
+	m_quadratic = quadratic;
+}
+
+void Light::set_cone_angles(const float inner_degrees, const float outer_degrees)
+{
+	m_inner_cut_off = glm::cos(glm::radians(inner_degrees));
+	m_outer_cut_off = glm::cos(glm::radians(outer_degrees));
+}
+
+void Light::update_light_data_ubo() const
+{
+	m_light_data_ubo->bind_object();
+	// vec4 position
+	m_light_data_ubo->set_buffer_sub_data(&m_position,        VEC3_SIZE,  0 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_inner_cut_off,         FLOAT_SIZE, 0 * VEC4_SIZE + VEC3_SIZE);
+
+	// vec4 direction
+	m_light_data_ubo->set_buffer_sub_data(&m_direction,       VEC3_SIZE,  1 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_outer_cut_off,   FLOAT_SIZE, 1 * VEC4_SIZE + VEC3_SIZE);
+
+	// vec4 ambient
+	m_light_data_ubo->set_buffer_sub_data(&m_ambient,         VEC3_SIZE,  2 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_constant,        FLOAT_SIZE, 2 * VEC4_SIZE + VEC3_SIZE);
+
+	// vec4 diffuse
+	m_light_data_ubo->set_buffer_sub_data(&m_diffuse,         VEC3_SIZE,  3 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_linear,          FLOAT_SIZE, 3 * VEC4_SIZE + VEC3_SIZE);
+
+	// vec4 specular
+	m_light_data_ubo->set_buffer_sub_data(&m_specular,        VEC3_SIZE,  4 * VEC4_SIZE + 0);
+	m_light_data_ubo->set_buffer_sub_data(&m_quadratic,       FLOAT_SIZE, 4 * VEC4_SIZE + VEC3_SIZE);
+
+	// vec4 intensity (.a only, .rgb is padding)
+	m_light_data_ubo->set_buffer_sub_data(&m_intensity,       FLOAT_SIZE, 5 * VEC4_SIZE + VEC3_SIZE);
+
+	// int type + float padding[3]
+	const int32_t type = static_cast<int32_t>(m_type);
+	m_light_data_ubo->set_buffer_sub_data(&type,              INT_SIZE,   6 * VEC4_SIZE);
+
+	m_light_data_ubo->unbind_object();
+}
+
+void Light::set_texture_by_type(const LightType type)
+{
+	if (m_type == type)
+	{
+		return;
+	}
+
+	m_type = type;
+	switch (m_type)
+	{
+		case LightType::Directional: m_sprite_texture = ResourceManager::get_texture("directional_light_icon.png"); break;
+		case LightType::Point: m_sprite_texture = ResourceManager::get_texture("point_light_icon.png"); break;
+		case LightType::Spot: m_sprite_texture = ResourceManager::get_texture("spot_light_icon.png"); break;
+		case LightType::Area: m_sprite_texture = ResourceManager::get_texture("area_light_icon.png"); break;
+		default: m_sprite_texture = ResourceManager::get_texture("point_light_icon.png"); break;
+	}
 }

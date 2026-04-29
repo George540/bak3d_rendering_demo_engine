@@ -78,7 +78,6 @@ void Model::draw() const
 	if (true)
 	{
 		// UPDATE MODEL MATERIAL
-		update_light_properties();
 		update_material_properties();
 	}
 	else
@@ -93,24 +92,10 @@ void Model::draw() const
 	}
 }
 
-void Model::update_light_properties() const
-{
-	const auto light = Scene::instance->get_active_light()->get_light_properties();
-
-	// VERTEX
-	m_current_material->set_vec3("viewPos", Scene::instance->get_camera()->get_camera_position());
-	m_current_material->set_vec3("lightPos", light.position);
-
-	// FRAGMENT
-	m_current_material->set_vec3("light.position", light.position);
-	m_current_material->set_vec3("light.diffuse", light.diffuse);
-	m_current_material->set_vec3("light.specular", light.specular);
-	m_current_material->set_vec3("light.ambient", light.ambient);
-	m_current_material->set_float("light.intensity", light.intensity);
-}
-
 void Model::update_material_properties() const
 {
+	m_current_material->set_vec3("camera_position", Scene::instance->get_camera()->get_camera_position());
+
 	// FRAGMENT MATERIAL
 	if (textures_cache.contains(aiTextureType_DIFFUSE))
 	{

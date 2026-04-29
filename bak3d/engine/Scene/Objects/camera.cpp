@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "camera.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Core/logger.h"
 #include "Input/event_manager.h"
 
@@ -44,6 +46,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, float speed, 
 	m_vertical_angle(ver_angle),
 	m_zoom(zoom)
 {
+	m_camera_data_ubo = make_unique<UniformBuffer>(MAT4_SIZE * 2, nullptr, 0, GL_DYNAMIC_DRAW);
+
 	B3D_LOG_INFO("Camera has been set up.");
 };
 
@@ -74,6 +78,11 @@ void Camera::update(float dt)
 	m_position = glm::vec3(cosf(phi) * cosf(theta), sinf(phi), -cosf(phi) * sinf(theta));
 	// Set zoom based on camera scroll offset
 	m_position *= EventManager::get_camera_scroll_offset();
+
+	m_camera_data_ubo->bind_object();
+	m_camera_data_ubo->set_buffer_sub_data(glm::value_ptr(get_projection_matrix()), MAT4_SIZE, 0);
+	m_camera_data_ubo->set_buffer_sub_data(glm::value_ptr(get_view_matrix()), MAT4_SIZE, MAT4_SIZE);
+	m_camera_data_ubo->unbind_object();
 }
 
 glm::mat4 Camera::get_view_matrix() const

@@ -55,12 +55,19 @@ enum class GlobalSettingOption : uint32_t
     AxisRendering,
     BackgroundColor,
     Light_Enabled,
+    Light_Type,
     Light_HorizontalRotation,
     Light_VerticalRotation,
     Light_Scaling,
     Light_OriginDistance,
     Light_Color,
     Light_Intensity,
+    Light_Directional_Direction,
+    Light_Point_Attenuation_Constant,
+    Light_Point_Attenuation_Linear,
+    Light_Point_Attenuation_Quadratic,
+    Light_Spot_ConeAngle_Inner_CutOff,
+    Light_Spot_ConeAngle_Outer_CutOff,
     AA_MSAA_Enabled,
     AA_MSAA_Samples,
     PostProcessing_Enabled,
@@ -98,8 +105,11 @@ enum class SceneObjectType : uint32_t
  */
 constexpr auto MAX_BONE_INFLUENCE = 4;
 
+static constexpr GLsizei FLOAT_SIZE = sizeof(float);
+static constexpr GLsizei VEC3_SIZE = sizeof(glm::vec3);
 static constexpr GLsizei VEC4_SIZE = sizeof(glm::vec4);
 static constexpr GLsizei UINT_SIZE = sizeof(GLuint);
+static constexpr GLsizei INT_SIZE = sizeof(GLint);
 static constexpr GLsizei MAT4_SIZE = sizeof(glm::mat4);
 
 struct Vertex

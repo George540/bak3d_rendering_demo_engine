@@ -46,7 +46,6 @@ using namespace std;
 GLFWwindow* Renderer::r_window = nullptr;
 MultisampleFrameBuffer* Renderer::r_msaa_fbo = nullptr;
 FrameBuffer* Renderer::r_fbo = nullptr;
-UniformBuffer* Renderer::r_ubo = nullptr;
 
 void Renderer::initialize()
 {
@@ -79,14 +78,6 @@ void Renderer::initialize()
 
 void Renderer::begin_frame()
 {
-	glm::mat4 projection_matrix = Scene::instance->get_camera()->get_projection_matrix();
-	glm::mat4 view_matrix = Scene::instance->get_camera()->get_view_matrix();
-
-	r_ubo->bind_object();
-	r_ubo->set_buffer_sub_data(glm::value_ptr(projection_matrix), MAT4_SIZE, 0);
-	r_ubo->set_buffer_sub_data(glm::value_ptr(view_matrix), MAT4_SIZE, MAT4_SIZE);
-	r_ubo->unbind_object();
-	
 	if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::AA_MSAA_Enabled))
 	{
 		if (const int samples_setting = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::AA_MSAA_Samples);
@@ -143,7 +134,6 @@ void Renderer::end_frame()
 void Renderer::shutdown()
 {
 	r_window = nullptr;
-	r_ubo = nullptr;
 	r_fbo = nullptr;
 	r_msaa_fbo = nullptr;
 }
@@ -163,5 +153,4 @@ void Renderer::initialize_buffers()
 {
 	r_msaa_fbo = new MultisampleFrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
 	r_fbo = new FrameBuffer(0, nullptr, EventManager::get_window_width(), EventManager::get_window_height());
-	r_ubo = new UniformBuffer(MAT4_SIZE * 2, nullptr, 0, GL_DYNAMIC_DRAW);
 }
