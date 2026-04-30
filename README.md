@@ -83,6 +83,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 ### [v1.3 - The Abstraction Update](https://github.com/George540/Bak3DEngine/milestone/2)
 | Status | Feature | Description |
 | :---: | :--- | :--- |
+|:ballot_box_with_check:| **Project Building** | Set up a propert build set up with build scripts in CMake and python for automated set up processes and support of multiple platforms. |
 |:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
 |:ballot_box_with_check:| **FrameBuffers** | Surprisingly I never had framebuffers set up, so if I want better control of the final output image, I need that. |
 |:ballot_box_with_check:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
