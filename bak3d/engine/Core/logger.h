@@ -49,10 +49,10 @@ namespace log_helper
 
 enum class LogLevel : uint8_t
 {
-    Log_Info,
-    Log_Warning,
-    Log_Error,
-    Log_Max
+    Log_Info = 1 << 0,
+    Log_Warning = 1 << 1,
+    Log_Error = 1 << 2,
+    Log_Max = 1 << 3
 };
 
 inline const char* to_string(LogLevel e)
@@ -66,6 +66,13 @@ inline const char* to_string(LogLevel e)
     default: return "unknown";
     }
 }
+
+struct LogEntry
+{
+    std::string header_buffer;
+    std::string log_buffer;
+    LogLevel log_level;
+};
 
 /*
  * Simple Logger class for logging different levels of logging severity (Log, Warning, Error).
@@ -93,23 +100,28 @@ public:
 
         char log_buffer[256];
         length = std::snprintf(log_buffer, sizeof(log_buffer), fmt, args...);
-        std::string full_log = std::string(header_buffer) + log_buffer + "\n";
 
-        if (log_entries_formatted.size() >= MAX_LOG_ENTRIES)
+        LogEntry log_entry;
+        log_entry.log_level = level;
+        log_entry.header_buffer = header_buffer;
+        log_entry.log_buffer = log_buffer;
+        
+
+        if (log_entries.size() >= MAX_LOG_ENTRIES)
         {
-            log_entries_formatted.erase(log_entries_formatted.begin());
+            log_entries.erase(log_entries.begin());
         }
 
-        log_entries_formatted.push_back(full_log);
+        log_entries.push_back(log_entry);
     }
 
-    static std::vector<std::string>& get_log_entries() { return log_entries_formatted; }
-    static void clear_log_entries() { log_entries_formatted.clear(); }
+    static std::vector<LogEntry>& get_log_entries() { return log_entries; }
+    static void clear_log_entries() { log_entries.clear(); }
 private:
     static std::string get_elapsed_time_formatted();
 
     static std::chrono::steady_clock::time_point start_time;
-    static std::vector<std::string> log_entries_formatted;
+    static std::vector<LogEntry> log_entries;
 };
 
 #define B3D_LOG_INFO(fmt, ...) \

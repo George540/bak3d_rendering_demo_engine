@@ -27,17 +27,17 @@ THE SOFTWARE.
 using namespace std;
 
 chrono::steady_clock::time_point Logger::start_time = chrono::steady_clock::now();
-vector<std::string> Logger::log_entries_formatted;
+vector<LogEntry> Logger::log_entries = {};
 
 void Logger::initialize()
 {
     start_time = chrono::steady_clock::now();
-    log_entries_formatted.clear();
+    log_entries.clear();
 }
 
 void Logger::shutdown()
 {
-    log_entries_formatted.clear();
+    log_entries.clear();
     B3D_LOG_INFO("Shutting down engine. Time passed: %s", get_elapsed_time_formatted().c_str());
 }
 

@@ -38,8 +38,8 @@ public:
     static bool PropertySliderFloat(const char* label, float* value, float v_min, float v_max, const char* format, const char* tooltip_desc = nullptr);
     static bool PropertyButton(const char* label, const char* button_label = nullptr, const char* tooltip_desc = nullptr, ImVec2 size = ImVec2(0, 0));
     static bool PropertyImageButton(const char* label, const char* tooltip_desc, int* texture_id, ImVec2 size, ImVec2 uv0 = ImVec2( 1.0f, 1.0f), ImVec2 uv1 = ImVec2( 0.0f, 0.0f), ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    
     static bool SeparatorWithSpacing(int num_spaces);
-
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);
 private:
     static bool ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size);

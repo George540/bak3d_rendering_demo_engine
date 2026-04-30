@@ -49,7 +49,7 @@ namespace
             if (!success)
             {
                 glGetShaderInfoLog(shader_id, 1024, nullptr, infoLog);
-                B3D_LOG_ERROR("Shader compilation error of type: %s%s\n %s\n -- --------------------------------------------------- -- ", shader_name.c_str(), shader_type.c_str(), infoLog);
+                B3D_LOG_ERROR("Shader compilation error of type: %s%s\n %s", shader_name.c_str(), shader_type.c_str(), infoLog);
             }
         }
         else
@@ -58,7 +58,7 @@ namespace
             if (!success)
             {
                 glGetProgramInfoLog(shader_id, 1024, nullptr, infoLog);
-                B3D_LOG_ERROR("Shader linking error of type: %s%s\n %s\n -- --------------------------------------------------- -- ", shader_name.c_str(), shader_type.c_str(), infoLog);
+                B3D_LOG_ERROR("Shader linking error of type: %s%s\n %s", shader_name.c_str(), shader_type.c_str(), infoLog);
             }
         }
     }
