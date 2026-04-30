@@ -29,467 +29,396 @@ import subprocess
 import platform
 import shutil
 from pathlib import Path
-from typing import Optional, Tuple, List
+from typing import Optional
 
+
+# ---------------------------------------------------------------------------
+# Colors
+# ---------------------------------------------------------------------------
 
 class Colors:
     """ANSI color codes for terminal output"""
-    RESET = "\033[0m"
-    RED = "\033[91m"
-    GREEN = "\033[92m"
+    RESET  = "\033[0m"
+    RED    = "\033[91m"
+    GREEN  = "\033[92m"
     YELLOW = "\033[93m"
-    CYAN = "\033[96m"
-    BOLD = "\033[1m"
-    
-    # Fallback for Windows without ANSI support
+    CYAN   = "\033[96m"
+    BOLD   = "\033[1m"
+
     @classmethod
     def disable_on_windows(cls):
-        """Disable colors on Windows if terminal doesn't support ANSI"""
         if platform.system() == "Windows":
-            # Try to enable ANSI colors on Windows 10+
-            if sys.platform == "win32":
-                try:
-                    import ctypes
-                    kernel32 = ctypes.windll.kernel32
-                    kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
-                except:
-                    # Fall back to no colors
-                    cls.RESET = ""
-                    cls.RED = ""
-                    cls.GREEN = ""
-                    cls.YELLOW = ""
-                    cls.CYAN = ""
-                    cls.BOLD = ""
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetConsoleMode(
+                    ctypes.windll.kernel32.GetStdHandle(-11), 7
+                )
+            except Exception:
+                cls.RESET = cls.RED = cls.GREEN = cls.YELLOW = cls.CYAN = cls.BOLD = ""
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+SEP  = f"{Colors.CYAN}{'─' * 60}{Colors.RESET}"   # thin section divider
+HSEP = f"{Colors.CYAN}{'═' * 60}{Colors.RESET}"   # heavy header/footer divider
+
+
+def _tag(color: str, label: str, message: str) -> None:
+    print(f"{color}[{label}]{Colors.RESET} {message}")
+
+def print_ok(msg: str)      -> None: _tag(Colors.GREEN,  "OK",      msg)
+def print_error(msg: str)   -> None: _tag(Colors.RED,    "ERROR",   msg)
+def print_warning(msg: str) -> None: _tag(Colors.YELLOW, "WARNING", msg)
+def print_info(msg: str)    -> None: _tag(Colors.CYAN,   "INFO",    msg)
+
+def print_section(title: str) -> None:
+    """Print a lightweight section header — no stacked blank lines."""
+    print(f"\n{SEP}")
+    print(f"  {Colors.BOLD}{title}{Colors.RESET}")
+    print(SEP)
+
+
+# ---------------------------------------------------------------------------
+# CMakeSetup
+# ---------------------------------------------------------------------------
 
 class CMakeSetup:
-    """Main CMake setup class"""
-    
-    # Visual Studio configurations
+
     VS_CONFIGS = {
-        "1": {
-            "name": "Visual Studio 2026",
-            "generator": "Visual Studio 18 2026",
-            "slnx": True,  # Supports .slnx format
-            "min_cmake": "3.27"
-        },
-        "2": {
-            "name": "Visual Studio 2022",
-            "generator": "Visual Studio 17 2022",
-            "slnx": False,  # Uses traditional .sln
-            "min_cmake": "3.20"
-        },
-        "3": {
-            "name": "Visual Studio 2019",
-            "generator": "Visual Studio 16 2019",
-            "slnx": False,
-            "min_cmake": "3.20"
-        },
+        "1": {"name": "Visual Studio 2026", "generator": "Visual Studio 18 2026",
+              "slnx": True,  "min_cmake": "3.27"},
+        "2": {"name": "Visual Studio 2022", "generator": "Visual Studio 17 2022",
+              "slnx": False, "min_cmake": "3.20"},
+        "3": {"name": "Visual Studio 2019", "generator": "Visual Studio 16 2019",
+              "slnx": False, "min_cmake": "3.20"},
     }
-    
+
     ARCHITECTURES = {
-        "1": {"name": "x64 (Recommended - 64-bit)", "arch": "x64"},
-        "2": {"name": "Win32 (32-bit)", "arch": "Win32"},
+        "1": {"name": "x64 (Recommended — 64-bit)", "arch": "x64"},
+        "2": {"name": "Win32 (32-bit)",              "arch": "Win32"},
     }
-    
+
     UNIX_GENERATORS = {
         "1": {"name": "Unix Makefiles", "generator": "Unix Makefiles"},
-        "2": {"name": "Ninja", "generator": "Ninja"},
-        "3": {"name": "Xcode (macOS only)", "generator": "Xcode"},
+        "2": {"name": "Ninja",          "generator": "Ninja"},
+        "3": {"name": "Xcode (macOS)",  "generator": "Xcode"},
     }
-    
+
     def __init__(self):
-        self.repo_root = Path(__file__).parent.resolve()
-        self.build_dir = self.repo_root / "build"
-        self.vs_version = None
-        self.vs_config = None
+        self.repo_root    = Path(__file__).parent.resolve()
+        self.build_dir    = self.repo_root / "build"
+        self.vs_config    = None
+        self.vs_version   = None
         self.architecture = None
-        self.generator = None
-        self.use_slnx = False
-        self.is_windows = platform.system() == "Windows"
-        
-        # Enable colors
+        self.generator    = None
+        self.use_slnx     = False
+        self.is_windows   = platform.system() == "Windows"
         Colors.disable_on_windows()
-    
+
+    # ------------------------------------------------------------------
+    # Header / footer
+    # ------------------------------------------------------------------
+
     def print_header(self):
-        """Print script header"""
-        print(f"\n{Colors.CYAN}{Colors.BOLD}")
-        print("=" * 70)
-        print(" bak3d CMake Setup Script (Python)")
-        print("=" * 70)
-        print(f"{Colors.RESET}\n")
-    
-    def print_success(self, message: str):
-        """Print success message"""
-        print(f"{Colors.GREEN}[OK]{Colors.RESET} {message}")
-    
-    def print_error(self, message: str):
-        """Print error message"""
-        print(f"{Colors.RED}[ERROR]{Colors.RESET} {message}")
-    
-    def print_warning(self, message: str):
-        """Print warning message"""
-        print(f"{Colors.YELLOW}[WARNING]{Colors.RESET} {message}")
-    
-    def print_info(self, message: str):
-        """Print info message"""
-        print(f"{Colors.CYAN}[INFO]{Colors.RESET} {message}")
-    
+        print(f"\n{HSEP}")
+        print(f"  {Colors.BOLD}{Colors.CYAN}bak3d CMake Setup Script{Colors.RESET}")
+        print(HSEP)
+
+    def print_footer(self, success: bool):
+        print(f"\n{HSEP}")
+        if success:
+            print(f"  {Colors.GREEN}{Colors.BOLD}Setup completed successfully!{Colors.RESET}")
+        else:
+            print(f"  {Colors.RED}{Colors.BOLD}Setup failed or was cancelled.{Colors.RESET}")
+        print(HSEP)
+
+    # ------------------------------------------------------------------
+    # Prerequisites
+    # ------------------------------------------------------------------
+
     def check_prerequisites(self) -> bool:
-        """Check if all prerequisites are met"""
-        print(f"\n{Colors.BOLD}Checking Prerequisites...{Colors.RESET}\n")
-        
-        # Check if we're in the right directory
+        print_section("Prerequisites")
+
         if not (self.repo_root / "bak3d").exists():
-            self.print_error("Could not find 'bak3d' directory")
-            print("Please run this script from the repository root directory")
+            print_error("Could not find 'bak3d' directory")
+            print("  Run this script from the repository root.")
             return False
-        
-        self.print_success("Found 'bak3d' directory")
-        
+        print_ok("bak3d/ directory found")
+
         if not (self.repo_root / "CMakeLists.txt").exists():
-            self.print_error("Could not find 'CMakeLists.txt'")
-            print("Please ensure CMakeLists.txt is in the repository root")
+            print_error("Could not find CMakeLists.txt")
             return False
-        
-        self.print_success("Found 'CMakeLists.txt'")
-        
-        # Check for CMake
-        if not self.check_cmake():
-            return False
-        
-        return True
-    
+        print_ok("CMakeLists.txt found")
+
+        return self.check_cmake()
+
     def check_cmake(self) -> bool:
-        """Check if CMake is installed and get version"""
         try:
             result = subprocess.run(
                 ["cmake", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5
+                capture_output=True, text=True, timeout=5
             )
-            
             if result.returncode == 0:
-                version_line = result.stdout.split('\n')[0]
-                self.print_success(f"CMake is installed: {version_line}")
+                version_line = result.stdout.split("\n")[0]
+                print_ok(f"CMake found: {version_line}")
                 return True
-            else:
-                self.print_error("CMake is installed but returned an error")
-                return False
-        
+            print_error("CMake returned a non-zero exit code")
+            return False
         except FileNotFoundError:
-            self.print_error("CMake is not installed or not in PATH")
-            print(f"\n{Colors.YELLOW}Please install CMake from https://cmake.org/download/{Colors.RESET}")
-            print(f"{Colors.YELLOW}Make sure to add CMake to PATH during installation{Colors.RESET}\n")
+            print_error("CMake not found in PATH")
+            print(f"  {Colors.YELLOW}Install from https://cmake.org/download/ and add to PATH{Colors.RESET}")
             return False
         except subprocess.TimeoutExpired:
-            self.print_error("CMake check timed out")
+            print_error("CMake version check timed out")
             return False
-    
+
+    # ------------------------------------------------------------------
+    # Generator / platform selection
+    # ------------------------------------------------------------------
+
     def select_platform(self) -> bool:
-        """Select the appropriate platform/generator"""
-        if self.is_windows:
-            return self.select_visual_studio()
-        else:
-            return self.select_unix_generator()
-    
+        return self.select_visual_studio() if self.is_windows else self.select_unix_generator()
+
     def select_visual_studio(self) -> bool:
-        """Select Visual Studio version on Windows"""
-        print(f"\n{Colors.BOLD}Choose Your Visual Studio Version:{Colors.RESET}\n")
-        
-        for key, config in self.VS_CONFIGS.items():
-            slnx_note = " (uses .slnx)" if config["slnx"] else ""
-            print(f"{key}. {config['name']}{slnx_note}")
-        
-        print("4. Cancel\n")
-        
-        choice = input("Enter your choice (1-4): ").strip()
-        
+        print_section("Visual Studio Version")
+
+        for key, cfg in self.VS_CONFIGS.items():
+            note = "  (.slnx)" if cfg["slnx"] else ""
+            print(f"  {key}. {cfg['name']}{note}")
+        print("  4. Cancel")
+
+        choice = input("\nChoice (1-4): ").strip()
         if choice == "4":
-            self.print_info("Setup cancelled")
+            print_info("Setup cancelled")
             return False
-        
         if choice not in self.VS_CONFIGS:
-            self.print_error("Invalid choice")
+            print_error("Invalid choice")
             return False
-        
-        self.vs_config = self.VS_CONFIGS[choice]
+
+        self.vs_config  = self.VS_CONFIGS[choice]
         self.vs_version = self.vs_config["name"]
-        self.generator = self.vs_config["generator"]
-        self.use_slnx = self.vs_config["slnx"]
-        
+        self.generator  = self.vs_config["generator"]
+        self.use_slnx   = self.vs_config["slnx"]
         return self.select_architecture()
-    
+
     def select_architecture(self) -> bool:
-        """Select architecture (x64 or Win32)"""
-        print(f"\n{Colors.BOLD}Choose Architecture:{Colors.RESET}\n")
-        
-        for key, config in self.ARCHITECTURES.items():
-            print(f"{key}. {config['name']}")
-        
-        print("3. Cancel\n")
-        
-        choice = input("Enter your choice (1-3): ").strip()
-        
+        print_section("Architecture")
+
+        for key, cfg in self.ARCHITECTURES.items():
+            print(f"  {key}. {cfg['name']}")
+        print("  3. Cancel")
+
+        choice = input("\nChoice (1-3): ").strip()
         if choice == "3":
-            self.print_info("Setup cancelled")
+            print_info("Setup cancelled")
             return False
-        
         if choice not in self.ARCHITECTURES:
-            self.print_error("Invalid choice")
+            print_error("Invalid choice")
             return False
-        
+
         self.architecture = self.ARCHITECTURES[choice]["arch"]
         return True
-    
+
     def select_unix_generator(self) -> bool:
-        """Select generator on Unix-like systems (Linux, macOS)"""
-        print(f"\n{Colors.BOLD}Choose Build Generator:{Colors.RESET}\n")
-        
         system = platform.system()
-        if system == "Darwin":
-            self.print_info("Detected macOS")
-        else:
-            self.print_info(f"Detected {system}")
-        
-        print("\nAvailable generators:\n")
-        
-        for key, config in self.UNIX_GENERATORS.items():
-            # Skip Xcode on non-macOS
-            if config["generator"] == "Xcode" and system != "Darwin":
+        print_section(f"Build Generator  [{system}]")
+
+        for key, cfg in self.UNIX_GENERATORS.items():
+            if cfg["generator"] == "Xcode" and system != "Darwin":
                 continue
-            print(f"{key}. {config['name']}")
-        
-        print("4. Cancel\n")
-        
-        choice = input("Enter your choice: ").strip()
-        
+            print(f"  {key}. {cfg['name']}")
+        print("  4. Cancel")
+
+        choice = input("\nChoice: ").strip()
         if choice == "4":
-            self.print_info("Setup cancelled")
+            print_info("Setup cancelled")
             return False
-        
         if choice not in self.UNIX_GENERATORS:
-            self.print_error("Invalid choice")
+            print_error("Invalid choice")
             return False
-        
-        config = self.UNIX_GENERATORS[choice]
-        self.generator = config["generator"]
-        self.vs_version = config["name"]
+
+        cfg            = self.UNIX_GENERATORS[choice]
+        self.generator = cfg["generator"]
+        self.vs_version = cfg["name"]
         return True
-    
+
+    # ------------------------------------------------------------------
+    # Summary
+    # ------------------------------------------------------------------
+
     def print_summary(self):
-        """Print configuration summary"""
-        print(f"\n{Colors.BOLD}=" * 70)
-        print("Configuration Summary:")
-        print("=" * 70 + f"{Colors.RESET}\n")
-        
+        print_section("Configuration Summary")
         if self.is_windows:
-            print(f"Visual Studio Version: {self.vs_version}")
-            print(f"Architecture: {self.architecture}")
-            if self.use_slnx:
-                print(f"Solution Format: .slnx (newer format)")
-            else:
-                print(f"Solution Format: .sln (traditional format)")
+            fmt = ".slnx" if self.use_slnx else ".sln"
+            print(f"  VS version   : {self.vs_version}")
+            print(f"  Architecture : {self.architecture}")
+            print(f"  Solution fmt : {fmt}")
         else:
-            print(f"Build Generator: {self.vs_version}")
-        
-        print(f"Generator: {self.generator}")
-        print(f"Repository Root: {self.repo_root}")
-        print(f"Build Directory: {self.build_dir}\n")
-    
+            print(f"  Generator    : {self.vs_version}")
+        print(f"  CMake gen    : {self.generator}")
+        print(f"  Repo root    : {self.repo_root}")
+        print(f"  Build dir    : {self.build_dir}")
+
+    # ------------------------------------------------------------------
+    # Build directory
+    # ------------------------------------------------------------------
+
     def create_build_directory(self) -> bool:
-        """Create build directory if it doesn't exist"""
         try:
             if not self.build_dir.exists():
-                self.print_info(f"Creating build directory: {self.build_dir}")
+                print_info(f"Creating build dir: {self.build_dir}")
                 self.build_dir.mkdir(parents=True, exist_ok=True)
             else:
-                self.print_info(f"Build directory already exists: {self.build_dir}")
-            
+                print_info(f"Build dir exists: {self.build_dir}")
             return True
         except Exception as e:
-            self.print_error(f"Failed to create build directory: {e}")
+            print_error(f"Failed to create build dir: {e}")
             return False
-    
+
+    # ------------------------------------------------------------------
+    # CMake generation
+    # ------------------------------------------------------------------
+
     def run_cmake(self) -> bool:
-        """Run CMake to generate solution/project files"""
-        print(f"\n{Colors.BOLD}Generating build configuration...{Colors.RESET}\n")
-        
+        print_section("CMake Generation")
+
         try:
-            # Change to build directory
             os.chdir(self.build_dir)
-            
-            # Prepare CMake command
-            cmake_cmd = ["cmake"]
-            cmake_cmd.extend(["-G", self.generator])
-            
-            # Add architecture for Visual Studio
+
+            cmake_cmd = ["cmake", "-G", self.generator]
             if self.is_windows and self.architecture:
-                cmake_cmd.extend(["-A", self.architecture])
-            
-            # Add path to CMakeLists.txt (parent directory)
+                cmake_cmd += ["-A", self.architecture]
             cmake_cmd.append("..")
-            
-            # Run CMake
-            self.print_info(f"Running: {' '.join(cmake_cmd)}")
+
+            print_info(f"Command: {' '.join(cmake_cmd)}")
+            print()
+
             result = subprocess.run(
                 cmake_cmd,
-                capture_output=True,
-                text=True,
-                timeout=120
+                capture_output=True, text=True, timeout=120
             )
-            
-            # Print output
+
             if result.stdout:
                 print(result.stdout)
-            
             if result.returncode != 0:
                 if result.stderr:
                     print(result.stderr)
-                self.print_error("CMake generation failed")
+                print_error("CMake generation failed")
                 return False
-            
-            self.print_success("CMake configuration completed successfully!")
+
+            print_ok("CMake generation succeeded")
             return True
-        
+
         except subprocess.TimeoutExpired:
-            self.print_error("CMake generation timed out")
+            print_error("CMake timed out")
             return False
         except Exception as e:
-            self.print_error(f"CMake generation failed: {e}")
+            print_error(f"CMake generation error: {e}")
             return False
         finally:
-            # Return to original directory
             os.chdir(self.repo_root)
-    
+
+    # ------------------------------------------------------------------
+    # Solution file
+    # ------------------------------------------------------------------
+
     def find_solution_file(self) -> Optional[Path]:
-        """Find the generated solution file"""
         if self.use_slnx:
-            # Look for .slnx file (Visual Studio 2026)
-            slnx_files = list(self.build_dir.glob("*.slnx"))
-            if slnx_files:
-                return slnx_files[0]
-        
-        # Look for traditional .sln file
-        sln_files = list(self.build_dir.glob("*.sln"))
-        if sln_files:
-            return sln_files[0]
-        
-        return None
-    
+            files = list(self.build_dir.glob("*.slnx"))
+            if files:
+                return files[0]
+        files = list(self.build_dir.glob("*.sln"))
+        return files[0] if files else None
+
     def open_solution(self, solution_path: Path) -> bool:
-        """Open the generated solution in Visual Studio"""
         try:
-            self.print_info(f"Opening solution: {solution_path.name}")
-            
+            print_info(f"Opening: {solution_path.name}")
             if self.is_windows:
-                # Use 'start' command on Windows
                 os.startfile(str(solution_path))
             elif platform.system() == "Darwin":
-                # Use 'open' command on macOS
                 subprocess.run(["open", str(solution_path)], check=False)
             else:
-                # On Linux, try common editors
                 for editor in ["code", "gedit", "nano"]:
                     if shutil.which(editor):
                         subprocess.run([editor, str(solution_path)], check=False)
                         break
-            
             return True
         except Exception as e:
-            self.print_error(f"Failed to open solution: {e}")
+            print_error(f"Could not open solution: {e}")
             return False
-    
+
     def ask_open_solution(self, solution_path: Path) -> bool:
-        """Ask user if they want to open the solution"""
-        print(f"\n{Colors.BOLD}Solution generated successfully!{Colors.RESET}")
-        print(f"Location: {solution_path.absolute()}\n")
-        
-        if self.is_windows:
-            prompt = "Do you want to open the solution in Visual Studio now? (y/n): "
-        else:
-            prompt = "Do you want to open the solution? (y/n): "
-        
-        response = input(prompt).strip().lower()
-        return response in ["y", "yes"]
-    
+        print_ok(f"Solution ready: {solution_path.absolute()}")
+        verb = "open in Visual Studio" if self.is_windows else "open"
+        response = input(f"\nDo you want to {verb} now? (y/n): ").strip().lower()
+        return response in ("y", "yes")
+
+    # ------------------------------------------------------------------
+    # Next-steps guidance
+    # ------------------------------------------------------------------
+
     def print_next_steps(self, solution_path: Path):
-        """Print next steps for the user"""
-        print(f"\n{Colors.BOLD}=" * 70)
-        print("SUCCESS! Build configuration generated successfully")
-        print("=" * 70 + f"{Colors.RESET}\n")
-        
-        print(f"{Colors.BOLD}Next Steps:{Colors.RESET}")
-        print(f"1. Open {solution_path.name if self.use_slnx else 'build/bak3d.sln'} in Visual Studio")
-        print(f"2. Select Debug or Release configuration")
-        print(f"3. Build → Build Solution")
-        print(f"4. Run the project\n")
-        
-        print(f"{Colors.BOLD}Build Location:{Colors.RESET}")
-        print(f"Debug:   {self.build_dir / 'Debug' / 'bin' / 'bak3d.exe'}")
-        print(f"Release: {self.build_dir / 'Release' / 'bin' / 'bak3d.exe'}\n")
-        
+        print_section("Next Steps")
+        sln_name = solution_path.name if self.use_slnx else "build/bak3d.sln"
+        print(f"  1. Open  {sln_name}  in Visual Studio")
+        print(f"  2. Select Debug or Release configuration")
+        print(f"  3. Build → Build Solution  (Ctrl+Shift+B)")
+        print(f"  4. Run bak3d")
+        print()
+        print(f"  Debug   bin: {self.build_dir / 'Debug'   / 'bin' / 'bak3d.exe'}")
+        print(f"  Release bin: {self.build_dir / 'Release' / 'bin' / 'bak3d.exe'}")
         if not self.is_windows:
-            print(f"{Colors.BOLD}Command Line Build:{Colors.RESET}")
-            print(f"cd {self.build_dir}")
-            print(f"cmake --build . --config Release\n")
-    
+            print()
+            print(f"  CLI build:")
+            print(f"    cd {self.build_dir}")
+            print(f"    cmake --build . --config Release")
+
+    # ------------------------------------------------------------------
+    # Main
+    # ------------------------------------------------------------------
+
     def run(self) -> bool:
-        """Main setup routine"""
         self.print_header()
-        
-        # Check prerequisites
+
         if not self.check_prerequisites():
             return False
-        
-        # Select platform/generator
         if not self.select_platform():
             return False
-        
-        # Print configuration summary
+
         self.print_summary()
-        
-        # Create build directory
+
         if not self.create_build_directory():
             return False
-        
-        # Run CMake
         if not self.run_cmake():
             return False
-        
-        # Find solution file
+
         solution_path = self.find_solution_file()
         if not solution_path:
-            self.print_warning("Could not find generated solution file")
-            self.print_info(f"Check {self.build_dir} directory manually")
+            print_warning("Generated solution file not found")
+            print_info(f"Check {self.build_dir} manually")
             return False
-        
+
         self.print_next_steps(solution_path)
-        
-        # Ask if user wants to open solution
+
         if self.ask_open_solution(solution_path):
             self.open_solution(solution_path)
-        
+
         return True
 
 
-def main():
-    print("Running from:", Path.cwd())
-    print("Script location:", Path(__file__).parent.resolve())
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+def main() -> int:
     os.chdir(Path(__file__).parent.resolve())
-    """Main entry point"""
     try:
         setup = CMakeSetup()
         success = setup.run()
-        
-        if success:
-            print(f"\n{Colors.GREEN}Setup completed successfully!{Colors.RESET}\n")
-            return 0
-        else:
-            print(f"\n{Colors.RED}Setup failed or was cancelled.{Colors.RESET}\n")
-            return 1
-    
+        setup.print_footer(success)
+        return 0 if success else 1
     except KeyboardInterrupt:
         print(f"\n\n{Colors.YELLOW}Setup cancelled by user.{Colors.RESET}\n")
         return 1

@@ -22,6 +22,11 @@ message(STATUS "Syncing shaders...")
 message(STATUS "  From: ${SOURCE_SHADERS}")
 message(STATUS "  To:   ${DEST_SHADERS}")
 
+if(EXISTS "${DEST_SHADERS}")
+    message(STATUS "  Removing existing destination folder...")
+    file(REMOVE_RECURSE "${DEST_SHADERS}")
+endif()
+
 file(COPY "${SOURCE_SHADERS}/." DESTINATION "${DEST_SHADERS}")
 
 message(STATUS "Syncing complete. Shaders are up to date in build folder.")

@@ -44,6 +44,7 @@ class Colors:
             except Exception:
                 cls.RESET = cls.RED = cls.GREEN = cls.YELLOW = cls.CYAN = cls.BOLD = ""
 
+SHADER_EXTENSIONS = {".vert", ".frag", ".glsl", ".geom", ".comp", ".tesc", ".tese"}
 
 class ShaderSync:
 
@@ -123,8 +124,46 @@ class ShaderSync:
     # --------------------------------------------------------------- sync
 
     def _count_shaders(self, directory: Path) -> int:
-        extensions = {".vert", ".frag", ".glsl", ".geom", ".comp", ".tesc", ".tese"}
-        return sum(1 for f in directory.rglob("*") if f.suffix in extensions)
+        return sum(1 for f in directory.rglob("*") if f.suffix in SHADER_EXTENSIONS)
+
+    def _sync_shaders(self) -> list[Path] | None:
+        """
+        Replicates what sync_shaders.cmake does, but file-by-file so each
+        copy can be logged individually. Returns a list of copied files, or
+        None on failure.
+        """
+        import shutil
+
+        # Wipe destination so stale/moved files don't linger
+        if self.dest_shaders.exists():
+            self._info("Removing existing destination folder...")
+            shutil.rmtree(self.dest_shaders)
+
+        copied = []
+        errors = []
+
+        for src_file in self.src_shaders.rglob("*"):
+            if src_file.is_dir() or src_file.suffix not in SHADER_EXTENSIONS:
+                continue
+
+            # Preserve sub-directory structure under dest_shaders
+            rel_path  = src_file.relative_to(self.src_shaders)
+            dest_file = self.dest_shaders / rel_path
+
+            try:
+                dest_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src_file, dest_file)
+                self._info(f"  Copied: {rel_path}")
+                copied.append(dest_file)
+            except Exception as e:
+                self._err(f"  Failed to copy {rel_path}: {e}")
+                errors.append(src_file)
+
+        if errors:
+            self._warn(f"{len(errors)} file(s) failed to copy.")
+            return None
+
+        return copied
 
     def run(self) -> bool:
         self._header()
@@ -139,33 +178,9 @@ class ShaderSync:
         self._info(f"Shader files found in source: {before}")
         self._info(f"Syncing  →  {self.dest_shaders}")
 
-        try:
-            result = subprocess.run(
-                ["cmake", "-P", str(self.sync_script)],
-                capture_output=True,
-                text=True,
-                cwd=str(self.repo_root),
-                timeout=30
-            )
-
-            if result.stdout:
-                for line in result.stdout.splitlines():
-                    self._info(line)
-
-            if result.returncode != 0:
-                self._err("cmake -P sync_shaders.cmake failed:")
-                if result.stderr:
-                    print(result.stderr, file=sys.stderr)
-                return False
-
-        except subprocess.TimeoutExpired:
-            self._err("Shader sync timed out.")
+        copied = self._sync_shaders()
+        if copied is None:
             return False
-        except Exception as e:
-            self._err(f"Unexpected error: {e}")
-            return False
-
-        after = self._count_shaders(self.dest_shaders)
 
         if not self.silent:
             print(f"\n{Colors.GREEN}{Colors.BOLD}")
@@ -173,7 +188,7 @@ class ShaderSync:
             print(" Shader sync complete!")
             print("=" * 60)
             print(Colors.RESET)
-            print(f"  Shaders synced : {after}")
+            print(f"  Shaders synced : {len(copied)}")
             print(f"  Destination    : {self.dest_shaders}\n")
 
         return True
