@@ -40,7 +40,7 @@ void main()
 
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vs_out.TangentLightPos = TBN * light_data.direction.rgb;
+    vs_out.TangentLightPos = TBN * light_data.position.rgb;
     vs_out.TangentViewPos  = TBN * camera_position;
     vs_out.TangentFragPos  = TBN * vs_out.FragPos;
     vs_out.TangentLightDir = TBN * normalize(-light_data.direction.rgb);

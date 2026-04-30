@@ -149,7 +149,7 @@ vec3 calc_spot_light()
 
     // Spotlight cone attenuation (soft edges)
     // cut_off and outer_cut_off are stored as cosines, inner > outer
-    float theta          = dot(worldLightDir, worldSpotDir);
+    float theta          = dot(worldLightDir, -worldSpotDir);
     float cut_off        = light_data.position.a;
     float outer_cut_off  = light_data.direction.a;
     float epsilon        = cut_off - outer_cut_off;

@@ -82,7 +82,7 @@ void Light::update(float dt)
 
 	m_position *= m_distance_offset;
 	m_scaling = glm::vec3(sprite_scaling, sprite_scaling, sprite_scaling);
-	m_direction = glm::normalize(m_position);
+	m_direction = glm::normalize(glm::vec3(0.0f) - m_position);
 
 	set_model_matrix(m_position, m_scaling, m_euler_rotation, 0.0f);
 
