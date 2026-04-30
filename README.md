@@ -85,16 +85,16 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 | :---: | :--- | :--- |
 |:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
 |:ballot_box_with_check:| **FrameBuffers** | Surprisingly I never had framebuffers set up, so if I want better control of the final output image, I need that. |
-|:gear:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
+|:ballot_box_with_check:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
 |:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
 |:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
 |:ballot_box_with_check:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
-|:gear:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
+|:ballot_box_with_check:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
 |:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
-|☐| **Light Types** | More light types to add such as spotlights, area lights and directional lights. For now, just make the single light in the scene to change type. |
+|:ballot_box_with_check:| **Light Types** | More light types to add such as spot, point and directional (maybe even area). For now, just make the single light in the scene to change type. |
 |:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
 |:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
-|☐| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
+|:gear:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
 
 ### [v1.4 - The Rendering Universe Expands](https://github.com/George540/Bak3DEngine/milestone/3)
