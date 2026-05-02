@@ -85,12 +85,6 @@ void Console::update()
 {
     EditorPanel::update();
 
-    // Clear button
-    if (ImGui::Button("Clear", BUTTON_SIZE))
-    {
-        Logger::clear_log_entries();
-    }
-
     const string count_text = to_string(Logger::get_log_entries().size()) + "/" + to_string(MAX_LOG_ENTRIES);
 
     ImGui::SameLine();
@@ -118,6 +112,14 @@ void Console::update()
 
     ImGui::PopStyleColor(3);
     ImGui::PopStyleVar();
+
+    ImGui::SameLine();
+
+    // Clear button
+    if (ImGui::Button("Clear", BUTTON_SIZE))
+    {
+        Logger::clear_log_entries();
+    }
 
     ImGui::SameLine();
 
