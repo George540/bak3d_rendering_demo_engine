@@ -1,4 +1,4 @@
-﻿/* ===========================================================================
+/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -24,32 +24,17 @@ THE SOFTWARE.
 
 #pragma once
 
-#include "editor_panel.h"
-
-class Environment : public EditorPanel
+/*
+ * Simple RenderDoc interface manager for handling RenderDoc commands on the application level.
+ */
+class RenderDocManager
 {
 public:
-    Environment();
+    static void initialize();
+    static void update();
+    static void shutdown();
 
-    void begin_frame() override;
-    void update() override;
-    void end_frame() override;
+    static void trigger_capture();
 private:
-    static void draw_gpu_tools_settings();
-    static void draw_shaders_settings();
-    static void draw_renderdoc_settings();
-    static void draw_general_settings();
-    static void draw_light_settings();
-    static void draw_post_processor_settings();
-
-    static void draw_rasterization_settings();
-    static void draw_post_processing_settings();
-
-    static void draw_color_grading_settings();
-    static void draw_kernel_effect_settings();
-
-    static void draw_vignette_settings();
-    
-    static void reset_color_grading_to_defaults();
-    static void reset_kernel_effects_to_defaults();
+    static void launch_renderdoc_ui();
 };

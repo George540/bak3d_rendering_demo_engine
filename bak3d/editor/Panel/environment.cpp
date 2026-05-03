@@ -1,4 +1,4 @@
-﻿/* ===========================================================================
+/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "imgui_b3d_extensions.h"
 #include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
+#include "Input/renderdoc_manager.h"
 #include "Renderer/renderer.h"
 #include "Scene/Objects/light.h"
 
@@ -71,7 +72,7 @@ void Environment::update()
 {
     EditorPanel::update();
 
-    draw_resources_settings();
+    draw_gpu_tools_settings();
 
     ImGuiB3D::SeparatorWithSpacing(1);
 
@@ -93,19 +94,47 @@ void Environment::end_frame()
     EditorPanel::end_frame();
 }
 
-void Environment::draw_resources_settings()
+void Environment::draw_gpu_tools_settings()
 {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Resources"))
+    if (ImGui::TreeNode("GPU Tools"))
     {
+        draw_shaders_settings();
+        draw_renderdoc_settings();
+
+        ImGui::TreePop();
+    }
+}
+
+void Environment::draw_shaders_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Shaders"))
+    {
+        // Force Fail
         bool force_fail = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail);
-        ImGuiB3D::PropertyToggle("Compile Failed Resources", &force_fail, "Force shaders to output visual results even if they fail during compilation or hot-reload");
+        ImGuiB3D::PropertyToggle("Force Fail Hot-Reload", &force_fail, "Force shaders to output visual results even if they fail during compilation or hot-reload");
         GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Resources_ForceFail, force_fail);
         
         // Hot-Reload Shaders
         if (ImGuiB3D::PropertyButton("Hot Reload", "Hot Reload Shaders", "Hot-Reload shaders after updating shader files after running sync_shaders.py script."))
         {
             ResourceManager::reload_shaders();
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+void Environment::draw_renderdoc_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("RenderDoc"))
+    {
+        // Trigger Capture
+        if (ImGuiB3D::PropertyButton("Trigger Capture", "Trigger GPU Capture", "Trigger GPU frame capture if RenderDoc app is available. Make sure it's installed locally first!"))
+        {
+            RenderDocManager::trigger_capture();
         }
 
         ImGui::TreePop();

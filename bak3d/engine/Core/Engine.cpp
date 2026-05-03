@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "Asset/resource_manager.h"
 #include "Input/event_manager.h"
+#include "Input/renderdoc_manager.h"
 #include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
 #include "Scene/scene_manager.h"
@@ -43,6 +44,7 @@ void Bak3DEngine::Initialize()
     ResourceManager::initialize();
     PostProcessor::initialize();
     Bak3DEditor::initialize();
+    RenderDocManager::initialize();
     SceneManager::initialize();
 
     B3D_LOG_INFO("Engine initialized.");
@@ -63,6 +65,8 @@ void Bak3DEngine::Update()
 
         Bak3DEditor::update(); // Update Editor - Panels / Widgets / ImGui context
 
+        RenderDocManager::update();
+
         EventManager::end_update();
     } while (EventManager::is_exit_requested() == false);
 }
@@ -70,6 +74,7 @@ void Bak3DEngine::Update()
 void Bak3DEngine::Shutdown()
 {
     SceneManager::shutdown();
+    Renderer::shutdown();
     Bak3DEditor::shutdown();
     PostProcessor::shutdown();
     ResourceManager::shutdown();

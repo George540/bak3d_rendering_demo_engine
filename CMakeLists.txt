@@ -129,6 +129,17 @@ else()
     message(STATUS "  [KHR] NOT FOUND — skipping")
 endif()
 
+# RenderDoc App
+if(EXISTS "${BAK3D_THIRD_PARTY_DIR}/renderdoc")
+    message(STATUS "  [renderdoc] Found at ${BAK3D_THIRD_PARTY_DIR}/renderdoc")
+    add_library(renderdoc INTERFACE)
+    target_include_directories(renderdoc INTERFACE ${BAK3D_THIRD_PARTY_DIR})
+	set_target_properties(renderdoc PROPERTIES FOLDER "ThirdParty")
+    message(STATUS "  [renderdoc] Added as INTERFACE (header-only, include root: ${BAK3D_THIRD_PARTY_DIR})")
+else()
+    message(STATUS "  [renderdoc] NOT FOUND — skipping")
+endif()
+
 # ============================================================================
 # Source Collection
 # ============================================================================
@@ -232,6 +243,10 @@ if(TARGET KHR)
     target_link_libraries(glad PUBLIC KHR)
     message(STATUS "  bak3d <- KHR (INTERFACE/header-only)")
     message(STATUS "  glad  <- KHR (PUBLIC, header-only)")
+endif()
+if(TARGET renderdoc)
+    target_link_libraries(bak3d PRIVATE renderdoc)
+    message(STATUS "  bak3d <- renderdoc (INTERFACE/header-only)")
 endif()
 
 # ============================================================================
