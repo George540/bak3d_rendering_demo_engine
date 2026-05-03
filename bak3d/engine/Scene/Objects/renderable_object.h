@@ -41,18 +41,18 @@ protected:
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
 
-    Material* m_material;
+    MaterialRef m_material;
 
     bool m_visible;
 public:
-    RenderableObject(Material* material, const glm::vec3 position, const std::string& name);
+    RenderableObject(MaterialRef material, const glm::vec3 position, const std::string& name);
     ~RenderableObject() override;
 
     void update(float dt) override;
     void draw() const override;
 
-    void set_material(Material* material) { m_material = material; }
-    Material* get_material() const { return m_material; }
+    void set_material(MaterialRef material) { m_material = material; }
+    MaterialRef get_material() const { return m_material; }
     void set_visible(bool visible) { m_visible = visible; }
     bool is_visible() const { return m_visible; }
 };
@@ -66,7 +66,7 @@ class InstancedObject : public RenderableObject
 protected:
     InstanceBuffer* m_ibo;
 public:
-    InstancedObject(Material* material, const std::string& name);
+    InstancedObject(MaterialRef material, const std::string& name);
     ~InstancedObject() override;
 
     void draw() const override;

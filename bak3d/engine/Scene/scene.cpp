@@ -40,13 +40,6 @@ Scene::Scene()
 {
 	instance = this;
 
-	// Unique material resources setup
-	ResourceManager::add_material("grid", new Material(ResourceManager::get_shader("GridShader")));
-	ResourceManager::add_material("line", new Material(ResourceManager::get_shader("LineShader")));
-	ResourceManager::add_material("light", new Material(ResourceManager::get_shader("LightShader")));
-	ResourceManager::add_material("particle", new Material(ResourceManager::get_shader("ParticleShader")));
-	ResourceManager::add_material("bounding-box", new Material(ResourceManager::get_shader("GridShader")));
-
 	// Camera Setup
 	m_camera = new Camera(glm::vec3(10.0f, 5.0f, 10.0f), // position
 						  glm::vec3(0.0f, 0.0f, 0.0f),   // lookat

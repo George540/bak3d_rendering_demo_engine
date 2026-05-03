@@ -23,6 +23,7 @@ THE SOFTWARE.
 =========================================================================== */
 
 #include <filesystem>
+#include <utility>
 
 #include "renderable_object.h"
 
@@ -30,10 +31,10 @@ THE SOFTWARE.
 
 using namespace std;
 
-RenderableObject::RenderableObject(Material* material, const glm::vec3 position, const std::string& name)
+RenderableObject::RenderableObject(MaterialRef material, const glm::vec3 position, const std::string& name)
 	: SceneObject(position, name)
 {
-	m_material = material;
+	m_material = std::move(material);
 	m_visible = true;
 
 	m_vao = new VertexArray();
@@ -49,7 +50,6 @@ RenderableObject::~RenderableObject()
 	delete m_vao;
 	delete m_vbo;
 	delete m_ebo;
-	delete m_material;
 }
 
 void RenderableObject::update(float dt)
@@ -67,7 +67,7 @@ void RenderableObject::draw() const
 	m_material->apply();
 }
 
-InstancedObject::InstancedObject(Material* material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
+InstancedObject::InstancedObject(MaterialRef material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
 
 InstancedObject::~InstancedObject()
 {

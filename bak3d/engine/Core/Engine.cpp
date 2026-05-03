@@ -24,8 +24,6 @@ THE SOFTWARE.
 
 #include "engine.h"
 
-#include <iostream>
-
 #include "editor.h"
 #include "global_settings.h"
 #include "logger.h"

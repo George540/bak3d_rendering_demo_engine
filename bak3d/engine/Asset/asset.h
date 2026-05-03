@@ -59,3 +59,62 @@ protected:
 };
 
 inline Asset::~Asset() = default;
+
+/*
+ * Ref structure for Asset objects. Used mainly for indirection and holding references to all types of assets.
+ * Helps with swapping inner pointer without any holders needing to know when it changes.
+ */
+template<typename T>
+struct AssetRef
+{
+    T* asset = nullptr;
+
+    explicit AssetRef(T* a) : asset(a) {}
+
+    T* operator->() const { return asset; }
+    T& operator*()  const { return *asset; }
+
+    bool is_valid() const { return asset != nullptr; }
+
+    // Swaps the inner pointer. All shared_ptr holders see the new asset immediately.
+    void swap(T* new_asset)
+    {
+        delete asset;
+        asset = new_asset;
+    }
+};
+
+/*
+ * Additional indirection layer for shared ref and ref counted pointer style assets.
+ * Mainly helps for cutting directly through the reference access without needing to get reference for every call.
+ */
+template<typename T>
+class SharedAssetRef
+{
+public:
+    SharedAssetRef() = default;
+    SharedAssetRef(std::nullptr_t) {}
+
+    explicit SharedAssetRef(AssetRef<T>* ref) : m_ref(ref) {}
+    SharedAssetRef(std::shared_ptr<AssetRef<T>> ref) : m_ref(std::move(ref)) {}
+
+    // Cuts through both levels — ref->use() works directly
+    T* operator->() const { return m_ref->asset; }
+    T& operator*()  const { return *m_ref->asset; }
+    explicit operator bool() const { return m_ref && m_ref->is_valid(); }
+
+    bool is_valid() const { return m_ref && m_ref->is_valid(); }
+    std::shared_ptr<AssetRef<T>> ref() const { return m_ref; } // Expose the inner ref
+
+private:
+    std::shared_ptr<AssetRef<T>> m_ref;
+};
+
+/*
+ * Easy use for asset ref making.
+ */
+template<typename T>
+SharedAssetRef<T> make_asset_ref(T* asset)
+{
+    return std::make_shared<AssetRef<T>>(asset);
+}

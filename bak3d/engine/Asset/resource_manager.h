@@ -1,4 +1,4 @@
-﻿/* ===========================================================================
+/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -25,14 +25,16 @@ THE SOFTWARE.
 #pragma once
 
 #include <string>
-#include <unordered_map>
+
+#include "asset.h"
+#include "asset_definitions.h"
+#include "material.h"
+#include "resource_map.h"
 
 class Shader;
-class Texture2D;
-class Model;
-class Camera;
-class Light;
 class Material;
+class Model;
+class Texture2D;
 
 /*
  * Static class for managing loaded rendering resources such as shaders, textures, materials
@@ -42,28 +44,29 @@ class ResourceManager
 {
 public:
     // resource storage
-    static std::unordered_map<std::string, Shader*> Shaders;
-    static std::unordered_map<std::string, Texture2D*> Textures;
-    static std::unordered_map<std::string, Material*> Materials;
-    static std::unordered_map<std::string, Model*> Models;
+    static ResourceMap<Shader> Shaders;
+    static ResourceMap<Texture2D> Textures;
+    static ResourceMap<Material> Materials;
+    static ResourceMap<Model> Models;
 
     static void initialize();
-    
-    static Shader* get_shader(const std::string& shader_name) { return Shaders[shader_name]; }
-    
-    static void add_texture(const std::string& texture_name, Texture2D* texture) { Textures[texture_name] = texture; }
-    static Texture2D* get_texture(const std::string& texture_name) { return Textures[texture_name]; }
-    
-    static Model* get_model(const std::string& model_name) { return Models[model_name]; }
 
-    static void add_material(const std::string& material_name, Material* material) { Materials[material_name] = material; }
-    static Material* get_material(const std::string& material_name) { return Materials[material_name]; }
+    static void add_shader(const std::string& name, Shader* shader) { Shaders.insert_or_swap(name, shader, [](const Shader* s) { return s != nullptr; }); }
+    static void add_texture(const std::string& name, Texture2D* texture) { Textures.insert_or_swap(name, texture, [](const Texture2D* t) { return t != nullptr; }); }
+    static void add_material(const std::string& name, Material* material) { Materials.insert_or_swap(name, material, [](const Material* m) { return m != nullptr && m->is_loaded(); }); }
+    static void add_model(const std::string& name, Model* model) { Models.insert_or_swap(name, model, [](const Model* m) { return m != nullptr; }); }
+
+    static ShaderRef get_shader(const std::string& name) { return Shaders.get(name); }
+    static TextureRef get_texture(const std::string& name) { return Textures.get(name); }
+    static MaterialRef get_material(const std::string& name) { return Materials.get(name); }
+    static ModelRef get_model(const std::string& name) { return Models.get(name); }
     
     static void shutdown();
 private:
     static void initialize_shaders();
     static void initialize_predefined_textures();
     static void initialize_models();
+    static void initialize_predefined_materials();
     
     ResourceManager() = default;
 };

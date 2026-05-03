@@ -60,13 +60,13 @@ public:
 
     virtual void process() = 0;
 
-    Shader* get_shader() const { return m_shader; }
+    ShaderRef get_shader() const { return m_shader; }
     const std::string& get_name() const { return m_name; }
     bool is_enabled() const{ return m_is_enabled; }
 
     void set_enabled(const bool enabled) { m_is_enabled = enabled; }
 protected:
-    Shader* m_shader;
+    ShaderRef m_shader;
     std::string m_name;
     bool m_is_enabled = false;
 };

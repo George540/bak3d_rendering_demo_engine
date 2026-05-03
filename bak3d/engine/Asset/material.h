@@ -24,6 +24,8 @@ THE SOFTWARE.
 
 #pragma once
 
+#include "asset.h"
+#include "asset_types.h"
 #include <unordered_map>
 #include <string>
 
@@ -31,15 +33,12 @@ THE SOFTWARE.
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp> 
 
-class Shader;
-class Texture2D;
-
 /*
  * Material class that sets parameters to be sent to a specific shader used by a renderable component.
  */
-class Material
+class Material : public Asset
 {
-    Shader* m_shader;
+    ShaderRef m_shader;
 
     // Single value-type uniforms
     std::unordered_map<std::string, bool> m_uniform_flags;
@@ -57,9 +56,14 @@ class Material
 
 public:
     Material() = default;
-    Material(Shader* shader);
+    // Materials aren't loaded from disk, so path is just the name
+    explicit Material(const std::string& material_name, const ShaderRef& shader)
+        : Asset(material_name, material_name)  // path = name, no real directory
+        , m_shader(shader) {}
 
-    Shader* get_shader() const { return m_shader; }
+    bool is_loaded() const { return m_shader.is_valid(); }
+
+    ShaderRef get_shader() const { return m_shader; }
 
     void apply();
 

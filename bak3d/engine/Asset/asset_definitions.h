@@ -22,38 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-#include <iostream>
+#pragma once
 
-#include "axis.h"
+#include "asset.h"
 
-#include "Core/global_definitions.h"
-#include "Core/logger.h"
+/*
+ * Global access to asset type related definitions that are used within the assets' scope.
+ * Helps with avoiding circular dependencies.
+ */
 
-Axis::Axis(MaterialRef material) :
-	RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), "Axis")
-{
-	m_scaling = glm::vec3(3.0f);
-	set_model_matrix(glm::vec3(0.0f), m_scaling, m_euler_rotation, 0.0f);
+class Shader;
+class Texture2D;
+class Material;
+class Model;
 
-	m_vbo = new VertexBuffer(sizeof(AxisVertex) * AXIS_VERTICES.size(), &AXIS_VERTICES[0]);
-	m_ebo = new ElementBuffer(sizeof(GLuint) * AXIS_INDICES.size(), &AXIS_INDICES[0]);
-
-	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(AxisVertex), reinterpret_cast<void*>(offsetof(AxisVertex, position)));
-	m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(AxisVertex), reinterpret_cast<void*>(offsetof(AxisVertex, color)));
-	m_vao->unbind_object();
-
-	B3D_LOG_INFO("Setting up 3D axis gizmo...");
-}
-
-void Axis::draw() const
-{
-	glDepthFunc(GL_ALWAYS);
-
-	RenderableObject::draw();
-
-	m_vao->bind_object();
-	glDrawElements(GL_LINES, static_cast<GLsizei>(AXIS_INDICES.size()), GL_UNSIGNED_INT, nullptr);
-	m_vao->unbind_object();
-
-	glDepthFunc(GL_LESS);
-}
+typedef SharedAssetRef<Shader> ShaderRef;
+typedef SharedAssetRef<Texture2D> TextureRef;
+typedef SharedAssetRef<Material> MaterialRef;
+typedef SharedAssetRef<Model> ModelRef;

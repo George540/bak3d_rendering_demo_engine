@@ -27,12 +27,13 @@ THE SOFTWARE.
 #include <iostream>
 #include <utility>
 
+#include "Asset/resource_manager.h"
 #include "Asset/texture.h"
 
 using namespace std;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, const std::string& name) :
-    RenderableObject(nullptr, glm::vec3(0.0f, 0.0f, 0.0f), name), // no initial material and position at first
+    RenderableObject(ResourceManager::get_material("LightShader"), glm::vec3(0.0f, 0.0f, 0.0f), name), // no initial material and position at first
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices))
 {

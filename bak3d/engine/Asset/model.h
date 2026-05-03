@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <set>
 
 #include "Asset/asset.h"
+#include "Asset/asset_definitions.h"
 #include "Asset/texture.h"
 #include "Scene/Objects/mesh.h"
 
@@ -61,7 +62,7 @@ public:
 
 	void draw() const; // draws the model, and thus all its meshes
 	void set_current_material(const std::string& material_name);
-	Material* get_current_material() const { return m_current_material; }
+	MaterialRef get_current_material() const { return m_current_material; }
 	void set_visible(bool visible) { m_visible = visible; }
 	bool is_visible() const { return m_visible; }
 
@@ -81,11 +82,10 @@ private:
 	Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
 
 	void load_material_textures(aiMaterial* mat, aiTextureType type);
-	void update_light_properties() const;
 	void update_material_properties() const;
 	void update_breakdown_shader() const;
 
-	Material* m_current_material;
+	MaterialRef m_current_material;
 
 	bool m_visible;
 };

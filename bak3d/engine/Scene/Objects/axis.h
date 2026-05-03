@@ -32,7 +32,7 @@ THE SOFTWARE.
 class Axis : public RenderableObject
 {
 public:
-	Axis(Material* material);
+	Axis(MaterialRef material);
 	~Axis() override = default;
 
 	void draw() const override;

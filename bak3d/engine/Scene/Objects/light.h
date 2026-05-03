@@ -79,9 +79,9 @@ protected:
 
 	std::unique_ptr<UniformBuffer> m_light_data_ubo;
 
-	Texture2D* m_sprite_texture;
+	TextureRef m_sprite_texture;
 public:
-	Light(glm::vec3 position, glm::vec3 scaling, Material* material);
+	Light(glm::vec3 position, glm::vec3 scaling, const MaterialRef& material);
 	~Light() override = default;
 
 	void update(float dt) override;

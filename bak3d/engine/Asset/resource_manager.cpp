@@ -36,16 +36,17 @@ THE SOFTWARE.
 using namespace std;
 
 // Instantiate static variables
-unordered_map<string, Shader*> ResourceManager::Shaders;
-unordered_map<string, Texture2D*> ResourceManager::Textures;
-unordered_map<string, Material*> ResourceManager::Materials;
-unordered_map<string, Model*> ResourceManager::Models;
+ResourceMap<Shader> ResourceManager::Shaders;
+ResourceMap<Texture2D> ResourceManager::Textures;
+ResourceMap<Material> ResourceManager::Materials;
+ResourceMap<Model> ResourceManager::Models;
 
 void ResourceManager::initialize()
 {
     initialize_shaders();
     initialize_predefined_textures();
     initialize_models();
+    initialize_predefined_materials();
 }
 
 void ResourceManager::initialize_shaders()
@@ -115,13 +116,12 @@ void ResourceManager::initialize_shaders()
         auto shader_path_string = string(shader_file_pair.second);
         auto shader_name = FileLoader::get_name_from_path(shader_path_string);
 
-        if (!Shaders.contains(shader_name))
-        {
-            Shaders[shader_name] = new Shader(
+        Shader* new_shader = new Shader(
             shader_file_pair.first.c_str(),
             shader_file_pair.second.c_str(),
             shader_name);
-        }
+
+        add_shader(shader_name, new_shader);
     }
 
     // If shaders that did not automatically match are found, manually match them with caution!
@@ -129,15 +129,15 @@ void ResourceManager::initialize_shaders()
     //       See shader files for reference.
     if (!shaders_to_match.empty())
     {
-        Shaders["ColorGradingShader"] = new Shader(
-            shaders_to_match["PostProcessingShader"].c_str(),
-            shaders_to_match["ColorGradingShader"].c_str(),
-            "ColorGradingShader");
+        add_shader("ColorGradingShader", new Shader(
+                shaders_to_match["PostProcessingShader"].c_str(),
+                shaders_to_match["ColorGradingShader"].c_str(),
+                "ColorGradingShader"));
 
-        Shaders["KernelEffectShader"] = new Shader(
-            shaders_to_match["PostProcessingShader"].c_str(),
-            shaders_to_match["KernelEffectShader"].c_str(),
-            "KernelEffectShader");
+        add_shader("KernelEffectShader", new Shader(
+                shaders_to_match["PostProcessingShader"].c_str(),
+                shaders_to_match["KernelEffectShader"].c_str(),
+                "KernelEffectShader"));
     }
 
     auto shaders = Shaders;
@@ -154,15 +154,15 @@ void ResourceManager::initialize_shaders()
 void ResourceManager::initialize_predefined_textures()
 {
     auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", png);
-    for (auto [file_name, file_path] : image_files)
+    for (const auto& [file_name, file_path] : image_files)
     {
-        Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE);
+        add_texture(file_name, new Texture2D(file_path, file_name, aiTextureType_DIFFUSE));
     }
 
     image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", jpg);
-    for (auto [file_name, file_path] : image_files)
+    for (const auto& [file_name, file_path] : image_files)
     {
-        Textures[file_name] = new Texture2D(file_path, file_name, aiTextureType_DIFFUSE);
+        add_texture(file_name, new Texture2D(file_path, file_name, aiTextureType_DIFFUSE));
     }
 
     B3D_LOG_INFO("Successfully loaded %d default sprite textures.", Textures.size());
@@ -170,20 +170,28 @@ void ResourceManager::initialize_predefined_textures()
 
 void ResourceManager::initialize_models()
 {
-    auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/models", obj);
+    const auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/models", obj);
     int index = 1;
-    for (const auto& model_pair : model_files)
+    for (const auto& [file_name, file_path] : model_files)
     {
-        auto model_file_name = model_pair.first;
-        Models[model_file_name] = new Model(model_pair.second, model_file_name, index++);
+        add_model(file_name, new Model(file_path, file_name, index++));
     }
+}
+
+void ResourceManager::initialize_predefined_materials()
+{
+    add_material("grid", new Material("grid", get_shader("GridShader")));
+    add_material("line", new Material("line", get_shader("LineShader")));
+    add_material("light", new Material("light", get_shader("LightShader")));
+    add_material("particle", new Material("particle", get_shader("ParticleShader")));
+    add_material("bounding-box", new Material("bounding-box", get_shader("GridShader")));
 }
 
 void ResourceManager::shutdown()
 {
-    for (const auto& val : Shaders | views::values)
+    for (const auto& shader : Shaders.all() | views::values)
     {
-        glDeleteProgram(val->get_object_id());
+        glDeleteProgram(shader->get_object_id());
     }
 
     Shaders.clear();

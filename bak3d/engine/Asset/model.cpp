@@ -49,8 +49,8 @@ Model::Model(const string& path, const std::string& file_name, int index) :
 	
 	load_model(path);
 
-	ResourceManager::add_material(m_object_name + ".model", new Material(ResourceManager::get_shader("ModelShader")));
-	ResourceManager::add_material(m_object_name + ".dissect", new Material(ResourceManager::get_shader("DissectShader")));
+	ResourceManager::add_material(m_object_name + ".model", new Material(m_object_name + ".model", ResourceManager::get_shader("ModelShader")));
+	ResourceManager::add_material(m_object_name + ".dissect", new Material(m_object_name + ".dissect", ResourceManager::get_shader("DissectShader")));
 
 	set_current_material(m_object_name + ".model");
 }
@@ -332,12 +332,9 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 
 void Model::set_current_material(const std::string& material_name)
 {
-	if (m_current_material != ResourceManager::get_material(material_name))
+	m_current_material = ResourceManager::get_material(material_name);
+	for (const auto mesh : meshes)
 	{
-		m_current_material = ResourceManager::get_material(material_name);
-		for (const auto mesh : meshes)
-		{
-			mesh->set_material(m_current_material);
-		}
+		mesh->set_material(m_current_material);
 	}
 }

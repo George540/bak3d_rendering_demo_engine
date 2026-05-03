@@ -47,7 +47,7 @@ namespace
 
 Details::Details() : EditorPanel("Details")
 {
-    for (const auto& model_name : ResourceManager::Models | views::keys)
+    for (const auto& model_name : ResourceManager::Models.all() | views::keys)
     {
         m_model_name_items.push_back(model_name.c_str());
     }
@@ -102,8 +102,8 @@ void Details::draw_model_section()
     if (ImGui::TreeNode("Model Data"))
     {
         ImGuiB3D::PropertyDropdown("Model", m_model_name_items, &model_selection_index, "Select one of the loaded asset models to render in the scene.");
-        string selected_model_name = m_model_name_items[model_selection_index];
-        Model* selected_model = model_selection_index > 0 ? ResourceManager::Models[selected_model_name] : nullptr;
+        const string selected_model_name = m_model_name_items[model_selection_index];
+        Model* selected_model = model_selection_index > 0 ? ResourceManager::get_model(selected_model_name).ref()->asset : nullptr;
         m_current_model = Scene::instance->get_model();
 
         bool is_model_different = selected_model && m_current_model ? selected_model->get_object_name() != m_current_model->get_object_name() : selected_model != m_current_model;
@@ -130,15 +130,15 @@ void Details::draw_model_section()
         if (m_current_model)
         {
             // Albedo
-            auto albedo = static_cast<int>(m_current_model->textures_cache[aiTextureType_DIFFUSE] ? m_current_model->textures_cache[aiTextureType_DIFFUSE]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
+            auto albedo = static_cast<int>(m_current_model->textures_cache[aiTextureType_DIFFUSE] ? m_current_model->textures_cache[aiTextureType_DIFFUSE]->get_object_id() : ResourceManager::get_texture("Checkerboard.jpg")->get_object_id());
             ImGuiB3D::PropertyImageButton("Albedo", nullptr, &albedo, ImVec2(40.0f, 40.0f));
 
             // Specular
-            auto specular = static_cast<int>(m_current_model->textures_cache[aiTextureType_SPECULAR] ? m_current_model->textures_cache[aiTextureType_SPECULAR]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
+            auto specular = static_cast<int>(m_current_model->textures_cache[aiTextureType_SPECULAR] ? m_current_model->textures_cache[aiTextureType_SPECULAR]->get_object_id() : ResourceManager::get_texture("Checkerboard.jpg")->get_object_id());
             ImGuiB3D::PropertyImageButton("Specular", nullptr, &specular, ImVec2(40.0f, 40.0f));
 
             // Normal
-            auto normal = static_cast<int>(m_current_model->textures_cache[aiTextureType_HEIGHT] ? m_current_model->textures_cache[aiTextureType_HEIGHT]->get_object_id() : ResourceManager::Textures["Checkerboard.jpg"]->get_object_id());
+            auto normal = static_cast<int>(m_current_model->textures_cache[aiTextureType_HEIGHT] ? m_current_model->textures_cache[aiTextureType_HEIGHT]->get_object_id() : ResourceManager::get_texture("Checkerboard.jpg")->get_object_id());
             ImGuiB3D::PropertyImageButton("Normal", nullptr, &normal, ImVec2(40.0f, 40.0f));
 
             // Gamma Correction

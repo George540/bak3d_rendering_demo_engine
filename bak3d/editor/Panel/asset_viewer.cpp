@@ -114,7 +114,7 @@ void AssetPanel::draw_asset_grid()
 
     if (ImGui::BeginTable("##asset_table", m_columns, 0))
     {
-        for (auto& [name, model] : ResourceManager::Models)
+        for (auto& [name, model] : ResourceManager::Models.all())
         {
             if (!m_search_name_string.empty() && !ImGuiB3D::StringContainsIgnoreCase(name, m_search_name_string))
             {
@@ -122,9 +122,9 @@ void AssetPanel::draw_asset_grid()
             }
 
             ImGui::TableNextColumn();
-            draw_asset_tile(name, model);
+            draw_asset_tile(name, model.ref()->asset);
         }
-        for (auto& [name, texture] : ResourceManager::Textures)
+        for (auto& [name, texture] : ResourceManager::Textures.all())
         {
             if (!m_search_name_string.empty() && !ImGuiB3D::StringContainsIgnoreCase(name, m_search_name_string))
             {
@@ -132,7 +132,7 @@ void AssetPanel::draw_asset_grid()
             }
 
             ImGui::TableNextColumn();
-            draw_asset_tile(name, texture);
+            draw_asset_tile(name, texture.ref()->asset);
         }
 
         ImGui::EndTable();

@@ -26,8 +26,6 @@ THE SOFTWARE.
 
 #include "shader.h"
 
-Material::Material(Shader* shader) : m_shader(shader) {}
-
 void Material::apply()
 {
     if (!m_shader) return;

@@ -32,7 +32,7 @@ THE SOFTWARE.
 class Grid : public RenderableObject
 {
 public:
-	Grid(Material* material);
+	Grid(MaterialRef material);
 	~Grid() override = default;
 
 	void draw() const override;

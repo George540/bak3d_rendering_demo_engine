@@ -92,7 +92,7 @@ void PostProcessor::process_frame(const FrameBuffer& resolved_fbo)
             continue;
         }
 
-        Shader* shader = pass->get_shader();
+        const ShaderRef shader = pass->get_shader();
 
         pong->bind_object();
         shader->use();

@@ -52,7 +52,7 @@ protected:
     InstanceBuffer* m_ibo;
     int m_num_instances;
 public:
-    InstancedMesh(Material* material);
+    InstancedMesh(MaterialRef material);
     ~InstancedMesh() override;
 
     void draw() const override;
