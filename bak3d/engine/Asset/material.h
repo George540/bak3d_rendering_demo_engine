@@ -25,7 +25,7 @@ THE SOFTWARE.
 #pragma once
 
 #include "asset.h"
-#include "asset_types.h"
+#include "asset_definitions.h"
 #include <unordered_map>
 #include <string>
 
@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 /*
  * Material class that sets parameters to be sent to a specific shader used by a renderable component.
+ * Materials for now are created at runtime and are not a file asset.
  */
 class Material : public Asset
 {

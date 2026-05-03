@@ -33,7 +33,7 @@ THE SOFTWARE.
 using namespace std;
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, const std::string& name) :
-    RenderableObject(ResourceManager::get_material("LightShader"), glm::vec3(0.0f, 0.0f, 0.0f), name), // no initial material and position at first
+    RenderableObject(ResourceManager::get_material("light"), glm::vec3(0.0f, 0.0f, 0.0f), name), // no initial material and position at first
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices))
 {

@@ -59,7 +59,6 @@ public:
         else
         {
             m_map[name] = make_asset_ref<T>(new_asset);
-            B3D_LOG_INFO("Registered new asset: %s", name.c_str());
         }
     }
 

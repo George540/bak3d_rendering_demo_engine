@@ -45,8 +45,8 @@ void ResourceManager::initialize()
 {
     initialize_shaders();
     initialize_predefined_textures();
-    initialize_models();
     initialize_predefined_materials();
+    initialize_models();
 }
 
 void ResourceManager::initialize_shaders()
