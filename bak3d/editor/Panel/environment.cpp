@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <glm/vec3.hpp>
 
 #include "imgui_b3d_extensions.h"
+#include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
 #include "Renderer/renderer.h"
 #include "Scene/Objects/light.h"
@@ -70,6 +71,10 @@ void Environment::update()
 {
     EditorPanel::update();
 
+    draw_resources_settings();
+
+    ImGuiB3D::SeparatorWithSpacing(1);
+
     draw_general_settings();
 
     ImGuiB3D::SeparatorWithSpacing(1);
@@ -86,6 +91,25 @@ void Environment::update()
 void Environment::end_frame()
 {
     EditorPanel::end_frame();
+}
+
+void Environment::draw_resources_settings()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Resources"))
+    {
+        bool force_fail = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail);
+        ImGuiB3D::PropertyToggle("Compile Failed Resources", &force_fail, "Force shaders to output visual results even if they fail during compilation or hot-reload");
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Resources_ForceFail, force_fail);
+        
+        // Hot-Reload Shaders
+        if (ImGuiB3D::PropertyButton("Hot Reload", "Hot Reload Shaders", "Hot-Reload shaders after updating shader files after running sync_shaders.py script."))
+        {
+            ResourceManager::reload_shaders();
+        }
+
+        ImGui::TreePop();
+    }
 }
 
 void Environment::draw_general_settings()

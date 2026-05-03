@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <unordered_map>
 
 #include "asset.h"
+#include "Core/global_settings.h"
 #include "Core/logger.h"
 
 /*
@@ -42,9 +43,9 @@ public:
     void insert_or_swap(const std::string& name, T* new_asset,
                         const std::function<bool(T*)>& is_valid)
     {
-        if (!is_valid(new_asset))
+        if (!is_valid(new_asset) && !GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail))
         {
-            B3D_LOG_ERROR("Asset '%s' failed validation, keeping old version.",
+            B3D_LOG_WARNING("Asset '%s' failed validation, keeping old version.",
                           name.c_str());
             delete new_asset;
             return;

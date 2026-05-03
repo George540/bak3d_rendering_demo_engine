@@ -44,6 +44,6 @@ void main()
     vs_out.TangentViewPos  = TBN * camera_position;
     vs_out.TangentFragPos  = TBN * vs_out.FragPos;
     vs_out.TangentLightDir = TBN * normalize(-light_data.direction.rgb);
-    
+
     gl_Position = camera_data.projection * camera_data.view * model * vec4(aPos, 1.0);
 }

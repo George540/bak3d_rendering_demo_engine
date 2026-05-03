@@ -89,10 +89,6 @@ void Details::end_frame()
 
 void Details::draw_object_section()
 {
-    if (ImGuiB3D::PropertyButton("Reload", "Reload Shaders", "Hot-Reload shaders after updating shader files after running sync_shaders.py script."))
-    {
-        ResourceManager::reload_shaders();
-    }
     // Object Selection
     if (ImGuiB3D::PropertyDropdown("Object Selection", m_object_items, &object_selection_index, "Select an object type to render in the scene"))
     {
