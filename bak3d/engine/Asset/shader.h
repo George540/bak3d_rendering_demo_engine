@@ -40,7 +40,7 @@ private:
 	const char* m_vert_path;
 	const char* m_frag_path;
 
-	GLuint m_index;
+	bool m_compiled;
 public:
 	// Constructor
 	Shader();
@@ -49,10 +49,9 @@ public:
 	~Shader() override;
 
 	// Core functions
-	[[nodiscard]] GLuint get_index() const { return m_index; }
+	[[nodiscard]] bool is_shader_compiled() const { return m_compiled; }
 	[[nodiscard]] const char* get_vert_path() const { return m_vert_path; }
 	[[nodiscard]] const char* get_frag_path() const { return m_frag_path; }
-	void set_index(int i) { m_index = i; }
 	void use() const;
 	void unuse() const;
 

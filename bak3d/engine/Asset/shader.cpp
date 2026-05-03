@@ -39,7 +39,7 @@ using namespace std;
 
 namespace
 {
-    void check_compile_errors(unsigned int shader_id, const string& shader_type, const string& shader_name)
+    bool check_compile_errors(unsigned int shader_id, const string& shader_type, const string& shader_name)
     {
         GLint success;
         GLchar infoLog[1024];
@@ -61,6 +61,8 @@ namespace
                 B3D_LOG_ERROR("Shader linking error of type: %s%s\n %s", shader_name.c_str(), shader_type.c_str(), infoLog);
             }
         }
+
+        return success == 0;
     }
 
     string resolve_includes(const string& source, const string& shader_dir)
@@ -119,7 +121,6 @@ Shader::Shader() :
 Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_source, const string& shader_name)
     : Asset(vertex_shader_source, shader_name)
 {
-    m_index = 0;
     m_vert_path = vertex_shader_source;
     m_frag_path = fragment_shader_source;
     
@@ -164,31 +165,40 @@ Shader::Shader(const char* vertex_shader_source, const char* fragment_shader_sou
 
     // 2. compile shaders
     GLuint vertex, fragment;
+    bool errors_found = false;
 
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
-    check_compile_errors(vertex, ".vert", m_object_name);
+    errors_found |= check_compile_errors(vertex, ".vert", m_object_name);
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
-    check_compile_errors(fragment, ".frag", m_object_name);
+    errors_found |= check_compile_errors(fragment, ".frag", m_object_name);
 
     // shader Program
     m_object_id = glCreateProgram();
     glAttachShader(m_object_id, vertex);
     glAttachShader(m_object_id, fragment);
     glLinkProgram(m_object_id);
-    check_compile_errors(m_object_id, "PROGRAM", m_object_name);
+    errors_found |= check_compile_errors(m_object_id, "PROGRAM", m_object_name);
 
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
 
-    B3D_LOG_INFO("Shader %s with ID %d has compiled.", m_object_name.c_str(), m_object_id);
+    m_compiled = errors_found == 0;
+    if (m_compiled)
+    {
+        B3D_LOG_INFO("Shader %s with ID %d has compiled.", m_object_name.c_str(), m_object_id);
+    }
+    else
+    {
+        B3D_LOG_ERROR("Shader %s with ID %d has failed to compile.\nCheck above logs for more info.", m_object_name.c_str(), m_object_id);
+    }
 }
 
 Shader::Shader(const Shader& otherShader) : Shader(otherShader.get_vert_path(), otherShader.get_frag_path(), otherShader.get_object_name())

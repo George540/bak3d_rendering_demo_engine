@@ -49,6 +49,13 @@ void ResourceManager::initialize()
     initialize_models();
 }
 
+void ResourceManager::reload_shaders()
+{
+    B3D_LOG_INFO("Reloading shaders...");
+    initialize_shaders();
+    B3D_LOG_INFO("Reloading shaders complete.");
+}
+
 void ResourceManager::initialize_shaders()
 {
     // Get directory and files
