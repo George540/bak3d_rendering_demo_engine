@@ -35,6 +35,7 @@ namespace
     RENDERDOC_Version rdc_version = eRENDERDOC_API_Version_1_4_0;
     RENDERDOC_API_1_4_0* rdc_api  = nullptr;
     int frames_to_wait = 0;
+    bool pending_capture = false;
 }
 
 void RenderDocManager::initialize()
@@ -75,7 +76,7 @@ void RenderDocManager::initialize()
     }
 }
 
-void RenderDocManager::update()
+void RenderDocManager::begin_frame()
 {
     if (frames_to_wait > 0)
     {
@@ -83,9 +84,24 @@ void RenderDocManager::update()
 
         if (frames_to_wait == 0)
         {
-            B3D_LOG_INFO("Frame captured. Opening RenderDoc UI...");
             launch_renderdoc_ui();
         }
+    }
+
+    if (pending_capture)
+    {
+        rdc_api->StartFrameCapture(nullptr, nullptr);
+        B3D_LOG_INFO("Starting capture frame...");
+    }
+}
+
+void RenderDocManager::end_frame()
+{
+    if (pending_capture)
+    {
+        rdc_api->EndFrameCapture(nullptr, nullptr);
+        B3D_LOG_INFO("GPU frame captured.Launching RenderDoc UI...");
+        pending_capture = false;
     }
 }
 
@@ -98,13 +114,14 @@ void RenderDocManager::trigger_capture()
 {
     if (rdc_api != nullptr)
     {
-        rdc_api->TriggerCapture();
-        B3D_LOG_INFO("Capturing Frame. Opening RenderDoc UI...");
-
-        // Wait 2 frames to give enough time for the UI to launch: 
-        // Frame 1: The frame being recorded.
-        // Frame 2: The frame where the file is finalized, and UI is launched.
-        frames_to_wait = 2; 
+        if (pending_capture)
+        {
+            B3D_LOG_WARNING("GPU frame is already being captured.");
+            return;
+        }
+        pending_capture = true;
+        frames_to_wait = 600;
+        B3D_LOG_INFO("Capture queued for next frame.");
     }
     else
     {

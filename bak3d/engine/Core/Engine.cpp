@@ -59,13 +59,13 @@ void Bak3DEngine::Update()
         EventManager::update(); // Update Event Manager - Frame time / input / events processing 
         SceneManager::update();
 
+        RenderDocManager::begin_frame();
         Renderer::begin_frame();
         Renderer::draw_frame(); // Update Renderer - Drawing / Passes / Buffer Objects
         Renderer::end_frame();
+        RenderDocManager::end_frame();
 
         Bak3DEditor::update(); // Update Editor - Panels / Widgets / ImGui context
-
-        RenderDocManager::update();
 
         EventManager::end_update();
     } while (EventManager::is_exit_requested() == false);

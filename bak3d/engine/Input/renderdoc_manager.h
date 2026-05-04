@@ -31,7 +31,8 @@ class RenderDocManager
 {
 public:
     static void initialize();
-    static void update();
+    static void begin_frame();
+    static void end_frame();
     static void shutdown();
 
     static void trigger_capture();
