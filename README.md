@@ -64,6 +64,7 @@ Found inside the third_party directory, these are the current libraries being su
 | **[ImGui](https://github.com/ocornut/imgui)** | Bloat-free immediate-mode graphical user interface for the engine's editor. |
 | **[KHRPlatform](https://registry.khronos.org/EGL/api/KHR/khrplatform.h)** | Khronos group header file that defines platform-specific types and macros for OpenGL. |
 | **[stb_image](https://github.com/nothings/stb)** | Lightweight header file for loading and creating textures in OpenGL, by stb. |
+| **[Nlohmann JSON](https://github.com/nothings/stb)** | Modern JSON library with intuitive syntax and STL compatibility for C++. |
 
 <img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/3639aed6-ff0f-463a-999b-daf375aa9b83" />
 
@@ -94,8 +95,8 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
 |:ballot_box_with_check:| **Light Types** | More light types to add such as spot, point and directional (maybe even area). For now, just make the single light in the scene to change type. |
 |:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
-|:gear:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
-|:gear:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
+|:ballot_box_with_check:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
+|:ballot_box_with_check:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
 
 ### [v1.4 - The Rendering Universe Expands](https://github.com/George540/Bak3DEngine/milestone/3)
@@ -128,11 +129,15 @@ I hope you enjoy using my little beginner engine and I hope you learn many more 
 
 ## Acknowledgments
 
-1. Special thanks to [Joe de Vries](http://joeydevries.com/#home) for his ebook ["Lean OpenGL"](https://learnopengl.com/About) for teaching me graphics when I was just a student. I initially made this project as a learning tool from his guide for one of my assignments. To attribute his work properly, here is [Joe's twitter](https://twitter.com/JoeyDeVriez.) as well. The code provided on this ebook is licensed under the [CC BY 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license. Proper attribution was given as well as any direct reference of his work in my code. This work is non-commercial.
+Special thanks to...
 
-2. I also appreciate the experts at [Graphics Programming](https://discord.gg/DStdQSaN) and [Together C & C++](https://discord.gg/tccpp) discord servers for answering my basic questions when I needed help understanding something in OpenGL and C++.
+1. [Joe de Vries](http://joeydevries.com/#home) for his ebook ["Lean OpenGL"](https://learnopengl.com/About) for teaching me graphics when I was just a student. I initially made this project as a learning tool from his guide for one of my assignments. To attribute his work properly, here is [Joe's twitter](https://twitter.com/JoeyDeVriez.) as well. The code provided on this ebook is licensed under the [CC BY 4.0](https://creativecommons.org/licenses/by-nc/4.0/) license. Proper attribution was given as well as any direct reference of his work in my code. This work is non-commercial.
 
-3. Finally, thanks to [vblanco20-1](https://github.com/vblanco20-1) for his thorough guide to transitioning to Vulkan a few years later after learning OpenGL. Some of the Vulkan concepts in his guide have been (or will be) translated to this learning project. Attributing to his github repository guide [vkguide.dev](https://vkguide.dev)
+2. The cool experts at [Graphics Programming](https://discord.gg/DStdQSaN) discord server for answering my basic or even obscur questions when I needed help understanding something that was bothering me for days.
+
+3. [Tom Looman](https://www.linkedin.com/in/tomlooman/) and his [Complete Game Optimization for Unreal Engine 5](https://courses.tomlooman.com/p/unrealperformance?coupon_code=COMMUNITY15) course that helped me advance my learning for optimizing games and graphics programs. A lot of his topics have been crucial to understanding numerous concepts I have encountered when designing this engine.
+
+4. Finally, [vblanco20-1](https://github.com/vblanco20-1) for his thorough guide to transitioning to Vulkan a few years later after learning OpenGL. Although this is (currently) an OpenGL project, some of the Vulkan concepts in his guide have been an inspiration for this engine. Attributing to his github repository guide [vkguide.dev](https://vkguide.dev)
 
 ## License
 
