@@ -31,9 +31,9 @@ THE SOFTWARE.
 
 #include "model.h"
 
+#include "file_loader.h"
 #include "Asset/resource_manager.h"
 #include "Core/logger.h"
-#include "Input/event_manager.h"
 #include "Scene/scene.h"
 
 using namespace std;
@@ -63,10 +63,7 @@ Model::Model(const string& path, const std::string& file_name) :
 	m_unique_edges.clear();
 	m_unique_faces.clear();
 
-	ResourceManager::add_material(m_object_name + ".model", new Material(m_object_name + ".model", ResourceManager::get_shader("ModelShader")));
-	ResourceManager::add_material(m_object_name + ".dissect", new Material(m_object_name + ".dissect", ResourceManager::get_shader("DissectShader")));
-
-	set_current_material(m_object_name + ".model");
+	set_current_material(m_object_name + "_material");
 }
 
 Model::~Model()
@@ -110,58 +107,13 @@ void Model::update_material_properties() const
 {
 	m_current_material->set_vec3("camera_position", Scene::instance->get_camera()->get_camera_position());
 
-	// FRAGMENT MATERIAL
-	if (has_texture_of_type(aiTextureType_DIFFUSE))
-	{
-		Texture2D* diffuse_texture = textures_cache.at(aiTextureType_DIFFUSE);
-		diffuse_texture->bind(0);
-		m_current_material->set_int("material.diffuse", 0);
-	}
-	
-	
-	if (has_texture_of_type(aiTextureType_SPECULAR))
-	{
-		Texture2D* specular_texture = textures_cache.at(aiTextureType_SPECULAR);
-		specular_texture->bind(1);
-		m_current_material->set_int("material.specular", 1);
-	}
-	
-	if (has_texture_of_type(aiTextureType_HEIGHT))
-	{
-		Texture2D* normal_texture = textures_cache.at(aiTextureType_HEIGHT);
-		normal_texture->bind(2);
-		m_current_material->set_int("material.normal", 2);
-	}
-	
-	m_current_material->set_float("material.ambient", 0.5f);
+	m_current_material->set_float("material.surface_parameters.x", 0.5f);
 	//m_current_material->set_float("material.shininess", m;
-	m_current_material->set_bool("materialSettings.useDiffuseTexture", has_texture_of_type(aiTextureType_DIFFUSE) && EventManager::get_using_diffuse_texture());
-	m_current_material->set_bool("materialSettings.useSpecularTexture", has_texture_of_type(aiTextureType_SPECULAR) && EventManager::get_using_specular_texture());
-	m_current_material->set_bool("materialSettings.useNormalsTexture", has_texture_of_type(aiTextureType_HEIGHT) && EventManager::get_using_normal_maps());
-	m_current_material->set_bool("material.gamma", gamma_correction);
+	m_current_material->set_float("material.gamma", gamma_correction);
+
+	m_current_material->bind_textures_cache();
 }
-
-void Model::update_breakdown_shader() const
-{
-	/*aiTextureType texture_type = aiTextureType_DIFFUSE;
-	if (UserInterface::is_diffuse_render_selected)
-	{
-		texture_type = aiTextureType_DIFFUSE;
-	}
-	else if (UserInterface::is_specular_selected)
-	{
-		texture_type = aiTextureType_SPECULAR;
-	}
-	else if (UserInterface::is_normal_map_selected)
-	{
-		texture_type = aiTextureType_HEIGHT;
-	}
-
-	m_current_material->set_int("textureSampler", 0);
-	Texture2D* texture = textures_cache.contains(texture_type) ? textures_cache.at(texture_type) : ResourceManager::get_texture("None.jpg");
-	texture->bind(0);*/
-}
-
+ 
 void Model::load_model(string const& path)
 {
 	// read file via ASSIMP
@@ -314,15 +266,20 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
-	// Process materials
-	auto material = scene->mMaterials[mesh->mMaterialIndex];
+	// If model is to be loaded with all its textures and materials individually, set this to true.
+	// We want textures and materials to be loaded independent of the model at the moment.
+	if (false)
+	{
+		// Process materials
+		auto material = scene->mMaterials[mesh->mMaterialIndex];
 
-	// 1. diffuse maps
-	load_material_textures(material, aiTextureType_DIFFUSE);
-	// 2. specular maps
-	load_material_textures(material, aiTextureType_SPECULAR);
-	// 3. normal maps
-	load_material_textures(material, aiTextureType_HEIGHT);
+		// 1. diffuse maps
+		load_material_textures(material, aiTextureType_DIFFUSE);
+		// 2. specular maps
+		load_material_textures(material, aiTextureType_SPECULAR);
+		// 3. normal maps
+		load_material_textures(material, aiTextureType_HEIGHT);
+	}
 
 	// Return a mesh object created from the extracted mesh data
 	const int mesh_index = meshes.size();
@@ -341,7 +298,7 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 		{
 			string path = m_directory + '/' + filename.C_Str();
 			string texture_file_name = string(filename.C_Str());
-			Texture2D* texture = new Texture2D(path, texture_file_name, type);
+			Texture2D* texture = new Texture2D(path, texture_file_name);
 			auto texture_name = texture_file_name.substr(0, texture_file_name.find('.'));
 			auto texture_key = format("{}.{}",m_object_name, texture_name);
 			ResourceManager::add_texture(texture_key, texture);

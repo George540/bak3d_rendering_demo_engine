@@ -44,6 +44,44 @@ namespace
     vector<const char*> m_map_selection_items = { "Full Render", "Albedo", "Specular", "Normal" };
 
     Model* m_current_model = nullptr;
+
+    void draw_texture_property_section(const MaterialRef& material, const string& texture_type_name, const aiTextureType texture_type, const string& parameter_name)
+    {
+        string texture_type_name_pascal = texture_type_name;
+        texture_type_name_pascal[0] = toupper(static_cast<unsigned char>(texture_type_name_pascal[0]));
+        bool use_texture_type = material->has_uniform("material.use_" + texture_type_name + "_texture")
+                                            ? material->get_bool("material.use_" + texture_type_name + "_texture")
+                                            : false;
+        ImGuiB3D::PropertyToggle(("Use " + texture_type_name_pascal + " Texture").c_str(), &use_texture_type);
+        material->set_bool("material.use_" + texture_type_name + "_texture", use_texture_type);
+
+        string label_name = "Slider Value##" + texture_type_name_pascal;
+
+        // Slider item
+        ImGui::BeginDisabled(!use_texture_type);
+        if (!parameter_name.empty())
+        {
+            float parameter = material->get_float(parameter_name); // ex: "material.surface_parameters.y"
+            ImGuiB3D::PropertySliderFloat("Slider Value", &parameter, 0.0f, 1.0f, "%.3f");
+            material->set_float(parameter_name, parameter);
+        }
+        ImGui::EndDisabled();
+
+        // Texture item
+        ImGui::BeginDisabled(use_texture_type);
+        if (m_current_model->has_texture_of_type(texture_type))
+        {
+            const ImTextureID texture_id = ResourceManager::get_texture(m_current_model->get_current_material()->get_texture_by_type(texture_type))->get_texture_id();
+            ImGuiB3D::PropertyImageButton("Slider Value", nullptr, texture_id, ImVec2(40.0f, 40.0f));
+        }
+        else
+        {
+            ImGuiB3D::PropertyButton("Texture", "None", nullptr, ImVec2(50.0f, 50.0f));
+        }
+        ImGui::EndDisabled();
+
+        ImGui::Spacing();
+    }
 }
 
 Details::Details() : EditorPanel("Details")
@@ -129,43 +167,18 @@ void Details::draw_model_section()
     {
         if (m_current_model)
         {
-            // Albedo
-            if (m_current_model->has_texture_of_type(aiTextureType_DIFFUSE))
-            {
-                const ImTextureID albedo = m_current_model->textures_cache[aiTextureType_DIFFUSE]->get_texture_id();
-                ImGuiB3D::PropertyImageButton("Albedo", nullptr, albedo, ImVec2(40.0f, 40.0f));
-            }
-            else
-            {
-                ImGuiB3D::PropertyButton("Albedo", "None", nullptr, ImVec2(50.0f, 50.0f));
-            }
+            const MaterialRef model_material = m_current_model->get_current_material();
 
-            // Specular
-            if (m_current_model->has_texture_of_type(aiTextureType_SPECULAR))
-            {
-                const ImTextureID specular = m_current_model->textures_cache[aiTextureType_SPECULAR]->get_texture_id();
-                ImGuiB3D::PropertyImageButton("Specular", nullptr, specular, ImVec2(40.0f, 40.0f));
-            }
-            else
-            {
-                ImGuiB3D::PropertyButton("Specular", "None", nullptr, ImVec2(50.0f, 50.0f));
-            }
-
-            // Normal
-            if (m_current_model->has_texture_of_type(aiTextureType_HEIGHT))
-            {
-                const ImTextureID normals = m_current_model->textures_cache[aiTextureType_HEIGHT]->get_texture_id();
-                ImGuiB3D::PropertyImageButton("Normals", nullptr, normals, ImVec2(40.0f, 40.0f));
-            }
-            else
-            {
-                ImGuiB3D::PropertyButton("Normals", "None", nullptr, ImVec2(50.0f, 50.0f));
-            }
+            draw_texture_property_section(model_material, "diffuse", aiTextureType_DIFFUSE, "material.surface_parameters.y");
+            draw_texture_property_section(model_material, "specular", aiTextureType_SPECULAR, "material.surface_parameters.z");
+            draw_texture_property_section(model_material, "normal", aiTextureType_HEIGHT, "");
 
             // Gamma Correction
             bool gamma_correction = m_current_model->gamma_correction;
             ImGuiB3D::PropertyToggle("Gamma Correction", &gamma_correction, "Toggle between linear and gamma space for texture brightness.");
             m_current_model->gamma_correction = gamma_correction;
+
+            model_material->apply();
         }
 
         ImGui::TreePop();

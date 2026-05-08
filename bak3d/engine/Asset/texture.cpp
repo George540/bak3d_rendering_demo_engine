@@ -41,10 +41,8 @@ THE SOFTWARE.
 
 using namespace std;
 
-Texture2D::Texture2D(const string& path, const string& file_name, aiTextureType type)
-    :
-    Asset(path, file_name),
-    m_texture_type(type)
+Texture2D::Texture2D(const string& path, const string& file_name)
+    : Asset(path, file_name)
 {
     // Bypass gen texture ID with unique ID
     glGenTextures(1, &m_texture_id);
@@ -102,13 +100,11 @@ void Texture2D::unbind()
 bool Texture2D::operator==(const Texture2D& other) const
 {
     return m_object_id == other.m_object_id
-        && m_file_name == other.m_file_name
-        && m_texture_type == other.m_texture_type;
+        && m_file_name == other.m_file_name;
 }
 
 bool Texture2D::operator!=(const Texture2D& other) const
 {
     return m_object_id != other.m_object_id
-        || m_file_name != other.m_file_name
-        || m_texture_type != other.m_texture_type;
+        || m_file_name != other.m_file_name;
 }

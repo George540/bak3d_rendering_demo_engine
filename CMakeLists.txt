@@ -140,6 +140,19 @@ else()
     message(STATUS "  [renderdoc] NOT FOUND — skipping")
 endif()
 
+# nlohmann json
+if(EXISTS "${BAK3D_THIRD_PARTY_DIR}/json")
+    message(STATUS "  [json] Found at ${BAK3D_THIRD_PARTY_DIR}/json")
+    add_library(json INTERFACE)
+    target_include_directories(json INTERFACE
+        ${BAK3D_THIRD_PARTY_DIR}/json
+    )
+    set_target_properties(json PROPERTIES FOLDER "ThirdParty")
+    message(STATUS "  [json] Added as INTERFACE (header-only)")
+else()
+    message(STATUS "  [json] NOT FOUND — skipping")
+endif()
+
 # ============================================================================
 # Source Collection
 # ============================================================================
@@ -248,6 +261,10 @@ if(TARGET renderdoc)
     target_link_libraries(bak3d PRIVATE renderdoc)
     message(STATUS "  bak3d <- renderdoc (INTERFACE/header-only)")
 endif()
+if(TARGET json)
+    target_link_libraries(bak3d PRIVATE json)
+    message(STATUS "  bak3d <- json (INTERFACE/header-only)")
+endif()
 
 # ============================================================================
 # Compile Definitions
@@ -264,8 +281,8 @@ target_compile_definitions(bak3d PRIVATE
     BAK3D_ASSETS_DIR="${ASSETS_PATH_NORMALIZED}"
     BAK3D_SHADERS_DIR="${SHADERS_PATH_NORMALIZED}"
 )
-message(STATUS "  BAK3D_ASSETS_DIR  = ${ASSETS_PATH_NORMALIZED}")
-message(STATUS "  BAK3D_SHADERS_DIR = ${SHADERS_PATH_NORMALIZED}")
+message(STATUS "  BAK3D_ASSETS_DIR    = ${ASSETS_PATH_NORMALIZED}")
+message(STATUS "  BAK3D_SHADERS_DIR   = ${SHADERS_PATH_NORMALIZED}")
 
 # ============================================================================
 # Post-Build Steps

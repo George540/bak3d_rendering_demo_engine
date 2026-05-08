@@ -43,14 +43,13 @@ class Texture2D : public Asset
 {
 public:
     Texture2D() = default;
-    Texture2D(const std::string& path, const std::string& file_name, aiTextureType type);
+    Texture2D(const std::string& path, const std::string& file_name);
     Texture2D(const Texture2D&) = delete;
     ~Texture2D() override;
 
     void bind(int unit_slot) const; // binds the texture as the current active GL_TEXTURE_2D texture object
     static void unbind();
-    
-    aiTextureType get_texture_type() const { return m_texture_type; }
+
     GLuint get_texture_id() const { return m_texture_id; }
     int get_width() const { return m_width; }
     int get_height() const { return m_height; }
@@ -61,7 +60,6 @@ public:
     bool operator!=(const Texture2D& other) const;
 private:
     GLuint m_texture_id;
-    aiTextureType m_texture_type;
     int m_width, m_height; // texture image dimensions: width and height of loaded image in pixels
     int m_nb_color_channels; // the number of color components in the loaded image
 };

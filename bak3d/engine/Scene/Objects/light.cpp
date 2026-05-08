@@ -109,7 +109,6 @@ void Light::draw() const
 	RenderableObject::draw();
 
 	m_material->set_vec4("diffuseColor", glm::vec4(m_diffuse, 1.0f));
-	m_material->set_int("sprite", 0);
 
 	m_sprite_texture->bind(0);
 

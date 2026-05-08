@@ -199,6 +199,7 @@ string FileLoader::enum_to_string(FileType type)
 		case obj: return ".obj";
 		case mtl: return ".mtl";
 		case fbx: return ".fbx";
+		case json: return ".json";
 		default: return ".obj";
 	}
 }

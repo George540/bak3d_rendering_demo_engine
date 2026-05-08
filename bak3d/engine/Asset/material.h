@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp> 
 
+#include "texture.h"
+
 /*
  * Material class that sets parameters to be sent to a specific shader used by a renderable component.
  * Materials for now are created at runtime and are not a file asset.
@@ -58,16 +60,20 @@ class Material : public Asset
 public:
     Material() = default;
     // Materials aren't loaded from disk, so path is just the name
-    explicit Material(const std::string& material_name, const ShaderRef& shader)
-        : Asset(material_name, material_name)  // path = name, no real directory
-        , m_shader(shader) {}
+    explicit Material(const std::string& path, const std::string& file_name, const ShaderRef& shader);
+    Material(const Material& other_material);
 
     bool is_loaded() const { return m_shader.is_valid(); }
 
     ShaderRef get_shader() const { return m_shader; }
 
+    void load_from_file(const std::string& path);
     void apply();
+    void bind_textures_cache();
 
+    std::unordered_map<aiTextureType, std::string> m_texture_names;
+
+    // Setters
     void set_bool(const std::string& key_name, const bool value) { m_uniform_flags[key_name] = value; }
     void set_uint(const std::string& key_name, const unsigned int value) { m_uint_uniforms[key_name] = value; }
     void set_int(const std::string& key_name, const int value) { m_int_uniforms[key_name] = value; }
@@ -80,4 +86,21 @@ public:
     void set_mat2(const std::string& key_name, const glm::mat2& value) { m_mat2_uniforms[key_name] = value; }
     void set_mat3(const std::string& key_name, const glm::mat3& value) { m_mat3_uniforms[key_name] = value; }
     void set_mat4(const std::string& key_name, const glm::mat4& value) { m_mat4_uniforms[key_name] = value; }
+
+    // Getters (only done on the material level. Not the shader)
+    std::string get_texture_by_type(const aiTextureType& key_name);
+    bool has_uniform(const std::string& key_name) const;
+    
+    bool get_bool(const std::string& key_name) { return m_uniform_flags[key_name]; }
+    GLuint get_uint(const std::string& key_name) { return m_uint_uniforms[key_name]; }
+    GLuint get_int(const std::string& key_name) { return m_int_uniforms[key_name]; }
+    float get_float(const std::string& key_name) { return m_float_uniforms[key_name]; }
+
+    glm::vec2 get_vec2(const std::string& key_name) { return m_vec2_uniforms[key_name]; }
+    glm::vec3 get_vec3(const std::string& key_name) { return m_vec3_uniforms[key_name]; }
+    glm::vec4 get_vec4(const std::string& key_name) { return m_vec4_uniforms[key_name]; }
+
+    glm::mat2 get_mat2(const std::string& key_name) { return m_mat2_uniforms[key_name]; }
+    glm::mat3 get_mat3(const std::string& key_name) { return m_mat3_uniforms[key_name]; }
+    glm::mat4 get_mat4(const std::string& key_name) { return m_mat4_uniforms[key_name]; }
 };

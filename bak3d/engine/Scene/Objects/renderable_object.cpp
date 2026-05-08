@@ -34,7 +34,7 @@ using namespace std;
 RenderableObject::RenderableObject(MaterialRef material, const glm::vec3 position, const std::string& name)
 	: SceneObject(position, name)
 {
-	m_material = std::move(material);
+	m_material = material;
 	m_visible = true;
 
 	m_vao = new VertexArray();

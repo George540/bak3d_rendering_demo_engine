@@ -40,7 +40,8 @@ enum FileType
 	frag,
 	obj,
 	mtl,
-	fbx
+	fbx,
+	json
 };
 
 /*

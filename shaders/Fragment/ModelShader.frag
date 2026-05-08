@@ -2,20 +2,17 @@
 
 struct Material
 {
-    sampler2D diffuse;
-    sampler2D specular;
-    sampler2D normal;
+    bool use_diffuse_texture;
+    bool use_specular_texture;
+    bool use_normal_texture;
+    bool use_gamma_correction;
+    float gamma;
+    
+    vec4 surface_parameters; // x = ambient, y = diffuse z = specular, w = shininess
 
-    float ambient;
-    float shininess;
-    bool  gamma;
-};
-
-struct MaterialSettings
-{
-    bool useDiffuseTexture;
-    bool useSpecularTexture;
-    bool useNormalsTexture;
+    sampler2D diffuse_texture;
+    sampler2D specular_texture;
+    sampler2D normal_texture;
 };
 
 in VS_OUT
@@ -30,7 +27,6 @@ in VS_OUT
 } fs_in;
 
 uniform Material material;
-uniform MaterialSettings materialSettings;
 uniform vec3 camera_position;
 
 out vec4 FragColor;
@@ -41,9 +37,9 @@ out vec4 FragColor;
 
 vec3 get_normal()
 {
-    if (materialSettings.useNormalsTexture)
+    if (material.use_normal_texture)
     {
-        vec3 n = texture(material.normal, fs_in.TexCoord).rgb;
+        vec3 n = texture(material.normal_texture, fs_in.TexCoord).rgb;
         return normalize(n * 2.0 - 1.0); // tangent space [-1, 1]
     }
     return normalize(fs_in.Normal);
@@ -51,40 +47,40 @@ vec3 get_normal()
 
 vec3 get_light_dir(vec3 light_pos)
 {
-    if (materialSettings.useNormalsTexture)
+    if (material.use_normal_texture)
         return normalize(fs_in.TangentLightPos - fs_in.TangentFragPos);
     return normalize(light_pos - fs_in.FragPos);
 }
 
 vec3 get_view_dir()
 {
-    if (materialSettings.useNormalsTexture)
+    if (material.use_normal_texture)
         return normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
     return normalize(camera_position - fs_in.FragPos);
 }
 
 vec3 calc_ambient(vec3 light_ambient)
 {
-    if (materialSettings.useDiffuseTexture)
-        return light_ambient * texture(material.diffuse, fs_in.TexCoord).rgb;
-    return light_ambient * vec3(material.ambient);
+    if (material.use_diffuse_texture)
+        return light_ambient * texture(material.diffuse_texture, fs_in.TexCoord).rgb;
+    return light_ambient * vec3(material.surface_parameters.x);
 }
 
 vec3 calc_diffuse(vec3 light_diffuse, vec3 lightDir, vec3 normal)
 {
     float diff = max(dot(lightDir, normal), 0.0);
-    if (materialSettings.useDiffuseTexture)
-        return light_diffuse * diff * texture(material.diffuse, fs_in.TexCoord).rgb;
-    return light_diffuse * diff * vec3(0.7);
+    if (material.use_diffuse_texture)
+        return light_diffuse * diff * texture(material.diffuse_texture, fs_in.TexCoord).rgb;
+    return light_diffuse * diff * vec3(material.surface_parameters.y);
 }
 
 vec3 calc_specular(vec3 light_specular, vec3 lightDir, vec3 normal, vec3 viewDir)
 {
     vec3  halfwayDir = normalize(lightDir + viewDir);
-    float spec       = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
-    if (materialSettings.useSpecularTexture)
-        return light_specular * spec * texture(material.specular, fs_in.TexCoord).rgb;
-    return light_specular * spec * vec3(0.7);
+    float spec       = pow(max(dot(normal, halfwayDir), 0.0), material.surface_parameters.w);
+    if (material.use_specular_texture)
+        return light_specular * spec * texture(material.specular_texture, fs_in.TexCoord).rgb;
+    return light_specular * spec * vec3(material.surface_parameters.z);
 }
 
 float calc_attenuation(float dist)
@@ -100,7 +96,7 @@ float calc_attenuation(float dist)
 
 vec3 calc_directional_light()
 {
-    vec3 lightDir = materialSettings.useNormalsTexture
+    vec3 lightDir = material.use_normal_texture
                     ? normalize(fs_in.TangentLightDir)
                     : normalize(-light_data.direction.rgb);
     vec3 normal   = get_normal();
@@ -183,8 +179,10 @@ void main()
         default:                     result = vec3(1.0, 0.0, 0.0);      break;
     }
 
-    if (material.gamma)
-        result = pow(result, vec3(1.0 / 2.2));
+    if (material.use_gamma_correction)
+    {
+        result = pow(result, vec3(1.0 / material.gamma));
+    }
 
     FragColor = vec4(result, 1.0);
 }

@@ -80,7 +80,6 @@ private:
 
 	void load_material_textures(aiMaterial* mat, aiTextureType type);
 	void update_material_properties() const;
-	void update_breakdown_shader() const;
 
 	MaterialRef m_current_material;
 

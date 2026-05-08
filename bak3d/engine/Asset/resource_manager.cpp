@@ -160,19 +160,19 @@ void ResourceManager::initialize_shaders()
 
 void ResourceManager::initialize_predefined_textures()
 {
-    auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", png);
+    auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), png);
     for (const auto& [file_name, file_path] : image_files)
     {
-        add_texture(file_name, new Texture2D(file_path, file_name, aiTextureType_DIFFUSE));
+        add_texture(file_name, new Texture2D(file_path, file_name));
     }
 
-    image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/sprites", jpg);
+    image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), jpg);
     for (const auto& [file_name, file_path] : image_files)
     {
-        add_texture(file_name, new Texture2D(file_path, file_name, aiTextureType_DIFFUSE));
+        add_texture(file_name, new Texture2D(file_path, file_name));
     }
 
-    B3D_LOG_INFO("Successfully loaded %d default sprite textures.", Textures.size());
+    B3D_LOG_INFO("Successfully loaded %d textures.", Textures.size());
 }
 
 void ResourceManager::initialize_models()
@@ -186,11 +186,12 @@ void ResourceManager::initialize_models()
 
 void ResourceManager::initialize_predefined_materials()
 {
-    add_material("grid", new Material("grid", get_shader("GridShader")));
-    add_material("line", new Material("line", get_shader("LineShader")));
-    add_material("light", new Material("light", get_shader("LightShader")));
-    add_material("particle", new Material("particle", get_shader("ParticleShader")));
-    add_material("bounding-box", new Material("bounding-box", get_shader("GridShader")));
+    const auto model_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR) + "/materials", json);
+    for (const auto& [file_name, file_path] : model_files)
+    {
+        auto name = FileLoader::get_name_from_filename(file_name);
+        add_material(name, new Material(file_path, file_name, nullptr));
+    }
 }
 
 void ResourceManager::shutdown()
