@@ -88,6 +88,7 @@ public:
     void set_mat4(const std::string& key_name, const glm::mat4& value) { m_mat4_uniforms[key_name] = value; }
 
     // Getters (only done on the material level. Not the shader)
+    bool has_texture_of_type(const aiTextureType& texture_type) const { return m_texture_names.contains(texture_type); }
     std::string get_texture_by_type(const aiTextureType& key_name);
     bool has_uniform(const std::string& key_name) const;
     

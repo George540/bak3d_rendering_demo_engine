@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "Asset/asset_definitions.h"
+
 /*
  * ============================ ENGINE DEFINITIONS ==========================
  * Engine declarations and definitions for different types, settings, constants and more.
@@ -191,6 +193,21 @@ struct Face
     }
 };
 
+/*
+ * Additional indirection layer for referencing MaterialRef's on different scene objects.
+ */
+using MaterialSlot = std::shared_ptr<MaterialRef>;
+
+// Helper to create a slot preloaded with a material
+inline MaterialSlot make_material_slot(const MaterialRef& mat)
+{
+    return std::make_shared<MaterialRef>(mat);
+}
+
+inline MaterialSlot make_material_slot()
+{
+    return std::make_shared<MaterialRef>(nullptr);
+}
 
 // Unique cube vertices (8 total)
 static const std::vector<glm::vec3> CUBE_VERTICES_SOLID =

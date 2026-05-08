@@ -73,6 +73,8 @@ int EventManager::m_window_height = 1080;
 bool EventManager::is_dragging_enabled = false;
 bool EventManager::is_scrolling_enabled = false;
 
+using namespace std;
+
 /*
  * Initializes the proper GLFW window settings and handles all inputs.
  */
@@ -309,6 +311,6 @@ void EventManager::on_scroll_callback(GLFWwindow* window, double xoffset, double
 			cam_zoom_factor = (cam_zoom_distance * 0.2) * -1;
 		}
 		cam_zoom_distance -= cam_zoom_factor;
-		cam_zoom_distance = std::max(0.1, std::min(35.0, cam_zoom_distance));
+		cam_zoom_distance = max(0.1, min(35.0, cam_zoom_distance));
 	}
 }

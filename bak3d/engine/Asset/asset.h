@@ -97,6 +97,34 @@ public:
 
     explicit SharedAssetRef(AssetRef<T>* ref) : m_ref(ref) {}
     SharedAssetRef(std::shared_ptr<AssetRef<T>> ref) : m_ref(std::move(ref)) {}
+    SharedAssetRef(const SharedAssetRef& other) : m_ref(other.m_ref) {} // Copy
+    SharedAssetRef(SharedAssetRef&& other) noexcept : m_ref(std::move(other.m_ref)) {} // Move
+
+    // Copy
+    SharedAssetRef& operator=(const SharedAssetRef& other)
+    {
+        if (this != &other)
+        {
+            m_ref = other.m_ref;
+        }
+        return *this;
+    }
+
+    // Move
+    SharedAssetRef& operator=(SharedAssetRef&& other) noexcept
+    {
+        if (this != &other)
+        {
+            m_ref = std::move(other.m_ref);
+        }
+        return *this;
+    }
+
+    SharedAssetRef& operator=(std::nullptr_t)
+    {
+        m_ref = nullptr;
+        return *this;
+    }
 
     // Cuts through both levels — ref->use() works directly
     T* operator->() const { return m_ref->asset; }

@@ -144,20 +144,20 @@ void Material::load_from_file(const string& path)
             const string texture_name = val.get<string>();
             if (TextureRef texture = ResourceManager::get_texture(texture_name))
             {
-                if (uniform_name == "material.diffuse")
+                if (uniform_name == "material.diffuse_texture")
                 {
                     set_int(uniform_name, 0);
                     m_texture_names[aiTextureType_DIFFUSE] = texture_name;
                 }
-                else if (uniform_name == "material.specular")
+                else if (uniform_name == "material.specular_texture")
                 {
                     set_int(uniform_name, 1);
                     m_texture_names[aiTextureType_SPECULAR] = texture_name;
                 }
-                else if (uniform_name == "material.normal")
+                else if (uniform_name == "material.normal_texture")
                 {
                     set_int(uniform_name, 2);
-                    m_texture_names[aiTextureType_HEIGHT] = texture_name;
+                    m_texture_names[aiTextureType_NORMALS] = texture_name;
                 }
             }
         }
@@ -165,9 +165,9 @@ void Material::load_from_file(const string& path)
         {
             throw runtime_error("Unknown uniform type: " + type);
         }
-
-        apply();
     }
+
+    apply();
 }
 
 void Material::apply()
@@ -235,17 +235,17 @@ void Material::bind_textures_cache()
         if (get_bool("material.use_diffuse_texture") && type == aiTextureType_DIFFUSE)
         {
             texture->bind(0);
-            set_int("material.diffuse", 0);
+            set_int("material.diffuse_texture", 0);
         }
         if (get_bool("material.use_specular_texture") && type == aiTextureType_SPECULAR)
         {
             texture->bind(1);
-            set_int("material.specular", 1);
+            set_int("material.specular_texture", 1);
         }
-        if (get_bool("material.use_normal_texture") && type == aiTextureType_HEIGHT)
+        if (get_bool("material.use_normal_texture") && type == aiTextureType_NORMALS)
         {
             texture->bind(2);
-            set_int("material.normal", 2);
+            set_int("material.normal_texture", 2);
         }
     }
 }

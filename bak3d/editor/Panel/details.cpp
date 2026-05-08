@@ -55,28 +55,29 @@ namespace
         ImGuiB3D::PropertyToggle(("Use " + texture_type_name_pascal + " Texture").c_str(), &use_texture_type);
         material->set_bool("material.use_" + texture_type_name + "_texture", use_texture_type);
 
-        string label_name = "Slider Value##" + texture_type_name_pascal;
+        string label_name = texture_type_name_pascal + " Slider";
 
         // Slider item
-        ImGui::BeginDisabled(!use_texture_type);
+        ImGui::BeginDisabled(use_texture_type);
         if (!parameter_name.empty())
         {
             float parameter = material->get_float(parameter_name); // ex: "material.surface_parameters.y"
-            ImGuiB3D::PropertySliderFloat("Slider Value", &parameter, 0.0f, 1.0f, "%.3f");
+            ImGuiB3D::PropertySliderFloat(label_name.c_str(), &parameter, 0.0f, 1.0f, "%.3f");
             material->set_float(parameter_name, parameter);
         }
         ImGui::EndDisabled();
 
         // Texture item
-        ImGui::BeginDisabled(use_texture_type);
-        if (m_current_model->has_texture_of_type(texture_type))
+        label_name = texture_type_name_pascal + " Texture";
+        ImGui::BeginDisabled(!use_texture_type);
+        if (material->has_texture_of_type(texture_type))
         {
-            const ImTextureID texture_id = ResourceManager::get_texture(m_current_model->get_current_material()->get_texture_by_type(texture_type))->get_texture_id();
-            ImGuiB3D::PropertyImageButton("Slider Value", nullptr, texture_id, ImVec2(40.0f, 40.0f));
+            const ImTextureID texture_id = ResourceManager::get_texture(material->get_texture_by_type(texture_type))->get_texture_id();
+            ImGuiB3D::PropertyImageButton(label_name.c_str(), nullptr, texture_id, ImVec2(40.0f, 40.0f));
         }
         else
         {
-            ImGuiB3D::PropertyButton("Texture", "None", nullptr, ImVec2(50.0f, 50.0f));
+            ImGuiB3D::PropertyButton(label_name.c_str(), "None", nullptr, ImVec2(50.0f, 50.0f));
         }
         ImGui::EndDisabled();
 
@@ -169,16 +170,24 @@ void Details::draw_model_section()
         {
             const MaterialRef model_material = m_current_model->get_current_material();
 
+            // Ambient
+            float ambient = model_material->get_float("material.surface_parameters.x");
+            ImGuiB3D::PropertySliderFloat("Ambient", &ambient, 0.0f, 1.0f, "%.3f");
+            model_material->set_float("material.surface_parameters.x", ambient);
+
             draw_texture_property_section(model_material, "diffuse", aiTextureType_DIFFUSE, "material.surface_parameters.y");
             draw_texture_property_section(model_material, "specular", aiTextureType_SPECULAR, "material.surface_parameters.z");
-            draw_texture_property_section(model_material, "normal", aiTextureType_HEIGHT, "");
+            draw_texture_property_section(model_material, "normal", aiTextureType_NORMALS, "");
 
             // Gamma Correction
             bool gamma_correction = m_current_model->gamma_correction;
             ImGuiB3D::PropertyToggle("Gamma Correction", &gamma_correction, "Toggle between linear and gamma space for texture brightness.");
             m_current_model->gamma_correction = gamma_correction;
 
-            model_material->apply();
+            // Shininess
+            float shininess = model_material->get_float("material.surface_parameters.w");
+            ImGuiB3D::PropertySliderFloat("Shininess", &shininess, 0.0f, 1.0f, "%.3f", "Control the shininess of the material.");
+            model_material->set_float("material.surface_parameters.w", shininess);
         }
 
         ImGui::TreePop();

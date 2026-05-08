@@ -25,6 +25,7 @@ THE SOFTWARE.
 #pragma once
 
 #include "Asset/material.h"
+#include "Core/global_definitions.h"
 #include "Core/renderable.h"
 #include "Renderer/buffer.h"
 #include "Renderer/vertex_array.h"
@@ -41,18 +42,22 @@ protected:
     VertexBuffer* m_vbo;
     ElementBuffer* m_ebo;
 
-    MaterialRef m_material;
+    MaterialSlot m_material_slot;
 
     bool m_visible;
+
+    void apply_material() const { if (has_material()) (*m_material_slot)->apply(); }
 public:
-    RenderableObject(MaterialRef material, const glm::vec3 position, const std::string& name);
+    RenderableObject(const MaterialRef& material, const glm::vec3 position, const std::string& name);
     ~RenderableObject() override;
 
     void update(float dt) override;
     void draw() const override;
 
-    void set_material(MaterialRef material) { m_material = material; }
-    MaterialRef get_material() const { return m_material; }
+    void set_material(const MaterialRef& material) const { *m_material_slot = material; } // Standalone objects swap their own slot
+    void set_material_slot(const MaterialSlot& slot) { m_material_slot = slot; } // Adopt a shared slot from a parent model
+    bool has_material() const { return m_material_slot && *m_material_slot; }
+    MaterialRef get_material() const { return *m_material_slot; }
     void set_visible(bool visible) { m_visible = visible; }
     bool is_visible() const { return m_visible; }
 };
@@ -66,7 +71,7 @@ class InstancedObject : public RenderableObject
 protected:
     InstanceBuffer* m_ibo;
 public:
-    InstancedObject(MaterialRef material, const std::string& name);
+    InstancedObject(const MaterialRef& material, const std::string& name);
     ~InstancedObject() override;
 
     void draw() const override;

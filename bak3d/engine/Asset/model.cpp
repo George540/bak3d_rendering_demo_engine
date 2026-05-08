@@ -63,7 +63,12 @@ Model::Model(const string& path, const std::string& file_name) :
 	m_unique_edges.clear();
 	m_unique_faces.clear();
 
+	m_current_material_slot = make_material_slot();
 	set_current_material(m_object_name + "_material");
+	for (const auto& mesh : meshes)
+	{
+		mesh->set_material(*m_current_material_slot);
+	}
 }
 
 Model::~Model()
@@ -72,7 +77,7 @@ Model::~Model()
 	textures_cache.clear();
 	B3D_LOG_INFO("Texture data of model %s has been cleared", m_file_name.c_str());
 
-	m_current_material = nullptr;
+	m_current_material_slot = nullptr;
 	
 	meshes.clear();
 	B3D_LOG_INFO("Model %s mesh data have been safely deleted", m_file_name.c_str());
@@ -80,7 +85,7 @@ Model::~Model()
 
 void Model::draw() const
 {
-	if (!m_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material) return;
+	if (!m_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material_slot) return;
 
 	/*UserInterface::is_full_render_selected
 			&& !UserInterface::is_diffuse_render_selected
@@ -105,13 +110,9 @@ void Model::draw() const
 
 void Model::update_material_properties() const
 {
-	m_current_material->set_vec3("camera_position", Scene::instance->get_camera()->get_camera_position());
+	(*m_current_material_slot)->set_vec3("camera_position", Scene::instance->get_camera()->get_camera_position());
 
-	m_current_material->set_float("material.surface_parameters.x", 0.5f);
-	//m_current_material->set_float("material.shininess", m;
-	m_current_material->set_float("material.gamma", gamma_correction);
-
-	m_current_material->bind_textures_cache();
+	(*m_current_material_slot)->bind_textures_cache();
 }
  
 void Model::load_model(string const& path)
@@ -278,7 +279,7 @@ Mesh* Model::process_mesh(aiMesh* mesh, const aiScene* scene)
 		// 2. specular maps
 		load_material_textures(material, aiTextureType_SPECULAR);
 		// 3. normal maps
-		load_material_textures(material, aiTextureType_HEIGHT);
+		load_material_textures(material, aiTextureType_NORMALS);
 	}
 
 	// Return a mesh object created from the extracted mesh data
@@ -309,9 +310,7 @@ void Model::load_material_textures(aiMaterial* mat, aiTextureType type)
 
 void Model::set_current_material(const std::string& material_name)
 {
-	m_current_material = ResourceManager::get_material(material_name);
-	for (const auto mesh : meshes)
-	{
-		mesh->set_material(m_current_material);
-	}
+	// Write into the shared slot. All meshes see this instantly
+	auto t = ResourceManager::get_material(material_name);
+	*m_current_material_slot = ResourceManager::get_material(material_name);
 }

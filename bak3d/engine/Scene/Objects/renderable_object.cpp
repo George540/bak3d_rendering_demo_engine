@@ -31,10 +31,10 @@ THE SOFTWARE.
 
 using namespace std;
 
-RenderableObject::RenderableObject(MaterialRef material, const glm::vec3 position, const std::string& name)
+RenderableObject::RenderableObject(const MaterialRef& material, const glm::vec3 position, const std::string& name)
 	: SceneObject(position, name)
 {
-	m_material = material;
+	m_material_slot = make_material_slot(material);
 	m_visible = true;
 
 	m_vao = new VertexArray();
@@ -60,14 +60,13 @@ void RenderableObject::update(float dt)
 void RenderableObject::draw() const
 {
 	Camera* scene_camera = Scene::instance->get_camera();
-	if (!m_material || !scene_camera) return;
+	if (!m_material_slot || !*m_material_slot || !scene_camera) return;
 
-	m_material->set_mat4("model", m_model_matrix);
-
-	m_material->apply();
+	(*m_material_slot)->set_mat4("model", m_model_matrix);
+	apply_material();
 }
 
-InstancedObject::InstancedObject(MaterialRef material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
+InstancedObject::InstancedObject(const MaterialRef& material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
 
 InstancedObject::~InstancedObject()
 {
@@ -77,7 +76,7 @@ InstancedObject::~InstancedObject()
 void InstancedObject::draw() const
 {
 	Camera* scene_camera = Scene::instance->get_camera();
-	if (!m_material || !scene_camera) return;
+	if (!m_material_slot || !*m_material_slot || !scene_camera) return;
 
-	m_material->apply();
+	(*m_material_slot)->apply();
 }

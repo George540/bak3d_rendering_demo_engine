@@ -60,7 +60,7 @@ public:
 
 	void draw() const; // draws the model, and thus all its meshes
 	void set_current_material(const std::string& material_name);
-	MaterialRef get_current_material() const { return m_current_material; }
+	MaterialRef get_current_material() const { return *m_current_material_slot; }
 	void set_visible(bool visible) { m_visible = visible; }
 	bool is_visible() const { return m_visible; }
 
@@ -69,8 +69,6 @@ public:
 	GLuint get_vertices() const { return m_num_vertices; }
 	GLuint get_unique_edges() const { return m_num_edges; }
 	GLuint get_faces() const { return m_num_faces; }
-
-	bool has_texture_of_type(const aiTextureType& texture_type) const { return textures_cache.contains(texture_type); }
 private:
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void load_model(std::string const& path);
@@ -81,7 +79,7 @@ private:
 	void load_material_textures(aiMaterial* mat, aiTextureType type);
 	void update_material_properties() const;
 
-	MaterialRef m_current_material;
+	MaterialSlot m_current_material_slot;
 
 	bool m_visible;
 };
