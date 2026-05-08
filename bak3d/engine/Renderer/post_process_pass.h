@@ -78,7 +78,7 @@ class PostProcessPass_ColorGrading : public PostProcessPass
 {
 public:
     PostProcessPass_ColorGrading()
-        : PostProcessPass("ColorGrading", "ColorGradingShader") { m_is_enabled = true; }
+        : PostProcessPass("ColorGrading", "color_grading") { m_is_enabled = true; }
 
     void process() override;
 private:
@@ -92,10 +92,10 @@ class PostProcessPass_KernelEffect : public PostProcessPass
 {
 public:
     PostProcessPass_KernelEffect()
-        : PostProcessPass("KernelEffect", "KernelEffectShader") { m_is_enabled = true; m_kernel_type = KernelEffectType::Sharpen; }
+        : PostProcessPass("KernelEffect", "kernel_effect") { m_is_enabled = true; m_kernel_type = KernelEffectType::Sharpen; }
 
     PostProcessPass_KernelEffect(const KernelEffectType type)
-        : PostProcessPass("KernelEffect", "KernelEffectShader") { m_is_enabled = true; m_kernel_type = type; }
+        : PostProcessPass("KernelEffect", "kernel_effect") { m_is_enabled = true; m_kernel_type = type; }
 
     KernelEffectType get_kernel_type() const { return m_kernel_type; }
 

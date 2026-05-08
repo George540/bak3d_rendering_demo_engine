@@ -132,19 +132,19 @@ void ResourceManager::initialize_shaders()
     }
 
     // If shaders that did not automatically match are found, manually match them with caution!
-    // NOTE: This is used so far to match post process fragment shaders with the PostProcessingShader.vert vertex shader.
+    // NOTE: This is used so far to match post process fragment shaders with the post_processing_quad.vert vertex shader.
     //       See shader files for reference.
     if (!shaders_to_match.empty())
     {
-        add_shader("ColorGradingShader", new Shader(
-                shaders_to_match["PostProcessingShader"].c_str(),
-                shaders_to_match["ColorGradingShader"].c_str(),
-                "ColorGradingShader"));
+        add_shader("color_grading", new Shader(
+                shaders_to_match["post_processing_quad"].c_str(),
+                shaders_to_match["color_grading"].c_str(),
+                "color_grading"));
 
-        add_shader("KernelEffectShader", new Shader(
-                shaders_to_match["PostProcessingShader"].c_str(),
-                shaders_to_match["KernelEffectShader"].c_str(),
-                "KernelEffectShader"));
+        add_shader("kernel_effect", new Shader(
+                shaders_to_match["post_processing_quad"].c_str(),
+                shaders_to_match["kernel_effect"].c_str(),
+                "kernel_effect"));
     }
 
     auto shaders = Shaders;

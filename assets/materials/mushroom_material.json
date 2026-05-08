@@ -1,5 +1,5 @@
 {
-  "shader": "ModelShader",
+  "shader": "lit",
   "uniforms": {
     "material.use_diffuse_texture": { "type": "bool",  "value": true },
     "material.use_specular_texture": { "type": "bool",  "value": false },

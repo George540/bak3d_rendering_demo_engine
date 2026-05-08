@@ -1,5 +1,5 @@
 {
-  "shader": "LineShader",
+  "shader": "line",
   "uniforms": {
     "model": { "type": "mat4",  "value": [
       1,0,0,0,
