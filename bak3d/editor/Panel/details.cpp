@@ -45,7 +45,7 @@ namespace
 
     Model* m_current_model = nullptr;
 
-    void draw_texture_property_section(const MaterialRef& material, const string& texture_type_name, const aiTextureType texture_type, const string& parameter_name)
+    void draw_texture_property_section(const MaterialRef& material, const string& texture_type_name, const aiTextureType texture_type, const string& parameter_name, float& surface_parameter)
     {
         string texture_type_name_pascal = texture_type_name;
         texture_type_name_pascal[0] = toupper(static_cast<unsigned char>(texture_type_name_pascal[0]));
@@ -61,9 +61,7 @@ namespace
         ImGui::BeginDisabled(use_texture_type);
         if (!parameter_name.empty())
         {
-            float parameter = material->get_float(parameter_name); // ex: "material.surface_parameters.y"
-            ImGuiB3D::PropertySliderFloat(label_name.c_str(), &parameter, 0.0f, 1.0f, "%.3f");
-            material->set_float(parameter_name, parameter);
+            ImGuiB3D::PropertySliderFloat(label_name.c_str(), &surface_parameter, 0.0f, 1.0f, "%.3f");
         }
         ImGui::EndDisabled();
 
@@ -170,24 +168,24 @@ void Details::draw_model_section()
         {
             const MaterialRef model_material = m_current_model->get_current_material();
 
-            // Ambient
-            float ambient = model_material->get_float("material.surface_parameters.x");
-            ImGuiB3D::PropertySliderFloat("Ambient", &ambient, 0.0f, 1.0f, "%.3f");
-            model_material->set_float("material.surface_parameters.x", ambient);
+            glm::vec4 surface_parameters = model_material->get_vec4("material.surface_parameters");
 
-            draw_texture_property_section(model_material, "diffuse", aiTextureType_DIFFUSE, "material.surface_parameters.y");
-            draw_texture_property_section(model_material, "specular", aiTextureType_SPECULAR, "material.surface_parameters.z");
-            draw_texture_property_section(model_material, "normal", aiTextureType_NORMALS, "");
+            draw_texture_property_section(model_material, "diffuse", aiTextureType_DIFFUSE, "material.surface_parameters.y", surface_parameters.y);
+            draw_texture_property_section(model_material, "specular", aiTextureType_SPECULAR, "material.surface_parameters.z", surface_parameters.z);
+            draw_texture_property_section(model_material, "normal", aiTextureType_NORMALS, "", surface_parameters.z);
 
             // Gamma Correction
-            bool gamma_correction = m_current_model->gamma_correction;
+            bool gamma_correction = model_material->get_bool("material.use_gamma_correction");
             ImGuiB3D::PropertyToggle("Gamma Correction", &gamma_correction, "Toggle between linear and gamma space for texture brightness.");
-            m_current_model->gamma_correction = gamma_correction;
+            model_material->set_bool("material.use_gamma_correction", gamma_correction);
 
             // Shininess
-            float shininess = model_material->get_float("material.surface_parameters.w");
-            ImGuiB3D::PropertySliderFloat("Shininess", &shininess, 0.0f, 1.0f, "%.3f", "Control the shininess of the material.");
-            model_material->set_float("material.surface_parameters.w", shininess);
+            ImGuiB3D::PropertySliderFloat("Shininess", &surface_parameters.w, 0.0f, 1.0f, "%.3f", "Control the shininess of the material.");
+
+            // Ambient
+            ImGuiB3D::PropertySliderFloat("Ambient", &surface_parameters.x, 0.0f, 1.0f, "%.3f");
+
+            model_material->set_vec4("material.surface_parameters", surface_parameters);
         }
 
         ImGui::TreePop();
