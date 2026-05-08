@@ -56,8 +56,8 @@ Scene::Scene()
 	m_axis = new Axis(ResourceManager::get_material("line"));
 	m_scene_objects[SceneObjectType::Axis] = m_axis;
 	
-	/*m_particle_system = new ParticleSystem(ResourceManager::get_material("particle"), ResourceManager::get_material("bounding-box"));
-	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;*/
+	m_particle_system = new ParticleSystem("ParticleSystem");
+	m_scene_objects[SceneObjectType::ParticleSystem] = m_particle_system;
 
 	// Light Setup
 	auto initial_light_scaling_value = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Light_Scaling);
@@ -74,7 +74,7 @@ Scene::~Scene()
 {
 	delete m_grid;
 	delete m_camera;
-	//delete m_particle_system;
+	delete m_particle_system;
 	delete m_light;
 	delete m_axis;
 	m_scene_objects.clear();
@@ -87,5 +87,5 @@ void Scene::update(float dt) const
 	{
 		m_light->update(dt);
 	}
-	//m_particle_system->update(dt);
+	m_particle_system->update(dt);
 }

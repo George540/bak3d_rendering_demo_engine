@@ -121,7 +121,7 @@ struct particle_info
  * Particle System class that is based on instanced object properties to generate billboard particles
  * and manage them in 3D space with dynamic lifetime and other properties that change over time.
  #1#
-class ParticleSystem : public InstancedObject
+class ParticleSystem : public InstancedRenderableObject
 {
 public:
     // constructor

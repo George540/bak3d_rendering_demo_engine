@@ -49,6 +49,10 @@ void RendererPasses::render_pass_base_geometry()
     {
         model->draw();
     }
+    if (const ParticleSystem* particle_system = Scene::instance->get_particle_system())
+    {
+        particle_system->draw();
+    }
 }
 
 void RendererPasses::render_pass_lighting()

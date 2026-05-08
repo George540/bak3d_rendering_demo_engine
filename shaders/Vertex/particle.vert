@@ -1,9 +1,9 @@
 #version 450 core
 
-// Particle quad vertex attributes
+// Shared quad vertex (pos.xy, uv.xy)
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
-// Particle instance attributes
+// Per-instance data (divisor = 1)
 layout (location = 1) in vec3 instancePosition;
 layout (location = 2) in float instanceRotation;
 layout (location = 3) in vec4 instanceColor;
@@ -16,6 +16,18 @@ out vec4 ParticleColor;
 
 void main()
 {
+    // Discard dead particles on GPU side (alpha == 0 after clip)
+    // We still emit the vertex; the fragment shader discards via alpha.
+    // Alternatively clip here for early-out:
+    if (instanceColor.a <= 0.0)
+    {
+        // Push outside clip space, effectively culls the instance
+        gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+        ParticleColor = vec4(0.0);
+        TexCoords = vec2(0.0);
+        return;
+    }
+
     // Apply billboarding to instance quad
     vec3 worldPosition = apply_billboarding(
         instancePosition,

@@ -9,5 +9,13 @@ uniform sampler2D sprite;
 
 void main()
 {
-    color = (texture(sprite, TexCoords) * ParticleColor);
+    vec4 tex_color = texture(sprite, TexCoords);
+
+    // Discard fully transparent fragments (also catches GPU-culled instances)
+    if (tex_color.a * ParticleColor.a < 0.01)
+    {
+        discard;
+    }
+
+    color = tex_color * ParticleColor;
 }

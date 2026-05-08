@@ -66,14 +66,14 @@ void RenderableObject::draw() const
 	apply_material();
 }
 
-InstancedObject::InstancedObject(const MaterialRef& material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
+InstancedRenderableObject::InstancedRenderableObject(const MaterialRef& material, const std::string& name) : RenderableObject(material, glm::vec3(0.0f, 0.0f, 0.0f), name), m_ibo(nullptr) {}
 
-InstancedObject::~InstancedObject()
+InstancedRenderableObject::~InstancedRenderableObject()
 {
 	delete m_ibo;
 }
 
-void InstancedObject::draw() const
+void InstancedRenderableObject::draw() const
 {
 	Camera* scene_camera = Scene::instance->get_camera();
 	if (!m_material_slot || !*m_material_slot || !scene_camera) return;

@@ -24,50 +24,37 @@ THE SOFTWARE.
 
 #pragma once
 
-#include "Asset/model.h"
-#include "Core/global_definitions.h"
-#include "Objects/axis.h"
-#include "Objects/camera.h"
-#include "Objects/grid.h"
-#include "Objects/light.h"
-#include "Objects/Particle/particle_system.h"
+#include "particle_emitter.h"
+#include "Scene/Objects/renderable_object.h"
 
 /*
- * This is the class that contains all the scene's data, such as references to cameras, lights, models, grids, etc.
- * Runs in the main loop of the project and is only one singleton instance (at the moment).
+ * Handles all emitters and their particle data from an entire single renderable scene object.
+ * Owns all the emitters and all buffer objects to upload data to the GPU from a single entry point.
  */
-class Scene
+class ParticleSystem : public RenderableObject
 {
 public:
-	Scene();
-	~Scene();
+    explicit ParticleSystem(const std::string& name = "ParticleSystem");
+    ~ParticleSystem() override;
 
-	static Scene* get_instance()
-	{
-		static Scene* instance;
-		return instance;
-	}
+    void update(float dt) override;
+    void draw() const override;
 
-	void update(float dt) const;
+    ParticleEmitter* add_emitter(const std::string& name, const ParticleEmitterConfig& cfg = {});
+    void remove_emitter(const std::string& name);
+    ParticleEmitter* get_emitter(const std::string& name) const;
+    const std::vector<std::unique_ptr<ParticleEmitter>>& get_emitters() const { return m_emitters; }
 
-	Camera* get_camera() const { return m_camera; }
-	Light* get_active_light() const { return m_light; }
-
-	RenderableObject* get_object_in_scene(SceneObjectType object_type) const { return m_scene_objects.at(object_type); }
-
-	Model* get_model() const { return m_model; }
-	void set_model(Model* model) { m_model = model; }
-
-	ParticleSystem* get_particle_system() const { return m_particle_system; }
-	void set_particle_system(ParticleSystem* model) { m_particle_system = model; }
-
-	static Scene* instance;
 private:
-	std::unordered_map<SceneObjectType, RenderableObject*> m_scene_objects;
-	ParticleSystem* m_particle_system;
-	Camera* m_camera;
-	Model* m_model; // Asset, not an Object
-	Light* m_light;
-	Grid* m_grid;
-	Axis* m_axis;
+    void ensure_ibo_capacity(const ParticleEmitter& emitter);
+
+    // Per-emitter IBO map: emitter name → IBO
+    struct EmitterGPUData
+    {
+        std::unique_ptr<InstanceBuffer> ibo;
+        int current_capacity = 0; // in particle count
+    };
+    std::unordered_map<std::string, EmitterGPUData> m_emitter_gpu;
+
+    std::vector<std::unique_ptr<ParticleEmitter>> m_emitters;
 };

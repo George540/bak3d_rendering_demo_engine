@@ -66,13 +66,13 @@ public:
  * Instanced version of the object class, containing an instanced buffer.
  * Used for drawing multiple instances of the same object in the same draw call.
  */
-class InstancedObject : public RenderableObject
+class InstancedRenderableObject : public RenderableObject
 {
 protected:
     InstanceBuffer* m_ibo;
 public:
-    InstancedObject(const MaterialRef& material, const std::string& name);
-    ~InstancedObject() override;
+    InstancedRenderableObject(const MaterialRef& material, const std::string& name);
+    ~InstancedRenderableObject() override;
 
     void draw() const override;
 };
