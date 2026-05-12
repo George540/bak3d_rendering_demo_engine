@@ -59,16 +59,13 @@ void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
 
         constexpr GLsizei stride = sizeof(ParticleInstanceData);
         // location 1: position (vec3)
-        m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+        m_vao->set_attrib_pointer(1, 4, GL_FLOAT, GL_FALSE, stride,
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
-        // location 2: rotation (float)
-        m_vao->set_attrib_pointer(2, 1, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, rotation)), 1);
-        // location 3: color (vec4)
-        m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, stride,
+        // location 2: color (vec4)
+        m_vao->set_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, stride,
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
-        // location 4: scale (float)
-        m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, stride,
+        // location 3: scale (float)
+        m_vao->set_attrib_pointer(3, 1, GL_FLOAT, GL_FALSE, stride,
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
 
         m_vao->unbind_object();

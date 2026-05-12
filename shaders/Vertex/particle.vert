@@ -4,10 +4,9 @@
 layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>
 
 // Per-instance data (divisor = 1)
-layout (location = 1) in vec3 instancePosition;
-layout (location = 2) in float instanceRotation;
-layout (location = 3) in vec4 instanceColor;
-layout (location = 4) in float instanceScale;
+layout (location = 1) in vec4 instancePosition; // <vec3 position, float rotation>
+layout (location = 2) in vec4 instanceColor;
+layout (location = 3) in float instanceScale;
 
 out vec2 TexCoords;
 out vec4 ParticleColor;
@@ -30,9 +29,9 @@ void main()
 
     // Apply billboarding to instance quad
     vec3 worldPosition = apply_billboarding(
-        instancePosition,
+        instancePosition.xyz,
         vertex.xy,
-        instanceRotation,
+        instancePosition.w,
         instanceScale,
         camera_data.view
     );

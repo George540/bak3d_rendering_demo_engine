@@ -128,10 +128,9 @@ void ParticleEmitter::update(float dt, const glm::vec3& emitter_world_pos)
     // Pack GPU instance data. GPU clips dead particles (alpha == 0)
     for (int i = 0; i < pool_size; ++i)
     {
-        m_instance_data[i].position = {m_position_x[i], m_position_y[i], m_position_z[i]};
+        m_instance_data[i].position = {m_position_x[i], m_position_y[i], m_position_z[i], m_rotation[i]};
         m_instance_data[i].scale = m_scale[i];
         m_instance_data[i].color = {m_color_r[i], m_color_g[i], m_color_b[i], m_color_a[i]};
-        m_instance_data[i].rotation = m_rotation[i];
     }
 }
 

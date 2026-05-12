@@ -33,10 +33,9 @@ THE SOFTWARE.
  */
 struct ParticleInstanceData
 {
-    glm::vec3 position; // world position
-    float     scale;    // uniform scale
+    glm::vec4 position; // world position (vec3) and billboard rotation in degrees (float)
     glm::vec4 color;    // rgba (alpha carries fade)
-    float     rotation; // billboard rotation in degrees
+    float     scale;    // uniform scale
     float     _pad[3];  // std140 alignment
 };
 static_assert(sizeof(ParticleInstanceData) == 48, "ParticleInstanceData size mismatch"); // 3 * sizeof(vec4) = 3 * 16 = 48
