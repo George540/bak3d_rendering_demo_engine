@@ -72,8 +72,6 @@ void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
 
         m_vao->unbind_object();
-
-        B3D_LOG_INFO("ParticleSystem: IBO for emitter '%s' resized to %d particles.", emitter_name.c_str(), needed);
     }
 }
 

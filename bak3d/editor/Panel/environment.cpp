@@ -158,12 +158,7 @@ void Environment::draw_general_settings()
 
         // Toggle background color
         glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
-        float bg_col[4] = {  bg_color_vec4.r,  bg_color_vec4.g,  bg_color_vec4.b, bg_color_vec4.a };
-        ImGuiB3D::PropertyColorPicker("Background Color", bg_col, "Change background color using glClearColor(...)");
-        bg_color_vec4.r = bg_col[0];
-        bg_color_vec4.g = bg_col[1];
-        bg_color_vec4.b = bg_col[2];
-        bg_color_vec4.a = bg_col[3];
+        ImGuiB3D::PropertyColorPicker("Background Color", &bg_color_vec4, "Change background color using glClearColor(...)");
         GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
 
         ImGui::TreePop();
@@ -247,12 +242,7 @@ void Environment::draw_light_settings()
 
                 // Color
                 glm::vec4 light_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::Light_Color);
-                float bg_col[4] = {  light_color.r,  light_color.g,  light_color.b, light_color.a };
-                ImGuiB3D::PropertyColorPicker("Color", bg_col, "Change light's color");
-                light_color.r = bg_col[0];
-                light_color.g = bg_col[1];
-                light_color.b = bg_col[2];
-                light_color.a = bg_col[3];
+                ImGuiB3D::PropertyColorPicker("Color", &light_color, "Change light's color");
                 GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::Light_Color, light_color);
 
                 ImGui::TreePop();
@@ -473,12 +463,7 @@ void Environment::draw_vignette_settings()
         GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
 
         glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
-        float bg_col[4] = {  vignette_color.r,  vignette_color.g,  vignette_color.b, vignette_color.a };
-        ImGuiB3D::PropertyColorPicker("Color", bg_col, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
-        vignette_color.r = bg_col[0];
-        vignette_color.g = bg_col[1];
-        vignette_color.b = bg_col[2];
-        vignette_color.a = bg_col[3];
+        ImGuiB3D::PropertyColorPicker("Color", &vignette_color, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
         GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
 
         ImGuiB3D::SeparatorWithSpacing(1);

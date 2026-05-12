@@ -49,7 +49,7 @@ bool ImGuiB3D::PropertyToggle(const char* label, bool* value, const char* toolti
     return ImGui::Checkbox(label_str.c_str(), value);
 }
 
-bool ImGuiB3D::PropertyColorPicker(const char* label, float* color, const char* tooltip_desc)
+bool ImGuiB3D::PropertyColorPicker(const char* label, glm::vec4* color, const char* tooltip_desc)
 {
     ImGui::TextUnformatted(label);
     if (tooltip_desc && ImGui::IsItemHovered())
@@ -59,7 +59,13 @@ bool ImGuiB3D::PropertyColorPicker(const char* label, float* color, const char* 
     ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
     const auto label_str = "##" + string(label);
-    return ImGui::ColorEdit4(label_str.c_str(), color);
+    float color_channels[4] = { color->r, color->g, color->b, color->a };
+    const bool result = ImGui::ColorEdit4(label_str.c_str(), color_channels);
+    color->r = color_channels[0];
+    color->g = color_channels[1];
+    color->b = color_channels[2];
+    color->a = color_channels[3];
+    return result;
 }
 
 bool ImGuiB3D::PropertyDropdown(const char* label, const std::vector<const char*>& data, int* selected_index, const char* tooltip_desc)
@@ -101,6 +107,58 @@ bool ImGuiB3D::PropertySliderFloat(const char* label, float* value, float v_min,
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
     const auto label_str = "##" + string(label);
     return ImGui::SliderFloat(label_str.c_str(), value, v_min, v_max, format);
+}
+
+bool ImGuiB3D::PropertySliderFloat3(const char* label, glm::vec3* value, float v_min, float v_max, const char* format,
+    const char* tooltip_desc)
+{
+    ImGui::TextUnformatted(label);
+    if (tooltip_desc && ImGui::IsItemHovered())
+    {
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
+    }
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    const auto label_str = "##" + string(label);
+    float float_3[3] = {  value->r,  value->g,  value->b };
+    const bool result = ImGui::SliderFloat3(label_str.c_str(), float_3, v_min, v_max, format);
+    value->r = float_3[0];
+    value->g = float_3[1];
+    value->b = float_3[2];
+    return result;
+}
+
+bool ImGuiB3D::PropertySliderFloat4(const char* label, glm::vec4* value, float v_min, float v_max, const char* format,
+    const char* tooltip_desc)
+{
+    ImGui::TextUnformatted(label);
+    if (tooltip_desc && ImGui::IsItemHovered())
+    {
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
+    }
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    const auto label_str = "##" + string(label);
+    float float_4[4] = {  value->r,  value->g,  value->b, value->a };
+    const bool result = ImGui::SliderFloat4(label_str.c_str(), float_4, v_min, v_max, format);
+    value->r = float_4[0];
+    value->g = float_4[1];
+    value->b = float_4[2];
+    value->a = float_4[4];
+    return result;
+}
+
+bool ImGuiB3D::PropertySliderInt(const char* label, int* value, int v_min, int v_max, const char* tooltip_desc)
+{
+    ImGui::TextUnformatted(label);
+    if (tooltip_desc && ImGui::IsItemHovered())
+    {
+        ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
+    }
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    const auto label_str = "##" + string(label);
+    return ImGui::SliderInt(label_str.c_str(), value, v_min, v_max);
 }
 
 bool ImGuiB3D::PropertyButton(const char* property_label, const char* button_label, const char* tooltip_desc, const ImVec2 size)

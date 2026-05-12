@@ -71,6 +71,7 @@ void Bak3DEditor::initialize()
     ImGuiIO& io = ImGui::GetIO();
     io.IniFilename = "editor_config.ini";
     io.ConfigWindowsResizeFromEdges = true;
+    io.ConfigDragClickToInputText = true;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard
                    | ImGuiConfigFlags_DockingEnable
                    | ImGuiConfigFlags_ViewportsEnable
