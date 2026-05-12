@@ -94,7 +94,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |:ballot_box_with_check:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
 |:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
 |:ballot_box_with_check:| **Light Types** | More light types to add such as spot, point and directional (maybe even area). For now, just make the single light in the scene to change type. |
-|:gear:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
+|:ballot_box_with_check:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
 |:ballot_box_with_check:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
 |:ballot_box_with_check:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
