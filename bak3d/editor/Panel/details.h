@@ -25,6 +25,7 @@ THE SOFTWARE.
 #pragma once
 
 #include "editor_panel.h"
+#include "Scene/Objects/Particle/particle_emitter.h"
 
 /*
  *  Panel view for object properties.
@@ -41,4 +42,5 @@ private:
     void draw_object_section();
     void draw_model_section();
     void draw_particle_system_section();
+    void draw_particle_emitter_section(ParticleEmitter& emitter);
 };

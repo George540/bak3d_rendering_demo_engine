@@ -63,7 +63,7 @@ void RendererPasses::render_pass_lighting()
     }
 }
 
-void RendererPasses::render_post_processing()
+void RendererPasses::render_pass_post_processing()
 {
     if (GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled))
     {

@@ -194,5 +194,39 @@ void Details::draw_model_section()
 
 void Details::draw_particle_system_section()
 {
-    
+    if (ParticleSystem* particle_system = Scene::instance->get_particle_system())
+    {
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Emitters"))
+        {
+            for (auto& emitter : particle_system->get_emitters())
+            {
+                draw_particle_emitter_section(*emitter);
+            }
+            
+            ImGui::TreePop();
+        }
+    }
+    else
+    {
+        ImGui::TextUnformatted("No particle system object exists.");
+    }
+}
+
+void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Data"))
+    {
+        ImGui::Text("Max Particles: %d", emitter.get_max_particles());
+        ImGui::Text("Alive Particles: %d", emitter.get_alive_count());
+        ImGui::Text("Dead Particles: %d", (emitter.get_max_particles() - emitter.get_alive_count()));
+
+        const ImTextureID texture_id = emitter.get_texture()->get_texture_id();
+        ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f));
+
+        ImGui::Text("P1 Position: {%.2f, %.2f, %.2f}", emitter.get_instance_data()[0].position.x, emitter.get_instance_data()[0].position.y, emitter.get_instance_data()[0].position.z);
+            
+        ImGui::TreePop();
+    }
 }

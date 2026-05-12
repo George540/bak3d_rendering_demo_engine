@@ -121,7 +121,7 @@ void Renderer::draw_frame()
 		r_fbo->unbind_object();
 	}
 
-	RendererPasses::render_post_processing();
+	RendererPasses::render_pass_post_processing();
 }
 
 void Renderer::end_frame()

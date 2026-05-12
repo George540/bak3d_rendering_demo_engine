@@ -50,8 +50,8 @@ struct ParticleEmitterConfig
     std::string texture_name = "particle_default.png";
 
     // Emission
-    int max_particles = 200; // pool size; resize triggers IBO rebuild
-    float emission_rate = 30.0f; // particles per second
+    int max_particles = 50; // pool size; resize triggers IBO rebuild
+    float emission_rate = 2.0f; // particles per second
 
     // Lifetime
     float lifetime = 2.0f;
@@ -64,7 +64,7 @@ struct ParticleEmitterConfig
     glm::vec3 velocity_rand_offset = {0.5f, 0.5f, 0.5f};
 
     // Scale
-    float scale = 0.3f;
+    float scale = 1.0f;
     bool randomize_scale = false;
     float scale_rand_offset = 0.1f;
 
@@ -77,6 +77,6 @@ struct ParticleEmitterConfig
     bool randomize_color = false;
 
     // Behaviour
-    bool fade_with_lifetime = true; // alpha = remaining_life / max_life
+    bool fade_with_lifetime = false; // alpha = remaining_life / max_life
     float spawn_range = 1.0f; // XZ radius for spawn scatter
 };

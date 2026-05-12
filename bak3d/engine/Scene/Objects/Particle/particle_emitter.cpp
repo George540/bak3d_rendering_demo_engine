@@ -174,10 +174,13 @@ void ParticleEmitter::resize_pool(int new_max)
     m_current_lifetime.resize(new_max, 0.f);
     m_max_lifetime.resize(new_max, 1.f);
 
-    m_scale.resize(new_max, 0.f);
+    m_scale.resize(new_max, 1.f);
     m_rotation.resize(new_max, 0.f);
 
     m_instance_data.resize(new_max);
+
+    m_dead_indices.clear();
+    m_dead_indices.reserve(new_max);
 
     // Rebuild dead index stack:
     //     Keep existing dead indices that are still in range, then add new slots.

@@ -61,15 +61,15 @@ void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
         // location 1: position (vec3)
         m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, stride,
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
-        // location 2: scale (float)
+        // location 2: rotation (float)
         m_vao->set_attrib_pointer(2, 1, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
+            reinterpret_cast<void*>(offsetof(ParticleInstanceData, rotation)), 1);
         // location 3: color (vec4)
         m_vao->set_attrib_pointer(3, 4, GL_FLOAT, GL_FALSE, stride,
             reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
-        // location 4: rotation (float)
+        // location 4: scale (float)
         m_vao->set_attrib_pointer(4, 1, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, rotation)), 1);
+            reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
 
         m_vao->unbind_object();
 
@@ -104,7 +104,6 @@ void ParticleSystem::update(const float dt)
 
 void ParticleSystem::draw() const
 {
-    
     if (!m_visible)
     {
         return;
@@ -115,6 +114,7 @@ void ParticleSystem::draw() const
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
 
+    (*m_material_slot)->set_int("sprite", 0);
     RenderableObject::draw();
 
     m_vao->bind_object();
@@ -150,6 +150,8 @@ void ParticleSystem::draw() const
 
     m_vao->unbind_object();
 
+    (*m_material_slot)->get_shader()->unuse();
+
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
@@ -169,7 +171,7 @@ ParticleEmitter* ParticleSystem::add_emitter(const string& name, const ParticleE
 
     auto emitter = make_unique<ParticleEmitter>(name, cfg);
     ParticleEmitter* raw = emitter.get();
-    m_emitters.push_back(std::move(emitter));
+    m_emitters.push_back(move(emitter));
 
     // Ensure GPU slot exists immediately
     m_emitter_gpu[name]; // default-constructs EmitterGPUData
