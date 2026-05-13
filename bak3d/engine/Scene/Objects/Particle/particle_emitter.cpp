@@ -49,6 +49,8 @@ ParticleEmitter::ParticleEmitter(const string& name, ParticleEmitterConfig confi
     m_prev_max_particles = m_config.max_particles;
 
     m_texture = ResourceManager::get_texture(m_config.texture_name);
+
+    m_bounds = new BoundingBox();
 }
 
 ParticleEmitter::~ParticleEmitter() = default;
@@ -131,6 +133,16 @@ void ParticleEmitter::update(float dt, const glm::vec3& emitter_world_pos)
         m_instance_data[i].position = {m_position_x[i], m_position_y[i], m_position_z[i], m_rotation[i]};
         m_instance_data[i].scale = m_scale[i];
         m_instance_data[i].color = {m_color_r[i], m_color_g[i], m_color_b[i], m_color_a[i]};
+    }
+
+    update_debug_bounds(dt);
+}
+
+void ParticleEmitter::draw() const
+{
+    if (m_config.bounds_enabled)
+    {
+        m_bounds->draw();
     }
 }
 
@@ -286,4 +298,25 @@ void ParticleEmitter::kill_one_particle(const int index)
     m_color_a[index] = 0.f; // invisible (to be GPU culled)
     m_dead_indices.push_back(index);
     --m_alive_count;
+}
+
+void ParticleEmitter::update_debug_bounds(const float dt)
+{
+    if (m_config.bounds_enabled)
+    {
+        glm::vec3 bounds_scale;
+        if (m_config.randomize_velocity)
+        {
+            m_bounds->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
+            bounds_scale = (glm::vec3(m_config.velocity_rand_offset) * m_config.lifetime) + (m_config.spawn_range * 2.0f);
+        }
+        else
+        {
+            const auto horizontal_scale = m_config.spawn_range * 2.0f;
+            m_bounds->set_position(glm::vec3(0.0f, 0.5f, 0.0f));
+            bounds_scale = (glm::vec3(m_config.velocity) * m_config.lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale);
+        }
+        m_bounds->set_scaling(bounds_scale);
+        m_bounds->update(dt);
+    }
 }

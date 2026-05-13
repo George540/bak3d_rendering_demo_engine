@@ -78,4 +78,7 @@ struct ParticleEmitterConfig
     // Behaviour
     bool fade_with_lifetime = false; // alpha = remaining_life / max_life
     float spawn_range = 1.0f; // XZ radius for spawn scatter
+
+    // Debug
+    bool bounds_enabled = false;
 };

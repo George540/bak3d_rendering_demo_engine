@@ -61,6 +61,9 @@ public:
 	ParticleSystem* get_particle_system() const { return m_particle_system; }
 	void set_particle_system(ParticleSystem* model) { m_particle_system = model; }
 
+	ParticleSystem* spawn_particle_system();
+	void despawn_particle_system();
+
 	static Scene* instance;
 private:
 	std::unordered_map<SceneObjectType, RenderableObject*> m_scene_objects;

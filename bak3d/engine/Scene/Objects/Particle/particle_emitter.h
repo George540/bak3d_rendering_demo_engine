@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "particle_definitions.h"
 #include "Asset/asset_definitions.h"
+#include "Scene/Objects/bounding_box.h"
 
 /*
  * Stores all particle data in a form of Structure of Arrays
@@ -44,6 +45,7 @@ public:
     ParticleEmitter(ParticleEmitter&&) = default;
 
     void update(float dt, const glm::vec3& emitter_world_pos);
+    void draw() const;
 
     // Caller uploads to GPU
     const std::vector<ParticleInstanceData>& get_instance_data() const { return m_instance_data; }
@@ -97,6 +99,9 @@ private:
     void spawn_one_particle(const glm::vec3& emitter_world_pos);
     void kill_one_particle(int index);
 
+    // Debug
+    void update_debug_bounds(float dt);
+
     // State
     std::string m_name;
     ParticleEmitterConfig m_config;
@@ -105,4 +110,6 @@ private:
     bool m_enabled = true;
 
     int m_prev_max_particles = 0; // track config changes
+
+    BoundingBox* m_bounds;
 };

@@ -110,6 +110,7 @@ constexpr auto MAX_BONE_INFLUENCE = 4;
 static constexpr GLsizei FLOAT_SIZE = sizeof(float);
 static constexpr GLsizei VEC3_SIZE = sizeof(glm::vec3);
 static constexpr GLsizei VEC4_SIZE = sizeof(glm::vec4);
+static constexpr GLsizei UVEC4_SIZE = sizeof(glm::uvec4);
 static constexpr GLsizei UINT_SIZE = sizeof(GLuint);
 static constexpr GLsizei INT_SIZE = sizeof(GLint);
 static constexpr GLsizei MAT4_SIZE = sizeof(glm::mat4);

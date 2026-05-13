@@ -32,9 +32,6 @@ ParticleSystem::~ParticleSystem()
 {
     m_emitters.clear();
     m_emitter_gpu.clear();
-    delete m_ebo;
-    delete m_vbo;
-    delete m_vao;
 }
 
 void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
@@ -136,6 +133,8 @@ void ParticleSystem::draw() const
             nullptr,
             emitter->get_max_particles() // GPU clips dead ones via alpha = 0
         );
+
+        emitter->draw();
 
         if (texture)
         {

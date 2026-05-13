@@ -22,44 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 =========================================================================== */
 
-/*#include "bounding_box.h"
+#include "bounding_box.h"
 
+#include "Asset/resource_manager.h"
 #include "Core/global_definitions.h"
+#include "Scene/scene.h"
 
-BoundingBox::BoundingBox(Material* material) : RenderableObject(material)
+BoundingBox::BoundingBox() : RenderableObject(ResourceManager::get_material("grid"), glm::vec3(0.0f), "Bounding Box")
 {
     m_vao->bind_object();
-    m_vbo = new VertexBuffer(sizeof(glm::vec3) * CUBE_VERTICES_WIREFRAME.size(), CUBE_VERTICES_WIREFRAME.data());
+    m_vbo = new VertexBuffer(VEC3_SIZE * CUBE_VERTICES_WIREFRAME.size(), CUBE_VERTICES_WIREFRAME.data());
     m_ebo = new ElementBuffer(sizeof(GLuint) * CUBE_INDICES_WIREFRAME.size(), CUBE_INDICES_WIREFRAME.data());
 
-    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
+    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, VEC3_SIZE, nullptr);
     m_vao->unbind_object();
 }
 
 void BoundingBox::update(float dt)
 {
-    auto particles_info = UserInterface::particle_payload_info;
-    if (particles_info.randomize_velocity)
-    {
-        auto velocity_offset = particles_info.velocity_random_offset;
-        m_scaling = (glm::vec3(velocity_offset) * particles_info.lifetime) + (particles_info.range * 2.0f);
-        RenderableObject::update(dt);
-    }
-    else
-    {
-        auto horizontal_scale = particles_info.range * 2;
-        m_position = glm::vec3(0.0f, 0.5f, 0.0f);
-        m_scaling = (glm::vec3(particles_info.velocity) * particles_info.lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale);
-    }
-
     RenderableObject::update(dt);
 }
 
 void BoundingBox::draw() const
 {
     glDepthFunc(GL_ALWAYS);
-
-    m_material->set_vec3("color", glm::vec3(1.0f));
     
     RenderableObject::draw();
 
@@ -68,5 +54,5 @@ void BoundingBox::draw() const
     m_vao->unbind_object();
 
     glDepthFunc(GL_LESS);
-}*/
+}
 

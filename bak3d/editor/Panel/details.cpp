@@ -37,13 +37,14 @@ namespace
 {
     constexpr ImVec2 IMAGE_BUTTON_PROPERTY_SIZE = ImVec2(40.0f, 40.0f);
     int object_selection_index = 0;
+    int previous_object_selection_index = -1;
     vector<const char*> m_object_items = { "None", "Model", "Particle System", "Advanced Particles" };
     int model_selection_index = 0;
     vector<const char*> m_model_name_items = { "None" };
-    int render_selection_index = 0;
-    vector<const char*> m_map_selection_items = { "Full Render", "Albedo", "Specular", "Normal" };
+    
 
     Model* m_current_model = nullptr;
+    ParticleSystem* m_current_particle_system = nullptr;
 
     void draw_texture_property_section(const MaterialRef& material, const string& texture_type_name, const aiTextureType texture_type, const string& parameter_name, float& surface_parameter)
     {
@@ -102,6 +103,29 @@ void Details::update()
 
     draw_object_section();
 
+    if (object_selection_index != previous_object_selection_index)
+    {
+        // Tear down whatever was previously active
+        if (previous_object_selection_index == 1)
+        {
+            m_current_model = nullptr;
+            Scene::instance->set_model(nullptr);
+            model_selection_index = 0;
+        }
+        else if (previous_object_selection_index == 2)
+        {
+            m_current_particle_system = nullptr;
+            Scene::instance->despawn_particle_system();
+        }
+
+        if (object_selection_index == 2)
+        {
+            m_current_particle_system = Scene::instance->spawn_particle_system();
+        }
+
+        previous_object_selection_index = object_selection_index;
+    }
+
     if (object_selection_index == 1) // Model
     {
         draw_model_section();
@@ -110,7 +134,7 @@ void Details::update()
     {
         draw_particle_system_section();
     }
-    else if (object_selection_index == 2) // Advanced Particles
+    else if (object_selection_index == 3) // Advanced Particles
     {
         ImGui::TextUnformatted("New GPU Particle system on the way!");
     }
@@ -222,131 +246,130 @@ void Details::draw_particle_system_section()
 
 void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
 {
+    auto& emitter_config = emitter.get_config();
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNodeEx("Metrics", ImGuiTreeNodeFlags_Framed))
+    {
+        ImGui::Text("Max Particles: %d", emitter.get_max_particles());
+        ImGui::Text("Alive Particles: %d", emitter.get_alive_count());
+        ImGui::Text("Dead Particles: %d", (emitter.get_max_particles() - emitter.get_alive_count()));
+        ImGuiB3D::PropertyToggle("Bounds", &emitter_config.bounds_enabled, "Toggle bounds updating and drawing for debugging.");
+        
+        ImGui::TreePop();
+    }
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNodeEx("Properties", ImGuiTreeNodeFlags_Framed))
     {
         ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-        if (ImGui::TreeNodeEx("Metrics", ImGuiTreeNodeFlags_Framed))
+        if (ImGui::TreeNode("Emission"))
         {
-            ImGui::Text("Max Particles: %d", emitter.get_max_particles());
-            ImGui::Text("Alive Particles: %d", emitter.get_alive_count());
-            ImGui::Text("Dead Particles: %d", (emitter.get_max_particles() - emitter.get_alive_count()));
-            
+            // Max Particles
+            ImGuiB3D::PropertySliderInt("Max Particles", &emitter_config.max_particles, emitter.get_config().emission_rate, 10000, "Control the maximum number of particles that can exist in the scene at once.\n"
+                                                                                                                    "The maximum will be reached once emission rate matches the particle's lifetime.");
+            // Emission Rate
+            ImGuiB3D::PropertySliderFloat("Emission Rate", &emitter_config.emission_rate, 0.0f, emitter_config.max_particles, "%.2f", "Control the emission rate of the particle emitter.\n"
+                                                                                                                    "Emission is calculated in particles per second (PPS).");
             ImGui::TreePop();
         }
 
         ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-        if (ImGui::TreeNodeEx("Properties", ImGuiTreeNodeFlags_Framed))
+        if (ImGui::TreeNode("Lifetime"))
         {
-            auto& emitter_config = emitter.get_config();
+            // Lifetime
+            ImGuiB3D::PropertySliderFloat("Lifetime", &emitter_config.lifetime, 0.01f, 100.0f, "%.2f", "Control the particle's lifetime in seconds.");
 
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Emission"))
-            {
-                // Max Particles
-                ImGuiB3D::PropertySliderInt("Max Particles", &emitter_config.max_particles, emitter.get_config().emission_rate, 10000, "Control the maximum number of particles that can exist in the scene at once.\n"
-                                                                                                                        "The maximum will be reached once emission rate matches the particle's lifetime.");
-                // Emission Rate
-                ImGuiB3D::PropertySliderFloat("Emission Rate", &emitter_config.emission_rate, 0.0f, emitter_config.max_particles, "%.2f", "Control the emission rate of the particle emitter.\n"
-                                                                                                                        "Emission is calculated in particles per second (PPS).");
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Lifetime"))
-            {
-                // Lifetime
-                ImGuiB3D::PropertySliderFloat("Lifetime", &emitter_config.lifetime, 0.01f, 100.0f, "%.2f", "Control the particle's lifetime in seconds.");
-
-                // Randomize Lifetime?
-                ImGuiB3D::PropertyToggle("Randomize Lifetime", &emitter_config.randomize_lifetime, "Will particle lifetime be constant or randomized per particle?\n"
-                                                                                                                   "Control lifetime random offset below for more control.");
-                // Lifetime Random Offset
-                ImGui::BeginDisabled(!emitter_config.randomize_lifetime);
-                ImGuiB3D::PropertySliderFloat("Lifetime Random Offset", &emitter_config.lifetime_rand_offset, 0.0f, emitter_config.lifetime, "%.2f", "Control the particle's lifetime random offset when activated.");
-                ImGui::EndDisabled();
-
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Velocity"))
-            {
-                // Velocity
-                ImGuiB3D::PropertySliderFloat3("Velocity", &emitter_config.velocity, 0.0f, 10.0f, "%.2f", "Control the particle's velocity in all directions.");
-
-                // Randomize Velocity? Simulate explosions
-                ImGuiB3D::PropertyToggle("Randomize Velocity", &emitter_config.randomize_velocity, "Will particle velocity be constant or randomized?\n"
-                                                                                                                   "Control velocity random offset below for more control.");
-                // Velocity Random Offset
-                ImGui::BeginDisabled(!emitter_config.randomize_velocity);
-                ImGuiB3D::PropertySliderFloat3("Velocity Random Offset", &emitter_config.velocity_rand_offset, 0.0f, 10.0f, "%.2f", "Control the particle's velocity random offset when activated.");
-                ImGui::EndDisabled();
-
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Scale"))
-            {
-                // Scale
-                ImGuiB3D::PropertySliderFloat("Scale", &emitter_config.scale, 0.01f, 10.0f, "%.2f", "Control the particle's scale.");
-
-                // Randomize Scale?
-                ImGuiB3D::PropertyToggle("Randomize Scale", &emitter_config.randomize_lifetime, "Will particle scale be constant or randomized?\n"
-                                                                                                                   "Control scale random offset below for more control.");
-                // Scale Random Offset
-                ImGui::BeginDisabled(emitter_config.randomize_scale);
-                ImGuiB3D::PropertySliderFloat("Scale Random Offset", &emitter_config.scale_rand_offset, 0.01f, emitter_config.scale, "%.2f", "Control the particle's scale random offset when activated.");
-                ImGui::EndDisabled();
-
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Rotation"))
-            {
-                // Randomize Rotation?
-                ImGuiB3D::PropertyToggle("Randomize Rotation", &emitter_config.randomize_rotation, "Will particle rotation be constant or randomized?\n"
-                                                                                                                   "Rotation is randomized between 0 and 360 euler angle degrees.");
-
-                // Rotation
-                ImGui::BeginDisabled(emitter_config.randomize_rotation);
-                ImGuiB3D::PropertySliderFloat("Rotation", &emitter_config.rotation, 0.0f, 360.0f, "%.2f", "Control the particle's rotation.");
-                ImGui::EndDisabled();
-
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Color"))
-            {
-                // Randomize Color?
-                ImGuiB3D::PropertyToggle("Randomize Color", &emitter_config.randomize_color, "Will particle color be constant or randomized?\n"
-                                                                                                                   "Control scale random offset below for more control.");
-                // Color
-                ImGui::BeginDisabled(emitter_config.randomize_color);
-                ImGuiB3D::PropertyColorPicker("Color", &emitter_config.color, "Control particle color in normalized RGBA channel.");
-                ImGui::EndDisabled();
-
-                // Sprite
-                const ImTextureID texture_id = emitter.get_texture()->get_texture_id();
-                ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f));
-
-                ImGui::TreePop();
-            }
-
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode("Behaviour"))
-            {
-                // Fade with lifetime?
-                ImGuiB3D::PropertyToggle("Fade with Lifetime", &emitter_config.fade_with_lifetime, "Will particle fade with lifetime?\nIf yes, particle will be discarded once opacity reaches zero.");
-
-                // Spawn Range within bounding volume
-                ImGuiB3D::PropertySliderFloat("Spawn Range", &emitter_config.spawn_range, 0.0f, 10.0f, "%.2f", "Control the spawning range within the particle system's bounding volume.");
-
-                ImGui::TreePop();
-            }
+            // Randomize Lifetime?
+            ImGuiB3D::PropertyToggle("Randomize Lifetime", &emitter_config.randomize_lifetime, "Will particle lifetime be constant or randomized per particle?\n"
+                                                                                                               "Control lifetime random offset below for more control.");
+            // Lifetime Random Offset
+            ImGui::BeginDisabled(!emitter_config.randomize_lifetime);
+            ImGuiB3D::PropertySliderFloat("Lifetime Random Offset", &emitter_config.lifetime_rand_offset, 0.0f, emitter_config.lifetime, "%.2f", "Control the particle's lifetime random offset when activated.");
+            ImGui::EndDisabled();
 
             ImGui::TreePop();
         }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Velocity"))
+        {
+            // Velocity
+            ImGuiB3D::PropertySliderFloat3("Velocity", &emitter_config.velocity, 0.0f, 10.0f, "%.2f", "Control the particle's velocity in all directions.");
+
+            // Randomize Velocity? Simulate explosions
+            ImGuiB3D::PropertyToggle("Randomize Velocity", &emitter_config.randomize_velocity, "Will particle velocity be constant or randomized?\n"
+                                                                                                               "Control velocity random offset below for more control.");
+            // Velocity Random Offset
+            ImGui::BeginDisabled(!emitter_config.randomize_velocity);
+            ImGuiB3D::PropertySliderFloat3("Velocity Random Offset", &emitter_config.velocity_rand_offset, 0.0f, 10.0f, "%.2f", "Control the particle's velocity random offset when activated.");
+            ImGui::EndDisabled();
+
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Scale"))
+        {
+            // Scale
+            ImGuiB3D::PropertySliderFloat("Scale", &emitter_config.scale, 0.01f, 10.0f, "%.2f", "Control the particle's scale.");
+
+            // Randomize Scale?
+            ImGuiB3D::PropertyToggle("Randomize Scale", &emitter_config.randomize_lifetime, "Will particle scale be constant or randomized?\n"
+                                                                                                               "Control scale random offset below for more control.");
+            // Scale Random Offset
+            ImGui::BeginDisabled(emitter_config.randomize_scale);
+            ImGuiB3D::PropertySliderFloat("Scale Random Offset", &emitter_config.scale_rand_offset, 0.01f, emitter_config.scale, "%.2f", "Control the particle's scale random offset when activated.");
+            ImGui::EndDisabled();
+
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Rotation"))
+        {
+            // Randomize Rotation?
+            ImGuiB3D::PropertyToggle("Randomize Rotation", &emitter_config.randomize_rotation, "Will particle rotation be constant or randomized?\n"
+                                                                                                               "Rotation is randomized between 0 and 360 euler angle degrees.");
+
+            // Rotation
+            ImGui::BeginDisabled(emitter_config.randomize_rotation);
+            ImGuiB3D::PropertySliderFloat("Rotation", &emitter_config.rotation, 0.0f, 360.0f, "%.2f", "Control the particle's rotation.");
+            ImGui::EndDisabled();
+
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Color"))
+        {
+            // Randomize Color?
+            ImGuiB3D::PropertyToggle("Randomize Color", &emitter_config.randomize_color, "Will particle color be constant or randomized?\n"
+                                                                                                               "Control scale random offset below for more control.");
+            // Color
+            ImGui::BeginDisabled(emitter_config.randomize_color);
+            ImGuiB3D::PropertyColorPicker("Color", &emitter_config.color, "Control particle color in normalized RGBA channel.");
+            ImGui::EndDisabled();
+
+            // Sprite
+            const ImTextureID texture_id = emitter.get_texture()->get_texture_id();
+            ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f));
+
+            ImGui::TreePop();
+        }
+
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Behaviour"))
+        {
+            // Fade with lifetime?
+            ImGuiB3D::PropertyToggle("Fade with Lifetime", &emitter_config.fade_with_lifetime, "Will particle fade with lifetime?\nIf yes, particle will be discarded once opacity reaches zero.");
+
+            // Spawn Range within bounding volume
+            ImGuiB3D::PropertySliderFloat("Spawn Range", &emitter_config.spawn_range, 0.0f, 10.0f, "%.2f", "Control the spawning range within the particle system's bounding volume.");
+
+            ImGui::TreePop();
+        }
+
+        ImGui::TreePop();
     }
 }

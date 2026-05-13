@@ -65,11 +65,11 @@ Grid::Grid(MaterialRef material)
 		}
 	}
 
-	m_vbo = new VertexBuffer(sizeof(glm::vec3) * vertices.size(), &vertices[0]);
-	m_ebo = new ElementBuffer(sizeof(glm::uvec4) * indices.size(), &indices[0]);
+	m_vbo = new VertexBuffer(VEC3_SIZE * vertices.size(), &vertices[0]);
+	m_ebo = new ElementBuffer(UVEC4_SIZE * indices.size(), &indices[0]);
 
 	m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)sizeof(glm::vec3));
+	m_vao->set_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, 2 * VEC3_SIZE, (void*)VEC3_SIZE);
 	m_vao->unbind_object();
 
 	m_number_of_elements = static_cast<GLuint>(indices.size()) * 4;
@@ -82,8 +82,6 @@ void Grid::draw() const
 	glDepthFunc(GL_ALWAYS);
 	
 	RenderableObject::draw();
-
-	//m_material->set_vec3("color", glm::vec3(0.5f));
 
 	m_vao->bind_object();
 	glDrawElements(GL_LINES, m_number_of_elements, GL_UNSIGNED_INT, nullptr);
