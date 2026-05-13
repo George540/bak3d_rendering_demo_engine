@@ -313,7 +313,7 @@ void ParticleEmitter::update_debug_bounds(const float dt)
         else
         {
             const auto horizontal_scale = m_config.spawn_range * 2.0f;
-            m_bounds->set_position(glm::vec3(0.0f, 0.5f, 0.0f));
+            m_bounds->set_position(glm::vec3(0.0f, 1.0f, 0.0f));
             bounds_scale = (glm::vec3(m_config.velocity) * m_config.lifetime) + glm::vec3(horizontal_scale, 0.0f, horizontal_scale);
         }
         m_bounds->set_scaling(bounds_scale);

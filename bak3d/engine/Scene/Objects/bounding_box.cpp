@@ -46,7 +46,8 @@ void BoundingBox::update(float dt)
 void BoundingBox::draw() const
 {
     glDepthFunc(GL_ALWAYS);
-    
+
+    (*m_material_slot)->set_vec4("color", glm::vec4(1.0f));
     RenderableObject::draw();
 
     m_vao->bind_object();
