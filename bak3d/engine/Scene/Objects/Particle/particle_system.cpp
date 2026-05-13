@@ -12,15 +12,8 @@ ParticleSystem::ParticleSystem(const string& name)
                         name)
 {
     // Build shared quad geometry (unit quad in 0..1 range, shader centres it)
-    m_vao = new VertexArray();
-    m_vao->bind_object();
-
     m_vbo = new VertexBuffer(static_cast<GLsizei>(QUAD_VERTICES.size()) * VEC4_SIZE, QUAD_VERTICES.data());
     m_ebo = new ElementBuffer(static_cast<GLsizei>(QUAD_INDICES.size()) * UINT_SIZE, QUAD_INDICES.data());
-
-    // Attribute 0: quad vertex (vec4: xy=pos, zw=uv)
-    m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
-    m_vao->unbind_object();
 
     // Add one emitter by default
     add_emitter();
@@ -40,12 +33,39 @@ void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
     const int needed = emitter.get_max_particles();
     auto& gpu_data = m_emitter_gpu[emitter_name];
 
-    if (gpu_data.current_capacity < needed)
+    if (gpu_data.current_capacity >= needed)
     {
-        const GLsizei byte_size = static_cast<GLsizei>(sizeof(ParticleInstanceData)) * needed;
-        gpu_data.ibo = make_unique<InstanceBuffer>(byte_size, nullptr, GL_DYNAMIC_DRAW);
-        gpu_data.current_capacity = needed;
+        return;
     }
+
+    const GLsizei byte_size = static_cast<GLsizei>(sizeof(ParticleInstanceData)) * needed;
+
+    // Allocate new IBO
+    gpu_data.ibo = std::make_unique<InstanceBuffer>(byte_size, nullptr, GL_DYNAMIC_DRAW);
+    gpu_data.current_capacity = needed;
+
+    // (Re)build VAO — fully configure it once here, never again until next resize
+    gpu_data.vao = std::make_unique<VertexArray>();
+    gpu_data.vao->bind_object();
+
+    // Attribute 0: quad vertex from the shared VBO
+    // VBO must be bound when glVertexAttribPointer is called so VAO records it
+    m_vbo->bind_object();
+    gpu_data.vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
+
+    // Attributes 1-4: per-instance data from this emitter's IBO
+    gpu_data.ibo->bind_object();
+    constexpr GLsizei stride = sizeof(ParticleInstanceData);
+    gpu_data.vao->set_attrib_pointer(1, 4, GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
+    gpu_data.vao->set_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
+    gpu_data.vao->set_attrib_pointer(3, 1, GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
+
+    m_ebo->bind_object();
+    m_vbo->unbind_object();
+    gpu_data.vao->unbind_object();
 }
 
 bool ParticleSystem::emitter_name_exists(const std::string& name) const
@@ -101,47 +121,23 @@ void ParticleSystem::draw() const
         }
 
         auto it = m_emitter_gpu.find(emitter->get_name());
-        if (it == m_emitter_gpu.end() || !it->second.ibo)
+        if (it == m_emitter_gpu.end() || !it->second.ibo || !it->second.vao)
         {
             continue;
         }
 
-        // Bind VAO and re-declare instanced attributes (must be done each time the IBO is recreated)
-        m_vao->bind_object();
-        m_vbo->bind_object();
-        
-        m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
+        // Single bind — all attribute state already recorded in this VAO
+        it->second.vao->bind_object();
 
-        // Re-declare instanced attributes from this emitter's IBO.
-        it->second.ibo->bind_object();
-        constexpr GLsizei stride = sizeof(ParticleInstanceData);
-        // location 1: position (vec3)
-        m_vao->set_attrib_pointer(1, 4, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
-        // location 2: color (vec4)
-        m_vao->set_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
-        // location 3: scale (float)
-        m_vao->set_attrib_pointer(3, 1, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
-
-        m_vbo->unbind_object();
-        m_ebo->bind_object();
-
-        // Bind texture
         const TextureRef& texture = emitter->get_texture();
-        if (texture)
-        {
-            texture->bind(0);
-        }
+        if (texture) texture->bind(0);
 
-        // Draw instanced
         glDrawElementsInstanced(
             GL_TRIANGLES,
             static_cast<GLsizei>(QUAD_INDICES.size()),
             GL_UNSIGNED_INT,
             nullptr,
-            emitter->get_max_particles() // GPU clips dead ones via alpha = 0
+            emitter->get_max_particles() // GPU clips dead particles via alpha = 0
         );
 
         emitter->draw();
@@ -151,7 +147,7 @@ void ParticleSystem::draw() const
             Texture2D::unbind();
         }
 
-        m_vao->unbind_object();
+        it->second.vao->unbind_object();
     }
 
     (*m_material_slot)->get_shader()->unuse();

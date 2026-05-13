@@ -54,6 +54,7 @@ private:
     struct EmitterGPUData
     {
         std::unique_ptr<InstanceBuffer> ibo;
+        std::unique_ptr<VertexArray> vao;
         int current_capacity = 0; // in particle count
     };
     std::unordered_map<std::string, EmitterGPUData> m_emitter_gpu;

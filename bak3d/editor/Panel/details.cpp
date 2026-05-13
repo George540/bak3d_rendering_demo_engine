@@ -218,26 +218,26 @@ void Details::draw_model_section()
 
 void Details::draw_particle_system_section()
 {
-    if (ParticleSystem* particle_system = Scene::instance->get_particle_system())
+    if (m_current_particle_system)
     {
-        int emitters_num = particle_system->get_emitters().size();
+        int emitters_num = m_current_particle_system->get_emitters().size();
         ImGui::Text("Emitters (%d)", emitters_num);
 
         ImGui::SameLine();
 
         if (ImGui::Button("+", ImVec2(40, 0)))
         {
-            particle_system->add_emitter();
+            m_current_particle_system->add_emitter();
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("-", ImVec2(40, 0)))
         {
-            particle_system->remove_last_emitter();
+            m_current_particle_system->remove_last_emitter();
         }
 
-        for (auto& emitter : particle_system->get_emitters())
+        for (auto& emitter : m_current_particle_system->get_emitters())
         {
             const string emitter_sub_label = emitter.get()->get_name();
             ImGui::SetNextItemOpen(true, ImGuiCond_Once);
