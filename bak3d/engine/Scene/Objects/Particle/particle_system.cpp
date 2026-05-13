@@ -23,7 +23,7 @@ ParticleSystem::ParticleSystem(const string& name)
     m_vao->unbind_object();
 
     // Add one emitter by default
-    add_emitter("Emitter_1");
+    add_emitter();
 
     B3D_LOG_INFO("Particle System '%s' created.", name.c_str());
 }
@@ -42,31 +42,15 @@ void ParticleSystem::ensure_ibo_capacity(const ParticleEmitter& emitter)
 
     if (gpu_data.current_capacity < needed)
     {
-        // Rebuild IBO with new size
-        // Layout matches ParticleInstanceData
         const GLsizei byte_size = static_cast<GLsizei>(sizeof(ParticleInstanceData)) * needed;
-
         gpu_data.ibo = make_unique<InstanceBuffer>(byte_size, nullptr, GL_DYNAMIC_DRAW);
         gpu_data.current_capacity = needed;
-
-        // Bind VAO and re-declare instanced attributes
-        // (must be done each time the IBO is recreated)
-        m_vao->bind_object();
-        gpu_data.ibo->bind_object();
-
-        constexpr GLsizei stride = sizeof(ParticleInstanceData);
-        // location 1: position (vec3)
-        m_vao->set_attrib_pointer(1, 4, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
-        // location 2: color (vec4)
-        m_vao->set_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
-        // location 3: scale (float)
-        m_vao->set_attrib_pointer(3, 1, GL_FLOAT, GL_FALSE, stride,
-            reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
-
-        m_vao->unbind_object();
     }
+}
+
+bool ParticleSystem::emitter_name_exists(const std::string& name) const
+{
+    return ranges::any_of(m_emitters, [&name](const unique_ptr<ParticleEmitter>& e){ return e->get_name() == name; });
 }
 
 void ParticleSystem::update(const float dt)
@@ -109,14 +93,40 @@ void ParticleSystem::draw() const
     (*m_material_slot)->set_int("sprite", 0);
     RenderableObject::draw();
 
-    m_vao->bind_object();
-
     for (const auto& emitter : m_emitters)
     {
         if (!emitter->is_enabled() || emitter->get_alive_count() == 0)
         {
             continue;
         }
+
+        auto it = m_emitter_gpu.find(emitter->get_name());
+        if (it == m_emitter_gpu.end() || !it->second.ibo)
+        {
+            continue;
+        }
+
+        // Bind VAO and re-declare instanced attributes (must be done each time the IBO is recreated)
+        m_vao->bind_object();
+        m_vbo->bind_object();
+        
+        m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
+
+        // Re-declare instanced attributes from this emitter's IBO.
+        it->second.ibo->bind_object();
+        constexpr GLsizei stride = sizeof(ParticleInstanceData);
+        // location 1: position (vec3)
+        m_vao->set_attrib_pointer(1, 4, GL_FLOAT, GL_FALSE, stride,
+            reinterpret_cast<void*>(offsetof(ParticleInstanceData, position)), 1);
+        // location 2: color (vec4)
+        m_vao->set_attrib_pointer(2, 4, GL_FLOAT, GL_FALSE, stride,
+            reinterpret_cast<void*>(offsetof(ParticleInstanceData, color)), 1);
+        // location 3: scale (float)
+        m_vao->set_attrib_pointer(3, 1, GL_FLOAT, GL_FALSE, stride,
+            reinterpret_cast<void*>(offsetof(ParticleInstanceData, scale)), 1);
+
+        m_vbo->unbind_object();
+        m_ebo->bind_object();
 
         // Bind texture
         const TextureRef& texture = emitter->get_texture();
@@ -140,9 +150,9 @@ void ParticleSystem::draw() const
         {
             Texture2D::unbind();
         }
-    }
 
-    m_vao->unbind_object();
+        m_vao->unbind_object();
+    }
 
     (*m_material_slot)->get_shader()->unuse();
 
@@ -154,25 +164,30 @@ void ParticleSystem::draw() const
 ParticleEmitter* ParticleSystem::add_emitter(const string& name, const ParticleEmitterConfig& cfg)
 {
     // Guard against duplicate names
-    for (const auto& emitter : m_emitters)
+    string unique_name = name;
+    if (emitter_name_exists(unique_name))
     {
-        if (emitter->get_name() == name)
+        int suffix = 1;
+        do
         {
-            B3D_LOG_WARNING("ParticleSystem: emitter '%s' already exists.", name.c_str());
-            return emitter.get();
+            unique_name = name + "_" + to_string(suffix);
+            ++suffix;
         }
+        while (emitter_name_exists(unique_name));
+
+        B3D_LOG_INFO("ParticleSystem: emitter name '%s' already exists, renamed to '%s'.", name.c_str(), unique_name.c_str());
     }
 
-    auto emitter = make_unique<ParticleEmitter>(name, cfg);
+    auto emitter = make_unique<ParticleEmitter>(unique_name, cfg);
     ParticleEmitter* raw = emitter.get();
-    m_emitters.push_back(move(emitter));
+    m_emitters.push_back(std::move(emitter));
 
     // Ensure GPU slot exists immediately
-    m_emitter_gpu[name]; // default-constructs EmitterGPUData
+    m_emitter_gpu[unique_name]; // default-constructs EmitterGPUData
     ensure_ibo_capacity(*raw);
 
-    B3D_LOG_INFO("ParticleSystem: emitter '%s' added (%d max particles).",
-                 name.c_str(), cfg.max_particles);
+    B3D_LOG_INFO("ParticleSystem: emitter '%s' added (%d max particles).", unique_name.c_str(), cfg.max_particles);
+
     return raw;
 }
 
@@ -190,6 +205,21 @@ void ParticleSystem::remove_emitter(const string& name)
     m_emitters.erase(it);
     m_emitter_gpu.erase(name);
     B3D_LOG_INFO("ParticleSystem: emitter '%s' removed.", name.c_str());
+}
+
+void ParticleSystem::remove_last_emitter()
+{
+    if (m_emitters.empty())
+    {
+        B3D_LOG_WARNING("ParticleSystem: no emitters to remove.");
+        return;
+    }
+
+    const std::string name = m_emitters.back()->get_name();
+    m_emitters.pop_back();
+    m_emitter_gpu.erase(name);
+
+    B3D_LOG_INFO("ParticleSystem: last emitter '%s' removed.", name.c_str());
 }
 
 ParticleEmitter* ParticleSystem::get_emitter(const string& name) const

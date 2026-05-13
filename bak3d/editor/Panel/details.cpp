@@ -220,22 +220,35 @@ void Details::draw_particle_system_section()
 {
     if (ParticleSystem* particle_system = Scene::instance->get_particle_system())
     {
-        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-        if (ImGui::TreeNode("Emitters"))
+        int emitters_num = particle_system->get_emitters().size();
+        ImGui::Text("Emitters (%d)", emitters_num);
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("+", ImVec2(40, 0)))
         {
-            for (auto& emitter : particle_system->get_emitters())
+            particle_system->add_emitter();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("-", ImVec2(40, 0)))
+        {
+            particle_system->remove_last_emitter();
+        }
+
+        for (auto& emitter : particle_system->get_emitters())
+        {
+            const string emitter_sub_label = emitter.get()->get_name();
+            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+            if (ImGui::TreeNodeEx(emitter_sub_label.c_str(), ImGuiTreeNodeFlags_Framed))
             {
-                const string emitter_sub_label = emitter.get()->get_name();
-                ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-                if (ImGui::TreeNodeEx(emitter_sub_label.c_str(), ImGuiTreeNodeFlags_Framed))
-                {
-                    draw_particle_emitter_section(*emitter);
-            
-                    ImGui::TreePop();
-                }
+                draw_particle_emitter_section(*emitter);
+
+                ImGui::TreePop();
             }
-            
-            ImGui::TreePop();
+
+            ImGuiB3D::SeparatorWithSpacing();
         }
     }
     else
@@ -278,7 +291,7 @@ void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
         if (ImGui::TreeNode("Lifetime"))
         {
             // Lifetime
-            ImGuiB3D::PropertySliderFloat("Lifetime", &emitter_config.lifetime, 0.01f, 100.0f, "%.2f", "Control the particle's lifetime in seconds.");
+            ImGuiB3D::PropertySliderFloat("Lifetime", &emitter_config.lifetime, 0.01f, 10.0f, "%.2f", "Control the particle's lifetime in seconds.");
 
             // Randomize Lifetime?
             ImGuiB3D::PropertyToggle("Randomize Lifetime", &emitter_config.randomize_lifetime, "Will particle lifetime be constant or randomized per particle?\n"

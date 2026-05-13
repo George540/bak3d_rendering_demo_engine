@@ -36,6 +36,20 @@ constexpr float LABEL_HORIZONTAL_WIDTH_RATIO = 0.5f;
 constexpr float VALUE_HORIZONTAL_WIDTH_RATIO = 0.1f;
 constexpr float VALUE_INNER_PADDING = 5.0f;
 
+namespace
+{
+    float align_to_label_column()
+    {
+        const float total_width  = ImGui::GetContentRegionAvail().x;  // snapshot before cursor moves
+        const float label_col    = total_width * LABEL_HORIZONTAL_WIDTH_RATIO;
+        const float widget_width = total_width - label_col - VALUE_INNER_PADDING;
+
+        ImGui::SameLine(label_col);
+
+        return widget_width;
+    }
+}
+
 bool ImGuiB3D::PropertyToggle(const char* label, bool* value, const char* tooltip_desc)
 {
     ImGui::TextUnformatted(label);
@@ -43,8 +57,7 @@ bool ImGuiB3D::PropertyToggle(const char* label, bool* value, const char* toolti
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     return ImGui::Checkbox(label_str.c_str(), value);
 }
@@ -56,8 +69,7 @@ bool ImGuiB3D::PropertyColorPicker(const char* label, glm::vec4* color, const ch
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     float color_channels[4] = { color->r, color->g, color->b, color->a };
     const bool result = ImGui::ColorEdit4(label_str.c_str(), color_channels);
@@ -75,8 +87,7 @@ bool ImGuiB3D::PropertyDropdown(const char* label, const std::vector<const char*
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     return ImGui::Combo(label_str.c_str(), selected_index, data.data(), static_cast<int>(data.size()));
 }
@@ -88,8 +99,7 @@ bool ImGuiB3D::PropertyBeginDropdown(const char* label, const char* preview_valu
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     return ImGui::BeginCombo(label_str.c_str(), preview_value);
     // NOTE: Make sure you use ImGui::EndCombo() to properly close the widget.
@@ -103,8 +113,7 @@ bool ImGuiB3D::PropertySliderFloat(const char* label, float* value, float v_min,
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     return ImGui::SliderFloat(label_str.c_str(), value, v_min, v_max, format);
 }
@@ -117,8 +126,7 @@ bool ImGuiB3D::PropertySliderFloat3(const char* label, glm::vec3* value, float v
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     float float_3[3] = {  value->r,  value->g,  value->b };
     const bool result = ImGui::SliderFloat3(label_str.c_str(), float_3, v_min, v_max, format);
@@ -136,8 +144,7 @@ bool ImGuiB3D::PropertySliderFloat4(const char* label, glm::vec4* value, float v
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     float float_4[4] = {  value->r,  value->g,  value->b, value->a };
     const bool result = ImGui::SliderFloat4(label_str.c_str(), float_4, v_min, v_max, format);
@@ -155,8 +162,7 @@ bool ImGuiB3D::PropertySliderInt(const char* label, int* value, int v_min, int v
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    ImGui::SetNextItemWidth(align_to_label_column());
     const auto label_str = "##" + string(label);
     return ImGui::SliderInt(label_str.c_str(), value, v_min, v_max);
 }
@@ -168,8 +174,7 @@ bool ImGuiB3D::PropertyButton(const char* property_label, const char* button_lab
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    align_to_label_column();
 
     const char* display_text = button_label ? button_label : property_label;
     char display_text_buffer[128];
@@ -185,8 +190,7 @@ bool ImGuiB3D::PropertyImageButton(const char* label, const char* tooltip_desc, 
     {
         ToolTipExtendedText(tooltip_desc, TOOL_TIP_WIDTH);
     }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * LABEL_HORIZONTAL_WIDTH_RATIO);
-    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * (1.0f - VALUE_HORIZONTAL_WIDTH_RATIO) - VALUE_INNER_PADDING);
+    align_to_label_column();
     const auto label_str = "##" + string(label);
     return ImGui::ImageButton(
             label,
@@ -216,7 +220,7 @@ bool ImGuiB3D::MultiSpacing(int num_spaces)
     return true;
 }
 
-bool ImGuiB3D::SeparatorWithSpacing(const int num_spaces = 1)
+bool ImGuiB3D::SeparatorWithSpacing(const int num_spaces)
 {
     MultiSpacing(num_spaces);
     ImGui::Separator();

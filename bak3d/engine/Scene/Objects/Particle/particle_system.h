@@ -40,13 +40,15 @@ public:
     void update(float dt) override;
     void draw() const override;
 
-    ParticleEmitter* add_emitter(const std::string& name, const ParticleEmitterConfig& cfg = {});
+    ParticleEmitter* add_emitter(const std::string& name = PARTICLE_EMITTER_DEFAULT_NAME, const ParticleEmitterConfig& cfg = {});
     void remove_emitter(const std::string& name);
+    void remove_last_emitter();
     ParticleEmitter* get_emitter(const std::string& name) const;
     const std::vector<std::unique_ptr<ParticleEmitter>>& get_emitters() const { return m_emitters; }
 
 private:
     void ensure_ibo_capacity(const ParticleEmitter& emitter);
+    bool emitter_name_exists(const std::string& name) const;
 
     // Per-emitter IBO map: emitter name → IBO
     struct EmitterGPUData

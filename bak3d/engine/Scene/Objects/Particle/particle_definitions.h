@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+constexpr const char* PARTICLE_EMITTER_DEFAULT_NAME = "Emitter_Instance";
+
 /*
  * Per-instance data packed for GPU upload (tight, GPU-friendly)
  */
