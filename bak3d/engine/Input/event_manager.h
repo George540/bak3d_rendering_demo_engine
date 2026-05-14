@@ -99,6 +99,7 @@ public:
 
 	static void enable_mouse_cursor();
 	static void disable_mouse_cursor();
+	static void toggle_vsync(bool vsync_enabled);
 	static float get_random_float(float min, float max);
 
 	static void on_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);

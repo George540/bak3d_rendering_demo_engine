@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "imgui_b3d_extensions.h"
 #include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
+#include "Input/event_manager.h"
 #include "Input/renderdoc_manager.h"
 #include "Renderer/renderer.h"
 #include "Scene/Objects/light.h"
@@ -72,7 +73,7 @@ void Environment::update()
 {
     EditorPanel::update();
 
-    draw_gpu_tools_settings();
+    draw_tools_settings();
 
     ImGuiB3D::SeparatorWithSpacing(1);
 
@@ -94,22 +95,10 @@ void Environment::end_frame()
     EditorPanel::end_frame();
 }
 
-void Environment::draw_gpu_tools_settings()
+void Environment::draw_tools_settings()
 {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("GPU Tools"))
-    {
-        draw_shaders_settings();
-        draw_renderdoc_settings();
-
-        ImGui::TreePop();
-    }
-}
-
-void Environment::draw_shaders_settings()
-{
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Shaders"))
+    if (ImGui::TreeNode("GPU & Display"))
     {
         // Force Fail
         bool force_fail = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail);
@@ -122,19 +111,18 @@ void Environment::draw_shaders_settings()
             ResourceManager::reload_shaders();
         }
 
-        ImGui::TreePop();
-    }
-}
-
-void Environment::draw_renderdoc_settings()
-{
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("RenderDoc"))
-    {
         // Trigger Capture
         if (ImGuiB3D::PropertyButton("Trigger Capture", "Trigger GPU Capture", "Trigger GPU frame capture if RenderDoc app is available. Make sure it's installed locally first!"))
         {
             RenderDocManager::trigger_capture();
+        }
+
+        // VSync
+        bool vsync = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Vsync);
+        if (ImGuiB3D::PropertyToggle("VSync", &vsync, "Toggle VSync. If enabled, GLFW frame rate synchronizes with display's refresh rate."))
+        {
+            EventManager::toggle_vsync(vsync);
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Vsync, vsync);
         }
 
         ImGui::TreePop();

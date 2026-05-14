@@ -55,6 +55,7 @@ using GlobalSettingValueType = std::variant<
 enum class GlobalSettingOption : uint32_t
 {
     Resources_ForceFail,
+    Vsync,
     GridRendering,
     AxisRendering,
     BackgroundColor,

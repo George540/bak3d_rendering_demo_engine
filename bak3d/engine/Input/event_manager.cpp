@@ -153,6 +153,8 @@ void EventManager::initialize()
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
 
+	toggle_vsync(false);
+
 	// Initial time
 	last_frame_time = glfwGetTime();
 	srand(static_cast<unsigned int>(time(nullptr)));  // NOLINT(cert-msc51-cpp)
@@ -280,6 +282,11 @@ void EventManager::enable_mouse_cursor()
 void EventManager::disable_mouse_cursor()
 {
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void EventManager::toggle_vsync(const bool vsync_enabled)
+{
+	glfwSwapInterval(vsync_enabled ? 1 : 0);
 }
 
 float EventManager::get_random_float(float min, float max)
