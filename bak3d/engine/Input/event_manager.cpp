@@ -70,6 +70,8 @@ GLFWmonitor* EventManager::m_monitor = nullptr;
 const GLFWvidmode* EventManager::m_vid_mode = nullptr;
 int EventManager::m_window_width = 1920; // defaulting to 1920 / 1080 just in case
 int EventManager::m_window_height = 1080;
+int EventManager::m_viewport_width = 1920;
+int EventManager::m_viewport_height = 1080;
 bool EventManager::is_dragging_enabled = false;
 bool EventManager::is_scrolling_enabled = false;
 
@@ -172,11 +174,12 @@ void EventManager::shutdown()
 
 void EventManager::begin_update()
 {
-	// Update inputs / events
+	// Update inputs/events
 	glfwPollEvents();
 
-	// Update mouse positions
+	// Update GLFW components
 	glfwGetCursorPos(m_window, &mouse_pos_x, &mouse_pos_y);
+	glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
 }
 
 void EventManager::update()

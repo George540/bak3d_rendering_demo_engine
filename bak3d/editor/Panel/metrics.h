@@ -40,4 +40,5 @@ public:
 private:
     void update_metrics();
     void update_hardware();
+    void update_viewport();
 };

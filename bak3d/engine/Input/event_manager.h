@@ -43,6 +43,8 @@ class EventManager
 	static const GLFWvidmode* m_vid_mode;
 	static int m_window_width;
 	static int m_window_height;
+	static int m_viewport_width;
+	static int m_viewport_height;
 
 	// Time
 	static double last_frame_time;
@@ -83,6 +85,13 @@ public:
 	const static GLFWvidmode* get_vid_mode();
 	static int get_window_width() { return m_window_width; }
 	static int get_window_height() { return m_window_height; }
+	static float get_window_aspect_ratio() { return static_cast<float>(m_window_width) / static_cast<float>(m_window_height); }
+
+	static int get_viewport_width() { return m_viewport_width; }
+	static void set_viewport_width(const int viewport_width) { m_viewport_width = viewport_width; }
+	static int get_viewport_height() { return m_viewport_height; }
+	static void set_viewport_height(const int viewport_height) { m_viewport_height = viewport_height; }
+	static float get_viewport_aspect_ratio() { return static_cast<float>(m_viewport_width) / static_cast<float>(m_viewport_height); }
 
 	static double get_mouse_motion_x();
 	static double get_mouse_motion_y();

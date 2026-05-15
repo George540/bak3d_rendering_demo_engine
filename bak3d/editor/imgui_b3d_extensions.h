@@ -46,8 +46,9 @@ public:
     
     static bool SeparatorWithSpacing(int num_spaces = 1);
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);
+
+    static bool MultiSpacing(int num_spaces);
 private:
     static bool ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size);
     static bool ToolTipExtendedAsset(const char* tooltip_desc, float text_wrap_size);
-    static bool MultiSpacing(int num_spaces);
 };

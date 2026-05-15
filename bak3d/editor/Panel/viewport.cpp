@@ -11,6 +11,7 @@
 namespace
 {
     ImVec2 previous_viewport_size = ImVec2(0, 0);
+    ImVec2 viewport_panel_size = ImVec2(0, 0);
 }
 
 Viewport::Viewport() : EditorPanel("Viewport")
@@ -27,7 +28,13 @@ void Viewport::update()
 {
     EditorPanel::update();
 
-    ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+    viewport_panel_size = ImGui::GetContentRegionAvail();
+
+    // Guard against zero or near-zero dimensions during resize
+    if (viewport_panel_size.x < 1.0f || viewport_panel_size.y < 1.0f)
+    {
+        return;
+    }
 
     bool post_processing_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
     auto frame_buffer_main = post_processing_enabled ? PostProcessor::get_final_frame_buffer() : Renderer::get_frame_buffer();
@@ -84,6 +91,8 @@ void Viewport::update()
     ImGui::Image(viewport_texture, viewport_panel_size, uv0, uv1);
 
     previous_viewport_size = viewport_panel_size;
+    EventManager::set_viewport_width(viewport_panel_size.x);
+    EventManager::set_viewport_height(viewport_panel_size.y);
 
     bool isHovered = ImGui::IsItemHovered();
 }
@@ -91,4 +100,19 @@ void Viewport::update()
 void Viewport::end_frame()
 {
     EditorPanel::end_frame();
+}
+
+float Viewport::get_viewport_width() const
+{
+    return viewport_panel_size.x;
+}
+
+float Viewport::get_viewport_height() const
+{
+    return viewport_panel_size.y;
+}
+
+float Viewport::get_viewport_aspect_ratio() const
+{
+    return viewport_panel_size.x;
 }

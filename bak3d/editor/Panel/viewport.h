@@ -37,4 +37,8 @@ public:
     void begin_frame() override;
     void update() override;
     void end_frame() override;
+
+    float get_viewport_width() const;
+    float get_viewport_height() const;
+    float get_viewport_aspect_ratio() const;
 };

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <vector>
 
 #include "editor.h"
+#include "imgui_b3d_extensions.h"
 #include "GLFW/glfw3.h"
 #include "Input/event_manager.h"
 
@@ -78,6 +79,7 @@ void Metrics::update()
 
         ImGui::TableNextColumn();
         update_hardware();
+        update_viewport();
 
         ImGui::EndTable();
     }
@@ -165,6 +167,8 @@ void Metrics::update_hardware()
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Hardware"))
     {
+        ImGuiB3D::MultiSpacing(2);
+
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);
         const GLFWvidmode* mode = EventManager::get_vid_mode();
@@ -174,6 +178,26 @@ void Metrics::update_hardware()
         ImGui::Text("Display Resolution: %d x %d", mode->width, mode->height);
         ImGui::Text("Refresh Rate: %d Hz", mode->refreshRate);
         ImGui::Text("Color Depth: R%d G%d B%d", mode->redBits, mode->greenBits, mode->blueBits);
+
+        ImGui::TreePop();
+    }
+
+    ImGuiB3D::SeparatorWithSpacing();
+}
+
+void Metrics::update_viewport()
+{
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Application & Viewport"))
+    {
+        ImGuiB3D::MultiSpacing(2);
+
+        const GLFWvidmode* mode = EventManager::get_vid_mode();
+
+        ImGui::Text("Application Resolution: %d x %d", static_cast<int>(EventManager::get_window_width()), static_cast<int>(mode->height));
+        ImGui::Text("Application Aspect Ratio: %.2f", EventManager::get_window_aspect_ratio());
+        ImGui::Text("Viewport Resolution: %d x %d", EventManager::get_viewport_width(), EventManager::get_viewport_height());
+        ImGui::Text("Viewport Aspect Ratio: %.2f", EventManager::get_viewport_aspect_ratio());
 
         ImGui::TreePop();
     }

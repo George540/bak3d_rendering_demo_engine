@@ -121,6 +121,15 @@ void FrameBuffer::resize(GLuint new_width, GLuint new_height)
     }
 }
 
+float FrameBuffer::get_aspect_ratio() const
+{
+    if (m_height == 0)
+    {
+        return 1.0f;
+    }
+    return static_cast<float>(m_width) / static_cast<float>(m_height);
+}
+
 void FrameBuffer::create_attachments()
 {
     glGenTextures(1, &m_texture_buffer);
