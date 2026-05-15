@@ -27,13 +27,14 @@ THE SOFTWARE.
 #include <imgui.h>
 #include <string>
 #include <vector>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 
 #include "Asset/asset.h"
+#include "Asset/resource_map.h"
+#include "Asset/texture.h"
 
 class ImGuiB3D
 {
+    static bool ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size);
 public:
     static bool PropertyToggle(const char* label, bool* value, const char* tooltip_desc = nullptr);
     static bool PropertyColorPicker(const char* label, glm::vec4* color, const char* tooltip_desc = nullptr);
@@ -53,7 +54,102 @@ public:
     static bool StringContainsIgnoreCase(std::string str, const std::string& sub_str);
 
     static bool MultiSpacing(int num_spaces);
-private:
-    static bool ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size);
-    static bool ToolTipExtendedAsset(const char* tooltip_desc, float text_wrap_size);
+
+    /*
+     * Generic asset picker popup.
+     *
+     * popup_id       - unique ImGui ID string for this popup (e.g. "##sprite_picker")
+     * separator_text - label shown above the search bar
+     * asset_map      - any ResourceMap<T>; iterated to build the grid
+     * texture_name   - string address of texture to assing
+     * tile_size      - icon size in pixels (default 56)
+     *
+     * Returns true the frame a selection is made.
+     *
+     * Usage:
+     *   if (ImGui::Button("Pick texture")) ImGui::OpenPopup("##my_picker");
+     *   ImGuiB3D::AssetPickerPopup(
+     *       "##my_picker", "Textures",
+     *       ResourceManager::Textures
+     *   );
+     */
+    template<typename T>
+    static bool AssetPickerPopup(
+        const char*                                             popup_id,
+        const char*                                             separator_text,
+        const ResourceMap<T>&                                   asset_map,
+        std::string*                                            texture_name,
+        float                                                   tile_size = 56.0f)
+    {
+        static std::unordered_map<std::string, std::string> s_search_buffers;
+        std::string& search = s_search_buffers[popup_id];
+
+        bool picked = false;
+
+        // SetNextWindowSizeConstraints must be called before BeginPopup,
+        // in the same frame, at the same window level — this is correct.
+        if (ImGui::IsPopupOpen(popup_id))
+        {
+            ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(400, 400));
+        }
+
+        if (ImGui::BeginPopup(popup_id, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysVerticalScrollbar))
+        {
+            // --- Header (fixed, non-scrolling) ---
+            ImGui::SeparatorText(separator_text);
+
+            char search_buf[64] = {};
+            const size_t copy_len = std::min(search.size(), sizeof(search_buf) - 1);
+            std::memcpy(search_buf, search.c_str(), copy_len);
+
+            ImGui::SetNextItemWidth(-1.0f);
+            if (ImGui::InputTextWithHint("##asset_picker_search", "Search...",
+                                         search_buf, IM_ARRAYSIZE(search_buf)))
+            {
+                search = search_buf;
+            }
+
+            ImGui::Spacing();
+
+            for (auto& [name, asset_ref] : asset_map.all())
+            {
+                if (!search.empty() && !StringContainsIgnoreCase(name, search))
+                    continue;
+
+                Asset* asset = asset_ref.ref()->asset;
+                if (!asset)
+                    continue;
+
+                const auto texture_asset = dynamic_cast<Texture2D*>(asset);
+                ImTextureID text_id = 0;
+                if (texture_asset)
+                {
+                    text_id = texture_asset->get_texture_id();
+                }
+                else
+                {
+                    text_id = asset->get_object_id();
+                }
+                const ImVec2 icon_sz = ImVec2(tile_size, tile_size);
+                if (ImGui::ImageButton(asset->get_file_name().c_str(), text_id, icon_sz, { 1, 1 }, { 0, 0 }))
+                {
+                    *texture_name = asset->get_file_name();
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                {
+                    AssetTooltip(asset);
+                }
+                
+                ImGui::SameLine();
+
+                const std::string trunc  = TruncateLabel(name, ImGui::GetContentRegionAvail().x);
+                ImGui::TextUnformatted(trunc.c_str());
+            }
+            ImGui::EndPopup();
+        }
+        
+        return picked;
+    }
 };

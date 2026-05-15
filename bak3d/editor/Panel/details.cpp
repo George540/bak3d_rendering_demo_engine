@@ -36,6 +36,8 @@ using namespace std;
 namespace
 {
     constexpr ImVec2 IMAGE_BUTTON_PROPERTY_SIZE = ImVec2(40.0f, 40.0f);
+    constexpr ImVec2 IMAGE_BUTTON_PROPERTY_SIZE_BORDERED = ImVec2(50.0f, 50.0f);
+    const char* PICKER_ID = "##sprite_picker";
     int object_selection_index = 0;
     int previous_object_selection_index = -1;
     vector<const char*> m_object_items = { "None", "Model", "Particle System", "Advanced Particles" };
@@ -72,11 +74,11 @@ namespace
         if (material->has_texture_of_type(texture_type))
         {
             const ImTextureID texture_id = ResourceManager::get_texture(material->get_texture_by_type(texture_type))->get_texture_id();
-            ImGuiB3D::PropertyImageButton(label_name.c_str(), nullptr, texture_id, ImVec2(40.0f, 40.0f));
+            ImGuiB3D::PropertyImageButton(label_name.c_str(), nullptr, texture_id, IMAGE_BUTTON_PROPERTY_SIZE);
         }
         else
         {
-            ImGuiB3D::PropertyButton(label_name.c_str(), "None", nullptr, ImVec2(50.0f, 50.0f));
+            ImGuiB3D::PropertyButton(label_name.c_str(), "None", nullptr, IMAGE_BUTTON_PROPERTY_SIZE_BORDERED);
         }
         ImGui::EndDisabled();
 
@@ -365,11 +367,30 @@ void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
             ImGui::EndDisabled();
 
             // Sprite
-            const ImTextureID texture_id = emitter.get_texture()->get_texture_id();
-            if (ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f)))
-            {
-                
-            }
+            static string selected_sprite_name = emitter.get_texture()->get_file_name();
+
+            // Resolve current texture for the button preview
+            const TextureRef current_tex = selected_sprite_name.empty()
+                ? ResourceManager::get_texture("particle.png")
+                : ResourceManager::get_texture(selected_sprite_name);
+
+            const ImTextureID preview_id = (current_tex && current_tex.is_valid())
+                ? current_tex->get_texture_id()
+                : 0;
+
+            // Button that opens the picker
+            if (ImGuiB3D::PropertyImageButton("Sprite", nullptr, preview_id, IMAGE_BUTTON_PROPERTY_SIZE))
+                ImGui::OpenPopup(PICKER_ID);
+
+            // Generic picker — only knows about Texture2D, nothing else
+            ImGuiB3D::AssetPickerPopup(
+                PICKER_ID,
+                "Sprite Selection",
+                ResourceManager::Textures,
+                &selected_sprite_name
+            );
+
+            emitter.set_texture(ResourceManager::get_texture(selected_sprite_name));
 
             ImGui::TreePop();
         }

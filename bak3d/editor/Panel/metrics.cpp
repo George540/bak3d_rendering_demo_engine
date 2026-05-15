@@ -25,7 +25,6 @@ THE SOFTWARE.
 #include "metrics.h"
 
 #include <algorithm>
-#include <imgui_impl_opengl3_loader.h>
 #include <implot.h>
 #include <vector>
 
