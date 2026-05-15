@@ -44,20 +44,6 @@ namespace
     float m_tile_padding = 8.0f;
     bool m_show_labels = true;
     bool m_show_tooltips = true;
-
-    string truncate_label(const string& label, const float tile_width)
-    {
-        const float char_width = ImGui::CalcTextSize("A").x;
-        int max_chars = static_cast<int>(tile_width / char_width);
-        max_chars = max(max_chars, 1);
-
-        if (cmp_less_equal(label.size(), max_chars))
-        {
-            return label;
-        }
-
-        return label.substr(0, max_chars - 3) + "...";
-    }
 }
 
 AssetPanel::AssetPanel() : EditorPanel("Assets")
@@ -192,7 +178,7 @@ void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
         // Label
         if (m_show_labels)
         {
-            const string label = truncate_label(name, m_tile_size);
+            const string label = ImGuiB3D::TruncateLabel(name, m_tile_size);
             const float text_width = ImGui::CalcTextSize(label.c_str()).x;
             const float indent = (m_tile_size - text_width) * 0.5f;
             if (indent > 0.0f)
@@ -207,24 +193,7 @@ void AssetPanel::draw_asset_tile(const string& name, Asset* asset)
     // Tooltip
     if (m_show_tooltips && ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
     {
-        ImGui::BeginTooltip();
-        ImGui::Image(text_id, { 128.0f, 128.0f }, { 1, 1}, { 0, 0 });
-        ImGui::Separator();
-        ImGui::Text("File:       %s", asset->get_file_name().c_str());
-        ImGui::Text("Directory:  %s", asset->get_directory().c_str());
-        if (const Texture2D* texture = dynamic_cast<Texture2D*>(asset))
-        {
-            ImGui::Text("Resolution: %d x %d", texture->get_width(), texture->get_height());
-            ImGui::Text("Channels:   %d", texture->get_nb_color_channels());
-        }
-        else if (const Model* model = dynamic_cast<Model*>(asset))
-        {
-            ImGui::Text("Vertices:   %u", model->get_vertices());
-            ImGui::Text("Edges:      %u", model->get_unique_edges());
-            ImGui::Text("Faces:      %u", model->get_faces());
-        }
-        ImGui::Text("GL ID:      %u", asset->get_object_id());
-        ImGui::EndTooltip();
+        ImGuiB3D::AssetTooltip(asset);
     }
 
     ImGui::PopID();

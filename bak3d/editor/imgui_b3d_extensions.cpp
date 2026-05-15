@@ -29,6 +29,9 @@ THE SOFTWARE.
 #include <iterator>
 #include <string>
 
+#include "Asset/model.h"
+#include "Asset/texture.h"
+
 using namespace std;
 
 constexpr float TOOL_TIP_WIDTH = 500.0f;
@@ -199,6 +202,48 @@ bool ImGuiB3D::PropertyImageButton(const char* label, const char* tooltip_desc, 
             uv0, uv1, // (0,0) and (1,1), flip pairs if needed (most of the time)
             bg_col,
             tint_col);
+}
+
+string ImGuiB3D::TruncateLabel(const string& label, const float tile_width)
+{
+    const float char_width = ImGui::CalcTextSize("A").x;
+    int max_chars = static_cast<int>(tile_width / char_width);
+    max_chars = max(max_chars, 1);
+    if (cmp_less_equal(label.size(), max_chars))
+    {
+        return label;
+    }
+    return label.substr(0, max_chars - 3) + "...";
+}
+
+void ImGuiB3D::AssetTooltip(const Asset* asset)
+{
+    if (!asset)
+    {
+        return;
+    }
+
+    const auto* texture = dynamic_cast<const Texture2D*>(asset);
+    const ImTextureID tex_id = texture ? texture->get_texture_id() : asset->get_object_id();
+
+    ImGui::BeginTooltip();
+    ImGui::Image(tex_id, { 128.0f, 128.0f }, { 1, 1 }, { 0, 0 });
+    ImGui::Separator();
+    ImGui::Text("File:       %s", asset->get_file_name().c_str());
+    ImGui::Text("Directory:  %s", asset->get_directory().c_str());
+    if (texture)
+    {
+        ImGui::Text("Resolution: %d x %d", texture->get_width(), texture->get_height());
+        ImGui::Text("Channels:   %d", texture->get_nb_color_channels());
+    }
+    else if (const auto* model = dynamic_cast<const Model*>(asset))
+    {
+        ImGui::Text("Vertices:   %u", model->get_vertices());
+        ImGui::Text("Edges:      %u", model->get_unique_edges());
+        ImGui::Text("Faces:      %u", model->get_faces());
+    }
+    ImGui::Text("GL ID:      %u", asset->get_object_id());
+    ImGui::EndTooltip();
 }
 
 bool ImGuiB3D::ToolTipExtendedText(const char* tooltip_desc, float text_wrap_size)

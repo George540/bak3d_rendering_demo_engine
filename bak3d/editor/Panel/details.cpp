@@ -366,7 +366,10 @@ void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
 
             // Sprite
             const ImTextureID texture_id = emitter.get_texture()->get_texture_id();
-            ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f));
+            if (ImGuiB3D::PropertyImageButton("Sprite", nullptr, texture_id, ImVec2(40.0f, 40.0f)))
+            {
+                
+            }
 
             ImGui::TreePop();
         }
