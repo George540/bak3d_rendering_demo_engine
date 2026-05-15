@@ -75,25 +75,25 @@ public:
      */
     template<typename T>
     static bool AssetPickerPopup(
-        const char*                                             popup_id,
-        const char*                                             separator_text,
-        const ResourceMap<T>&                                   asset_map,
-        std::string*                                            texture_name,
-        float                                                   tile_size = 56.0f)
+        const char*           popup_id,
+        const char*           separator_text,
+        const ResourceMap<T>& asset_map,
+        std::string*          texture_name,
+        const float           tile_size = 56.0f)
     {
         static std::unordered_map<std::string, std::string> s_search_buffers;
         std::string& search = s_search_buffers[popup_id];
 
-        bool picked = false;
+        const bool is_pop_up_open = ImGui::IsPopupOpen(popup_id);
 
         // SetNextWindowSizeConstraints must be called before BeginPopup,
         // in the same frame, at the same window level — this is correct.
-        if (ImGui::IsPopupOpen(popup_id))
+        if (is_pop_up_open)
         {
-            ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(400, 400));
+            ImGui::SetNextWindowSizeConstraints(ImVec2(200, 300), ImVec2(400, 400));
         }
 
-        if (ImGui::BeginPopup(popup_id, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysVerticalScrollbar))
+        if (ImGui::BeginPopup(popup_id, ImGuiWindowFlags_NoMove))
         {
             // --- Header (fixed, non-scrolling) ---
             ImGui::SeparatorText(separator_text);
@@ -111,45 +111,53 @@ public:
 
             ImGui::Spacing();
 
-            for (auto& [name, asset_ref] : asset_map.all())
+            const ImVec2 availableSpace = ImGui::GetContentRegionAvail();
+            const std::string scrollable_region_id = std::string("##ScrollableRegion_") + popup_id;
+            if (ImGui::BeginChild(scrollable_region_id.c_str(), availableSpace, ImGuiChildFlags_None, ImGuiWindowFlags_None))
             {
-                if (!search.empty() && !StringContainsIgnoreCase(name, search))
-                    continue;
+                for (auto& [name, asset_ref] : asset_map.all())
+                {
+                    if (!search.empty() && !StringContainsIgnoreCase(name, search))
+                        continue;
 
-                Asset* asset = asset_ref.ref()->asset;
-                if (!asset)
-                    continue;
+                    Asset* asset = asset_ref.ref()->asset;
+                    if (!asset)
+                        continue;
 
-                const auto texture_asset = dynamic_cast<Texture2D*>(asset);
-                ImTextureID text_id = 0;
-                if (texture_asset)
-                {
-                    text_id = texture_asset->get_texture_id();
-                }
-                else
-                {
-                    text_id = asset->get_object_id();
-                }
-                const ImVec2 icon_sz = ImVec2(tile_size, tile_size);
-                if (ImGui::ImageButton(asset->get_file_name().c_str(), text_id, icon_sz, { 1, 1 }, { 0, 0 }))
-                {
-                    *texture_name = asset->get_file_name();
-                    ImGui::CloseCurrentPopup();
-                }
+                    const auto texture_asset = dynamic_cast<Texture2D*>(asset);
+                    ImTextureID text_id = 0;
+                    if (texture_asset)
+                    {
+                        text_id = texture_asset->get_texture_id();
+                    }
+                    else
+                    {
+                        text_id = asset->get_object_id();
+                    }
+                    const ImVec2 icon_sz = ImVec2(tile_size, tile_size);
+                    if (ImGui::ImageButton(asset->get_file_name().c_str(), text_id, icon_sz, { 1, 1 }, { 0, 0 }))
+                    {
+                        *texture_name = asset->get_file_name();
+                        ImGui::CloseCurrentPopup();
+                    }
 
-                if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
-                {
-                    AssetTooltip(asset);
-                }
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                    {
+                        AssetTooltip(asset);
+                    }
                 
-                ImGui::SameLine();
+                    ImGui::SameLine();
 
-                const std::string trunc  = TruncateLabel(name, ImGui::GetContentRegionAvail().x);
-                ImGui::TextUnformatted(trunc.c_str());
+                    const std::string trunc  = TruncateLabel(name, ImGui::GetContentRegionAvail().x);
+                    ImGui::TextUnformatted(trunc.c_str());
+                }
+
+                ImGui::EndChild();
             }
+            
             ImGui::EndPopup();
         }
         
-        return picked;
+        return is_pop_up_open;
     }
 };

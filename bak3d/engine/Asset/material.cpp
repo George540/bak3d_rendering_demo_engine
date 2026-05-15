@@ -250,9 +250,14 @@ void Material::bind_textures_cache()
     }
 }
 
-std::string Material::get_texture_by_type(const aiTextureType& key_name)
+std::string Material::get_texture_by_type(const aiTextureType& texture_type)
 {
-    return m_texture_names[key_name];
+    return m_texture_names[texture_type];
+}
+
+void Material::set_texture_by_type(const aiTextureType& texture_type, const std::string& texture_name)
+{
+    m_texture_names[texture_type] = texture_name;
 }
 
 bool Material::has_uniform(const std::string& key_name) const
