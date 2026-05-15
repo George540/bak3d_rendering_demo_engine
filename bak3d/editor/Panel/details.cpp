@@ -240,6 +240,14 @@ void Details::draw_model_section()
             ImGuiB3D::PropertySliderFloat("Ambient", &surface_parameters.x, 0.0f, 1.0f, "%.3f");
 
             model_material->set_vec4("material.surface_parameters", surface_parameters);
+
+            ImGuiB3D::MultiSpacing(3);
+
+            // Apply Button
+            if (ImGuiB3D::PropertyButton("Apply", "Save Changes", "Save material data if changed to corresponding material JSON file."))
+            {
+                model_material->save_to_file();
+            }
         }
 
         ImGui::TreePop();

@@ -1,4 +1,4 @@
-﻿/* ===========================================================================
+/* ===========================================================================
 The MIT License (MIT)
 
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
@@ -68,6 +68,7 @@ public:
     ShaderRef get_shader() const { return m_shader; }
 
     void load_from_file(const std::string& path);
+    void save_to_file() const;
     void apply();
     void bind_textures_cache();
 

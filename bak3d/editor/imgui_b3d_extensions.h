@@ -79,7 +79,7 @@ public:
         const char*           separator_text,
         const ResourceMap<T>& asset_map,
         std::string*          texture_name,
-        const float           tile_size = 56.0f)
+        const float           tile_size = 50.0f)
     {
         static std::unordered_map<std::string, std::string> s_search_buffers;
         std::string& search = s_search_buffers[popup_id];
@@ -141,7 +141,7 @@ public:
                         ImGui::CloseCurrentPopup();
                     }
 
-                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNone))
                     {
                         AssetTooltip(asset);
                     }

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "shader.h"
 
 using namespace std;
+using ordered_json = nlohmann::ordered_json;
 
 namespace
 {
@@ -116,7 +117,7 @@ void Material::load_from_file(const string& path)
         throw runtime_error("Cannot open material: " + path);
     }
 
-    nlohmann::json j;
+    ordered_json j;
     file >> j;
 
     const string material_name = FileLoader::get_name_from_path(path);
@@ -168,6 +169,109 @@ void Material::load_from_file(const string& path)
     }
 
     apply();
+}
+
+void Material::save_to_file() const
+{
+    if (m_path.empty())
+    {
+        B3D_LOG_ERROR("Material has no path to save to.");
+        return;
+    }
+
+    // Create directories if they don't exist
+    std::filesystem::create_directories(std::filesystem::path(m_path).parent_path());
+
+    ordered_json j;
+
+    j["shader"] = m_shader->get_object_name();
+
+    ordered_json uniforms;
+
+    for (const auto& [name, value] : m_uniform_flags)
+        uniforms[name] = { {"type", "bool"}, {"value", value} };
+
+    for (const auto& [name, value] : m_int_uniforms)
+    {
+        if (name == "material.diffuse_texture" || name == "material.specular_texture" || name == "material.normal_texture")
+        {
+            continue;
+        }
+        uniforms[name] = { {"type", "int"}, {"value", value} };
+    }
+
+    for (const auto& [name, value] : m_uint_uniforms)
+        uniforms[name] = { {"type", "uint"}, {"value", value} };
+
+    for (const auto& [name, value] : m_float_uniforms)
+        uniforms[name] = { {"type", "float"}, {"value", value} };
+
+    for (const auto& [name, value] : m_vec2_uniforms)
+        uniforms[name] = { {"type", "vec2"}, {"value", {value.x, value.y}} };
+
+    for (const auto& [name, value] : m_vec3_uniforms)
+        uniforms[name] = { {"type", "vec3"}, {"value", {value.x, value.y, value.z}} };
+
+    for (const auto& [name, value] : m_vec4_uniforms)
+        uniforms[name] = { {"type", "vec4"}, {"value", {value.x, value.y, value.z, value.w}} };
+
+    for (const auto& [name, value] : m_mat2_uniforms)
+        uniforms[name] = { {"type", "mat2"}, {"value", {
+            value[0][0], value[0][1],
+            value[1][0], value[1][1]
+        }}};
+
+    for (const auto& [name, value] : m_mat3_uniforms)
+        uniforms[name] = { {"type", "mat3"}, {"value", {
+            value[0][0], value[0][1], value[0][2],
+            value[1][0], value[1][1], value[1][2],
+            value[2][0], value[2][1], value[2][2]
+        }}};
+
+    for (const auto& [name, value] : m_mat4_uniforms)
+        uniforms[name] = { {"type", "mat4"}, {"value", {
+            value[0][0], value[0][1], value[0][2], value[0][3],
+            value[1][0], value[1][1], value[1][2], value[1][3],
+            value[2][0], value[2][1], value[2][2], value[2][3],
+            value[3][0], value[3][1], value[3][2], value[3][3]
+        }}};
+
+    if (m_texture_names.contains(aiTextureType_DIFFUSE))
+    {
+        uniforms["material.diffuse_texture"] = {
+            {"type", "sampler2D"},
+            {"value", m_texture_names.at(aiTextureType_DIFFUSE)}
+        };
+    }
+
+    if (m_texture_names.contains(aiTextureType_SPECULAR))
+    {
+        uniforms["material.specular_texture"] = {
+            {"type", "sampler2D"},
+            {"value", m_texture_names.at(aiTextureType_SPECULAR)}
+        };
+    }
+
+    if (m_texture_names.contains(aiTextureType_NORMALS))
+    {
+        uniforms["material.normal_texture"] = {
+            {"type", "sampler2D"},
+            {"value", m_texture_names.at(aiTextureType_NORMALS)}
+        };
+    }
+
+    j["uniforms"] = uniforms;
+
+    // Write to file
+    std::ofstream file(m_path);
+    if (!file.is_open())
+    {
+        B3D_LOG_ERROR("Could not open material file for writing: %s", m_path.c_str());
+        return;
+    }
+
+    file << j.dump(4); // 4 = indent spaces
+    B3D_LOG_INFO("Material saved to: %s", m_path.c_str());
 }
 
 void Material::apply()
