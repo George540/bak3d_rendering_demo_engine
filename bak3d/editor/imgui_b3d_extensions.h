@@ -95,7 +95,7 @@ public:
 
         if (ImGui::BeginPopup(popup_id, ImGuiWindowFlags_NoMove))
         {
-            // --- Header (fixed, non-scrolling) ---
+            // Header fixed in viewport space
             ImGui::SeparatorText(separator_text);
 
             char search_buf[64] = {};
@@ -111,6 +111,7 @@ public:
 
             ImGui::Spacing();
 
+            // Scrollable texture selection region
             const ImVec2 availableSpace = ImGui::GetContentRegionAvail();
             const std::string scrollable_region_id = std::string("##ScrollableRegion_") + popup_id;
             if (ImGui::BeginChild(scrollable_region_id.c_str(), availableSpace, ImGuiChildFlags_None, ImGuiWindowFlags_None))

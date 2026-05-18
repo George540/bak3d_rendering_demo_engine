@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include "details.h"
 
+#include <imgui_internal.h>
 #include <ranges>
 
 #include "imgui_b3d_extensions.h"
@@ -37,6 +38,8 @@ namespace
 {
     constexpr ImVec2 IMAGE_BUTTON_PROPERTY_SIZE = ImVec2(40.0f, 40.0f);
     constexpr ImVec2 IMAGE_BUTTON_PROPERTY_SIZE_BORDERED = ImVec2(50.0f, 50.0f);
+    constexpr ImVec2 POPUP_SIZE = ImVec2(200, 300);
+
     string asset_picker_item_id = "##sprite_picker";
     int object_selection_index = 0;
     int previous_object_selection_index = -1;
@@ -63,9 +66,31 @@ namespace
 
         // Button that opens the picker
         if (ImGuiB3D::PropertyImageButton(label, tooltip_desc, preview_id, IMAGE_BUTTON_PROPERTY_SIZE))
-            ImGui::OpenPopup(asset_picker_item_id.c_str());
+        {
+            const ImVec2 mouse_pos = ImGui::GetMousePos();
+            const ImGuiViewport* viewport = ImGui::GetMainViewport();
+            const ImVec2 work_pos  = viewport->WorkPos;
+            const ImVec2 work_size = viewport->WorkSize;
 
-        // Generic picker — only knows about Texture2D, nothing else
+            // Clamp based on viewport's work size and position.
+            // Avoid popup being places outside the viewport's context.
+            ImVec2 final_pos = mouse_pos;
+            if (final_pos.x + POPUP_SIZE.x > work_pos.x + work_size.x)
+            {
+                final_pos.x = work_pos.x + work_size.x - POPUP_SIZE.x;
+            }
+            if (final_pos.y + POPUP_SIZE.y > work_pos.y + work_size.y)
+            {
+                final_pos.y = work_pos.y + work_size.y - POPUP_SIZE.y;
+            }
+
+            final_pos.x = ImMax(final_pos.x, work_pos.x);
+            final_pos.y = ImMax(final_pos.y, work_pos.y);
+
+            ImGui::SetNextWindowPos(final_pos);
+            ImGui::OpenPopup(asset_picker_item_id.c_str());
+        }
+
         ImGuiB3D::AssetPickerPopup(
             asset_picker_item_id.c_str(),
             "Sprite Selection",
