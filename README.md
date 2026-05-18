@@ -1,7 +1,7 @@
 # The Bak3D Rendering Demo Engine
 Copyright (c) 2022-2026 George Mavroeidis - GeoGraphics
 
-<img width="1200" height="657" alt="image" src="https://github.com/user-attachments/assets/1d002028-8b45-4fee-86a2-e6abab5f9133" />
+<img width="1920" height="1030" alt="bak3d_v1 3_particles_demo" src="https://github.com/user-attachments/assets/5189969d-9a87-4791-bc38-b31ef2b73f27" />
 
 
 # What is Bak3D
@@ -12,9 +12,9 @@ Bak3D (baked) is a real-time beginner-friendly 3D rendering engine that can be u
 
 Bak3D engine started as a fun project back at a time where I just graduated from University in 2022. I had just started my first full-time opportunity as a Junior 3D Graphics Programmer and I wanted to make a project that will supplement my learning experience from that job. Based on an old sample project I made for a Computer Graphics course, Bak3D became an super-extension of it. It formed a playground for different rendering and engine concepts I always wanted to learn more about and introduce them to other beginners willing to learn or get help for their school assignments. Although it is a 4 year old engine based on junior knowledge, I occasionally still try to update it when I am looking to rapidly implement something I am interested in playing around with.
 
-<img width="2557" height="1004" alt="image" src="https://github.com/user-attachments/assets/e0569608-e1db-4744-92c7-44328c8823fb" />
+<img width="1919" height="1030" alt="bak3d_v1 3_postprocess" src="https://github.com/user-attachments/assets/cf834e07-bbb0-4891-ae6d-8bb5c84fa24d" />
 
-*Bak3D v1.3, 2026: editor overhaul, restructuring and fundamental rendering system implementations*
+*Bak3D engine v1.3 comes with a complete and more professional editor UI overhaul as well as a robust post processing stack, anti-aliasing and rendering optimizations.*
 
 <br>
 
@@ -36,19 +36,18 @@ This is (or planning to be) the perfect starting point for computer graphics and
 
 | Feature | Description |
 |--------|---------|
-| **Editor** | ImGui-based editor with environment settings, object settings for models and particle systems, metrics view and soon to make it hierarchy-based and flexible panels. |
-| **Environment** | Simple scene with a single point light, grid and axis overlays for auditing loaded models. |
-| **Lighting** | Simple spotlight with Blinn-Phong lighting method implemented. Can tune properties in Environment Settings. |
-| **Asset import** | Assimp for loading 40+ model formats, stbi_image for loading image-based formats. |
-| **Input** | Keyboard and Mouse: Hold **Left Mouse Button** doiwn and move around to orbit the scene's origin and **Scroll Wheel** to zoom in and out. |
-| **Models** | Assimp-loaded custom models that can be textured and use simple Blinn-Phong based shaders for sahding (soon to be PBR). Backpack.mtl is the main sample. |
-| **Texture Slicing** | Breakdown and audit existing texture channels for the loaded model. Currently supporting albedo, normal, specular and height map textures. |
-| **Particles** | GPU-driven particle system that can render thousands of particles with an extensive property modifications (size, velocity, lifetime, amount, textures, bounding box flow, etc) (restructuring at the moment). |
-| **Metrics** | Simple profiling window for displaying basic GPU metrics, such as FPS, frame time in both numerical and histogram formats. |
+| **Editor** | Overhauled ImGui-based editor with a more standard and professional structure, familiar to commercial engines. |
+| **Lighting & Casters** | Simple Blinn-Phong lighting method implemented with different casters: spotlight, pointlight, directional light. Can tune properties in Environment Settings. |
+| **Asset import** | Assimp for loading 40+ model formats, stbi_image for loading image-based formats, JSON for material loading and saving. |
+| **Post-Processing** | Robust Post-Processing stack, focusing on color grading and kernel effects with convolution matrices. |
+| **Anti-Aliasing** | Native MSAA implemented on the rasterization level with 2x2, 4x4 and even 8x8 if GPU vendor allows it. |
+| **Input** | Keyboard and Mouse: Hold **Left Mouse Button** down and move around to orbit the scene's origin and **Scroll Wheel** to zoom in and out. |
+| **Particles** | GPU instanced and culled particles with SoA (Structure of Arrays) CPU particle management and multiple particle emitters. |
+| **Performance & Profiling Tools** | GPU tools ranging from timers, captures and runtime shader recompilation. Great for debugging and profiling. |
 
-<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec0a7938-b165-4c1b-b515-d384997772b9" />
+<img width="1920" height="1031" alt="bak3d_v1 3_particles" src="https://github.com/user-attachments/assets/b348b026-0a97-4e19-b0fb-56ad53bb91e4" />
 
-*Bak3D v1.2, 2024: introduction of Particle Systems*
+*Robust Particle System with GPU instancing, GPU culling, CPU Structure of Arrays (SoA), all in dynamic and multiple particle emitters.*
 
 <br>
 
@@ -66,9 +65,9 @@ Found inside the third_party directory, these are the current libraries being su
 | **[stb_image](https://github.com/nothings/stb)** | Lightweight header file for loading and creating textures in OpenGL, by stb. |
 | **[Nlohmann JSON](https://github.com/nothings/stb)** | Modern JSON library with intuitive syntax and STL compatibility for C++. |
 
-<img width="2498" height="1080" alt="image" src="https://github.com/user-attachments/assets/3639aed6-ff0f-463a-999b-daf375aa9b83" />
+<img width="1918" height="1030" alt="bak3d_v1 3_model" src="https://github.com/user-attachments/assets/44acbbc3-e5a5-47da-9982-809839bced93" />
 
-*Bak3D v1.1, 2022: The first major feature of the engine, custom assimp model loading*
+*Custom assimp loading with materials loaded and saved using JSON files and intuitive editor properties setup.*
 
 <br>
 
@@ -80,24 +79,6 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 
 
 ## Roadmap
-
-### [v1.3 - The Abstraction Update](https://github.com/George540/Bak3DEngine/milestone/2)
-| Status | Feature | Description |
-| :---: | :--- | :--- |
-|:ballot_box_with_check:| **Project Building** | Set up a propert build set up with build scripts in CMake and python for automated set up processes and support of multiple platforms. |
-|:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
-|:ballot_box_with_check:| **FrameBuffers** | Surprisingly I never had framebuffers set up, so if I want better control of the final output image, I need that. |
-|:ballot_box_with_check:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
-|:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
-|:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
-|:ballot_box_with_check:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
-|:ballot_box_with_check:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
-|:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
-|:ballot_box_with_check:| **Light Types** | More light types to add such as spot, point and directional (maybe even area). For now, just make the single light in the scene to change type. |
-|:ballot_box_with_check:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
-|:ballot_box_with_check:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
-|:ballot_box_with_check:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
-
 
 ### [v1.4 - The Rendering Universe Expands](https://github.com/George540/Bak3DEngine/milestone/3)
 | Status | Feature | Description |
@@ -113,6 +94,24 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 |☐| **GPU Culling** | As the scene grows, we need to handle it at scale with culling unecessary or unseen objects. |
 |☐| **Bonus: Rigidbody demo setup** | If time and motivation, add a simple rigidbody structure for fun physics. |
 |☐| **Bonus: FPV movement** | make camera move around the scene without just being restricted in orbit. |
+
+### [v1.3 - The Abstraction Update](https://github.com/George540/Bak3DEngine/milestone/2)
+Completed in April 18 2026. (v1.1 got released in September 2022).
+| Status | Feature | Description |
+| :---: | :--- | :--- |
+|:ballot_box_with_check:| **Project Building** | Set up a propert build set up with build scripts in CMake and python for automated set up processes and support of multiple platforms. |
+|:ballot_box_with_check:| **Class Abstraction** | Create an organized but simple structure for different concepts that are reused often (objects, buffers, materials, shaders, textures, lights, etc). |
+|:ballot_box_with_check:| **FrameBuffers** | Surprisingly I never had framebuffers set up, so if I want better control of the final output image, I need that. |
+|:ballot_box_with_check:| **ImGui Editor Overhaul** | A more professional and user-fiendly look is needed as the engine grows. Flexible panels and different windows will be added. |
+|:ballot_box_with_check:| **Logging System** | Create a universal logging system to output verbose logs, warnings and errors. Will output in ImGui panel. |
+|:ballot_box_with_check:| **Asset Viewer** | New panel to view all assets found in content folders, such as models, textures and shaders. |
+|:ballot_box_with_check:| **Refined Object Settings** | They are quite hard to understand right now for both models and particles. Currently setting it up just like an ECS-based view. |
+|:ballot_box_with_check:| **Post Processing** | Add some basic post processing settings to be applied to the viewport framebuffer Also considering rendering passes. |
+|:ballot_box_with_check:| **Profiling Metrics** | Add a dedicated system and panel for profiling different features and other important metrics. |
+|:ballot_box_with_check:| **Light Types** | More light types to add such as spot, point and directional (maybe even area). For now, just make the single light in the scene to change type. |
+|:ballot_box_with_check:| **Bug fixing** | Fix minor bugs in some features I have left behind. |
+|:ballot_box_with_check:| **Code restructuring** | Some more important code overhaul that will be easier to build on top of in the future. |
+|:ballot_box_with_check:| **Bonus: QoL Features** | Add shader recompiling at runtime to test shader changes faster and integrate RenderDoc for rapid GPU captures. |
 
 I am open for requests as well as open to any support to help implement these features, although I am willing to try to implement most of these myself whenever I can. Just let me know!
 
