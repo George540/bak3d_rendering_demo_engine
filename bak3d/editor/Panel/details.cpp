@@ -462,7 +462,7 @@ void Details::draw_particle_emitter_section(ParticleEmitter& emitter)
             ImGui::EndDisabled();
 
             // Sprite
-            static string selected_sprite_name = emitter.get_texture()->get_file_name();
+            string selected_sprite_name = emitter.get_texture()->get_file_name();
 
             draw_property_button_selection_item(&selected_sprite_name, "Sprite", "Select particle sprite for current emitter.");
 
