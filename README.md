@@ -81,6 +81,7 @@ Download and extract the latest .zip folder on the *Releases* section onto your 
 ## Roadmap
 
 ### [v1.4 - The Rendering Universe Expands](https://github.com/George540/Bak3DEngine/milestone/3)
+Development will start Fall 2026
 | Status | Feature | Description |
 | :---: | :--- | :--- |
 |☐| **Shadows** | With a complex environment scene, implementing shadows (perhaps CSM) will make it even more lively. |
