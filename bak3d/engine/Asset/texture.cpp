@@ -85,16 +85,26 @@ Texture2D::~Texture2D()
     glDeleteTextures(1, &m_texture_id);
 }
 
-void Texture2D::bind(int unit_slot) const
+void Texture2D::bind(const int unit_slot) const
 {
     assert(m_texture_id && "Binding an invalid texture");
     glActiveTexture(GL_TEXTURE0 + unit_slot);
     glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
-void Texture2D::unbind()
+void Texture2D::unbind(const int unit_slot)
 {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + unit_slot);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::unbind_all(const int slot_count)
+{
+    for (int i = 0; i < slot_count; i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 bool Texture2D::operator==(const Texture2D& other) const

@@ -60,6 +60,4 @@ void Mesh::draw() const
     m_vao->bind_object();
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
     m_vao->unbind_object();
-
-    Texture2D::unbind();
 }

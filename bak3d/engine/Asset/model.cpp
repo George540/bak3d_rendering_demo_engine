@@ -87,20 +87,7 @@ void Model::draw() const
 {
 	if (!m_visible || !Scene::instance->get_camera() || !Scene::instance->get_active_light() || !m_current_material_slot) return;
 
-	/*UserInterface::is_full_render_selected
-			&& !UserInterface::is_diffuse_render_selected
-			&& !UserInterface::is_specular_selected
-			&& !UserInterface::is_normal_map_selected*/
-	if (true)
-	{
-		// UPDATE MODEL MATERIAL
-		update_material_properties();
-	}
-	else
-	{
-		// UPDATE DISSECT MATERIAL
-		//update_breakdown_shader();
-	}
+	update_material_properties();
 	
 	for (auto& mesh : meshes)
 	{

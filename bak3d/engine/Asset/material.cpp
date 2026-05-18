@@ -333,6 +333,8 @@ void Material::apply()
 
 void Material::bind_textures_cache()
 {
+    Texture2D::unbind_all(m_texture_names.size());
+
     for (const auto& [type, value] : m_texture_names)
     {
         const TextureRef texture = ResourceManager::get_texture(value);

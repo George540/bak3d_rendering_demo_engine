@@ -97,12 +97,9 @@ namespace
         ImGui::BeginDisabled(!use_texture_type);
         if (material->has_texture_of_type(texture_type))
         {
-            //draw_property_button_selection_item(string* selected_name, label_name.c_str(), nullptr);
             string texture_name = ResourceManager::get_texture(material->get_texture_by_type(texture_type))->get_file_name();
             draw_property_button_selection_item(&texture_name, label_name.c_str(), nullptr);
             material->set_texture_by_type(texture_type, texture_name);
-            /*const ImTextureID texture_id = ResourceManager::get_texture(material->get_texture_by_type(texture_type))->get_texture_id();
-            ImGuiB3D::PropertyImageButton(label_name.c_str(), nullptr, texture_id, IMAGE_BUTTON_PROPERTY_SIZE);*/
         }
         else
         {

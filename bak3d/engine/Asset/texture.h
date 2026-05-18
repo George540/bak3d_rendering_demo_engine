@@ -48,7 +48,8 @@ public:
     ~Texture2D() override;
 
     void bind(int unit_slot) const; // binds the texture as the current active GL_TEXTURE_2D texture object
-    static void unbind();
+    static void unbind(int unit_slot = 0);
+    static void unbind_all(int slot_count);
 
     GLuint get_texture_id() const { return m_texture_id; }
     int get_width() const { return m_width; }
