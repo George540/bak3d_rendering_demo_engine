@@ -363,7 +363,42 @@ std::string Material::get_texture_by_type(const aiTextureType& texture_type)
 
 void Material::set_texture_by_type(const aiTextureType& texture_type, const std::string& texture_name)
 {
+    if (texture_name.empty())
+        return;
     m_texture_names[texture_type] = texture_name;
+
+    // Wire up the sampler slot index so the shader knows which unit to read.
+    if (texture_type == aiTextureType_DIFFUSE)
+        set_int("material.diffuse_texture", 0);
+    else if (texture_type == aiTextureType_SPECULAR)
+        set_int("material.specular_texture", 1);
+    else if (texture_type == aiTextureType_NORMALS)
+        set_int("material.normal_texture", 2);
+}
+
+void Material::remove_texture_by_type(const aiTextureType& key_name)
+{
+    if (!m_texture_names.contains(key_name))
+        return;
+
+    m_texture_names.erase(key_name);
+
+    // Undo the sampler binding and disable the toggle so the shader falls back to the scalar surface parameter for this channel.
+    if (key_name == aiTextureType_DIFFUSE)
+    {
+        m_uniform_flags["material.use_diffuse_texture"]  = false;
+        m_int_uniforms.erase("material.diffuse_texture");
+    }
+    else if (key_name == aiTextureType_SPECULAR)
+    {
+        m_uniform_flags["material.use_specular_texture"] = false;
+        m_int_uniforms.erase("material.specular_texture");
+    }
+    else if (key_name == aiTextureType_NORMALS)
+    {
+        m_uniform_flags["material.use_normal_texture"]   = false;
+        m_int_uniforms.erase("material.normal_texture");
+    }
 }
 
 bool Material::has_uniform(const std::string& key_name) const

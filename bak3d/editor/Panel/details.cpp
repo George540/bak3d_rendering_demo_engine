@@ -47,6 +47,8 @@ namespace
     Model* m_current_model = nullptr;
     ParticleSystem* m_current_particle_system = nullptr;
 
+    unordered_map<aiTextureType, string> m_pending_texture_selections;
+
     void draw_property_button_selection_item(string* selected_name, const char* label, const char* tooltip_desc)
     {
         // Make popup ID as unique as possible to avoid duplicates
@@ -74,38 +76,73 @@ namespace
 
     void draw_texture_property_section(const MaterialRef& material, const string& texture_type_name, const aiTextureType texture_type, const string& parameter_name, float& surface_parameter)
     {
-        string texture_type_name_pascal = texture_type_name;
-        texture_type_name_pascal[0] = toupper(static_cast<unsigned char>(texture_type_name_pascal[0]));
-        bool use_texture_type = material->has_uniform("material.use_" + texture_type_name + "_texture")
-                                            ? material->get_bool("material.use_" + texture_type_name + "_texture")
-                                            : false;
-        ImGuiB3D::PropertyToggle(("Use " + texture_type_name_pascal + " Texture").c_str(), &use_texture_type);
-        material->set_bool("material.use_" + texture_type_name + "_texture", use_texture_type);
+        string texture_pascal = texture_type_name;
+        texture_pascal[0] = toupper(static_cast<unsigned char>(texture_pascal[0]));
 
-        string label_name = texture_type_name_pascal + " Slider";
+        // Toggle
+        const string use_key = "material.use_" + texture_type_name + "_texture";
+        bool use_texture = material->has_uniform(use_key)
+                           ? material->get_bool(use_key)
+                           : false;
+        ImGuiB3D::PropertyToggle(("Use " + texture_pascal + " Texture").c_str(), &use_texture);
+        material->set_bool(use_key, use_texture);
 
-        // Slider item
-        ImGui::BeginDisabled(use_texture_type);
+        // Slider
+        ImGui::BeginDisabled(use_texture);
         if (!parameter_name.empty())
         {
-            ImGuiB3D::PropertySliderFloat(label_name.c_str(), &surface_parameter, 0.0f, 1.0f, "%.3f");
+            const string slider_label = texture_pascal + " Slider";
+            ImGuiB3D::PropertySliderFloat(slider_label.c_str(), &surface_parameter,
+                                          0.0f, 1.0f, "%.3f");
         }
         ImGui::EndDisabled();
 
-        // Texture item
-        label_name = texture_type_name_pascal + " Texture";
-        ImGui::BeginDisabled(!use_texture_type);
-        if (material->has_texture_of_type(texture_type))
+        // Texture Picker
+        const string label_name = texture_pascal + " Texture";
+        const bool has_texture  = material->has_texture_of_type(texture_type);
+
+        string& pending = m_pending_texture_selections[texture_type];
+        if (has_texture)
         {
-            string texture_name = ResourceManager::get_texture(material->get_texture_by_type(texture_type))->get_file_name();
-            draw_property_button_selection_item(&texture_name, label_name.c_str(), nullptr);
-            material->set_texture_by_type(texture_type, texture_name);
+            pending = material->get_texture_by_type(texture_type);
+        }
+
+        const string before_pick = pending;
+
+        if (has_texture)
+        {
+            draw_property_button_selection_item(&pending, label_name.c_str(), nullptr);
+
+            ImGui::SameLine();
+            const string remove_id = "X##remove_" + texture_type_name;
+            if (ImGui::Button(remove_id.c_str(), ImVec2(22, 22)))
+            {
+                material->remove_texture_by_type(texture_type);
+                pending.clear(); // reset pending so the next frame shows "None"
+            }
         }
         else
         {
-            ImGuiB3D::PropertyButton(label_name.c_str(), "None", nullptr, IMAGE_BUTTON_PROPERTY_SIZE_BORDERED);
+            const string popup_id = "##asset_picker_none_" + texture_type_name;
+
+            if (ImGuiB3D::PropertyButton(label_name.c_str(), "None", nullptr,
+                                         IMAGE_BUTTON_PROPERTY_SIZE_BORDERED))
+            {
+                ImGui::OpenPopup(popup_id.c_str());
+            }
+
+            ImGuiB3D::AssetPickerPopup(
+                popup_id.c_str(),
+                (texture_pascal + " Selection").c_str(),
+                ResourceManager::Textures,
+                &pending);
         }
-        ImGui::EndDisabled();
+
+        // Write back if a new selection has been made
+        if (pending != before_pick && !pending.empty())
+        {
+            material->set_texture_by_type(texture_type, pending);
+        }
 
         ImGui::Spacing();
     }

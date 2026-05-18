@@ -92,6 +92,7 @@ public:
     bool has_texture_of_type(const aiTextureType& texture_type) const { return m_texture_names.contains(texture_type); }
     std::string get_texture_by_type(const aiTextureType& texture_type);
     void set_texture_by_type(const aiTextureType& texture_type, const std::string& texture_name);
+    void remove_texture_by_type(const aiTextureType& key_name);
     bool has_uniform(const std::string& key_name) const;
     
     bool get_bool(const std::string& key_name) { return m_uniform_flags[key_name]; }
