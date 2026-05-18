@@ -34,11 +34,17 @@ namespace
 {
     RENDERDOC_Version rdc_version = eRENDERDOC_API_Version_1_4_0;
     RENDERDOC_API_1_4_0* rdc_api  = nullptr;
+    constexpr bool IS_RDC_DISABLED = true;
     bool pending_capture = false;
 }
 
 void RenderDocManager::initialize()
 {
+    if (IS_RDC_DISABLED)
+    {
+        return;
+    }
+
     // Try to find the DLL (will succeed if launched via RenderDoc)
     HMODULE mod = GetModuleHandleA("renderdoc.dll");
 
@@ -102,6 +108,11 @@ void RenderDocManager::shutdown()
 
 void RenderDocManager::trigger_capture()
 {
+    if (IS_RDC_DISABLED)
+    {
+        return;
+    }
+
     if (rdc_api != nullptr)
     {
         if (pending_capture)
