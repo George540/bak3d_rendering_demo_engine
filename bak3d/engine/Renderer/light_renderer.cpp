@@ -2,6 +2,7 @@
 
 #include "shadow_renderer.h"
 #include "Core/logger.h"
+#include "Scene/bounding_volume.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ void LightRenderer::update_and_upload_data(const std::vector<Light*>& active_lig
             continue;
         }
         if (light->get_type() != LightType::Directional
-            && !frustum.intersects_sphere(light->transform.get_global_position(), light->get_effective_radius()))
+            && !BoundingSphere(light->transform.get_global_position(), light->get_effective_radius()).is_on_frustum(frustum, glm::mat4(1.0f)))
         {
             continue;
         }
@@ -63,7 +64,7 @@ void LightRenderer::update_and_upload_data(const std::vector<Light*>& active_lig
     }
 
     m_visible_light_count = static_cast<int>(m_staging_lights.size());
-    if (m_staging_lights.empty())
+    if (m_visible_light_count == 0)
     {
         return;
     }

@@ -41,45 +41,6 @@ using namespace std;
 
 constexpr static glm::vec3 CAMERA_UP = glm::vec3(0.0f, 1.0f, 0.0f);
 
-Frustum Frustum::get_frustum_structure(const glm::mat4& view_projection)
-{
-	Frustum frustum {};
-
-	const glm::vec4 row0 = glm::row(view_projection, 0);
-	const glm::vec4 row1 = glm::row(view_projection, 1);
-	const glm::vec4 row2 = glm::row(view_projection, 2);
-	const glm::vec4 row3 = glm::row(view_projection, 3);
-
-	frustum.planes[0] = row3 + row0; // Left
-	frustum.planes[1] = row3 - row0; // Right
-	frustum.planes[2] = row3 + row1; // Bottom
-	frustum.planes[3] = row3 - row1; // Top
-	frustum.planes[4] = row3 + row2; // Near
-	frustum.planes[5] = row3 - row2; // Far
-
-	for (auto& plane : frustum.planes)
-	{
-		if (const float length = glm::length(glm::vec3(plane)); length > 0.0f)
-		{
-			plane /= length;
-		}
-	}
-
-	return frustum;
-}
-
-bool Frustum::intersects_sphere(const glm::vec3& center, const float radius) const
-{
-	for (const auto& plane : planes)
-	{
-		if (glm::dot(glm::vec3(plane), center) + plane.w + radius < 0.0f)
-		{
-			return false; // outside frustrum
-		}
-	}
-	return true;
-}
-
 Camera::Camera(glm::vec3 position) : SceneObject(position, "Camera")
 {
 	object_type = SceneObjectType::Camera;
@@ -97,7 +58,7 @@ void Camera::update(float dt)
 	// Prevent from having the camera move only when the cursor is within the windows
 	EventManager::enable_mouse_cursor();
 
-	m_frustum = Frustum::get_frustum_structure(get_view_projection_matrix());
+	m_frustum = Frustum(get_view_projection_matrix());
 
 	if (EventManager::is_camera_looking())
 	if (EventManager::is_camera_looking())
@@ -157,7 +118,7 @@ void Camera::update(float dt)
 	if (const double scroll_delta = EventManager::get_camera_scroll_offset(); scroll_delta != 0.0)
 	{
 		m_fov -= static_cast<float>(scroll_delta) * 2.0f;
-		m_fov = clamp(m_fov, 20.0f, 90.0f);
+		m_fov = glm::clamp(m_fov, 20.0f, 90.0f);
 	}
 
 	m_camera_data_ubo->bind();

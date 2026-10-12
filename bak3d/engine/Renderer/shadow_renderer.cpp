@@ -91,7 +91,7 @@ void ShadowRenderer::render()
 
         const glm::mat4& light_space = m_shadow_data[layer].light_space_matrix;
         shader->set_mat4("light_space_matrix", light_space);
-        const Frustum light_frustum = Frustum::get_frustum_structure(light_space);
+        const Frustum light_frustum(light_space);
 
         for (const Mesh* mesh : SceneManager::get_current_scene()->get_all_meshes())
         {
@@ -107,10 +107,7 @@ void ShadowRenderer::render()
 
             // Per-light culling with the mesh's world-space bounding sphere
             const glm::mat4 model = mesh->transform.get_global_model_matrix();
-            const glm::vec3 scale = mesh->transform.get_global_scale();
-            const glm::vec3 center = glm::vec3(model * glm::vec4(data->get_bounds_center(), 1.0f));
-            const float radius = data->get_bounds_radius() * glm::max(scale.x, glm::max(scale.y, scale.z));
-            if (!light_frustum.intersects_sphere(center, radius))
+            if (!data->get_aabb().is_on_frustum(light_frustum, model))
             {
                 continue;
             }

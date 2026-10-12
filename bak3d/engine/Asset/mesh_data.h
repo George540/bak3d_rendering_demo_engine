@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "Core/global_definitions.h"
 #include "Renderer/Buffers/buffer.h"
 #include "Renderer/Buffers/vertex_array.h"
+#include "Scene/bounding_volume.h"
 
 /*
  * Mesh asset that holds rendering data for rendering a mesh in the scene.
@@ -83,12 +84,12 @@ public:
     const std::vector<Vertex>& get_vertices() const { return m_vertices; }
     const std::vector<GLuint>& get_indices() const { return m_indices; }
 
-    const glm::vec3& get_bounds_center() const { return m_bounds_center; }
-    float get_bounds_radius() const { return m_bounds_radius; }
+    const BoundingAABB& get_aabb() const { return m_aabb; }
+    const BoundingSphere& get_sphere() const { return m_sphere; }
 
 private:
-    glm::vec3 m_bounds_center = glm::vec3(0.0f);
-    float m_bounds_radius = 0.0f;
+    BoundingAABB m_aabb;
+    BoundingSphere m_sphere;
 
     std::vector<Vertex> m_vertices;
     std::vector<GLuint> m_indices;

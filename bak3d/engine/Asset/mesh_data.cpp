@@ -46,8 +46,8 @@ MeshData::MeshData(vector<Vertex> vertices, vector<GLuint> indices, const string
             min_p = glm::min(min_p, v.position);
             max_p = glm::max(max_p, v.position);
         }
-        m_bounds_center = (min_p + max_p) * 0.5f;
-        m_bounds_radius = glm::length(max_p - min_p) * 0.5f;
+        m_aabb = BoundingAABB::from_min_max(min_p, max_p);
+        m_sphere = BoundingSphere(m_aabb.get_center(), glm::length(m_aabb.get_extents()));
     }
 
     m_vbo = new VertexBuffer(VERTEX_SIZE * m_vertices.size(), m_vertices.data());

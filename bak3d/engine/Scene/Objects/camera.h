@@ -24,21 +24,44 @@ THE SOFTWARE.
 
 #pragma once
 
-#include <glm/fwd.hpp>
 #include <glm/vec3.hpp>
+#include <glm/gtc/matrix_access.hpp>
 
 #include "Renderer/Buffers/data_buffer.h"
 #include "Scene/scene_object.h"
 
 /*
- * Termporary frustrum structure for culling object (temporarily lights)
+ * Camera Frustum structure for culling object based on their bounding volumes or colliders
  */
 struct Frustum
 {
-	std::array<glm::vec4, 6> planes;           
+	enum PlaneSide : uint8_t { Left, Right, Bottom, Top, Near, Far, Count };
 
-	static Frustum get_frustum_structure(const glm::mat4& view_projection);
-	bool intersects_sphere(const glm::vec3& center, float radius) const; // @TODO: Make BVH and shape-agnostic
+	Frustum() = default;
+	explicit Frustum(const glm::mat4& view_projection)
+	{
+		const glm::vec4 row0 = glm::row(view_projection, 0);
+		const glm::vec4 row1 = glm::row(view_projection, 1);
+		const glm::vec4 row2 = glm::row(view_projection, 2);
+		const glm::vec4 row3 = glm::row(view_projection, 3);
+
+		planes[Left] = row3 + row0;
+		planes[Right] = row3 - row0;
+		planes[Bottom] = row3 + row1;
+		planes[Top] = row3 - row1;
+		planes[Near] = row3 + row2; // OpenGL clip space (z in -1..1)
+		planes[Far] = row3 - row2;
+
+		for (glm::vec4& plane : planes)
+		{
+			if (const float length = glm::length(glm::vec3(plane)); length > 0.0f)
+			{
+				plane /= length;
+			}
+		}
+	}
+
+	std::array<glm::vec4, Count> planes;
 };
 
 /*
@@ -65,8 +88,6 @@ public:
 
 private:
 	double m_cam_speed = 20.0f;
-	double m_horizontal_angle = 135.0; // horizontal angle
-	double m_vertical_angle = -20.0;   // vertical angle
 	float m_fov = 45.0f; // camera zoom
 
 	Frustum m_frustum = Frustum();
