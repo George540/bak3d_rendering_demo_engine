@@ -1,6 +1,7 @@
 ﻿#include "viewport.h"
 
 #include <imgui_internal.h>
+#include <implot.h>
 #include <glm/common.hpp>
 
 #include "imgui_b3d_extensions.h"
@@ -15,6 +16,7 @@ using namespace std;
 
 namespace
 {
+    constexpr float IMGUI_VIEWPORT_POPUP_WIDTH = 250.0f;
     ImVec2 previous_viewport_size = ImVec2(0, 0);
     ImVec2 viewport_panel_size = ImVec2(0, 0);
     bool m_camera_look_started_in_viewport = false;
@@ -22,6 +24,61 @@ namespace
     OverlaysFlags current_overlay_flags = OverlaysFlags::None;
 
     vector<OverlayFlagsDefinition> overlay_flags_list;
+
+    float popup_opacity_value = 0.5f;
+
+    void popup_opacity_slider()
+    {
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        ImGui::SliderFloat("##popup_opacity_value", &popup_opacity_value, 0.0f, 1.0f);
+    }
+
+    void push_popup_style()
+    {
+        const ImVec2 button_position = ImGui::GetItemRectMin();
+        const float button_size_vertical = ImGui::GetItemRectSize().y;
+
+        ImGui::SetNextWindowSize(ImVec2(IMGUI_VIEWPORT_POPUP_WIDTH, 0.0f));
+        ImGui::SetNextWindowPos(ImVec2(button_position.x, button_position.y + button_size_vertical));
+        ImVec4 popup_bg_color = ImGui::GetStyle().Colors[ImGuiCol_PopupBg];
+        popup_bg_color.w = popup_opacity_value;
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, popup_bg_color);
+    }
+
+    string format_count(const uint64_t value)
+    {
+        string value_string = to_string(value);
+        for (int i = static_cast<int>(value_string.size()) - 3; i > 0; i -= 3)
+        {
+            value_string.insert(i, ",");
+        }
+        return value_string;
+    }
+
+    bool begin_stats_section(const char* title, const char* table_id)
+    {
+        ImGui::SeparatorText(title);
+        if (!ImGui::BeginTable(table_id, 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings))
+        {
+            return false;
+        }
+        ImGui::TableSetupColumn("Stat Name", ImGuiTableColumnFlags_WidthStretch, 0.6f);
+        ImGui::TableSetupColumn("Stat Value", ImGuiTableColumnFlags_WidthStretch, 0.4f);
+        return true;
+    }
+
+    void stat_row(const char* name, const string& value, const char* tooltip = nullptr)
+    {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextUnformatted(name);
+        if (tooltip && ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", tooltip);
+        }
+        ImGui::TableSetColumnIndex(1);
+        ImGui::TextUnformatted(value.c_str());
+    }
 }
 
 Viewport::Viewport() : EditorPanel("Viewport")
@@ -166,13 +223,11 @@ void Viewport::draw_visual_modes_selection()
         ImGui::OpenPopup("View Modes Popup");
     }
 
-    const ImVec2 button_position = ImGui::GetItemRectMin();
-    const float button_size_vertical = ImGui::GetItemRectSize().y;
-
-    ImGui::SetNextWindowSize(ImVec2(250.0f, 0.0f));
-    ImGui::SetNextWindowPos(ImVec2(button_position.x, button_position.y + button_size_vertical));
+    push_popup_style();
     if (ImGui::BeginPopup("View Modes Popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove))
     {
+        popup_opacity_slider();
+
         ImGui::SeparatorText("View Modes");
 
         int view_selection = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::ViewMode);
@@ -242,6 +297,7 @@ void Viewport::draw_visual_modes_selection()
 
         ImGui::EndPopup();
     }
+    ImGui::PopStyleColor();
 }
 
 
@@ -252,13 +308,11 @@ void Viewport::draw_editor_overlays_selection()
         ImGui::OpenPopup("Editor Overlays Popup");
     }
 
-    const ImVec2 button_position = ImGui::GetItemRectMin();
-    const float button_size_vertical = ImGui::GetItemRectSize().y;
-
-    ImGui::SetNextWindowSize(ImVec2(250.0f, 0.0f));
-    ImGui::SetNextWindowPos(ImVec2(button_position.x, button_position.y + button_size_vertical));
+    push_popup_style();
     if (ImGui::BeginPopup("Editor Overlays Popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove))
     {
+        popup_opacity_slider();
+
         ImGui::SeparatorText("Editor Overlays");
 
         float light_icon_size = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::EditorOverlayFlags_LightIconSize);
@@ -323,6 +377,8 @@ void Viewport::draw_editor_overlays_selection()
     {
         GlobalSettings::set_global_setting<uint32_t>(GlobalSettingOption::EditorOverlayFlags, overlay_flags_numbered);
     }
+
+    ImGui::PopStyleColor();
 }
 
 void Viewport::draw_stats_popup()
@@ -332,73 +388,46 @@ void Viewport::draw_stats_popup()
         ImGui::OpenPopup("Scene Stats Popup");
     }
 
-    const ImVec2 button_position = ImGui::GetItemRectMin();
-    const float button_size_vertical = ImGui::GetItemRectSize().y;
-
-    ImGui::SetNextWindowSize(ImVec2(250.0f, 0.0f));
-    ImGui::SetNextWindowPos(ImVec2(button_position.x, button_position.y + button_size_vertical));
+    push_popup_style();
     if (ImGui::BeginPopup("Scene Stats Popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove))
     {
-        ImGui::SeparatorText("Lights");
-        if (ImGui::BeginTable("LightsStatsTable", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings))
+        popup_opacity_slider();
+
+        const SceneStats& scene_stats = SceneManager::get_current_scene()->gather_scene_stats();
+
+        if (begin_stats_section("Lights", "LightsStatsTable"))
         {
-            ImGui::TableSetupColumn("Stat Name", ImGuiTableColumnFlags_WidthStretch, 0.7f);
-            ImGui::TableSetupColumn("Stat Value", ImGuiTableColumnFlags_WidthStretch, 0.3f);
-
-            // Existing Lights
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Existing Lights:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", static_cast<int>(SceneManager::get_current_scene()->get_all_lights().size()));
-
-            // Active Lights
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Active Lights:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", LightRenderer::get_visible_light_count());
-
-            // Visible Lights
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Visible Lights:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", LightRenderer::get_visible_light_count());
-
+            stat_row("Total", format_count(scene_stats.lights_total), "All lights registered in the scene.");
+            stat_row("Active", format_count(scene_stats.lights_active), "All active light objects.");
+            stat_row("Visible", format_count(LightRenderer::get_visible_light_count()), "Lights sent to the GPU.");
             ImGui::EndTable();
         }
 
-        ImGui::SeparatorText("Meshes");
-        if (ImGui::BeginTable("MeshesStatsTable", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings))
+        if (begin_stats_section("Meshes", "MeshesStatsTable"))
         {
-            ImGui::TableSetupColumn("Stat Name", ImGuiTableColumnFlags_WidthStretch, 0.7f);
-            ImGui::TableSetupColumn("Stat Value", ImGuiTableColumnFlags_WidthStretch, 0.3f);
+            stat_row("Total", format_count(scene_stats.meshes_total), "All meshes registered in the scene.");
+            stat_row("Active", format_count(scene_stats.meshes_active), "All active mesh objects.");
+            stat_row("Visible", format_count(scene_stats.meshes_visible), "All active and visible meshes in the camera's view.");
+            ImGui::EndTable();
+        }
 
-            // Existing Meshes
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Existing Meshes:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", static_cast<int>(SceneManager::get_current_scene()->get_all_meshes().size()));
+        if (begin_stats_section("Particles", "ParticlesStatsTable"))
+        {
+            stat_row("Total Systems", format_count(scene_stats.particle_systems_total), "All particle systems registered in the scene.");
+            stat_row("Active Systems", format_count(scene_stats.particle_systems_active), "All active particle system objects.");
+            stat_row("Visible Systems", format_count(scene_stats.particle_systems_visible), "All active and visible particle systems in the camera's view,\ndetermined through their bounding box.");
 
-            // Active Meshes
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Active Meshes:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", LightRenderer::get_visible_light_count());
-
-            // Visible Meshes
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted("Visible Meshes:");
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%d", LightRenderer::get_visible_light_count());
+            stat_row("Total Emitters", format_count(scene_stats.particle_systems_emitters_total), "All particle emitters registered in the scene.");
+            stat_row("Active Emitters", format_count(scene_stats.particle_systems_emitters_active), "All active particle emitter objects.");
+            stat_row("Visible Emitters", format_count(scene_stats.particle_systems_emitters_visible), "All active and visible particle emitter objects.");
+            
+            stat_row("Total Particles", format_count(scene_stats.particle_systems_particles_total), "All particles in the scene.");
 
             ImGui::EndTable();
         }
 
         ImGui::EndPopup();
     }
+
+    ImGui::PopStyleColor();
 }

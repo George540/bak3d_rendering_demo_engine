@@ -37,6 +37,25 @@ THE SOFTWARE.
 
 using namespace std;
 
+struct SceneStats
+{
+	int lights_total = 0;
+	int lights_active = 0;
+	int lights_visible = 0;
+
+	int meshes_total = 0;
+	int meshes_active = 0;
+	int meshes_visible = 0;
+
+	int particle_systems_total = 0;
+	int particle_systems_active = 0;
+	int particle_systems_visible = 0;
+	int particle_systems_emitters_total = 0;
+	int particle_systems_emitters_active = 0;
+	int particle_systems_emitters_visible = 0;
+	int particle_systems_particles_total = 0;
+};
+
 /*
  * This is the class that contains all the scene's data. Runs in the main loop of the project.
  */
@@ -133,6 +152,8 @@ public:
 	
 	void update(float dt);
 
+	SceneStats& gather_scene_stats();
+
 private:
 	void initialize_default_scene_objects();
 	void initialize_preview_scene_objects();
@@ -163,4 +184,6 @@ private:
 	std::vector<AdvancedParticleSystem*> m_advanced_particle_systems;
 
 	bool m_is_asset_preview_scene = false;
+
+	SceneStats m_scene_stats = SceneStats();
 };

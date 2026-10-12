@@ -102,6 +102,11 @@ void AdvancedParticleSystem::draw() const
     glDisable(GL_PROGRAM_POINT_SIZE);
 }
 
+int AdvancedParticleSystem::get_particles_amount() const
+{
+    return PARTICLE_INITIAL_COUNT;
+}
+
 void AdvancedParticleSystem::emit() const
 {
     if (!m_emit_compute_shader || !m_emit_compute_shader->is_shader_compiled())

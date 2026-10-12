@@ -200,6 +200,67 @@ void Scene::update(float dt)
     delete_selected_object();
 }
 
+SceneStats& Scene::gather_scene_stats()
+{
+    m_scene_stats = SceneStats();
+
+    // Light stats
+    m_scene_stats.lights_total += static_cast<int>(m_lights.size());
+    for (const Light* light : m_lights)
+    {
+        m_scene_stats.lights_active += light->is_active ? 1 : 0;
+    }
+
+    const bool has_camera = m_current_camera != nullptr;
+    const Frustum& frustum = has_camera ? m_current_camera->get_frustum() : Frustum();
+
+    // Mesh stats
+    m_scene_stats.meshes_total += static_cast<int>(m_meshes.size());
+    for (const Mesh* mesh : m_meshes)
+    {
+        if (mesh->is_active)
+        {
+            m_scene_stats.meshes_active++;
+        }
+
+        if (!mesh->has_mesh() || !mesh->is_visible())
+        {
+            continue;
+        }
+
+        if (const auto* data = dynamic_cast<const MeshData*>(mesh->get_mesh().operator->()); !data
+            || !has_camera
+            || data->get_aabb().is_on_frustum(frustum, mesh->transform.get_global_model_matrix()))
+        {
+            m_scene_stats.meshes_visible++;
+        }
+    }
+
+    // Sprite Particle Systems Stats
+    m_scene_stats.particle_systems_total += static_cast<int>(m_particle_systems.size());
+    for (const ParticleSystem* particle_system : m_particle_systems)
+    {
+        m_scene_stats.particle_systems_emitters_total += static_cast<int>(particle_system->get_emitters().size());
+        m_scene_stats.particle_systems_active += particle_system->is_active ? 1 : 0;
+        for (const auto& emitter : particle_system->get_emitters())
+        {
+            const int emitter_alive_particles = emitter->get_alive_count();
+            m_scene_stats.particle_systems_emitters_active += emitter_alive_particles <= 0 ? 1 : 0;
+            m_scene_stats.particle_systems_emitters_visible += m_scene_stats.particle_systems_emitters_active; // @TODO: Use bounding box as a culling volume
+            m_scene_stats.particle_systems_particles_total += emitter_alive_particles;
+        }
+    }
+
+    // Advanced Particle Systems Stats (Cummulative with Sprite Particle Systems)
+    m_scene_stats.particle_systems_total += static_cast<int>(m_advanced_particle_systems.size());
+    for (const AdvancedParticleSystem* advanced_particle_system : m_advanced_particle_systems)
+    {
+        m_scene_stats.particle_systems_particles_total += advanced_particle_system->get_particles_amount();
+    }
+
+    return m_scene_stats;
+}
+
 void Scene::initialize_default_scene_objects()
 {
     instantiate<Grid>(nullptr);

@@ -40,6 +40,8 @@ public:
     void update(float dt) override;
     void draw() const override;
 
+    int get_particles_amount() const; // @TODO: Properly set up advanced particle stats and properties
+
 private:
     void emit() const override;
     void simulate() const override;
