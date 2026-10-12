@@ -49,4 +49,5 @@ private:
     void draw_toolbar() override;
     void draw_visual_modes_selection();
     void draw_editor_overlays_selection();
+    void draw_stats_popup();
 };

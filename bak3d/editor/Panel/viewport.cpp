@@ -6,8 +6,10 @@
 #include "imgui_b3d_extensions.h"
 #include "Core/global_settings.h"
 #include "Input/event_manager.h"
+#include "Renderer/light_renderer.h"
 #include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
+#include "Scene/scene_manager.h"
 
 using namespace std;
 
@@ -149,6 +151,10 @@ void Viewport::draw_toolbar()
     ImGui::SameLine();
 
     draw_editor_overlays_selection();
+
+    ImGui::SameLine();
+
+    draw_stats_popup();
 
     ImGui::SameLine();
 }
@@ -316,5 +322,83 @@ void Viewport::draw_editor_overlays_selection()
     if (GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::EditorOverlayFlags) != overlay_flags_numbered)
     {
         GlobalSettings::set_global_setting<uint32_t>(GlobalSettingOption::EditorOverlayFlags, overlay_flags_numbered);
+    }
+}
+
+void Viewport::draw_stats_popup()
+{
+    if (ImGui::Button("Scene Stats"))
+    {
+        ImGui::OpenPopup("Scene Stats Popup");
+    }
+
+    const ImVec2 button_position = ImGui::GetItemRectMin();
+    const float button_size_vertical = ImGui::GetItemRectSize().y;
+
+    ImGui::SetNextWindowSize(ImVec2(250.0f, 0.0f));
+    ImGui::SetNextWindowPos(ImVec2(button_position.x, button_position.y + button_size_vertical));
+    if (ImGui::BeginPopup("Scene Stats Popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove))
+    {
+        ImGui::SeparatorText("Lights");
+        if (ImGui::BeginTable("LightsStatsTable", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings))
+        {
+            ImGui::TableSetupColumn("Stat Name", ImGuiTableColumnFlags_WidthStretch, 0.7f);
+            ImGui::TableSetupColumn("Stat Value", ImGuiTableColumnFlags_WidthStretch, 0.3f);
+
+            // Existing Lights
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Existing Lights:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", static_cast<int>(SceneManager::get_current_scene()->get_all_lights().size()));
+
+            // Active Lights
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Active Lights:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", LightRenderer::get_visible_light_count());
+
+            // Visible Lights
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Visible Lights:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", LightRenderer::get_visible_light_count());
+
+            ImGui::EndTable();
+        }
+
+        ImGui::SeparatorText("Meshes");
+        if (ImGui::BeginTable("MeshesStatsTable", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings))
+        {
+            ImGui::TableSetupColumn("Stat Name", ImGuiTableColumnFlags_WidthStretch, 0.7f);
+            ImGui::TableSetupColumn("Stat Value", ImGuiTableColumnFlags_WidthStretch, 0.3f);
+
+            // Existing Meshes
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Existing Meshes:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", static_cast<int>(SceneManager::get_current_scene()->get_all_meshes().size()));
+
+            // Active Meshes
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Active Meshes:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", LightRenderer::get_visible_light_count());
+
+            // Visible Meshes
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted("Visible Meshes:");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%d", LightRenderer::get_visible_light_count());
+
+            ImGui::EndTable();
+        }
+
+        ImGui::EndPopup();
     }
 }
