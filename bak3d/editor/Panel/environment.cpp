@@ -144,13 +144,15 @@ void Environment::draw_general_settings()
 
 void Environment::draw_shadow_settings()
 {
+    ShadowSettings& shadow_settings = ShadowRenderer::get_settings();
+    ImGuiB3D::PropertyToggle("Cast Shadows", &shadow_settings.cast_shadows, "Global toggle for processing shadows in the Renderer.");
+
+    ImGui::BeginDisabled(!shadow_settings.cast_shadows);
+
     const bool modified = ShadowRenderer::is_modified();
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-
     if (ImGui::TreeNode(modified ? "Shadows (modified)###ShadowsNode" : "Shadows###ShadowsNode"))
     {
-        ShadowSettings& shadow_settings = ShadowRenderer::get_settings();
-
         ImGui::BeginDisabled(!modified);
         if (ImGuiB3D::PropertyButton("Reset", "Reset Shadows", "Restore all shadow settings to their defaults."))
         {
@@ -168,24 +170,28 @@ void Environment::draw_shadow_settings()
             ShadowRenderer::apply_resolution(resolution_values[resolution_index]);
         }
 
-        ImGuiB3D::PropertySliderFloat("Depth Bias", &shadow_settings.depth_bias_texels, 0.0f, 8.0f, "%.2f", "Constant bias in shadow texels. Fixes acne.");
-        ImGuiB3D::PropertySliderFloat("Slope Bias", &shadow_settings.slope_bias_texels, 0.0f, 8.0f, "%.2f", "Extra bias on surfaces at grazing angles to the light.");
+        ImGuiB3D::PropertySliderFloat("Depth Bias", &shadow_settings.depth_bias_texels, 0.0f, 8.0f, "%.2f", "Constant bias in shadow texels.");
+        ImGuiB3D::PropertySliderFloat("Slope Bias", &shadow_settings.slope_bias_texels, 0.0f, 8.0f, "%.2f", "Extra bias at grazing angles. Ignored when Receiver Plane Bias is on.");
         ImGuiB3D::PropertySliderFloat("Normal Offset", &shadow_settings.normal_offset_texels, 0.0f, 8.0f, "%.2f", "Pushes the lookup along the normal. Fixes acne without Peter Panning.");
-        ImGuiB3D::PropertySliderInt("PCF Radius", &shadow_settings.pcf_radius, 0, 3, "Filter kernel: 0 = hard, 1 = 3x3, 2 = 5x5. Cost is (2r+1)^2 taps.");
-        ImGuiB3D::PropertyToggle("Cull Front Faces", &shadow_settings.cull_front_faces, "Render back faces into the map. Single-sided planes won't cast.");
+        ImGuiB3D::PropertyToggle("Receiver Plane Bias", &shadow_settings.receiver_plane_bias, "Per-sample depth correction from the surface normal. Removes acne across wide PCSS kernels.");
+        ImGuiB3D::PropertySliderFloat("Polygon Offset Factor", &shadow_settings.polygon_offset_factor, 0.0f, 8.0f, "%.2f", "Slope-scaled depth offset in the shadow depth pass.");
+        ImGuiB3D::PropertySliderFloat("Polygon Offset Units", &shadow_settings.polygon_offset_units, 0.0f, 16.0f, "%.2f", "Constant depth offset in the shadow depth pass.");
+        ImGuiB3D::PropertyToggle("Cull Front Faces", &shadow_settings.cull_front_faces, "Render back faces into the map. Single-sided planes and open meshes won't cast.");
         ImGuiB3D::PropertySliderFloat("Near Plane", &shadow_settings.near_plane, 0.01f, 5.0f, "%.2f", "Near plane of the light projection.");
 
-        ImGui::SeparatorText("Directional");
-        ImGuiB3D::PropertyDragFloat3("Focus", &shadow_settings.directional_focus, 0.1f, 0.0f, 0.0f, "%.2f", "World point the shadow box is centered on.");
-        ImGuiB3D::PropertySliderFloat("Extent", &shadow_settings.directional_extent, 1.0f, 100.0f, "%.1f", "Half-size of the orthographic box. Larger = wider coverage, blurrier shadows.");
-        ImGuiB3D::PropertySliderFloat("Depth Range", &shadow_settings.directional_depth_range, 10.0f, 500.0f, "%.1f", "Depth of the box along the light axis.");
+        ImGui::SeparatorText("Filtering (PCSS)");
 
-        ImGui::SeparatorText("Spot");
-        ImGuiB3D::PropertySliderFloat("Max Range", &shadow_settings.spot_max_range, 10.0f, 500.0f, "%.1f", "Far plane cap for spot shadows.");
-        ImGuiB3D::PropertySliderFloat("FOV Margin", &shadow_settings.spot_fov_margin_degrees, 0.0f, 10.0f, "%.1f", "Extra degrees added to the cone so edges aren't clipped.");
+        ImGuiB3D::PropertyToggle("PCSS", &shadow_settings.pcss_enabled, "Contact-hardening soft shadows. When off, a fixed-radius disk filter is used.");
+        ImGuiB3D::PropertySliderInt("Min Filter Radius", &shadow_settings.pcf_radius, 0, 4, "Minimum filter radius in shadow texels.");
+        ImGuiB3D::PropertySliderFloat("Max Filter Radius", &shadow_settings.max_filter_radius_texels, 1.0f, 64.0f, "%.1f", "Caps penumbra width in texels. Bounds cost and noise.");
+        ImGuiB3D::PropertySliderInt("Blocker Samples", &shadow_settings.blocker_samples, 1, 64, "Taps for the blocker search.");
+        ImGuiB3D::PropertySliderInt("Filter Samples", &shadow_settings.filter_samples, 1, 128, "Taps for the final filter.");
+        ImGuiB3D::PropertySliderFloat("Sun Angular Size", &shadow_settings.directional_angular_size_degrees, 0.0f, 10.0f, "%.2f", "Directional light angular diameter in degrees. Larger = softer penumbra.");
+        ImGuiB3D::PropertySliderFloat("Spot Light Radius", &shadow_settings.spot_light_radius, 0.0f, 5.0f, "%.2f", "Spot light source radius in world units.");
 
         ImGui::TreePop();
     }
+    ImGui::EndDisabled();
 }
 
 void Environment::draw_post_processor_settings()

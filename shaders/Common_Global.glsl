@@ -25,9 +25,10 @@ uniform mat4 model;
 struct ShadowData
 {
     mat4 light_space_matrix;
-    vec4 bias_params;       // x = const bias, y = slope bias, z = normal offset (shadow texels), w = PCF radius
-    vec4 projection_params; // x = near,       y = far,        z = frustum scale,                 w = 1 perspective / 0 ortho
-    vec4 map_params;        // x = resolution, rest are padding
+    vec4 bias_params;       // x = const bias,      y = slope bias,     z = normal offset (shadow texels), w = PCF radius
+    vec4 projection_params; // x = near,            y = far,            z = frustum scale,                 w = 1 perspective / 0 ortho
+    vec4 map_params;        // x = resolution,      y = enabled,        z = light size,                    w = max filter radius (texels)
+    vec4 pcss_params;       // x = blocker samples, y = filter samples, z = flags,                         w = unused
 };
 
 layout (std430, binding = 14) readonly buffer ShadowBuffer
@@ -221,61 +222,160 @@ float shadow_linear_depth(vec4 projection_params, float depth)
     return near + depth * (far - near); // ortho
 }
 
+// Golden-angle spiral: even radial distribution for any sample count
+vec2 vogel_disk(int index, int count, float rotation)
+{
+    float radius = sqrt((float(index) + 0.5) / float(count));
+    float angle = float(index) * 2.39996323 + rotation;
+    return radius * vec2(cos(angle), sin(angle));
+}
+
+// World-position hash: per-pixel rotation without gl_FragCoord (this file is also included by non-fragment stages)
+float shadow_disk_rotation(vec3 p)
+{
+    uint seed = pcg_hash(floatBitsToUint(p.x) ^ pcg_hash(floatBitsToUint(p.y) ^ pcg_hash(floatBitsToUint(p.z))));
+    return pcg_hash_rand01(seed) * 6.28318530718;
+}
+
+// textureLod: implicit derivatives are undefined inside non-uniform branches
+float shadow_sample_linear_depth(vec4 projection_params, vec2 uv, float layer)
+{
+    return shadow_linear_depth(projection_params, textureLod(shadow_map, vec3(uv, layer), 0.0).r);
+}
+
 // Returns 1.0 = fully lit, 0.0 = fully shadowed. light_direction points from the fragment to the light.
 float calculate_shadow(LightData light, vec3 frag_position, vec3 normal, vec3 light_direction)
 {
-    if (light.shadow_index < 0) // Are shadows enabled?
+    if (light.shadow_index < 0)
     {
         return 1.0;
     }
 
-    ShadowData shadow_entry = shadow_data.entries[light.shadow_index];
-    bool is_perspective = shadow_entry.projection_params.w > 0.5;
-    float map_size = shadow_entry.map_params.x;
-    float pcf_radius = shadow_entry.bias_params.w;
-    float n_dot_l = clamp(dot(normal, light_direction), 0.0, 1.0);
+    // Surface faces away from the light: diffuse/specular are zero anyway
+    float n_dot_l = min(dot(normal, light_direction), 1.0);
+    if (n_dot_l <= 0.0)
+    {
+        return 0.0;
+    }
 
-    // World-space size of one shadow texel at this fragment.
-    // Constant for orthographic, grows with distance for perspective view.
-    vec4 probe = shadow_entry.light_space_matrix * vec4(frag_position, 1.0);
+    ShadowData entry = shadow_data.entries[light.shadow_index];
+    bool is_perspective = entry.projection_params.w > 0.5;
+    float near_plane = entry.projection_params.x;
+    float far_plane = entry.projection_params.y;
+    float frustum_scale = entry.projection_params.z;
+    float map_size = entry.map_params.x;
+    float texel_uv = 1.0 / map_size;
+    uint flags = uint(entry.pcss_params.z);
+
+    // Early out: behind or beyond a perspective light
+    vec4 probe = entry.light_space_matrix * vec4(frag_position, 1.0);
+    if (is_perspective && (probe.w <= 0.0 || probe.w >= far_plane))
+    {
+        return 1.0;
+    }
+
+    // World-space size of one shadow texel at this fragment
     float light_distance = is_perspective ? probe.w : 1.0;
-    float texel_world_size = 2.0 * shadow_entry.projection_params.z * light_distance / map_size;
+    float texel_world_size = 2.0 * frustum_scale * light_distance / map_size;
 
-    // Normal offset: push the lookup position off the surface, more at grazing angles
+    // Normal offset
     float sin_theta = sqrt(1.0 - n_dot_l * n_dot_l);
-    vec3 offset_position = frag_position + normal * (shadow_entry.bias_params.z * texel_world_size * sin_theta);
+    vec3 offset_position = frag_position + normal * (entry.bias_params.z * texel_world_size * sin_theta);
 
-    vec4 light_clip = shadow_entry.light_space_matrix * vec4(offset_position, 1.0);
+    vec4 light_clip = entry.light_space_matrix * vec4(offset_position, 1.0);
     if (light_clip.w <= 0.0)
     {
-        return 1.0; // behind a perspective light
+        return 1.0;
     }
     vec3 coords = light_clip.xyz / light_clip.w * 0.5 + 0.5;
 
-    // Lit beyond far plane of depth map
-    if (coords.z > 1.0)
+    // Early out: outside the light's frustum
+    if (coords.z > 1.0 || coords.z < 0.0
+        || any(lessThan(coords.xy, vec2(0.0))) || any(greaterThan(coords.xy, vec2(1.0))))
     {
         return 1.0;
     }
 
-    // Bias and PCF handling
-    float bias = (shadow_entry.bias_params.x + shadow_entry.bias_params.y * (1.0 - n_dot_l) * (1.0 + pcf_radius)) * texel_world_size;
-    float current_depth = shadow_linear_depth(shadow_entry.projection_params, coords.z) - bias;
+    float receiver_depth = shadow_linear_depth(entry.projection_params, coords.z);
+    float world_per_uv = 2.0 * (is_perspective ? frustum_scale * receiver_depth : frustum_scale);
+    float min_radius_uv = entry.bias_params.w * texel_uv;
+    float max_radius_uv = max(entry.map_params.w * texel_uv, min_radius_uv);
+    float light_size = entry.map_params.z;
 
-    // PCF
-    int radius = int(pcf_radius);
-    vec2 texel = vec2(1.0 / map_size);
-    float layer = float(light.shadow_index);
-    float lit = 0.0;
-    for (int x = -radius; x <= radius; ++x)
+    // Bias: receiver plane (analytic, from the normal) or constant + slope
+    float bias = entry.bias_params.x * texel_world_size;
+    vec2 plane_slope = vec2(0.0); // linear depth change per unit UV offset
+    float plane_clamp = 0.0;
+    if ((flags & 2u) != 0u)
     {
-        for (int y = -radius; y <= radius; ++y)
+        mat4 m = entry.light_space_matrix;
+        vec3 axis_right = normalize(vec3(m[0][0], m[1][0], m[2][0]));
+        vec3 axis_up = normalize(vec3(m[0][1], m[1][1], m[2][1]));
+        plane_slope = vec2(dot(normal, axis_right), dot(normal, axis_up)) * world_per_uv / max(n_dot_l, 0.1);
+        plane_clamp = 2.0 * max_radius_uv * world_per_uv;
+    }
+    else
+    {
+        bias += entry.bias_params.y * (1.0 - n_dot_l) * (1.0 + entry.bias_params.w) * texel_world_size;
+    }
+    float biased_depth = receiver_depth - bias;
+
+    float layer = float(light.shadow_index);
+    float rotation = shadow_disk_rotation(frag_position);
+    float filter_radius_uv = min_radius_uv;
+
+    // PCSS blocker search (also serves as the coarse early-out test)
+    if ((flags & 1u) != 0u)
+    {
+        float search_world = is_perspective
+        ? light_size * (receiver_depth - near_plane) / receiver_depth
+        : light_size * (receiver_depth - near_plane);
+        float search_radius_uv = clamp(search_world / world_per_uv, min_radius_uv, max_radius_uv);
+
+        int blocker_samples = int(entry.pcss_params.x);
+        int blocker_count = 0;
+        float blocker_sum = 0.0;
+        for (int i = 0; i < blocker_samples; ++i)
         {
-            float stored_depth = texture(shadow_map, vec3(coords.xy + vec2(x, y) * texel, layer)).r;
-            lit += current_depth <= shadow_linear_depth(shadow_entry.projection_params, stored_depth) ? 1.0 : 0.0;
+            vec2 offset = vogel_disk(i, blocker_samples, rotation) * search_radius_uv;
+            float blocker_depth = shadow_sample_linear_depth(entry.projection_params, coords.xy + offset, layer);
+            float sample_receiver = biased_depth + clamp(dot(plane_slope, offset), -plane_clamp, plane_clamp);
+            if (blocker_depth < sample_receiver)
+            {
+                blocker_count++;
+                blocker_sum += blocker_depth;
+            }
+        }
+
+        if (blocker_count == 0)
+        {
+            return 1.0; // nothing in the region: fully lit
+        }
+
+        float average_blocker = blocker_sum / float(blocker_count);
+        float penumbra_world = is_perspective
+        ? light_size * (receiver_depth - average_blocker) / average_blocker
+        : light_size * (receiver_depth - average_blocker);
+        filter_radius_uv = clamp(penumbra_world / world_per_uv, min_radius_uv, max_radius_uv);
+
+        // Everything blocked and the filter fits inside the search region: umbra
+        if (blocker_count == blocker_samples && filter_radius_uv <= search_radius_uv)
+        {
+            return 0.0;
         }
     }
-    return lit / float((2 * radius + 1) * (2 * radius + 1));
+
+    // Filter (penumbra pixels only reach here under PCSS)
+    int filter_samples = filter_radius_uv < 0.5 * texel_uv ? 1 : int(entry.pcss_params.y);
+    float lit = 0.0;
+    for (int i = 0; i < filter_samples; ++i)
+    {
+        vec2 offset = vogel_disk(i, filter_samples, rotation) * filter_radius_uv;
+        float stored_depth = shadow_sample_linear_depth(entry.projection_params, coords.xy + offset, layer);
+        float sample_receiver = biased_depth + clamp(dot(plane_slope, offset), -plane_clamp, plane_clamp);
+        lit += sample_receiver <= stored_depth ? 1.0 : 0.0;
+    }
+    return lit / float(filter_samples);
 }
 
 vec3 process_deferred_light_contribution(

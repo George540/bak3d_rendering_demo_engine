@@ -39,20 +39,36 @@ struct ShadowGPUData
     glm::vec4 bias_params = glm::vec4(0.0f);       // x = const bias, y = slope bias, z = normal offset (all shadow texels), w = PCF radius (texels)
     glm::vec4 projection_params = glm::vec4(0.0f); // x = near, y = far, z = frustum scale (ortho half-extent | tan(half fov)), w = 1 perspective / 0 ortho
     glm::vec4 map_params = glm::vec4(0.0f);        // x = resolution, y = enabled
+    glm::vec4 pcss_params = glm::vec4(0.0f);       // x = blocker samples, y = filter samples, z = flags (bit0 PCSS, bit1 receiver plane bias), w = unused
 };
 static constexpr GLsizei SHADOW_GPU_DATA_SIZE = sizeof(ShadowGPUData);
-static_assert(SHADOW_GPU_DATA_SIZE == 112, "Must match ShadowEntry std430 layout");
+static_assert(SHADOW_GPU_DATA_SIZE == 128, "Must match ShadowEntry std430 layout");
 
 // Tunable settings collected in a single payload
 struct ShadowSettings
 {
+    bool cast_shadows = true;
+    
     GLuint resolution = 2048;
 
     float depth_bias_texels = 1.0f;
     float slope_bias_texels = 2.0f;
     float normal_offset_texels = 1.5f;
-    int pcf_radius = 1; // 1 = 3x3, 2 = 5x5
-    bool cull_front_faces = true; // render back faces into the map (acne + peter panning); single-sided planes won't cast
+    int pcf_radius = 1; // 1 = 3x3, 2 = 5x5 (PCSS never goes below this)
+    bool cull_front_faces = false; // render back faces into the map (acne + peter panning); single-sided planes won't cast
+
+    // Depth pass slope-scale bias
+    float polygon_offset_factor = 1.5f;
+    float polygon_offset_units = 2.0f;
+
+    // PCSS
+    bool pcss_enabled = true;
+    bool receiver_plane_bias = true;
+    float directional_angular_size_degrees = 0.53f; // full angular diameter (the sun is ~0.53)
+    float spot_light_radius = 0.25f; // world units
+    int blocker_samples = 16;
+    int filter_samples = 32;
+    float max_filter_radius_texels = 24.0f;
 
     float near_plane = 0.1f;
 
@@ -95,7 +111,6 @@ private:
     static ShadowGPUData build_shadow_data(const Light& light);
     static void ensure_layer_capacity(size_t needed);
     static void update_and_upload_data();
-    static void render_depth_pass(const ShaderRef& shader);
 
     static std::unique_ptr<ShadowMapFrameBuffer> m_shadow_fbo;
     static std::unique_ptr<ShaderStorageBuffer> m_shadow_ssbo;

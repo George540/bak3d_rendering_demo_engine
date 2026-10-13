@@ -80,6 +80,8 @@ void ShadowRenderer::render()
     glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
     glCullFace(m_settings.cull_front_faces ? GL_FRONT : GL_BACK);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(m_settings.polygon_offset_factor, m_settings.polygon_offset_units);
 
     shader->use();
     for (size_t layer = 0; layer < m_light_casters.size(); ++layer)
@@ -118,6 +120,7 @@ void ShadowRenderer::render()
     }
     shader->unuse();
 
+    glDisable(GL_POLYGON_OFFSET_FILL);
     glCullFace(GL_BACK);
     m_shadow_fbo->unbind();
 
@@ -137,6 +140,11 @@ void ShadowRenderer::select_casters(const vector<const Light*>& visible_lights, 
 {
     m_light_casters.clear();
     m_shadow_data.clear();
+
+    if (!m_settings.cast_shadows)
+    {
+        return;
+    }
 
     const ShaderRef shader = ResourceManager::get_shader("shadow_depth");
     if (!shader || !shader->is_shader_compiled())
@@ -210,12 +218,14 @@ ShadowGPUData ShadowRenderer::build_shadow_data(const Light& light)
     float far_plane;
     float frustum_scale;
     float is_perspective;
+    float light_size;
 
     if (light.get_type() == LightType::Directional)
     {
         far_plane = settings.directional_depth_range;
         frustum_scale = settings.directional_extent;
         is_perspective = 0.0f;
+        light_size = glm::tan(glm::radians(settings.directional_angular_size_degrees * 0.5f));
         eye = settings.directional_focus - direction * (far_plane * 0.5f); // box centered on focus along the light axis
         projection = glm::ortho(-frustum_scale, frustum_scale, -frustum_scale, frustum_scale, settings.near_plane, far_plane);
     }
@@ -227,15 +237,23 @@ ShadowGPUData ShadowRenderer::build_shadow_data(const Light& light)
         far_plane = glm::min(light.get_effective_radius(), settings.spot_max_range);
         frustum_scale = glm::tan(fov * 0.5f);
         is_perspective = 1.0f;
+        light_size = settings.spot_light_radius;
         eye = light.transform.get_global_position();
         projection = glm::perspective(fov, 1.0f, settings.near_plane, far_plane);
     }
+
+    const int flags = (settings.pcss_enabled ? 1 : 0) | (settings.receiver_plane_bias ? 2 : 0);
 
     ShadowGPUData data;
     data.light_space_matrix = projection * glm::lookAt(eye, eye + direction, up);
     data.bias_params = glm::vec4(settings.depth_bias_texels, settings.slope_bias_texels, settings.normal_offset_texels, static_cast<float>(settings.pcf_radius));
     data.projection_params = glm::vec4(settings.near_plane, far_plane, frustum_scale, is_perspective);
-    data.map_params = glm::vec4(static_cast<float>(settings.resolution), 1.0f, 0.0f, 0.0f);
+    data.map_params = glm::vec4(static_cast<float>(settings.resolution), 1.0f, light_size, settings.max_filter_radius_texels);
+    data.pcss_params = glm::vec4(
+        static_cast<float>(glm::clamp(settings.blocker_samples, 1, 64)),
+        static_cast<float>(glm::clamp(settings.filter_samples, 1, 128)),
+        static_cast<float>(flags),
+        0.0f);
     return data;
 }
 
@@ -261,40 +279,4 @@ void ShadowRenderer::update_and_upload_data()
     m_shadow_ssbo->bind();
     m_shadow_ssbo->bind_buffer_data(m_shadow_data.data(), size);
     m_shadow_ssbo->bind_to_binding_point(SHADOW_DATA_SSBO_BINDING);
-}
-
-void ShadowRenderer::render_depth_pass(const ShaderRef& shader)
-{
-    // Avoid a feedback loop: the map must not be bound for sampling while it is the render target
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_TEXTURE_UNIT);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0);
-
-    m_shadow_fbo->bind(); // also sets the viewport to the map resolution
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    glCullFace(m_settings.cull_front_faces ? GL_FRONT : GL_BACK);
-
-    shader->use();
-    for (const Mesh* mesh : SceneManager::get_current_scene()->get_all_meshes())
-    {
-        if (!mesh->is_visible() || !mesh->has_mesh())
-        {
-            continue;
-        }
-        shader->set_mat4("model", mesh->transform.get_global_model_matrix());
-        mesh->get_mesh()->draw();
-    }
-    shader->unuse();
-
-    glCullFace(GL_BACK);
-    m_shadow_fbo->unbind();
-
-    // Leave the map bound for the geometry passes
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_TEXTURE_UNIT);
-    glBindTexture(GL_TEXTURE_2D, m_shadow_fbo->get_depth_texture());
-    glActiveTexture(GL_TEXTURE0);
 }
