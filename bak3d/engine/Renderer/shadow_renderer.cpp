@@ -36,6 +36,7 @@ vector<const Light*> ShadowRenderer::m_light_casters;
 vector<ShadowGPUData> ShadowRenderer::m_shadow_data;
 GLuint ShadowRenderer::m_max_layers = 1;
 ShadowSettings ShadowRenderer::m_settings;
+GLuint ShadowRenderer::m_preview_view = 0;
 
 void ShadowRenderer::initialize()
 {
@@ -54,6 +55,11 @@ void ShadowRenderer::initialize()
 
 void ShadowRenderer::shutdown()
 {
+    if (m_preview_view != 0)
+    {
+        glDeleteTextures(1, &m_preview_view); m_preview_view = 0;
+    }
+
     m_light_casters.clear();
     m_shadow_data.clear();
     m_shadow_fbo.reset();
@@ -134,6 +140,32 @@ int ShadowRenderer::get_shadow_index(const Light* light)
 {
     const auto it = ranges::find(m_light_casters, light);
     return it == m_light_casters.end() ? -1 : static_cast<int>(it - m_light_casters.begin());
+}
+
+GLuint ShadowRenderer::get_light_preview_texture(const Light* light)
+{
+    const int layer = get_shadow_index(light);
+    const GLuint source = get_shadow_map_texture();
+    if (layer < 0 || source == 0)
+    {
+        return 0;
+    }
+
+    if (m_preview_view != 0)
+    {
+        glDeleteTextures(1, &m_preview_view);
+    }
+    glGenTextures(1, &m_preview_view);
+    glTextureView(m_preview_view, GL_TEXTURE_2D, source, GL_DEPTH_COMPONENT32F, 0, 1, static_cast<GLuint>(layer), 1);
+
+    glBindTexture(GL_TEXTURE_2D, m_preview_view);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, SWIZZLE_MASK);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return m_preview_view;
 }
 
 void ShadowRenderer::select_casters(const vector<const Light*>& visible_lights, const glm::vec3& camera_position)

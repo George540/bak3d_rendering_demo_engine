@@ -84,9 +84,11 @@ public:
 
 	[[nodiscard]] glm::vec3 get_forward_vector() const;
 	[[nodiscard]] glm::vec3 get_right_vector() const;
-	[[nodiscard]] Frustum get_frustum() const { return m_frustum; };
+	[[nodiscard]] Frustum get_frustum() const { return m_frustum; }
 
 private:
+	void upload_camera_data() const;
+
 	double m_cam_speed = 20.0f;
 	float m_fov = 45.0f; // camera zoom
 

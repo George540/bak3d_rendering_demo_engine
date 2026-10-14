@@ -501,7 +501,7 @@ void ShadowMapFrameBuffer::create_attachments()
 {
     glGenTextures(1, &m_depth_texture);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_depth_texture);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, m_width, m_height, m_layer_count, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT32F, m_width, m_height, m_layer_count);
 
     // Nearest filtering for custom PCF
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // PCF is manual

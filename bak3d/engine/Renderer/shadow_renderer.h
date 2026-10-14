@@ -98,6 +98,8 @@ public:
     static void render();
 
     static int get_shadow_index(const Light* light);
+    static GLuint get_shadow_map_texture() { return m_shadow_fbo ? m_shadow_fbo->get_depth_texture() : 0; }
+    static GLuint get_light_preview_texture(const Light* light);
     static ShadowSettings& get_settings() { return m_settings; }
     static void set_settings(const ShadowSettings& s) { m_settings = s; }
 
@@ -118,4 +120,5 @@ private:
     static std::vector<ShadowGPUData> m_shadow_data;
     static GLuint m_max_layers;
     static ShadowSettings m_settings;
+    static GLuint m_preview_view;
 };

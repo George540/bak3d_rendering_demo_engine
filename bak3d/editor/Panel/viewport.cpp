@@ -10,6 +10,7 @@
 #include "Renderer/light_renderer.h"
 #include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
+#include "Renderer/shadow_renderer.h"
 #include "Scene/scene_manager.h"
 
 using namespace std;
@@ -17,9 +18,14 @@ using namespace std;
 namespace
 {
     constexpr float IMGUI_VIEWPORT_POPUP_WIDTH = 250.0f;
+    constexpr float IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL = 256.0f;
+    constexpr float IMGUI_VIEWPORT_HIGHLIGHT_POPUP_VERTICAL = 144.0f;
+    constexpr float IMGUI_PREVIEW_OVERLAY_MARGIN = 10.0f;
     ImVec2 previous_viewport_size = ImVec2(0, 0);
     ImVec2 viewport_panel_size = ImVec2(0, 0);
     bool m_camera_look_started_in_viewport = false;
+    ImVec2 viewport_image_min = ImVec2(0, 0);
+    ImVec2 viewport_image_max = ImVec2(0, 0);
 
     OverlaysFlags current_overlay_flags = OverlaysFlags::None;
 
@@ -107,6 +113,7 @@ void Viewport::update()
 
     draw_viewport();
     sync_camera_controls();
+    draw_preview_overlay();
 }
 
 void Viewport::end_frame()
@@ -165,6 +172,9 @@ void Viewport::draw_viewport()
         uv1
     );
 
+    viewport_image_min = ImGui::GetItemRectMin();
+    viewport_image_max = ImGui::GetItemRectMax();
+
     // Viewport dimensions syncing
     previous_viewport_size = viewport_panel_size;
     EventManager::set_viewport_width(viewport_panel_size.x);
@@ -184,6 +194,69 @@ void Viewport::sync_camera_controls()
     }
     EventManager::set_scrolling_enabled(viewport_hovered);
     EventManager::set_camera_looking(m_camera_look_started_in_viewport);
+}
+
+void Viewport::draw_preview_overlay()
+{
+    const Scene* scene = SceneManager::get_current_scene();
+    const SceneObject* selected = scene ? scene->get_selected_scene_object() : nullptr;
+    if (!selected)
+    {
+        return;
+    }
+
+    GLuint preview_texture = 0;
+    ImVec2 image_size;
+
+    if (selected->get_object_type() == SceneObjectType::Camera)
+    {
+        if (selected == scene->get_current_camera()) // @TODO: Make sure that it only applies to game scene cameras and not editor cameras
+        {
+            const FrameBuffer* main_fbo = Renderer::get_main_frame_buffer();
+            preview_texture = main_fbo->get_color_texture();
+            image_size = ImVec2(IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL, IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL / main_fbo->get_aspect_ratio());
+        }
+    }
+    else if (selected->get_object_type() == SceneObjectType::Light)
+    {
+        preview_texture = ShadowRenderer::get_light_preview_texture(dynamic_cast<const Light*>(selected));
+        image_size = ImVec2(IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL, IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL);
+
+        if (preview_texture == 0)
+        {
+            return; // Early exist for non-shadow casters
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    const ImGuiStyle& style = ImGui::GetStyle();
+    const ImVec2 panel_size(image_size.x + style.WindowPadding.x * 2.0f,
+                            image_size.y + ImGui::GetTextLineHeight() + style.ItemSpacing.y + style.WindowPadding.y * 2.0f);
+
+    // Skip if the viewport is too small to host the popup
+    const ImVec2 viewport_size(viewport_image_max.x - viewport_image_min.x, viewport_image_max.y - viewport_image_min.y);
+    if (viewport_size.x < panel_size.x + IMGUI_PREVIEW_OVERLAY_MARGIN * 2.0f || viewport_size.y < panel_size.y + IMGUI_PREVIEW_OVERLAY_MARGIN * 2.0f)
+    {
+        return;
+    }
+
+    ImGui::SetCursorScreenPos(ImVec2(viewport_image_min.x + IMGUI_PREVIEW_OVERLAY_MARGIN, viewport_image_max.y - panel_size.y - IMGUI_PREVIEW_OVERLAY_MARGIN));
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.10f, 0.10f, 0.10f, 0.75f));
+    if (ImGui::BeginChild("##Object_Preview_Overlay", panel_size, ImGuiChildFlags_Borders, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+    {
+        ImGui::TextUnformatted(ImGuiB3D::TruncateLabel(selected->get_object_name(), image_size.x).c_str());
+
+        if (preview_texture != 0)
+        {
+            ImGui::Image(preview_texture, image_size, ImVec2(0, 1), ImVec2(1, 0));
+        }
+    }
+    ImGui::EndChild();
+    ImGui::PopStyleColor();
 }
 
 float Viewport::get_viewport_width() const
