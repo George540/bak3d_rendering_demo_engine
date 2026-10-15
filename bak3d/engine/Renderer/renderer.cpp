@@ -159,8 +159,7 @@ void Renderer::draw_frame()
 	// Deferred Rendering: Resolve into main
 	// ------------------------------------------------------------
 	r_main_fbo->bind();
-	const auto background_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
-	glClearColor(background_color.r, background_color.g, background_color.b, background_color.a);
+	glClearColor(0.133f, 0.168f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT); // depth/stencil already holds GBuffer's values, don't touch them
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);

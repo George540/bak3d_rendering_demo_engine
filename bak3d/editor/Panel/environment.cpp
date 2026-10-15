@@ -72,19 +72,11 @@ void Environment::update()
 {
     EditorPanel::update();
 
-    draw_tools_settings();
-
-    ImGuiB3D::SeparatorWithSpacing(1);
-
-    draw_general_settings();
-
-    ImGuiB3D::SeparatorWithSpacing(1);
-
     draw_shadow_settings();
 
     ImGuiB3D::SeparatorWithSpacing(1);
 
-    draw_post_processor_settings();
+    draw_post_processing_settings();
 
     ImGuiB3D::SeparatorWithSpacing(1);
 }
@@ -92,54 +84,6 @@ void Environment::update()
 void Environment::end_frame()
 {
     EditorPanel::end_frame();
-}
-
-void Environment::draw_tools_settings()
-{
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("GPU & Display"))
-    {
-        // Force Fail
-        bool force_fail = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail);
-        ImGuiB3D::PropertyToggle("Force Fail Hot-Reload", &force_fail, "Force shaders to output visual results even if they fail during compilation or hot-reload");
-        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Resources_ForceFail, force_fail);
-        
-        // Hot-Reload Shaders
-        if (ImGuiB3D::PropertyButton("Hot Reload", "Hot Reload Shaders", "Hot-Reload shaders after updating shader files after running sync_shaders.py script."))
-        {
-            ResourceManager::reload_shaders();
-        }
-
-        // Trigger Capture
-        if (ImGuiB3D::PropertyButton("Trigger Capture", "Trigger GPU Capture", "Trigger GPU frame capture if RenderDoc app is available. Make sure it's installed locally first!"))
-        {
-            RenderDocManager::trigger_capture();
-        }
-
-        // VSync
-        bool vsync = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Vsync);
-        if (ImGuiB3D::PropertyToggle("VSync", &vsync, "Toggle VSync. If enabled, GLFW frame rate synchronizes with display's refresh rate."))
-        {
-            EventManager::toggle_vsync(vsync);
-            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Vsync, vsync);
-        }
-
-        ImGui::TreePop();
-    }
-}
-
-void Environment::draw_general_settings()
-{
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("General"))
-    {
-        // Toggle background color
-        glm::vec4 bg_color_vec4 = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::BackgroundColor);
-        ImGuiB3D::ColorPicker4("Background Color", &bg_color_vec4, "Change background color using glClearColor(...)");
-        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::BackgroundColor, bg_color_vec4);
-
-        ImGui::TreePop();
-    }
 }
 
 void Environment::draw_shadow_settings()
@@ -170,6 +114,7 @@ void Environment::draw_shadow_settings()
             ShadowRenderer::apply_resolution(resolution_values[resolution_index]);
         }
 
+        ImGui::SeparatorText("General");
         ImGuiB3D::PropertySliderFloat("Depth Bias", &shadow_settings.depth_bias_texels, 0.0f, 8.0f, "%.2f", "Constant bias in shadow texels.");
         ImGuiB3D::PropertySliderFloat("Slope Bias", &shadow_settings.slope_bias_texels, 0.0f, 8.0f, "%.2f", "Extra bias at grazing angles. Ignored when Receiver Plane Bias is on.");
         ImGuiB3D::PropertySliderFloat("Normal Offset", &shadow_settings.normal_offset_texels, 0.0f, 8.0f, "%.2f", "Pushes the lookup along the normal. Fixes acne without Peter Panning.");
@@ -180,7 +125,6 @@ void Environment::draw_shadow_settings()
         ImGuiB3D::PropertySliderFloat("Near Plane", &shadow_settings.near_plane, 0.01f, 5.0f, "%.2f", "Near plane of the light projection.");
 
         ImGui::SeparatorText("Filtering (PCSS)");
-
         ImGuiB3D::PropertyToggle("PCSS", &shadow_settings.pcss_enabled, "Contact-hardening soft shadows. When off, a fixed-radius disk filter is used.");
         ImGuiB3D::PropertySliderInt("Min Filter Radius", &shadow_settings.pcf_radius, 0, 4, "Minimum filter radius in shadow texels.");
         ImGuiB3D::PropertySliderFloat("Max Filter Radius", &shadow_settings.max_filter_radius_texels, 1.0f, 64.0f, "%.1f", "Caps penumbra width in texels. Bounds cost and noise.");
@@ -194,136 +138,109 @@ void Environment::draw_shadow_settings()
     ImGui::EndDisabled();
 }
 
-void Environment::draw_post_processor_settings()
-{
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Effects"))
-    {
-        draw_post_processing_settings();
-
-        ImGui::TreePop();
-    }
-}
-
 void Environment::draw_post_processing_settings()
 {
+    bool post_process_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
+    ImGuiB3D::PropertyToggle("Post Processing", &post_process_enabled, "Toggle Post Processing.");
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Enabled, post_process_enabled);
+
+    ImGui::BeginDisabled(!post_process_enabled);
+
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Post Processing"))
     {
-        bool post_process_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcessing_Enabled);
-        ImGuiB3D::PropertyToggle("Enabled", &post_process_enabled, "Toggle Post Processing.");
-        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcessing_Enabled, post_process_enabled);
-
-        ImGui::BeginDisabled(!post_process_enabled);
-        {
-            draw_color_grading_settings();
-            draw_kernel_effect_settings();
-        }
-        ImGui::EndDisabled();
-
-        ImGuiB3D::SeparatorWithSpacing(1);
+        draw_color_grading_settings();
+        draw_kernel_effect_settings();
 
         ImGui::TreePop();
     }
+
+    ImGui::EndDisabled();
 }
 
 void Environment::draw_color_grading_settings()
 {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Color Grading"))
+    ImGui::SeparatorText("Color Grading");
+
+    if (ImGuiB3D::PropertyButton("Reset", "Reset Color Grading", "Reset Post Processing effects to disabled values."))
     {
-        if (ImGuiB3D::PropertyButton("Reset", "Reset Color Grading", "Reset Post Processing effects to disabled values."))
-        {
-            reset_color_grading_to_defaults();
-        }
-        
-        bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert);
-        ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
-        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert, invert);
-
-        bool grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale);
-        ImGuiB3D::PropertyToggle("Grayscale", &grayscale, "Turn color image into black and white using Perceptive Luminance.");
-        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale, grayscale);
-
-        float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness);
-        ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's brightness levels");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness, brightness);
-
-        float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast);
-        ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's contrast.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast, contrast);
-
-        float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue);
-        ImGuiB3D::PropertySliderFloat("Hue", &hue, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's hue.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue, hue);
-
-        float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation);
-        ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's saturation.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation, saturation);
-
-        float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature);
-        ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, temperature);
-
-        ImGuiB3D::SeparatorWithSpacing(1);
-
-        draw_vignette_settings();
-
-        ImGui::TreePop();
+        reset_color_grading_to_defaults();
     }
+    
+    bool invert = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert);
+    ImGuiB3D::PropertyToggle("Invert", &invert, "Invert color image.");
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Invert, invert);
+
+    bool grayscale = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale);
+    ImGuiB3D::PropertyToggle("Grayscale", &grayscale, "Turn color image into black and white using Perceptive Luminance.");
+    GlobalSettings::set_global_setting<bool>(GlobalSettingOption::PostProcess_ColorGrading_Grayscale, grayscale);
+
+    float brightness = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness);
+    ImGuiB3D::PropertySliderFloat("Brightness", &brightness, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's brightness levels");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Brightness, brightness);
+
+    float contrast = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast);
+    ImGuiB3D::PropertySliderFloat("Contrast", &contrast, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's contrast.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Contrast, contrast);
+
+    float hue = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue);
+    ImGuiB3D::PropertySliderFloat("Hue", &hue, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's hue.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Hue, hue);
+
+    float saturation = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation);
+    ImGuiB3D::PropertySliderFloat("Saturation", &saturation, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's saturation.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Saturation, saturation);
+
+    float temperature = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature);
+    ImGuiB3D::PropertySliderFloat("Temperature", &temperature, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust color image's temperature. Controls red and blue color channels.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_Temperature, temperature);
+
+    ImGuiB3D::SeparatorWithSpacing(1);
+
+    draw_vignette_settings();
 }
 
 void Environment::draw_kernel_effect_settings()
 {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Kernel Effects - Convolution Matrices"))
+    ImGui::SeparatorText("Kernel Effect");
+    
+    if (ImGuiB3D::PropertyButton("Reset", "Reset Kernel Effects", "Reset kernel effects to disabled values."))
     {
-        if (ImGuiB3D::PropertyButton("Reset", "Reset Kernel Effects", "Reset kernel effects to disabled values."))
-        {
-            reset_kernel_effects_to_defaults();
-        }
-
-        float sharpen_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity);
-        ImGuiB3D::PropertySliderFloat("Sharpen", &sharpen_intensity, 0.0f, 1.0f, "%.1f", "Adjust Sharpen intensity. Enhances edges and details by increasing the contrast between adjacent pixels.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity, sharpen_intensity);
-
-        float sobel_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity);
-        ImGuiB3D::PropertySliderFloat("Sobel", &sobel_intensity, 0.0f, 1.0f, "%.1f", "Adjust Sobel Edge Detection intensity. Bright colored pixels are marked as edges, black for transitions.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity, sobel_intensity);
-
-        float emboss_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity);
-        ImGuiB3D::PropertySliderFloat("Emboss", &emboss_intensity, 0.0f, 1.0f, "%.1f", "Adjust Embossing intensity. Emboss is a monochrome that highlights edges with bright color for transitions and dark for edges.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity, emboss_intensity);
-
-        float box_blur_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity);
-        ImGuiB3D::PropertySliderFloat("Box Blur", &box_blur_intensity, 0.0f, 1.0f, "%.1f", "Adjust Box Blur intensity. Reduce image details by averaging high contrast edges.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity, box_blur_intensity);
-
-        float laplacian_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity);
-        ImGuiB3D::PropertySliderFloat("Laplacian", &laplacian_intensity, 0.0f, 1.0f, "%.1f", "Adjust Laplacian intensity. Used mostly for edge detection and image denoising.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity, laplacian_intensity);
-
-        ImGui::TreePop();
+        reset_kernel_effects_to_defaults();
     }
+
+    float sharpen_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity);
+    ImGuiB3D::PropertySliderFloat("Sharpen", &sharpen_intensity, 0.0f, 1.0f, "%.1f", "Adjust Sharpen intensity. Enhances edges and details by increasing the contrast between adjacent pixels.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SharpenIntensity, sharpen_intensity);
+
+    float sobel_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity);
+    ImGuiB3D::PropertySliderFloat("Sobel", &sobel_intensity, 0.0f, 1.0f, "%.1f", "Adjust Sobel Edge Detection intensity. Bright colored pixels are marked as edges, black for transitions.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_SobelIntensity, sobel_intensity);
+
+    float emboss_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity);
+    ImGuiB3D::PropertySliderFloat("Emboss", &emboss_intensity, 0.0f, 1.0f, "%.1f", "Adjust Embossing intensity. Emboss is a monochrome that highlights edges with bright color for transitions and dark for edges.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_EmbossIntensity, emboss_intensity);
+
+    float box_blur_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity);
+    ImGuiB3D::PropertySliderFloat("Box Blur", &box_blur_intensity, 0.0f, 1.0f, "%.1f", "Adjust Box Blur intensity. Reduce image details by averaging high contrast edges.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_BoxBlurIntensity, box_blur_intensity);
+
+    float laplacian_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity);
+    ImGuiB3D::PropertySliderFloat("Laplacian", &laplacian_intensity, 0.0f, 1.0f, "%.1f", "Adjust Laplacian intensity. Used mostly for edge detection and image denoising.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_KernelEffect_LaplacianIntensity, laplacian_intensity);
 }
 
 void Environment::draw_vignette_settings()
 {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Vignette"))
-    {
-        float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity);
-        ImGuiB3D::PropertySliderFloat("Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
-        GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
+    ImGui::SeparatorText("Vignette");
+    
+    float vignette_intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity);
+    ImGuiB3D::PropertySliderFloat("Intensity", &vignette_intensity, -POST_PROCESS_COLORING_SLIDER_CLAMP, POST_PROCESS_COLORING_SLIDER_CLAMP, "%.1f", "Adjust vignette intensity. Positive intensity gives a darker vignette tone and negative intensity colors the inverse.");
+    GlobalSettings::set_global_setting<float>(GlobalSettingOption::PostProcess_ColorGrading_VignetteIntensity, vignette_intensity);
 
-        glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
-        ImGuiB3D::ColorPicker4("Color", &vignette_color, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
-        GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
-
-        ImGuiB3D::SeparatorWithSpacing(1);
-
-        ImGui::TreePop();
-    }
+    glm::vec4 vignette_color = GlobalSettings::get_global_setting_value<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor);
+    ImGuiB3D::ColorPicker4("Color", &vignette_color, "Adjust vignette coloring. Color gets inverted when intensity is negative.");
+    GlobalSettings::set_global_setting<glm::vec4>(GlobalSettingOption::PostProcess_ColorGrading_VignetteColor, vignette_color);
 }
 
 void Environment::reset_color_grading_to_defaults()

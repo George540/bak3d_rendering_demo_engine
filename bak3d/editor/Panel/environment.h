@@ -35,11 +35,7 @@ public:
     void update() override;
     void end_frame() override;
 private:
-    static void draw_tools_settings();
-    static void draw_general_settings();
     static void draw_shadow_settings();
-    static void draw_post_processor_settings();
-
     static void draw_post_processing_settings();
 
     static void draw_color_grading_settings();

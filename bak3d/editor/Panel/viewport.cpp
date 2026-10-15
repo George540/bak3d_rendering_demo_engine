@@ -5,8 +5,10 @@
 #include <glm/common.hpp>
 
 #include "imgui_b3d_extensions.h"
+#include "Asset/resource_manager.h"
 #include "Core/global_settings.h"
 #include "Input/event_manager.h"
+#include "Input/renderdoc_manager.h"
 #include "Renderer/light_renderer.h"
 #include "Renderer/post_processor.h"
 #include "Renderer/renderer.h"
@@ -18,8 +20,10 @@ using namespace std;
 namespace
 {
     constexpr float IMGUI_VIEWPORT_POPUP_WIDTH = 280.0f;
+    constexpr float IMGUI_VIEWPORT_POPUP_ENTRY_HEIGHT = 25.0f;
     constexpr float IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL = 256.0f;
     constexpr float IMGUI_PREVIEW_OVERLAY_MARGIN = 10.0f;
+
     ImVec2 previous_viewport_size = ImVec2(0, 0);
     ImVec2 viewport_panel_size = ImVec2(0, 0);
     bool m_camera_look_started_in_viewport = false;
@@ -74,15 +78,27 @@ namespace
 
     void stat_row(const char* name, const string& value, const char* tooltip = nullptr)
     {
-        ImGui::TableNextRow();
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, IMGUI_VIEWPORT_POPUP_ENTRY_HEIGHT);
         ImGui::TableSetColumnIndex(0);
         ImGui::TextUnformatted(name);
         if (tooltip && ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("%s", tooltip);
+            ImGuiB3D::ToolTipExtendedText(tooltip);
         }
         ImGui::TableSetColumnIndex(1);
         ImGui::TextUnformatted(value.c_str());
+    }
+
+    void begin_tool_row(const char* name, const char* tooltip = nullptr)
+    {
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, IMGUI_VIEWPORT_POPUP_ENTRY_HEIGHT);
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextUnformatted(name);
+        if (tooltip && ImGui::IsItemHovered())
+        {
+            ImGuiB3D::ToolTipExtendedText(tooltip);
+        }
+        ImGui::TableSetColumnIndex(1);
     }
 }
 
@@ -282,20 +298,24 @@ float Viewport::get_viewport_aspect_ratio() const
 
 void Viewport::draw_toolbar()
 {
-    draw_visual_modes_selection();
+    draw_visual_modes_popup();
 
     ImGui::SameLine();
 
-    draw_editor_overlays_selection();
+    draw_editor_overlays_popup();
 
     ImGui::SameLine();
 
     draw_stats_popup();
 
     ImGui::SameLine();
+
+    draw_gpu_tools_popup();
+
+    ImGui::SameLine();
 }
 
-void Viewport::draw_visual_modes_selection()
+void Viewport::draw_visual_modes_popup()
 {
     if (ImGui::Button("View Modes"))
     {
@@ -322,7 +342,7 @@ void Viewport::draw_visual_modes_selection()
             for (int view_mode_num = 0; view_mode_num < static_cast<int>(DebugViewMode::Count); ++view_mode_num)
             {
                 const auto view_mode = static_cast<DebugViewMode>(view_mode_num);
-                ImGui::TableNextRow();
+                ImGui::TableNextRow(ImGuiTableRowFlags_None, IMGUI_VIEWPORT_POPUP_ENTRY_HEIGHT);
                 ImGui::TableSetColumnIndex(0);
                 ImGui::RadioButton(to_string(view_mode), &view_selection, view_mode_num);
 
@@ -380,7 +400,7 @@ void Viewport::draw_visual_modes_selection()
 }
 
 
-void Viewport::draw_editor_overlays_selection()
+void Viewport::draw_editor_overlays_popup()
 {
     if (ImGui::Button("Editor Overlays"))
     {
@@ -405,7 +425,7 @@ void Viewport::draw_editor_overlays_selection()
 
             for (auto& [flag, label] : overlay_flags_list)
             {
-                ImGui::TableNextRow();
+                ImGui::TableNextRow(ImGuiTableRowFlags_None, IMGUI_VIEWPORT_POPUP_ENTRY_HEIGHT);
                 ImGui::TableSetColumnIndex(0);
 
                 const bool is_selected = (current_overlay_flags & flag) != 0;
@@ -502,6 +522,59 @@ void Viewport::draw_stats_popup()
             
             stat_row("Total Particles", format_count(scene_stats.particle_systems_particles_total), "All particles in the scene.");
 
+            ImGui::EndTable();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopStyleColor();
+}
+
+void Viewport::draw_gpu_tools_popup()
+{
+    if (ImGui::Button("GPU Debugging"))
+    {
+        ImGui::OpenPopup("GPU Debugging Popup");
+    }
+
+    push_popup_style();
+    if (ImGui::BeginPopup("GPU Debugging Popup", ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove))
+    {
+        popup_opacity_slider();
+
+        if (begin_stats_section("Shaders", "ShadersTable"))
+        {
+            begin_tool_row("Hot Reload", "Hot-Reload shaders after updating shader files after running sync_shaders.py script");
+            if (ImGui::Button("Reload"))
+            {
+                ResourceManager::reload_shaders();
+            }
+
+            bool force_fail = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Resources_ForceFail);
+            begin_tool_row("Force Fail", "Force shaders to output visual results even if they fail during compilation or hot-reload");
+            ImGui::Checkbox("##ForceFail", &force_fail);
+            GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Resources_ForceFail, force_fail);
+            
+            ImGui::EndTable();
+        }
+
+        if (begin_stats_section("Tools", "GPUToolsTable"))
+        {
+            begin_tool_row("RenderDoc Capture", "Trigger GPU frame capture if RenderDoc app is available. Make sure it's installed locally first!");
+            if (ImGui::Button("Capture Frame"))
+            {
+                RenderDocManager::trigger_capture();
+            }
+
+            bool vsync = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Vsync);
+            begin_tool_row("VSync", "Toggle VSync. If enabled, GLFW frame rate synchronizes with display's refresh rate");
+            if (ImGui::Checkbox("##VSync", &vsync))
+            {
+                EventManager::toggle_vsync(vsync);
+                GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Vsync, vsync);
+            }
+            
             ImGui::EndTable();
         }
 

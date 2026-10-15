@@ -47,7 +47,8 @@ private:void draw_viewport();
     void draw_preview_overlay();
 
     void draw_toolbar() override;
-    void draw_visual_modes_selection();
-    void draw_editor_overlays_selection();
+    void draw_visual_modes_popup();
+    void draw_editor_overlays_popup();
     void draw_stats_popup();
+    void draw_gpu_tools_popup();
 };
