@@ -9,7 +9,7 @@
 #define DEBUG_VIEW_GBUFFER_NORMALS  3
 #define DEBUG_VIEW_GBUFFER_SPECULAR 4
 #define DEBUG_VIEW_DEPTH            5
-#define DEBUG_VIEW_SHADOWMASK       6
+#define DEBUG_VIEW_SHADOW_MASK      6
 #define DEBUG_VIEW_AO               7
 #define DEBUG_VIEW_MAX              8
 

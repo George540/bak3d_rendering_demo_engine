@@ -329,6 +329,9 @@ void RendererPasses::render_pass_debug_view()
     case DebugViewMode::Depth:
         active_view_texture = Renderer::get_main_frame_buffer()->get_depth_texture();
         break;
+    case DebugViewMode::ShadowMask:
+        active_view_texture = Renderer::get_gbuffer()->get_position_texture();
+        break;
     default:
         break;
     }
@@ -336,6 +339,15 @@ void RendererPasses::render_pass_debug_view()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, active_view_texture);
     debug_view_shader->set_int("debug_view_texture", 0);
+
+    if (view_mode == DebugViewMode::ShadowMask)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, Renderer::get_gbuffer()->get_normals_texture());
+        debug_view_shader->set_int("debug_view_normal_texture", 1);
+        debug_view_shader->set_int("active_light_count", LightRenderer::get_visible_light_count());
+        glActiveTexture(GL_TEXTURE0);
+    }
 
     Renderer::draw_quad();
 
