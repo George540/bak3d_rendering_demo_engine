@@ -38,6 +38,8 @@ layout (std430, binding = 14) readonly buffer ShadowBuffer
 
 layout (binding = 8) uniform sampler2DArray shadow_map;
 
+const float SPECULAR_HORIZON_FADE = 0.25;
+
 struct LightData
 {
     vec4 position;  // .rgb = position,  .a = cut_off
@@ -419,11 +421,14 @@ vec3 process_deferred_light_contribution(
         }
     }
 
-    float diff = max(dot(normal, light_direction), 0.0);
-    float ambient_face = clamp(dot(normal, light_direction) * 0.5 + 0.5, 0.0, 1.0);
-    
+    float n_dot_l = dot(normal, light_direction);
+    float diff = max(n_dot_l, 0.0);
+    float ambient_face = clamp(n_dot_l * 0.5 + 0.5, 0.0, 1.0);
+
     vec3 halfway_dir = normalize(light_direction + view_direction);
-    float spec = pow(max(dot(normal, halfway_dir), 0.0), max(shininess, 1.0));
+    // Smooth horizon fade and avoid shadow hardline cutoff
+    float spec_horizon = smoothstep(0.0, SPECULAR_HORIZON_FADE, n_dot_l);
+    float spec = pow(max(dot(normal, halfway_dir), 0.0), max(shininess, 1.0)) * spec_horizon;
 
     vec3 ambient_term = light.ambient.rgb * ambient_basis * ambient_face;
     vec3 diffuse_term = light.diffuse.rgb * diff * albedo;

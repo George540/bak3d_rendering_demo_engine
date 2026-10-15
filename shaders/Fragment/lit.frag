@@ -62,10 +62,11 @@ vec3 calc_diffuse(vec3 light_diffuse, vec3 light_direction, vec3 normal)
     return light_diffuse * diff * vec3(material.surface_parameters.y);
 }
 
-vec3 calc_specular(vec3 light_specular, vec3 light_direction, vec3 normal, vec3 viewDir)
+vec3 calc_specular(vec3 light_specular, vec3 light_direction, vec3 normal, vec3 view_direction)
 {
-    vec3 halfway_direction = normalize(light_direction + viewDir);
-    float spec = pow(max(dot(normal, halfway_direction), 0.0), material.surface_parameters.w);
+    vec3 halfway_direction = normalize(light_direction + view_direction);
+    float horizon = smoothstep(0.0, SPECULAR_HORIZON_FADE, dot(normal, light_direction));
+    float spec = pow(max(dot(normal, halfway_direction), 0.0), material.surface_parameters.w) * horizon;
     if (material.use_specular_texture)
         return light_specular * spec * texture(material.specular_texture, fs_in.TexCoord).rgb;
     return light_specular * spec * vec3(material.surface_parameters.z);
@@ -73,26 +74,26 @@ vec3 calc_specular(vec3 light_specular, vec3 light_direction, vec3 normal, vec3 
 
 // Light type calculators
 
-vec3 calc_directional_light(LightData light, vec3 normal, vec3 viewDir)
+vec3 calc_directional_light(LightData light, vec3 normal, vec3 view_direction)
 {
     vec3 light_direction = normalize(-light.direction.rgb);
 
     vec3 ambient = calc_ambient(light.ambient.rgb);
     vec3 diffuse = calc_diffuse(light.diffuse.rgb, light_direction, normal);
-    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, viewDir);
+    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, view_direction);
 
     float shadow = calculate_shadow(light, fs_in.FragPos, normal, light_direction);
 
     return (ambient + (diffuse + specular) * shadow) * light.diffuse.a;
 }
 
-vec3 calc_point_light(LightData light, vec3 normal, vec3 viewDir)
+vec3 calc_point_light(LightData light, vec3 normal, vec3 view_direction)
 {
     vec3 light_direction = normalize(light.position.rgb - fs_in.FragPos);
 
     vec3 ambient = calc_ambient(light.ambient.rgb);
     vec3 diffuse = calc_diffuse(light.diffuse.rgb, light_direction, normal);
-    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, viewDir);
+    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, view_direction);
 
     // Dynamic distance attenuation pass (using light.ambient.a as radius)
     float attenuation = process_attenuation(light, fs_in.FragPos);;
@@ -104,13 +105,13 @@ vec3 calc_point_light(LightData light, vec3 normal, vec3 viewDir)
     return (ambient + diffuse + specular) * light.diffuse.a;
 }
 
-vec3 calc_spot_light(LightData light, vec3 normal, vec3 viewDir)
+vec3 calc_spot_light(LightData light, vec3 normal, vec3 view_direction)
 {
     vec3 light_direction = normalize(light.position.rgb - fs_in.FragPos);
 
     vec3 ambient  = calc_ambient(light.ambient.rgb);
     vec3 diffuse  = calc_diffuse(light.diffuse.rgb, light_direction, normal);
-    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, viewDir);
+    vec3 specular = calc_specular(light.specular.rgb, light_direction, normal, view_direction);
 
     vec3 world_spotlight_direction = normalize(light.direction.rgb);
 
