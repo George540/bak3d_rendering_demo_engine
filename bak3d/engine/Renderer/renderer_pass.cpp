@@ -137,6 +137,7 @@ void RendererPasses::render_pass_debug_geometry()
             debug_geometry->draw();
         }
     }
+
     glDepthFunc(GL_LESS);
 }
 
@@ -262,9 +263,24 @@ void RendererPasses::render_pass_editor_overlays()
 {
     DebugScopeGroup scope("Editor Overlays pass");
 
-    // Editor-only visualization icon, drawn last so it's never covered by
-    // transparency, and deliberately left with depth test disabled since
-    // everything after this (post-processing) is screen-space only.
+    // Depth-Tested Light Gizmos
+    if (GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::EditorOverlayFlags) & static_cast<uint32_t>(OverlaysFlags::LightGeometry))
+    {
+        const SceneObject* selected = SceneManager::get_current_scene()->get_selected_scene_object();
+        if (const auto* selected_light = dynamic_cast<const Light*>(selected); selected_light && selected_light->is_active)
+        {
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+            glDepthMask(GL_FALSE);
+
+            selected_light->draw_debug_geometry();
+
+            glDepthMask(GL_TRUE);
+        }
+    }
+
+    // Editor-only world positioned visualization icon, with depth test disabled.
+    // Not affected by any other pass, except UI.
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

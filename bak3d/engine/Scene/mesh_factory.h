@@ -36,6 +36,15 @@ struct MeshGeometry
 };
 
 /*
+ * Struct that holds only vertex and index data for a primitive
+ */
+struct MeshGeometryPrimitive
+{
+    std::vector<glm::vec3> vertices;
+    std::vector<GLuint> indices;
+};
+
+/*
  * Mesh factory utility class for generating primitives and subsequently more complex shapes
  */
 class MeshFactory
@@ -46,4 +55,8 @@ public:
     static MeshGeometry build_sphere_geometry(int rings = 16, int segments = 32);
     static MeshGeometry build_cylinder_geometry(int segments = 16);
     static MeshGeometry build_torus_geometry(int major_segments = 16, int minor_segments = 8, float minor_radius = 0.25f);
+
+    static MeshGeometryPrimitive build_line_geometry();
+    static MeshGeometryPrimitive build_line_circle_geometry();
+    static MeshGeometryPrimitive build_line_cone_geometry();
 };

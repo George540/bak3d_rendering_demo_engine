@@ -89,6 +89,24 @@ void QuadData::bind_vertex_attributes() const
     m_vao->set_attrib_pointer(0, 4, GL_FLOAT, GL_FALSE, VEC4_SIZE, nullptr);
 }
 
+LineData::LineData(const std::vector<glm::vec3>& vertices, const std::vector<GLuint>& indices, const std::string& name) : PrimitiveData(name)
+{
+    m_vbo = new VertexBuffer(VEC3_SIZE * vertices.size(), vertices.data());
+    m_ebo = new ElementBuffer(UINT_SIZE * indices.size(), indices.data());
+
+    LineData::bind_vertex_attributes();
+
+    m_vao->unbind();
+
+    m_index_count = static_cast<GLsizei>(indices.size());
+    m_draw_mode = GL_LINES;
+}
+
+void LineData::bind_vertex_attributes() const
+{
+    m_vao->set_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, VEC3_SIZE, nullptr);
+}
+
 GridData::GridData() : GridData(40, 20.0f) {}
 
 GridData::GridData(const int num_of_elements, const float grid_size) : PrimitiveData("Grid"), m_number_of_slices(num_of_elements), m_grid_size(grid_size)

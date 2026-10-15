@@ -17,9 +17,8 @@ using namespace std;
 
 namespace
 {
-    constexpr float IMGUI_VIEWPORT_POPUP_WIDTH = 250.0f;
+    constexpr float IMGUI_VIEWPORT_POPUP_WIDTH = 280.0f;
     constexpr float IMGUI_VIEWPORT_HIGHLIGHT_POPUP_HORIZONTAL = 256.0f;
-    constexpr float IMGUI_VIEWPORT_HIGHLIGHT_POPUP_VERTICAL = 144.0f;
     constexpr float IMGUI_PREVIEW_OVERLAY_MARGIN = 10.0f;
     ImVec2 previous_viewport_size = ImVec2(0, 0);
     ImVec2 viewport_panel_size = ImVec2(0, 0);
@@ -96,7 +95,9 @@ Viewport::Viewport() : EditorPanel("Viewport")
     overlay_flags_list =
     {
         {.flag = OverlaysFlags::WorldGrid, .label = "Grid" },
-        {.flag = OverlaysFlags::LightIcons, .label = "Light Icons" }
+        {.flag = OverlaysFlags::LightIcons, .label = "Light Icons" },
+        {.flag = OverlaysFlags::LightGeometry, .label = "Light Geometry" },
+        {.flag = OverlaysFlags::ObjectPreview, .label = "Object Preview" },
     };
 }
 
@@ -198,6 +199,11 @@ void Viewport::sync_camera_controls()
 
 void Viewport::draw_preview_overlay()
 {
+    if (!(GlobalSettings::get_global_setting_value<uint32_t>(GlobalSettingOption::EditorOverlayFlags) & static_cast<uint32_t>(OverlaysFlags::ObjectPreview)))
+    {
+        return;
+    }
+
     const Scene* scene = SceneManager::get_current_scene();
     const SceneObject* selected = scene ? scene->get_selected_scene_object() : nullptr;
     if (!selected)

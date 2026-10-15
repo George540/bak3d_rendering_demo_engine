@@ -59,6 +59,22 @@ namespace
 
         indices.insert(indices.end(), { base, base + 2, base + 1, base + 2, base, base + 3 });
     }
+
+    constexpr int DEBUG_CIRCLE_SEGMENTS = 64;
+
+    // Appends a unit-radius ring at depth z as line pairs. Returns the index of its first vertex.
+    GLuint add_unit_ring(vector<glm::vec3>& vertices, vector<GLuint>& indices, const float z)
+    {
+        const auto first = static_cast<GLuint>(vertices.size());
+        for (int segment = 0; segment < DEBUG_CIRCLE_SEGMENTS; ++segment)
+        {
+            const float angle = glm::two_pi<float>() * static_cast<float>(segment) / DEBUG_CIRCLE_SEGMENTS;
+            vertices.emplace_back(cosf(angle), sinf(angle), z);
+            indices.push_back(first + segment);
+            indices.push_back(first + (segment + 1) % DEBUG_CIRCLE_SEGMENTS);
+        }
+        return first;
+    }
 }
 
 MeshGeometry MeshFactory::build_cube_geometry()
@@ -346,5 +362,37 @@ MeshGeometry MeshFactory::build_torus_geometry(int major_segments, int minor_seg
         }
     }
 
-    return {.vertices = move(vertices), .indices = move(indices) };
+    return { .vertices = move(vertices), .indices = move(indices) };
+}
+
+MeshGeometryPrimitive MeshFactory::build_line_geometry()
+{
+    return { .vertices = LINE_VERTICES, .indices = LINE_INDICES };
+}
+
+MeshGeometryPrimitive MeshFactory::build_line_circle_geometry()
+{
+    vector<glm::vec3> vertices;
+    vector<GLuint> indices;
+
+    add_unit_ring(vertices, indices, 0.0f); // No depth, all vertices are coplanar
+
+    return { .vertices = move(vertices), .indices = move(indices) };
+}
+
+MeshGeometryPrimitive MeshFactory::build_line_cone_geometry()
+{
+    vector<glm::vec3> vertices;
+    vector<GLuint> indices;
+
+    const GLuint rim = add_unit_ring(vertices, indices, -1.0f);
+    const auto apex_index = static_cast<GLuint>(vertices.size());
+    vertices.emplace_back(0.0f, 0.0f, 0.0f);
+    for (int corner_point = 0; corner_point < 4; ++corner_point)
+    {
+        indices.push_back(apex_index);
+        indices.push_back(rim + corner_point * DEBUG_CIRCLE_SEGMENTS / 4);
+    }
+
+    return { .vertices = move(vertices), .indices = move(indices) };
 }

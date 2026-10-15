@@ -97,7 +97,9 @@ enum class OverlaysFlags : uint32_t
     None = 0,
     WorldGrid = 1 << 0,
     LightIcons = 1 << 1,
-    All = WorldGrid | LightIcons
+    LightGeometry = 1 << 2,
+    ObjectPreview = 1 << 3,
+    All = WorldGrid | LightIcons | LightGeometry | ObjectPreview
 };
 
 // Bitwise AND operator
@@ -143,8 +145,6 @@ enum class GlobalSettingOption : uint32_t
     EditorOverlayFlags_LightIconSize,
     ViewMode,
     BackgroundColor,
-    AA_MSAA_Enabled,
-    AA_MSAA_Samples,
     PostProcessing_Enabled,
     PostProcess_ColorGrading_Invert,
     PostProcess_ColorGrading_Grayscale,
@@ -421,14 +421,13 @@ static const std::vector<GLuint> CUBE_INDICES_WIREFRAME =
     0, 4,  1, 5,  2, 6,  3, 7   // connecting edges
 };
 
-// Unique vertices for the line (only position)
+// Unique vertices for the line (locally centered at origin, pointing down)
 static const std::vector<glm::vec3> LINE_VERTICES =
 {
-    {-1.0f, 0.0f, 0.0f}, // 0: Start point
-    {1.0f, 0.0f, 0.0f}   // 1: End point
+    {0.0f, 0.0f, 0.0f}, // 0: Start point
+    {0.0f, 0.0f, -1.0f} // 1: End point
 };
 
-// Indices for the Element Buffer Object (EBO)
 static const std::vector<GLuint> LINE_INDICES =
 {
     0, 1  // Single line connecting two points

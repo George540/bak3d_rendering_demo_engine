@@ -86,6 +86,8 @@ public:
 	void update(float dt) override;
 	void draw() const override;
 
+	void draw_debug_geometry() const; // @TODO: Make this editor-only
+
 	// Type
 	LightType get_type() const { return m_type; }
 	void set_type(const LightType type);

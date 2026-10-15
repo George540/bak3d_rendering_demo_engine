@@ -37,6 +37,24 @@ THE SOFTWARE.
 
 using namespace std;
 
+namespace
+{
+    constexpr int DEBUG_CIRCLE_SEGMENTS = 32;
+
+    GLuint add_unit_ring(vector<glm::vec3>& vertices, vector<GLuint>& indices, const float z)
+    {
+        const auto first = static_cast<GLuint>(vertices.size());
+        for (int s = 0; s < DEBUG_CIRCLE_SEGMENTS; ++s)
+        {
+            const float angle = glm::two_pi<float>() * static_cast<float>(s) / DEBUG_CIRCLE_SEGMENTS;
+            vertices.emplace_back(cosf(angle), sinf(angle), z);
+            indices.push_back(first + s);
+            indices.push_back(first + (s + 1) % DEBUG_CIRCLE_SEGMENTS);
+        }
+        return first;
+    }
+}
+
 // Instantiate static variables
 ResourceMap<Shader> ResourceManager::Shaders;
 ResourceMap<Texture2D> ResourceManager::Textures;
@@ -215,6 +233,16 @@ void ResourceManager::initialize_predefined_meshes()
 
     const auto torus_geometry = MeshFactory::build_torus_geometry();
     add_mesh("Torus", new MeshData(torus_geometry.vertices, torus_geometry.indices, "Torus"));
+
+    // Debug meshes for debug geometry overlays in the scene
+    const auto line_debug_geometry = MeshFactory::build_line_geometry();
+    add_mesh("LineDebug", new LineData(line_debug_geometry.vertices, line_debug_geometry.indices, "LineDebug"));
+
+    const auto line_circle_debug_geometry = MeshFactory::build_line_circle_geometry();
+    add_mesh("CircleDebug", new LineData(line_circle_debug_geometry.vertices, line_circle_debug_geometry.indices, "CircleDebug"));
+
+    const auto line_cone_debug_geometry = MeshFactory::build_line_cone_geometry();
+    add_mesh("ConeDebug", new LineData(line_cone_debug_geometry.vertices, line_cone_debug_geometry.indices, "ConeDebug"));
     
     Renderer::initialize_screen_quad();
 }

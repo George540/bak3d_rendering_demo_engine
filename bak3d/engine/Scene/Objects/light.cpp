@@ -38,6 +38,25 @@ THE SOFTWARE.
 #include "Renderer/renderer.h"
 #include "Scene/scene.h"
 
+namespace
+{
+	constexpr glm::vec4 LIGHT_DEBUG_COLOR = glm::vec4(0.55f, 0.78f, 1.0f, 1.0f);
+	constexpr float DIRECTIONAL_DEBUG_LENGTH = 3.0f;
+	constexpr float MAX_CONE_HALF_ANGLE = 89.0f; // tan() explodes at 90
+
+	void draw_composite_debug_light_shape(const MaterialRef& material, const char* mesh_name, const glm::mat4& model)
+	{
+		const MeshRef mesh = ResourceManager::get_mesh(mesh_name);
+		if (!mesh)
+		{
+			return;
+		}
+		material->set_mat4("model", model);
+		material->apply();
+		mesh->draw();
+	}
+}
+
 Light::Light(const LightType type, const glm::vec3 position) :
 	RenderableObject(ResourceManager::get_material("light_icon"), position, "Light")
 {
@@ -72,6 +91,51 @@ void Light::draw() const
 	Texture2D::unbind();
 }
 
+void Light::draw_debug_geometry() const
+{
+	const MaterialRef material = ResourceManager::get_material("grid");
+	if (!material)
+	{
+		return;
+	}
+	material->set_vec4("color", LIGHT_DEBUG_COLOR);
+
+	const glm::vec3 position = transform.get_global_position();
+	const glm::vec3 direction = glm::normalize(m_direction);
+	const glm::vec3 up = glm::abs(direction.y) > 0.99f ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+	const glm::mat4 oriented = glm::inverse(glm::lookAt(position, position + direction, up)); // local -Z
+
+	switch (m_type)
+	{
+		case LightType::Point:
+		{
+			const glm::mat4 base = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(m_attenuation_radius));
+			draw_composite_debug_light_shape(material, "CircleDebug", base); // XY
+			draw_composite_debug_light_shape(material, "CircleDebug", base * glm::rotate(glm::mat4(1.0f), glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f))); // XZ
+			draw_composite_debug_light_shape(material, "CircleDebug", base * glm::rotate(glm::mat4(1.0f), glm::half_pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f))); // YZ
+			break;
+		}
+		case LightType::Directional:
+			draw_composite_debug_light_shape(material, "LineDebug", oriented * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, DIRECTIONAL_DEBUG_LENGTH)));
+			break;
+		case LightType::Spot:
+		case LightType::Area: // @TODO: Make unique geometry for Area lights
+		{
+			const float length = m_attenuation_radius;
+			const float inner_half = glm::min(m_inner_angle + m_cone_size, MAX_CONE_HALF_ANGLE);
+			const float outer_half = glm::min(m_outer_angle + m_cone_size, MAX_CONE_HALF_ANGLE);
+			const float inner_radius = length * glm::tan(glm::radians(inner_half));
+			const float outer_radius = length * glm::tan(glm::radians(outer_half));
+
+			draw_composite_debug_light_shape(material, "ConeDebug", oriented * glm::scale(glm::mat4(1.0f), glm::vec3(inner_radius, inner_radius, length)));
+			draw_composite_debug_light_shape(material, "ConeDebug", oriented * glm::scale(glm::mat4(1.0f), glm::vec3(outer_radius, outer_radius, length)));
+			draw_composite_debug_light_shape(material, "LineDebug", oriented * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, length)));
+			break;
+		}
+		default:
+			break;
+	}
+}
 void Light::set_type(const LightType type)
 {
 	if (m_type == type)

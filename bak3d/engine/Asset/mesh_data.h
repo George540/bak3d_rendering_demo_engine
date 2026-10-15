@@ -104,6 +104,15 @@ public:
     void bind_vertex_attributes() const override;
 };
 
+class LineData : public PrimitiveData
+{
+public:
+    LineData(const std::vector<glm::vec3>& vertices, const std::vector<GLuint>& indices, const std::string& name);
+    ~LineData() override = default;
+
+    void bind_vertex_attributes() const override;
+};
+
 class GridData : public PrimitiveData
 {
 public:
