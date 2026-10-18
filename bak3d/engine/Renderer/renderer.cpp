@@ -179,8 +179,8 @@ void Renderer::draw_frame()
 
 	if (!debug_view_active)
 	{
-		RendererPasses::render_pass_sprites();
 		RendererPasses::render_pass_skybox();
+		RendererPasses::render_pass_sprites();
 	}
 
 	glDisable(GL_DEPTH_TEST);

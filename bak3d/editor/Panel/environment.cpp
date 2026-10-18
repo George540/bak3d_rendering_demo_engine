@@ -37,29 +37,14 @@ using namespace std;
 
 namespace
 {
-    vector<string> m_msaa_samples = { };
-    vector<string> m_light_type_items = { };
+    vector<const char*> m_skybox_mode_labels = { };
 }
 
 Environment::Environment() : EditorPanel("Environment")
 {
-    // Dynamically create MSAA sampling options for dropdown selection based on hardware's max samples.
-    const int msaa_max_samples = Renderer::get_msaa_frame_buffer()->get_samples();
-    m_msaa_samples.reserve(msaa_max_samples);
-    for (int sample_id = 2; sample_id <= msaa_max_samples; sample_id *= 2)
+    for (const SkyboxModeInfo& info : SkyboxModeInfos)
     {
-        string label = to_string(sample_id) + "x" + to_string(sample_id);
-        m_msaa_samples.push_back(label);
-    }
-
-    // Could be hardcoded since we know the light types already, but let's keep it modular.
-    constexpr int light_types_num = static_cast<int>(LightType::Max);
-    m_light_type_items.reserve(light_types_num);
-    for (int light_type_id = 0; light_type_id < light_types_num; light_type_id++)
-    {
-        const LightType light_type = static_cast<LightType>(light_type_id);
-        string label = light_type_to_string(light_type);
-        m_light_type_items.push_back(label);
+        m_skybox_mode_labels.emplace_back(info.label);
     }
 }
 
@@ -71,6 +56,10 @@ void Environment::begin_frame()
 void Environment::update()
 {
     EditorPanel::update();
+
+    draw_skybox_settings();
+
+    ImGuiB3D::SeparatorWithSpacing(1);
 
     draw_shadow_settings();
 
@@ -84,6 +73,65 @@ void Environment::update()
 void Environment::end_frame()
 {
     EditorPanel::end_frame();
+}
+
+void Environment::draw_skybox_settings()
+{
+    const bool has_skybox = ResourceManager::Textures.contains("skybox");
+
+    bool skybox_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Skybox_Enabled);
+    if (ImGuiB3D::PropertyToggle("Skybox", &skybox_enabled, "Render the skybox behind the scene."))
+    {
+        GlobalSettings::set_global_setting<bool>(GlobalSettingOption::Skybox_Enabled, skybox_enabled);
+    }
+
+    ImGui::BeginDisabled(!skybox_enabled);
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Skybox###SkyboxNode"))
+    {
+        // Mode
+        int mode = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::Skybox_Mode);
+        if (ImGuiB3D::PropertyDropdown("Mode", m_skybox_mode_labels, &mode, "Skybox rendering method.\nModes marked WIP are not implemented yet and draw nothing."))
+        {
+            GlobalSettings::set_global_setting<int>(GlobalSettingOption::Skybox_Mode, mode);
+        }
+
+        if (static_cast<SkyboxMode>(mode) == SkyboxMode::Cubemap && !has_skybox)
+        {
+            ImGui::TextDisabled("Cubemap faces not found in assets/skybox.");
+        }
+
+        // Color
+        glm::vec3 color = GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color);
+        if (ImGuiB3D::ColorPicker3("Color", &color, "Multiplies the skybox color."))
+        {
+            GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Color, color);
+        }
+
+        // Intensity
+        float intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Skybox_Intensity);
+        if (ImGuiB3D::PropertyDragFloat("Intensity", &intensity, 0.1f, 0.0f, 5.0f, "%.2f", "Brightness multiplier of the skybox."))
+        {
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Skybox_Intensity, intensity);
+        }
+
+        // Rotation
+        glm::vec3 rotation = GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Rotation);
+        if (ImGuiB3D::PropertyDragFloat3("Rotation", &rotation, 0.1f, 0.0f, 0.0f, "%.3f", "Rotate the skybox based on Euler angles."))
+        {
+            GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Rotation, rotation);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##SkyboxRotation"))
+        {
+            GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Rotation, glm::vec3(0.0f));
+        }
+
+        ImGui::TreePop();
+    }
+
+    ImGui::EndDisabled();
 }
 
 void Environment::draw_shadow_settings()

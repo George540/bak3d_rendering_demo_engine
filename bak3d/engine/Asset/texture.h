@@ -66,6 +66,7 @@ public:
     static void unbind_all(int slot_count);
 
     GLuint get_texture_id() const { return m_texture_id; }
+    GLenum get_target() const { return m_target; }
     int get_width() const { return m_width; }
     int get_height() const { return m_height; }
     int get_nb_color_channels() const { return m_nb_color_channels; }

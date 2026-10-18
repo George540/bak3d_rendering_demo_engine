@@ -145,6 +145,10 @@ enum class GlobalSettingOption : uint32_t
     EditorOverlayFlags_LightIconSize,
     ViewMode,
     Skybox_Enabled,
+    Skybox_Mode,
+    Skybox_Rotation,
+    Skybox_Intensity,
+    Skybox_Color,
     PostProcessing_Enabled,
     PostProcess_ColorGrading_Invert,
     PostProcess_ColorGrading_Grayscale,
@@ -162,6 +166,34 @@ enum class GlobalSettingOption : uint32_t
     PostProcess_KernelEffect_LaplacianIntensity,
     Max
 };
+
+enum class SkyboxMode : int
+{
+    Cubemap,
+    Equirectangular,
+    HDRI,
+    LUT,
+    AtmosphericScattering,
+    Count
+};
+
+struct SkyboxModeInfo
+{
+    SkyboxMode mode;
+    const char* label;
+    const char* material_name;
+    bool implemented;
+};
+
+inline constexpr std::array SkyboxModeInfos =
+{
+    SkyboxModeInfo { .mode = SkyboxMode::Cubemap,               .label = "Cubemap",                .material_name = "skybox", .implemented = true },
+    SkyboxModeInfo { .mode = SkyboxMode::Equirectangular,       .label = "Equirectangular (WIP)",  .material_name = "",        .implemented = false },
+    SkyboxModeInfo { .mode = SkyboxMode::HDRI,                  .label = "HDRI (WIP)",             .material_name = "",        .implemented = false },
+    SkyboxModeInfo { .mode = SkyboxMode::LUT,                   .label = "LUT (WIP)",              .material_name = "",        .implemented = false },
+    SkyboxModeInfo { .mode = SkyboxMode::AtmosphericScattering, .label = "Atmospheric Scattering (WIP)", .material_name = "", .implemented = false },
+};
+static_assert(SkyboxModeInfos.size() == static_cast<size_t>(SkyboxMode::Count), "SkyboxModeInfos must match SkyboxMode");
 
 enum class SceneObjectType : uint32_t
 {

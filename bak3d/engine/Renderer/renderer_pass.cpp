@@ -256,30 +256,68 @@ void RendererPasses::render_pass_skybox()
 {
     DebugScopeGroup scope("Skybox Pass");
 
-    if (!GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Skybox_Enabled)
-        || !ResourceManager::Textures.contains("skybox")
-        || !ResourceManager::Materials.contains("skybox"))
+    if (!GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Skybox_Enabled))
     {
         return;
     }
 
-    const TextureRef cubemap = ResourceManager::get_texture("skybox");
-    const MaterialRef material = ResourceManager::get_material("skybox");
+    const int mode_index = GlobalSettings::get_global_setting_value<int>(GlobalSettingOption::Skybox_Mode);
+    if (mode_index < 0 || mode_index >= static_cast<int>(SkyboxMode::Count))
+    {
+        return;
+    }
+
+    const SkyboxModeInfo& info = SkyboxModeInfos[mode_index];
+    if (!info.implemented || !ResourceManager::Materials.contains(info.material_name))
+    {
+        return;
+    }
+
+    const MaterialRef material = ResourceManager::get_material(info.material_name);
     const MeshRef cube = ResourceManager::get_mesh("Cube");
-    if (!cubemap || !material || !cube || !material->get_shader() || !material->get_shader()->is_shader_compiled())
+    if (!material || !cube || !material->get_shader() || !material->get_shader()->is_shader_compiled())
     {
         return;
     }
 
-    glDepthFunc(GL_LEQUAL); // sky depth == 1.0 must pass against the cleared depth
+    // Per-mode inputs. Add new modes here.
+    TextureRef cubemap;
+    switch (static_cast<SkyboxMode>(mode_index))
+    {
+        case SkyboxMode::Cubemap:
+            if (!ResourceManager::Textures.contains("skybox"))
+            {
+                return;
+            }
+            cubemap = ResourceManager::get_texture("skybox");
+            if (!cubemap)
+            {
+                return;
+            }
+            break;
+        default:
+            return;
+    }
+
+    // Common parameters (same Y * X * Z order as Transform; transpose = inverse for rotating the sample direction)
+    const glm::vec3 euler = GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Rotation);
+    const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(euler.y), glm::vec3(0.0f, 1.0f, 0.0f))
+                             * glm::rotate(glm::mat4(1.0f), glm::radians(euler.x), glm::vec3(1.0f, 0.0f, 0.0f))
+                             * glm::rotate(glm::mat4(1.0f), glm::radians(euler.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    material->set_mat3("sky_rotation", glm::transpose(glm::mat3(rotation)));
+    material->set_vec3("tint", GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color));
+    material->set_float("intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Skybox_Intensity));
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL); // sky depth == 1.0 
     glDepthMask(GL_FALSE); // never write depth
-    glDisable(GL_CULL_FACE); // viewed from inside the cube
+    glDisable(GL_CULL_FACE); // inside view of cube
 
     material->apply();
     cubemap->bind(0);
     cube->draw();
 
-    Texture2D::unbind(0, GL_TEXTURE_CUBE_MAP);
+    Texture2D::unbind(0, cubemap->get_target());
     material->get_shader()->unuse();
 
     glEnable(GL_CULL_FACE);
