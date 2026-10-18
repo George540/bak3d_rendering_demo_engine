@@ -36,6 +36,7 @@ const char* GlobalSettings::to_string(const GlobalSettingOption enum_setting)
         case GlobalSettingOption::EditorOverlayFlags: return "Editor Overlays";
         case GlobalSettingOption::EditorOverlayFlags_LightIconSize: return "Size";
         case GlobalSettingOption::ViewMode: return "View Mode";
+        case GlobalSettingOption::Skybox_Enabled: return "Enabled";
         case GlobalSettingOption::PostProcessing_Enabled: return "Enabled";
         case GlobalSettingOption::PostProcess_ColorGrading_Invert: return "Invert";
         case GlobalSettingOption::PostProcess_ColorGrading_Brightness: return "Brightness";
@@ -62,6 +63,7 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::EditorOverlayFlags] = static_cast<uint32_t>(OverlaysFlags::LightIcons | OverlaysFlags::LightGeometry | OverlaysFlags::ObjectPreview);
     global_settings[GlobalSettingOption::EditorOverlayFlags_LightIconSize] = 0.1f;
     global_settings[GlobalSettingOption::ViewMode] = 0;
+    global_settings[GlobalSettingOption::Skybox_Enabled] = true;
     global_settings[GlobalSettingOption::PostProcessing_Enabled] = false;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_Invert] = false;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_Grayscale] = false;

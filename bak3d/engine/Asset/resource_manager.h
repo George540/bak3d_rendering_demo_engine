@@ -71,6 +71,7 @@ public:
 private:
     static void initialize_shaders();
     static void initialize_predefined_textures();
+    static void initialize_predefined_cubemaps();
     static void initialize_models();
     static void initialize_predefined_meshes();
     static void initialize_predefined_materials();

@@ -31,8 +31,21 @@ THE SOFTWARE.
 #pragma once
 
 #include <assimp/material.h>
+#include <array>
 
 #include "asset.h"
+
+/*
+ * Decoded RGB8 pixel data for the 6 cubemap faces (+X, -X, +Y, -Y, +Z, -Z).
+ */
+struct CubemapImageData
+{
+    int width = 0;
+    int height = 0;
+    std::array<std::vector<unsigned char>, 6> faces;
+
+    bool is_valid() const { return width > 0 && width == height && !faces[0].empty(); }
+};
 
 /*
  * Class that stores texture data in memory loaded from an image asset on disk.
@@ -44,11 +57,12 @@ class Texture2D : public Asset
 public:
     Texture2D() = default;
     Texture2D(const std::string& path, const std::string& file_name, bool is_editor = false);
+    Texture2D(const std::string& path, const std::string& file_name, CubemapImageData cubemap_image_data);
     Texture2D(const Texture2D&) = delete;
     ~Texture2D() override;
 
     void bind(int unit_slot) const; // binds the texture as the current active GL_TEXTURE_2D texture object
-    static void unbind(int unit_slot = 0);
+    static void unbind(int unit_slot = 0, GLenum target = GL_TEXTURE_2D);
     static void unbind_all(int slot_count);
 
     GLuint get_texture_id() const { return m_texture_id; }
@@ -60,8 +74,10 @@ public:
     Texture2D& operator=(const Texture2D&) = delete;
     bool operator==(const Texture2D& other) const;
     bool operator!=(const Texture2D& other) const;
+
 private:
     GLuint m_texture_id;
+    GLenum m_target = GL_TEXTURE_2D;
     int m_width, m_height; // texture image dimensions: width and height of loaded image in pixels
     int m_nb_color_channels; // the number of color components in the loaded image
     bool m_is_editor;

@@ -36,6 +36,7 @@ public:
     static void render_pass_opaque_geometry();       // depth-writing scene geometry (model)
     static void render_pass_sprites();               // basic alpha-blended sprite ParticleSystem (skipped in debug view)
     static void render_pass_transparency();          // WBOIT accumulate + composite (skipped in debug view)
+    static void render_pass_skybox();                // cubemap/equirectangular/HDRI images that are meant for environment mapping
     static void render_pass_post_processing();       // skipped in debug view
     static void render_pass_editor_overlays();       // light gizmo sprite, always drawn last
     static void render_pass_debug_view();            // depth (and future AO/etc) visualization

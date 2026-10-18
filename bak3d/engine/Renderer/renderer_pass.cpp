@@ -252,6 +252,41 @@ void RendererPasses::render_pass_transparency()
     }
 }
 
+void RendererPasses::render_pass_skybox()
+{
+    DebugScopeGroup scope("Skybox Pass");
+
+    if (!GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Skybox_Enabled)
+        || !ResourceManager::Textures.contains("skybox")
+        || !ResourceManager::Materials.contains("skybox"))
+    {
+        return;
+    }
+
+    const TextureRef cubemap = ResourceManager::get_texture("skybox");
+    const MaterialRef material = ResourceManager::get_material("skybox");
+    const MeshRef cube = ResourceManager::get_mesh("Cube");
+    if (!cubemap || !material || !cube || !material->get_shader() || !material->get_shader()->is_shader_compiled())
+    {
+        return;
+    }
+
+    glDepthFunc(GL_LEQUAL); // sky depth == 1.0 must pass against the cleared depth
+    glDepthMask(GL_FALSE); // never write depth
+    glDisable(GL_CULL_FACE); // viewed from inside the cube
+
+    material->apply();
+    cubemap->bind(0);
+    cube->draw();
+
+    Texture2D::unbind(0, GL_TEXTURE_CUBE_MAP);
+    material->get_shader()->unuse();
+
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+}
+
 void RendererPasses::render_pass_post_processing()
 {
     DebugScopeGroup scope("Post Processing Pass");

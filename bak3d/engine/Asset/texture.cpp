@@ -96,6 +96,100 @@ Texture2D::Texture2D(const string& path, const string& file_name, const bool is_
     }
 }
 
+Texture2D::Texture2D(const std::string& path, const std::string& file_name, CubemapImageData cubemap_image_data)
+    : Asset(path, file_name)
+    , m_target(GL_TEXTURE_CUBE_MAP)
+    , m_nb_color_channels(3)
+    , m_is_editor(false)
+{
+    m_nb_color_channels = 3;
+    m_is_editor = true;
+    m_target = GL_TEXTURE_CUBE_MAP;
+
+    // Order must match GL_TEXTURE_CUBE_MAP_POSITIVE_X + i
+    static constexpr array<const char*, 6> FACE_NAMES = { "right", "left", "top", "bottom", "front", "back" };
+    static constexpr array<const char*, 2> EXTENSIONS = { ".png", ".jpg" };
+
+    bool success = true;
+    stbi_set_flip_vertically_on_load(false); // cubemaps use a top-left origin
+
+    for (size_t face = 0; face < 6 && success; ++face)
+    {
+        std::string face_path;
+        for (const char* extension : EXTENSIONS)
+        {
+            if (auto candidate = path + "/" + (string(FACE_NAMES[face]) + extension); filesystem::exists(candidate))
+            {
+                face_path = candidate;
+                break;
+            }
+        }
+
+        if (face_path.empty())
+        {
+            B3D_LOG_ERROR("Cubemap face '%s' not found in %s", FACE_NAMES[face], path.c_str());
+            success = false;
+            break;
+        }
+
+        int width = 0, height = 0, channels = 0;
+        unsigned char* data = stbi_load(face_path.c_str(), &width, &height, &channels, 3); // force RGB
+        if (!data)
+        {
+            B3D_LOG_ERROR("Failed to load cubemap face: %s", face_path.c_str());
+            success = false;
+            break;
+        }
+
+        if (width != height || (face > 0 && (width != cubemap_image_data.width || height != cubemap_image_data.height)))
+        {
+            B3D_LOG_ERROR("Cubemap face %s must be square and match other faces.", face_path.c_str());
+            stbi_image_free(data);
+            success = false;
+            break;
+        }
+
+        cubemap_image_data.width = width;
+        cubemap_image_data.height = height;
+        cubemap_image_data.faces[face].assign(data, data + static_cast<size_t>(width) * height * 3);
+        stbi_image_free(data);
+    }
+
+    stbi_set_flip_vertically_on_load(true); // restore engine-wide default
+
+    if (!success || !cubemap_image_data.is_valid())
+    {
+        B3D_LOG_ERROR("Cubemap failed to load from: %s", path.c_str());
+        return; // m_texture_id stays 0
+    }
+
+    m_width = cubemap_image_data.width;
+    m_height = cubemap_image_data.height;
+
+    glGenTextures(1, &m_texture_id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture_id);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // tightly packed RGB rows
+    for (GLuint face = 0; face < 6; ++face)
+    {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGB8, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, cubemap_image_data.faces[face].data());
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // no visible seams on face edges (globally)
+
+    glObjectLabel(GL_TEXTURE, m_texture_id, -1, file_name.c_str());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    B3D_LOG_INFO("Cubemap '%s' loaded (%dx%d per face), texture ID: %d", file_name.c_str(), m_width, m_height, m_texture_id);
+}
+
 Texture2D::~Texture2D()
 {
     glDeleteTextures(1, &m_texture_id);
@@ -105,13 +199,13 @@ void Texture2D::bind(const int unit_slot) const
 {
     assert(m_texture_id && "Binding an invalid texture");
     glActiveTexture(GL_TEXTURE0 + unit_slot);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
+    glBindTexture(m_target, m_texture_id);
 }
 
-void Texture2D::unbind(const int unit_slot)
+void Texture2D::unbind(const int unit_slot, const GLenum target)
 {
     glActiveTexture(GL_TEXTURE0 + unit_slot);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(target, 0);
 }
 
 void Texture2D::unbind_all(const int slot_count)

@@ -180,6 +180,7 @@ void Renderer::draw_frame()
 	if (!debug_view_active)
 	{
 		RendererPasses::render_pass_sprites();
+		RendererPasses::render_pass_skybox();
 	}
 
 	glDisable(GL_DEPTH_TEST);

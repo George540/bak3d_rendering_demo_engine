@@ -66,6 +66,7 @@ void ResourceManager::initialize()
 {
     initialize_shaders();
     initialize_predefined_textures();
+    initialize_predefined_cubemaps();
     initialize_predefined_materials();
     initialize_models();
     initialize_predefined_meshes();
@@ -203,6 +204,20 @@ void ResourceManager::initialize_predefined_textures()
     }
 
     B3D_LOG_INFO("Successfully loaded %d textures.", Textures.size());
+}
+
+void ResourceManager::initialize_predefined_cubemaps()
+{
+    const string directory = (filesystem::path(BAK3D_ASSETS_DIR) / "skybox").generic_string();
+
+    auto* skybox = new Texture2D(directory, "DefaultSkybox", CubemapImageData());
+    if (skybox->get_texture_id() == 0)
+    {
+        B3D_LOG_WARNING("Skybox cubemap not loaded. Expected 6 square faces in %s.", directory.c_str());
+        delete skybox;
+        return;
+    }
+    add_texture("skybox", skybox);
 }
 
 void ResourceManager::initialize_models()

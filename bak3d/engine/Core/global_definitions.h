@@ -144,6 +144,7 @@ enum class GlobalSettingOption : uint32_t
     EditorOverlayFlags,
     EditorOverlayFlags_LightIconSize,
     ViewMode,
+    Skybox_Enabled,
     PostProcessing_Enabled,
     PostProcess_ColorGrading_Invert,
     PostProcess_ColorGrading_Grayscale,

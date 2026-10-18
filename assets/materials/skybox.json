@@ -1,0 +1,8 @@
+{
+    "shader": "skybox",
+    "uniforms": {
+        "skybox":    { "type": "int",   "value": 0 },
+        "tint":      { "type": "vec3",  "value": [1.0, 1.0, 1.0] },
+        "intensity": { "type": "float", "value": 1.0 }
+    }
+}
