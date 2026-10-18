@@ -38,6 +38,7 @@ const char* GlobalSettings::to_string(const GlobalSettingOption enum_setting)
         case GlobalSettingOption::ViewMode: return "View Mode";
         case GlobalSettingOption::Skybox_Enabled: return "Enabled";
         case GlobalSettingOption::Skybox_Mode: return "Skybox Mode";
+        case GlobalSettingOption::Skybox_Cubemap: return "Skybox Cubemap";
         case GlobalSettingOption::Skybox_Intensity: return "Skybox Intensity";
         case GlobalSettingOption::Skybox_Color: return "Skybox Color";
         case GlobalSettingOption::Skybox_Rotation: return "Rotation";
@@ -69,9 +70,10 @@ void GlobalSettings::initialize()
     global_settings[GlobalSettingOption::ViewMode] = 0;
     global_settings[GlobalSettingOption::Skybox_Enabled] = true;
     global_settings[GlobalSettingOption::Skybox_Mode] = static_cast<int>(SkyboxMode::Cubemap);
+    global_settings[GlobalSettingOption::Skybox_Cubemap] = "Cubemap_Sky_04-512x512.png";
     global_settings[GlobalSettingOption::Skybox_Intensity] = 1.0f;
     global_settings[GlobalSettingOption::Skybox_Color] = glm::vec3(1.0f);
-    global_settings[GlobalSettingOption::Skybox_Rotation] = glm::vec3(0.0f, 100.0f, 0.0f);
+    global_settings[GlobalSettingOption::Skybox_Rotation] = glm::vec3(0.0f, -135.0f, 0.0f);
     global_settings[GlobalSettingOption::PostProcessing_Enabled] = false;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_Invert] = false;
     global_settings[GlobalSettingOption::PostProcess_ColorGrading_Grayscale] = false;

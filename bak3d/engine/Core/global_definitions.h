@@ -134,7 +134,8 @@ using GlobalSettingValueType = std::variant<
     float,
     uint32_t,
     glm::vec3,
-    glm::vec4
+    glm::vec4,
+    std::string
 >;
 
 enum class GlobalSettingOption : uint32_t
@@ -146,9 +147,10 @@ enum class GlobalSettingOption : uint32_t
     ViewMode,
     Skybox_Enabled,
     Skybox_Mode,
-    Skybox_Rotation,
+    Skybox_Cubemap,
     Skybox_Intensity,
     Skybox_Color,
+    Skybox_Rotation,
     PostProcessing_Enabled,
     PostProcess_ColorGrading_Invert,
     PostProcess_ColorGrading_Grayscale,

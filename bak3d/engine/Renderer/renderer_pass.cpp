@@ -280,23 +280,31 @@ void RendererPasses::render_pass_skybox()
         return;
     }
 
-    // Per-mode inputs. Add new modes here.
     TextureRef cubemap;
     switch (static_cast<SkyboxMode>(mode_index))
     {
-        case SkyboxMode::Cubemap:
-            if (!ResourceManager::Textures.contains("skybox"))
+    case SkyboxMode::Cubemap:
+    {
+        const string cubemap_file_name = GlobalSettings::get_global_setting_value<string>(GlobalSettingOption::Skybox_Cubemap);
+        string cubemap_name = FileLoader::get_name_from_filename(cubemap_file_name);
+        if (!ResourceManager::Cubemaps.contains(cubemap_name))
+        {
+            if (cubemap_name.empty())
+            {
+                cubemap_name = material->get_texture_by_type(aiTextureType_DIFFUSE);
+            }
+            if (ResourceManager::Cubemaps.empty())
             {
                 return;
             }
-            cubemap = ResourceManager::get_texture("skybox");
-            if (!cubemap)
-            {
-                return;
-            }
-            break;
-        default:
-            return;
+            cubemap_name = ResourceManager::Cubemaps.all().begin()->first;
+            GlobalSettings::set_global_setting<string>(GlobalSettingOption::Skybox_Cubemap, cubemap_name);
+        }
+        cubemap = ResourceManager::get_cubemap(cubemap_name);
+        break;
+    }
+    default:
+        return;
     }
 
     // Common parameters (same Y * X * Z order as Transform; transpose = inverse for rotating the sample direction)
@@ -304,9 +312,10 @@ void RendererPasses::render_pass_skybox()
     const glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(euler.y), glm::vec3(0.0f, 1.0f, 0.0f))
                              * glm::rotate(glm::mat4(1.0f), glm::radians(euler.x), glm::vec3(1.0f, 0.0f, 0.0f))
                              * glm::rotate(glm::mat4(1.0f), glm::radians(euler.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    material->set_mat3("sky_rotation", glm::transpose(glm::mat3(rotation)));
-    material->set_vec3("tint", GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color));
+    material->set_int("cubemap", 0);
+    material->set_vec3("color", GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color));
     material->set_float("intensity", GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Skybox_Intensity));
+    material->set_mat3("sky_rotation", glm::transpose(glm::mat3(rotation)));
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL); // sky depth == 1.0 

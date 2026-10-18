@@ -1,7 +1,7 @@
 {
     "shader": "skybox",
     "uniforms": {
-        "skybox":    { "type": "int",   "value": 0 },
+		"cubemap": 	 { "type": "samplerCube",  "value": "Cubemap_Sky_04-512x512.png" },
         "tint":      { "type": "vec3",  "value": [1.0, 1.0, 1.0] },
         "intensity": { "type": "float", "value": 1.0 }
     }

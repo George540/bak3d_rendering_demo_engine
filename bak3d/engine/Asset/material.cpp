@@ -162,6 +162,12 @@ void Material::load_from_file(const string& path)
                 }
             }
         }
+        else if (type == "samplerCube")
+        {
+            const string cubemap_name = val.get<string>();
+            set_int(uniform_name, 0);
+            m_texture_names[aiTextureType_DIFFUSE] = cubemap_name;
+        }
         else
         {
             throw runtime_error("Unknown uniform type: " + type);

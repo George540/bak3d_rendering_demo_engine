@@ -77,8 +77,6 @@ void Environment::end_frame()
 
 void Environment::draw_skybox_settings()
 {
-    const bool has_skybox = ResourceManager::Textures.contains("skybox");
-
     bool skybox_enabled = GlobalSettings::get_global_setting_value<bool>(GlobalSettingOption::Skybox_Enabled);
     if (ImGuiB3D::PropertyToggle("Skybox", &skybox_enabled, "Render the skybox behind the scene."))
     {
@@ -97,23 +95,40 @@ void Environment::draw_skybox_settings()
             GlobalSettings::set_global_setting<int>(GlobalSettingOption::Skybox_Mode, mode);
         }
 
-        if (static_cast<SkyboxMode>(mode) == SkyboxMode::Cubemap && !has_skybox)
+        // Image selection
+        if (static_cast<SkyboxMode>(mode) == SkyboxMode::Cubemap)
         {
-            ImGui::TextDisabled("Cubemap faces not found in assets/skybox.");
-        }
+            if (ResourceManager::Cubemaps.empty())
+            {
+                ImGui::TextDisabled("No cubemaps found in assets/skybox.");
+            }
+            else
+            {
+                const string cubemap_file_name = GlobalSettings::get_global_setting_value<string>(GlobalSettingOption::Skybox_Cubemap);
+                string cubemap_name = FileLoader::get_name_from_filename(cubemap_file_name);
+                const string before_pick = cubemap_name;
 
-        // Color
-        glm::vec3 color = GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color);
-        if (ImGuiB3D::ColorPicker3("Color", &color, "Multiplies the skybox color."))
-        {
-            GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Color, color);
-        }
+                ImTextureID preview_id = 0;
+                if (ResourceManager::Cubemaps.contains(cubemap_name))
+                {
+                    preview_id = ImGuiB3D::GetAssetPreviewTextureId(ResourceManager::Cubemaps.get(cubemap_name).ref()->asset);
+                }
 
-        // Intensity
-        float intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Skybox_Intensity);
-        if (ImGuiB3D::PropertyDragFloat("Intensity", &intensity, 0.1f, 0.0f, 5.0f, "%.2f", "Brightness multiplier of the skybox."))
-        {
-            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Skybox_Intensity, intensity);
+                if (ImGuiB3D::PropertyImageButton("Cubemap", "Select the cubemap image used by the skybox.", preview_id, ImVec2(50.0f, 50.0f), ImVec2(0, 1), ImVec2(1, 0)))
+                {
+                    ImGui::OpenPopup("##picker_skybox_cubemap");
+                }
+
+                ImGuiB3D::AssetPickerPopup("##picker_skybox_cubemap", "Cubemaps", ResourceManager::Cubemaps, &cubemap_name);
+
+                ImGui::SameLine();
+                ImGui::Text("%s", cubemap_name.c_str());
+
+                if (cubemap_name != before_pick)
+                {
+                    GlobalSettings::set_global_setting<string>(GlobalSettingOption::Skybox_Cubemap, cubemap_name);
+                }
+            }
         }
 
         // Rotation
@@ -126,6 +141,20 @@ void Environment::draw_skybox_settings()
         if (ImGui::Button("Reset##SkyboxRotation"))
         {
             GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Rotation, glm::vec3(0.0f));
+        }
+
+        // Color
+        glm::vec3 color = GlobalSettings::get_global_setting_value<glm::vec3>(GlobalSettingOption::Skybox_Color);
+        if (ImGuiB3D::ColorPicker3("Color", &color, "Multiplies the skybox color."))
+        {
+            GlobalSettings::set_global_setting<glm::vec3>(GlobalSettingOption::Skybox_Color, color);
+        }
+
+        // Intensity
+        float intensity = GlobalSettings::get_global_setting_value<float>(GlobalSettingOption::Skybox_Intensity);
+        if (ImGuiB3D::PropertyDragFloat("Intensity", &intensity, 0.01f, 0.0f, 3.0f, "%.2f", "Brightness multiplier of the skybox."))
+        {
+            GlobalSettings::set_global_setting<float>(GlobalSettingOption::Skybox_Intensity, intensity);
         }
 
         ImGui::TreePop();

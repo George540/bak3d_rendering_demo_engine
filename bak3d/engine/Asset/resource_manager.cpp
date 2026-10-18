@@ -58,6 +58,7 @@ namespace
 // Instantiate static variables
 ResourceMap<Shader> ResourceManager::Shaders;
 ResourceMap<Texture2D> ResourceManager::Textures;
+ResourceMap<Texture2D> ResourceManager::Cubemaps;
 ResourceMap<Material> ResourceManager::Materials;
 ResourceMap<Model> ResourceManager::Models;
 ResourceMap<PrimitiveData> ResourceManager::Meshes;
@@ -190,6 +191,10 @@ void ResourceManager::initialize_predefined_textures()
     auto image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), FileType::png);
     for (const auto& [file_name, file_path] : image_files)
     {
+        if (file_path.contains("/skybox/"))
+        {
+            continue;
+        }
         filesystem::path path(file_path);
         bool is_editor_texture = path.parent_path().filename() == "editor";
         add_texture(file_name, new Texture2D(file_path, file_name, is_editor_texture));
@@ -198,6 +203,10 @@ void ResourceManager::initialize_predefined_textures()
     image_files = FileLoader::get_files_by_type_with_path(string(BAK3D_ASSETS_DIR), FileType::jpg);
     for (const auto& [file_name, file_path] : image_files)
     {
+        if (file_path.contains("/skybox/"))
+        {
+            continue;
+        }
         filesystem::path path(file_path);
         bool is_editor_texture = path.parent_path().filename() == "editor";
         add_texture(file_name, new Texture2D(file_path, file_name, is_editor_texture));
@@ -208,17 +217,15 @@ void ResourceManager::initialize_predefined_textures()
 
 void ResourceManager::initialize_predefined_cubemaps()
 {
-    const string directory = (filesystem::path(BAK3D_ASSETS_DIR) / "skybox").generic_string();
+    auto files = FileLoader::get_files_by_types_with_path(filesystem::path(BAK3D_ASSETS_DIR) / "skybox", { FileType::png, FileType::jpg });
+    ranges::sort(files);
 
-    auto* skybox = new Texture2D(directory, "DefaultSkybox", CubemapImageData());
-    if (skybox->get_texture_id() == 0)
+    for (const auto& [name, path] : files)
     {
-        B3D_LOG_WARNING("Skybox cubemap not loaded. Expected 6 square faces in %s.", directory.c_str());
-        delete skybox;
-        return;
+        add_cubemap(name, new Texture2D(path, name, CubemapImageData{}));
     }
-    add_texture("skybox", skybox);
 }
+
 
 void ResourceManager::initialize_models()
 {

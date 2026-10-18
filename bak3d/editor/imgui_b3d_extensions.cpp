@@ -369,7 +369,7 @@ void ImGuiB3D::AssetTooltip(const Asset* asset)
     const auto* texture_asset = dynamic_cast<const Texture2D*>(asset);
     const GLuint thumbnail_id = asset->get_thumbnail_id();
     ImTextureID texture_id;
-    if (texture_asset)
+    if (texture_asset && !texture_asset->is_cubemap())
     {
         texture_id = texture_asset->get_texture_id();
     }
@@ -432,7 +432,7 @@ ImTextureID ImGuiB3D::GetAssetPreviewTextureId(const Asset* asset)
     {
         return 0;
     }
-    if (const auto* texture = dynamic_cast<const Texture2D*>(asset))
+    if (const auto* texture = dynamic_cast<const Texture2D*>(asset); texture && !texture->is_cubemap())
     {
         return texture->get_texture_id();
     }

@@ -44,7 +44,7 @@ struct CubemapImageData
     int height = 0;
     std::array<std::vector<unsigned char>, 6> faces;
 
-    bool is_valid() const { return width > 0 && width == height && !faces[0].empty(); }
+    bool is_valid() const { return width > 0 && !faces[0].empty(); }
 };
 
 /*
@@ -67,6 +67,7 @@ public:
 
     GLuint get_texture_id() const { return m_texture_id; }
     GLenum get_target() const { return m_target; }
+    bool is_cubemap() const { return m_target == GL_TEXTURE_CUBE_MAP; }
     int get_width() const { return m_width; }
     int get_height() const { return m_height; }
     int get_nb_color_channels() const { return m_nb_color_channels; }
