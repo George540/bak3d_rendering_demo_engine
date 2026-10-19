@@ -97,7 +97,6 @@ Development will start Fall 2026
 |:ballot_box_with_check:| **Bonus: FPV movement** | make camera move around the scene without just being restricted in orbit. |
 
 ### [v1.5 - The Advanced Engine World at Scale](https://github.com/George540/Bak3DEngine/milestone/3)
-Development will start 2027 TBD
 | Status | Feature | Description |
 | :---: | :--- | :--- |
 |☐| **LUT Atmosphere** | Render realistic sky and atmosphere using LUT atmospheric scattering. |
@@ -110,7 +109,7 @@ Development will start 2027 TBD
 |☐| **Level Editor** | Full ECS, play-in-viewport, multi-level editor with prefabs, expanding the current Scene Graph structure |
 
 ### [v1.6 - Project Tempest](https://github.com/George540/Bak3DEngine/milestone/3)
-Development will start 2028 TBD (Big Project and just an idea. Taking the engine to the next level that will be more high-end and artist friendly.)
+Big Project and just an idea. Taking the engine to the next level that will be more high-end and artist friendly.
 | Status | Feature | Description |
 | :---: | :--- | :--- |
 |☐| **Editor QoL** | Asset editor visualizers, shader editors, multi-entity editing, etc |
