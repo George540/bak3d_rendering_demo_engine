@@ -162,10 +162,11 @@ Shader::Shader()
     shader_stage_sources.emplace(GL_FRAGMENT_SHADER, filesystem::absolute("shaders/line.frag").string());
 }
 
-Shader::Shader(const ShaderStageMap& shader_stage_sources, const string& shader_name)
-    : Asset(shader_stage_sources.begin()->second, shader_name)
-    , m_stages(shader_stage_sources)
-    , m_compiled(false)
+Shader::Shader(ShaderStageMap stages, string name)
+    : Asset(stages.begin()->second,
+    move(name)),
+    m_stages(std::move(stages)),
+    m_compiled(false)
 {
     build();
 }

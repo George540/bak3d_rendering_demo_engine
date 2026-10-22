@@ -143,7 +143,7 @@ void ParticleSystem::draw() const
     (*m_material_slot)->get_shader()->unuse();
 }
 
-ParticleEmitter* ParticleSystem::add_emitter(const string& name, const ParticleEmitterConfig& cfg)
+ParticleEmitter* ParticleSystem::add_emitter(const string& name, const ParticleEmitterConfig& emitter_config)
 {
     // Guard against duplicate names
     string unique_name = name;
@@ -160,14 +160,14 @@ ParticleEmitter* ParticleSystem::add_emitter(const string& name, const ParticleE
         B3D_LOG_INFO("ParticleSystem: emitter name '%s' already exists, renamed to '%s'.", name.c_str(), unique_name.c_str());
     }
 
-    auto emitter = make_unique<ParticleEmitter>(unique_name, cfg);
+    auto emitter = make_unique<ParticleEmitter>(unique_name, move(emitter_config));
     ParticleEmitter* raw = emitter.get();
     m_emitters.push_back(std::move(emitter));
 
     m_emitter_gpu[unique_name];
     ensure_ibo_capacity(*raw);
 
-    B3D_LOG_INFO("ParticleSystem: emitter '%s' added (%d max particles).", unique_name.c_str(), cfg.max_particles);
+    B3D_LOG_INFO("ParticleSystem: emitter '%s' added (%d max particles).", unique_name.c_str(), emitter_config.max_particles);
 
     return raw;
 }

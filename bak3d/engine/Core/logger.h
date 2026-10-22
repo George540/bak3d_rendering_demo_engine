@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include <chrono>
 #include <cstdio>
+#include <deque>
 
 #include "global_definitions.h"
 #include "Asset/file_loader.h"
@@ -70,8 +71,7 @@ inline const char* to_string(LogLevel e)
 
 struct LogEntry
 {
-    std::string header_buffer;
-    std::string log_buffer;
+    std::string header_buffer, log_buffer, full_text;
     LogLevel log_level;
 };
 
@@ -83,9 +83,12 @@ class Logger
 public:
     static void initialize();
     static void shutdown();
+
     template<typename... Args>
-    static void print_log(const char* file, int line, LogLevel level, const char* fmt, Args... args)
+    static void print_log(const char* file, int line, LogLevel level, const char* fmt, Args&&... args)
     {
+        static_assert((std::is_trivially_copyable_v<std::decay_t<Args>> && ...), "printf-style logging: pass .c_str(), never std::string");
+
         const char* tag = "LOG";
         switch (level)
         {
@@ -100,7 +103,7 @@ public:
         int length = std::snprintf(header_buffer, sizeof(header_buffer), "[%s][%s] %s:%d - ", elapsed_time_formatted.c_str(), tag, file, line);
 
         char log_buffer[512];
-        length = std::snprintf(log_buffer, sizeof(log_buffer), fmt, args...);
+        std::snprintf(log_buffer, sizeof(log_buffer), fmt, std::forward<Args>(args)...);
 
         LogEntry log_entry;
         log_entry.log_level = level;
@@ -111,25 +114,23 @@ public:
         {
             log_entry.log_buffer.pop_back();
         }
+        log_entry.full_text = log_entry.header_buffer + log_entry.log_buffer;
 
+        FileLoader::write_save_export_to_log_file_immediate(log_entry.full_text);
         if (log_entries.size() >= MAX_LOG_ENTRIES)
         {
-            log_entries.erase(log_entries.begin());
+            log_entries.pop_front();
         }
-
-        log_entries.push_back(log_entry);
-
-        const std::string full_log = log_entry.header_buffer + log_entry.log_buffer;
-        FileLoader::write_save_export_to_log_file_immediate(full_log);
+        log_entries.push_back(std::move(log_entry));
     }
 
-    static std::vector<LogEntry>& get_log_entries() { return log_entries; }
+    static std::deque<LogEntry>& get_log_entries() { return log_entries; }
     static void clear_log_entries() { log_entries.clear(); }
 private:
     static std::string get_elapsed_time_formatted();
 
     static std::chrono::steady_clock::time_point start_time;
-    static std::vector<LogEntry> log_entries;
+    static std::deque<LogEntry> log_entries;
 };
 
 #define B3D_LOG_INFO(fmt, ...) \

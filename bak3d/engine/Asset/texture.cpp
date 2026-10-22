@@ -69,7 +69,7 @@ Texture2D::Texture2D(const string& path, const string& file_name, const bool is_
             internal_format = GL_SRGB_ALPHA; 
             break;
         default: 
-            B3D_LOG_ERROR("Invalid texture format for texture %s with ID %d", file_name, m_texture_id); 
+            B3D_LOG_ERROR("Invalid texture format for texture %s with ID %d", file_name.c_str(), m_texture_id); 
             stbi_image_free(data);
             return;
         }

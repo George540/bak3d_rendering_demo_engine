@@ -36,11 +36,10 @@ class Asset : public Bak3DObject
 {
 public:
     Asset() = default;
-    Asset(const std::string& path, const std::string& asset_name) : Bak3DObject(asset_name), m_path(path)
+    Asset(const std::string& path, const std::string& asset_name) : Bak3DObject(std::move(asset_name)), m_path(std::move(path))
     {
         m_directory = m_path.substr(0, m_path.find_last_of('/'));
-        m_file_name = path.substr(m_path.find_last_of('/') + 1);
-        m_object_name = asset_name;
+        m_file_name = m_path.substr(m_path.find_last_of('/') + 1);
     }
     
     virtual ~Asset() = 0;

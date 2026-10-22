@@ -40,7 +40,7 @@ public:
     void update(float dt) override;
     void draw() const override;
 
-    ParticleEmitter* add_emitter(const std::string& name = PARTICLE_EMITTER_DEFAULT_NAME, const ParticleEmitterConfig& cfg = {});
+    ParticleEmitter* add_emitter(const std::string& name = PARTICLE_EMITTER_DEFAULT_NAME, const ParticleEmitterConfig& emitter_config = {});
     void remove_emitter(const std::string& name);
     void remove_last_emitter();
     ParticleEmitter* get_emitter(const std::string& name) const;

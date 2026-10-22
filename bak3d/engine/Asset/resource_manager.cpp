@@ -123,7 +123,7 @@ void ResourceManager::initialize_shaders()
             ShaderStageMap shader_stage_map;
             shader_stage_map.emplace(GL_VERTEX_SHADER, vert_path);
             shader_stage_map.emplace(GL_FRAGMENT_SHADER, frag_path);
-            Shader* new_graphics_shader = new Shader(shader_stage_map, shader_name);
+            Shader* new_graphics_shader = new Shader(move(shader_stage_map), shader_name);
             add_shader(shader_name, new_graphics_shader);
         }
         else
@@ -156,10 +156,10 @@ void ResourceManager::initialize_shaders()
         // Create new shader stage map for each shader creation fixes this issue.
         const auto make_quad_paired_shader = [&](const std::string& fragment_name)
         {
-            ShaderStageMap map;
-            map.emplace(GL_VERTEX_SHADER, shaders_to_match["quad"]);
-            map.emplace(GL_FRAGMENT_SHADER, shaders_to_match[fragment_name]);
-            add_shader(fragment_name, new Shader(map, fragment_name));
+            ShaderStageMap shader_stage_map;
+            shader_stage_map.emplace(GL_VERTEX_SHADER, shaders_to_match["quad"]);
+            shader_stage_map.emplace(GL_FRAGMENT_SHADER, shaders_to_match[fragment_name]);
+            add_shader(fragment_name, new Shader(move(shader_stage_map), fragment_name));
         };
 
         make_quad_paired_shader("color_grading");
@@ -173,7 +173,7 @@ void ResourceManager::initialize_shaders()
         ShaderStageMap shader_stage_map;
         shader_stage_map.emplace(GL_COMPUTE_SHADER, file_path);
         auto shader_name = FileLoader::get_name_from_filename(file_name);
-        add_shader(shader_name, new Shader(shader_stage_map, shader_name));
+        add_shader(shader_name, new Shader(move(shader_stage_map), shader_name));
     }
 
     if (Shaders.empty())
@@ -238,23 +238,17 @@ void ResourceManager::initialize_models()
 
 void ResourceManager::initialize_predefined_meshes()
 {
+    const auto add_geometry = [](const char* name, MeshGeometry&& g)   // binds to the prvalue, no copy
+    {
+        add_mesh(name, new MeshData(std::move(g.vertices), std::move(g.indices), name));
+    };
     add_mesh("Grid", new GridData());
     add_mesh("Quad", new QuadData());
-
-    const auto cube_geometry = MeshFactory::build_cube_geometry();
-    add_mesh("Cube", new MeshData(cube_geometry.vertices, cube_geometry.indices, "Cube"));
-
-    const auto plane_geometry = MeshFactory::build_plane_geometry();
-    add_mesh("Plane", new MeshData(plane_geometry.vertices, plane_geometry.indices, "Plane"));
-
-    const auto sphere_geometry = MeshFactory::build_sphere_geometry();
-    add_mesh("Sphere", new MeshData(sphere_geometry.vertices, sphere_geometry.indices, "Sphere"));
-
-    const auto cylinder_geometry = MeshFactory::build_cylinder_geometry();
-    add_mesh("Cylinder", new MeshData(cylinder_geometry.vertices, cylinder_geometry.indices, "Cylinder"));
-
-    const auto torus_geometry = MeshFactory::build_torus_geometry();
-    add_mesh("Torus", new MeshData(torus_geometry.vertices, torus_geometry.indices, "Torus"));
+    add_geometry("Cube", MeshFactory::build_cube_geometry());
+    add_geometry("Plane", MeshFactory::build_plane_geometry());
+    add_geometry("Sphere", MeshFactory::build_sphere_geometry());
+    add_geometry("Cylinder", MeshFactory::build_cylinder_geometry());
+    add_geometry("Torus", MeshFactory::build_torus_geometry());
 
     // Debug meshes for debug geometry overlays in the scene
     const auto line_debug_geometry = MeshFactory::build_line_geometry();

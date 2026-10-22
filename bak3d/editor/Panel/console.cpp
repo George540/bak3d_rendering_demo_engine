@@ -145,8 +145,7 @@ void Console::draw_log_table()
         int current_log_index = 0;
         for (const auto& log_entry : Logger::get_log_entries())
         {
-            string full_log = log_entry.header_buffer + log_entry.log_buffer;
-            if (search_buffer[0] != '\0' && !ImGuiB3D::StringContainsIgnoreCase(full_log, string(search_buffer)))
+            if (search_buffer[0] != '\0' && !ImGuiB3D::StringContainsIgnoreCase(log_entry.full_text, string(search_buffer)))
             {
                 continue;
             }
@@ -176,7 +175,7 @@ void Console::draw_log_table()
                 break;
             }
             const string label = to_string(current_log_index++) + log_entry.header_buffer;
-            ImGuiB3D::InteractableMultilineText(label, full_log, log_color);
+            ImGuiB3D::InteractableMultilineText(label, log_entry.full_text, log_color);
         }
 
         if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())

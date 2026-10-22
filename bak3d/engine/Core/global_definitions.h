@@ -371,9 +371,9 @@ using MaterialSlot = std::shared_ptr<MaterialRef>;
 using MeshSlot = std::shared_ptr<MeshRef>;
 
 // Helper to create a slot preloaded with an asseted slot
-inline MaterialSlot make_material_slot(const MaterialRef& mat)
+inline MaterialSlot make_material_slot(MaterialRef mat)
 {
-    return std::make_shared<MaterialRef>(mat);
+    return std::make_shared<MaterialRef>(std::move(mat));
 }
 
 inline MaterialSlot make_material_slot()
@@ -381,9 +381,9 @@ inline MaterialSlot make_material_slot()
     return std::make_shared<MaterialRef>(nullptr);
 }
 
-inline MeshSlot make_mesh_slot(const MeshRef& mesh)
+inline MeshSlot make_mesh_slot(MeshRef mesh)
 {
-    return std::make_shared<MeshRef>(mesh);
+    return std::make_shared<MeshRef>(std::move(mesh));
 }
 
 inline MeshSlot make_mesh_slot()

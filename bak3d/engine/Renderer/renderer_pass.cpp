@@ -37,9 +37,13 @@ namespace
 {
     bool is_deferred_tagged(const Mesh* mesh)
     {
-        return mesh->get_material()
-            && mesh->get_material()->get_shader()
-            && mesh->get_material()->get_shader()->get_object_name() == "gbuffer";
+        const MaterialRef& material = mesh->get_material();
+        if (!material)
+        {
+            return false;
+        }
+        const ShaderRef& shader = material->get_shader();
+        return shader && shader->get_object_name() == "gbuffer";
     }
 }
 

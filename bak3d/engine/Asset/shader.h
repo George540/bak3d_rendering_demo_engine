@@ -46,7 +46,7 @@ private:
 public:
 	// Constructor
 	Shader();
-	Shader(const ShaderStageMap& shader_stage_sources, const std::string& shader_name);
+	Shader(ShaderStageMap stages, std::string name);
 	Shader(const Shader& other_shader);
 	~Shader() override;
 

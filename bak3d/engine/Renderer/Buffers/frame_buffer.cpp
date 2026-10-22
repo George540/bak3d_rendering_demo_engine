@@ -299,7 +299,7 @@ void FrameBuffer::create_framebuffer()
     // Verify framebuffer is complete
     if (const GLenum status = glCheckFramebufferStatus(m_target); status != GL_FRAMEBUFFER_COMPLETE)
     {
-        B3D_LOG_ERROR("Framebuffer %s is not complete! Status: 0x%x", m_debug_name, status);
+        B3D_LOG_ERROR("Framebuffer %s is not complete! Status: 0x%x", m_debug_name.c_str(), status);
     }
 
     label_resources();

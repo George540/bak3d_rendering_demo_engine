@@ -59,7 +59,7 @@ public:
     const std::string& get_name() const { return m_name; }
 
     TextureRef get_texture() const { return m_texture; }
-    void set_texture(const TextureRef& tex) { m_texture = tex; }
+    void set_texture(TextureRef texture) { m_texture = std::move(texture); }
 
     bool is_enabled() const { return m_enabled; }
     void set_enabled(bool enabled) { m_enabled = enabled; }

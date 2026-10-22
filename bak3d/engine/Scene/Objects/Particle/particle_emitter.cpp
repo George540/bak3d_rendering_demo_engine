@@ -42,8 +42,8 @@ namespace
 #include "particle_emitter.h"
 
 ParticleEmitter::ParticleEmitter(const string& name, ParticleEmitterConfig config)
-    : m_name(name)
-    , m_config(std::move(config))
+    :  m_name(move(name))
+    , m_config(move(config))
 {
     resize_pool(m_config.max_particles);
     m_prev_max_particles = m_config.max_particles;
@@ -149,7 +149,7 @@ void ParticleEmitter::draw() const
 void ParticleEmitter::apply_config(const ParticleEmitterConfig& cfg)
 {
     const bool needs_resize = (cfg.max_particles != m_config.max_particles);
-    m_config = cfg;
+    m_config = move(cfg);
 
     if (needs_resize)
     {

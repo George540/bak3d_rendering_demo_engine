@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #pragma once
 
+#include <memory>
 #include <glm/fwd.hpp>
 
 #include "transform.h"
@@ -54,7 +55,7 @@ public:
     bool is_active = true;
 
     SceneObject() : SceneObject(glm::vec3(0.0f, 0.0f, 0.0f), "SceneObject") {}
-    SceneObject(const glm::vec3 position, const std::string& name) : Bak3DObject(name) { transform.set_local_position(position); }
+    SceneObject(const glm::vec3 position, const std::string& name) : Bak3DObject(std::move(name)) { transform.set_local_position(position); }
     ~SceneObject() override = default;
 
     // If no arguments, default constructor is called instead for the called class.

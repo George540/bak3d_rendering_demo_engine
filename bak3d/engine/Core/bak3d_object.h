@@ -40,7 +40,7 @@ public:
     {
         m_object_id = generate_unique_id();
     }
-    Bak3DObject(const std::string& name) : Bak3DObject() { m_object_name = name; }
+    Bak3DObject(std::string name) : Bak3DObject() { m_object_name = std::move(name); }
     virtual ~Bak3DObject() = 0;
 
     const std::string& get_object_name() const { return m_object_name; }

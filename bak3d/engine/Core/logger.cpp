@@ -27,7 +27,7 @@ THE SOFTWARE.
 using namespace std;
 
 chrono::steady_clock::time_point Logger::start_time = chrono::steady_clock::now();
-vector<LogEntry> Logger::log_entries = {};
+deque<LogEntry> Logger::log_entries = {};
 
 void Logger::initialize()
 {

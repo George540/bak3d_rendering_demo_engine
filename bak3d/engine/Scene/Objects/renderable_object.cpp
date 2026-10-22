@@ -37,7 +37,7 @@ THE SOFTWARE.
 using namespace std;
 
 RenderableObject::RenderableObject(const MaterialRef& material, const glm::vec3 position, const std::string& name)
-	: SceneObject(position, name)
+	: SceneObject(position, move(name))
 {
 	// Make sure that the default material is used as a fallback
 	m_material_slot = make_material_slot(material ? material : ResourceManager::get_material("default_material"));
